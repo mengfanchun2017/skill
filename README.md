@@ -52,6 +52,8 @@
 | `lark-drive` | 飞书云空间 |
 | `lark-calendar` | 飞书日历 |
 
+**官方安装地址**：[github.com/larksuite/cli](https://github.com/larksuite/cli) / `npm install -g @larksuite/cli`（拿到完整 CLI + 26 个 skill）
+
 ### 辅助工具 — 来自 [vinvcn/mattpocock-skills-zh-CN](https://github.com/vinvcn/mattpocock-skills-zh-CN)
 
 | Skill | 说明 |
@@ -67,11 +69,16 @@
 
 ## 安装前置
 
-**lark-* 8 个 skill** 需要先装 [lark-cli](https://github.com/larksuite/cli)：
+**lark-* 8 个 skill** 是 larksuite/cli 官方维护。两种装法：
 ```bash
+# 方式 A：官方 npm 装 lark-cli（推荐，CLI 命令 + 26 个 skill 全有）
 npm install -g @larksuite/cli
 lark-cli auth login
+
+# 方式 B：本 marketplace 只装 skill（不开 CLI 功能）
+# /plugin install lark-base@mengfanchun2017-skills
 ```
+> 方式 A 拿完整 CLI + skill，方式 B 只拿 skill 走 Claude Code 编排。**不要重复装**（CLI 装过就别 marketplace 装 lark-*）。
 
 **f-vessel** 需要先装 [Vessel AI 浏览器](https://github.com/unmodeled-tyler/vessel-browser)：
 ```bash
@@ -104,6 +111,7 @@ claude-skills/                          ← 单聚合 marketplace 仓
 
 **为什么用 marketplace 引用而不是复制**：
 - lark-* 来自 larksuite/cli，三方来自 mattpocock-skills-zh-CN，**这些是上游社区维护**，不在我仓里更对（避免重复维护、跟官方版本错位）
+- 用户想要 lark 完整功能（CLI + skill）走官方 `npm install -g @larksuite/cli`；只要 skill 走本 marketplace
 - 我的贡献是 `f-*` 编排层（飞书/调研/PPT/PDF/浏览器）和集成经验（option-vessel/）
 
 ## 许可
