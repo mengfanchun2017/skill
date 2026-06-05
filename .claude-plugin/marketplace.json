@@ -7,7 +7,7 @@
   },
   "metadata": {
     "description": "mengfanchun2017 的 Claude Code skill 集合 — 自建 + 飞书 CLI + 辅助工具",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "homepage": "https://github.com/mengfanchun2017/claude-skills"
   },
   "plugins": [
@@ -15,6 +15,15 @@
       "name": "f-doc",
       "description": "统一文档入口 — 创建飞书wiki/表格/白板/PPT、更新报告、整合/拆分文档、飞书↔Office双向转换、文档对比。 Use when 用户说\"创建文档\"/\"写文档\"、\"更新文档\"/\"更新报告\"、\"整合文档\"/\"合并文档\"、 \"拆分文档\"、\"导出Word/PPT\"、\"飞书转Office\"、\"导入到飞书\"、\"对比文档\"、\"生成PPT\"、 \"画架构图\"/\"画流程图\"、或给出飞书文档URL要求操作。",
       "source": "./plugins/f-doc",
+      "version": "0.1.0",
+      "keywords": [
+        "f"
+      ]
+    },
+    {
+      "name": "f-report-std",
+      "description": "报告写作横向规范 — 内容结构、数据呈现、论证逻辑、图表约定。4 套模板（研究/分析/对比/方案）+ 通用规则。Use when 用户说\"写报告\"/\"出报告\"/\"分析报告\"/\"对比报告\"/\"方案报告\"，或任何需要产出\"长篇正式文档\"的场景。被 f-research-report 和 f-logme 委托调用。",
+      "source": "./plugins/f-report-std",
       "version": "0.1.0",
       "keywords": [
         "f"
@@ -58,7 +67,7 @@
     },
     {
       "name": "f-research-report",
-      "description": "报告生成 — 读 JSON / 大纲 / 自由素材 → 结构化 markdown 报告。 3 种输入模式，按用户场景自动选择。内容规范委派 f-report-framework。 飞书输出委派 f-doc（图子文档工作流 G）。",
+      "description": "报告生成 — 读 JSON / 大纲 / 自由素材 → 结构化 markdown 报告。 3 种输入模式，按用户场景自动选择。内容规范委派 f-report-std。 飞书输出委派 f-doc（图子文档工作流 G）。",
       "source": "./plugins/f-research-report",
       "version": "0.1.0",
       "keywords": [
