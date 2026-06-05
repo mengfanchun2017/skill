@@ -1,6 +1,6 @@
 # claude-skills — mengfanchun2017 的 Claude Code skill 集合
 
-> Claude Code 技能聚合仓。21 个 skill，**一个 marketplace，一次安装**。
+> Claude Code 技能聚合仓。**7 个自建 + 14 个外部引用**，一个 marketplace，一次安装。
 > 飞书 / 调研 / 文档 / PPT / PDF / AI 浏览器一站式。
 
 ## 快速开始
@@ -17,7 +17,6 @@
 /plugin install f-pdf@mengfanchun2017-skills
 /plugin install f-doc@mengfanchun2017-skills
 /plugin install f-research@mengfanchun2017-skills
-# ...
 ```
 
 后续更新：
@@ -26,25 +25,21 @@
 /plugin marketplace update mengfanchun2017-skills
 ```
 
-## 包含的 skill（21 个）
-
-### 文档 / PPT / PDF
+## 自建 skill（7 个，仓内）
 
 | Skill | 说明 |
 |-------|------|
 | `f-doc` | 飞书文档统一入口（wiki/表格/白板/PPT、报告整合/拆分/转换/对比） |
 | `f-ppt` | PPT 生成（双引擎：ppt-master + OfficeCLI） |
 | `f-pdf` | PDF 内容提取（PyMuPDF：文字/图片/表格/元数据） |
-| `f-research-report` | 报告生成（JSON/大纲/素材 → 结构化 Markdown） |
-
-### 调研
-
-| Skill | 说明 |
-|-------|------|
 | `f-research` | 快速研究（三源并行：Tavily + MiniMax + WebSearch） |
 | `f-research-deep` | 深度研究（批量 JSON 输出） |
+| `f-research-report` | 报告生成（JSON/大纲/素材 → 结构化 Markdown） |
+| `f-vessel` | AI 浏览器操控（Vessel MCP，需配套 option-vessel/ 安装器） |
 
-### 飞书（依赖 lark-cli）
+## 外部 skill（14 个，marketplace.json 引用，自动跟官方更新）
+
+### 飞书 — 来自 [larksuite/cli](https://github.com/larksuite/cli)
 
 | Skill | 说明 |
 |-------|------|
@@ -57,17 +52,18 @@
 | `lark-drive` | 飞书云空间 |
 | `lark-calendar` | 飞书日历 |
 
-### 浏览器 / 调试 / 工具
+### 辅助工具 — 来自 [vinvcn/mattpocock-skills-zh-CN](https://github.com/vinvcn/mattpocock-skills-zh-CN)
 
 | Skill | 说明 |
 |-------|------|
-| `f-vessel` | AI 浏览器操控（Vessel MCP，需配套 option-vessel/ 安装器） |
 | `caveman` | 超压缩输出模式（节省 ~75% token） |
 | `diagnose` | 纪律化 bug 诊断循环 |
 | `grill-me` | 设计审查 interview |
 | `improve-codebase-architecture` | 架构深化优化 |
 | `write-a-skill` | 创建新 skill |
 | `zoom-out` | 代码全景视角 |
+
+> 这些 skill 不在仓内实体，marketplace.json 用 `source: {source: "github", repo: ..., path: ...}` 引用。安装时从原仓库拉取，**自动跟官方更新**。
 
 ## 安装前置
 
@@ -87,14 +83,16 @@ bash option-vessel/init.sh   # 仓内已带安装器
 ```
 claude-skills/                          ← 单聚合 marketplace 仓
 ├── .claude-plugin/
-│   └── marketplace.json                # 21 个 plugin 入口
-├── plugins/                            ← 各 skill 实体
-│   ├── f-pdf/.claude-plugin/plugin.json
+│   └── marketplace.json                # 21 个 plugin 入口（7 本地 + 14 外部）
+├── plugins/                            ← 7 个自建 plugin
 │   ├── f-pdf/SKILL.md
-│   ├── f-pdf/...
-│   ├── f-ppt/
-│   ├── ...
-│   └── zoom-out/
+│   ├── f-ppt/SKILL.md
+│   ├── f-research/SKILL.md
+│   ├── f-research-deep/SKILL.md
+│   ├── f-research-report/SKILL.md
+│   ├── f-doc/SKILL.md
+│   ├── f-vessel/SKILL.md
+│   └── skill-template/                 # 脚手架（开发用）
 ├── option-vessel/                      # f-vessel 配套安装器
 │   ├── init.sh
 │   └── README.md
@@ -104,9 +102,9 @@ claude-skills/                          ← 单聚合 marketplace 仓
 └── LICENSE
 ```
 
-**两层 .claude-plugin**：
-- 仓根 `.claude-plugin/marketplace.json`：Claude Code 用这个找"这个仓是 marketplace"
-- 每个 plugin 内 `.claude-plugin/plugin.json`（自动生成）：描述**这个** plugin
+**为什么用 marketplace 引用而不是复制**：
+- lark-* 来自 larksuite/cli，三方来自 mattpocock-skills-zh-CN，**这些是上游社区维护**，不在我仓里更对（避免重复维护、跟官方版本错位）
+- 我的贡献是 `f-*` 编排层（飞书/调研/PPT/PDF/浏览器）和集成经验（option-vessel/）
 
 ## 许可
 
@@ -114,11 +112,14 @@ MIT — 见 [LICENSE](LICENSE)
 
 ## English Summary
 
-21 Claude Code skills in a single marketplace repo. Install via:
+A Claude Code marketplace with 7 original skills + 14 external references:
 
+- **Self-built (in repo)**: f-doc, f-ppt, f-pdf, f-research, f-research-deep, f-research-report, f-vessel
+- **Feishu CLI (from `larksuite/cli`)**: lark-shared, lark-doc, lark-base, lark-sheets, lark-wiki, lark-whiteboard, lark-drive, lark-calendar
+- **Utilities (from `vinvcn/mattpocock-skills-zh-CN`)**: caveman, diagnose, grill-me, improve-codebase-architecture, write-a-skill, zoom-out
+
+Install:
 ```
 /plugin marketplace add mengfanchun2017/claude-skills
-/plugin install <skill-name>@mengfanchun2017-skills
+/plugin install <skill>@mengfanchun2017-skills
 ```
-
-Categories: docs (f-doc/f-ppt/f-pdf/f-research-report), research (f-research/f-research-deep), Feishu (8 lark-* skills via lark-cli), AI browser (f-vessel + option-vessel installer), dev tools (caveman/diagnose/grill-me/improve-codebase-architecture/write-a-skill/zoom-out).
