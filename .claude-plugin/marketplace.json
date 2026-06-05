@@ -84,185 +84,34 @@
       ]
     },
     {
-      "name": "caveman",
-      "description": "超压缩输出模式（mattpocock-skills-zh-CN）",
+      "name": "mattpocock-skills",
+      "description": "mattpocock/skills 简体中文本地化版（18 个 skill：caveman/diagnose/grill-me/grill-with-docs/improve-codebase-architecture/tdd/to-issues/to-prd/triage/zoom-out/prototype/handoff/write-a-skill/git-guardrails-claude-code/migrate-to-shoehorn/scaffold-exercises/setup-pre-commit/setup-matt-pocock-skills）。一次安装暴露全部 skill，避免 subdir 拆分导致 6× 重复 cache。",
       "source": {
         "source": "github",
-        "repo": "vinvcn/mattpocock-skills-zh-CN",
-        "path": "skills/caveman"
+        "repo": "vinvcn/mattpocock-skills-zh-CN"
       },
       "version": "0.1.0",
       "keywords": [
-        "caveman"
-      ]
-    },
-    {
-      "name": "diagnose",
-      "description": "纪律化 bug 诊断循环（mattpocock-skills-zh-CN）",
-      "source": {
-        "source": "github",
-        "repo": "vinvcn/mattpocock-skills-zh-CN",
-        "path": "skills/diagnose"
-      },
-      "version": "0.1.0",
-      "keywords": [
-        "diagnose"
-      ]
-    },
-    {
-      "name": "grill-me",
-      "description": "设计审查 interview（mattpocock-skills-zh-CN）",
-      "source": {
-        "source": "github",
-        "repo": "vinvcn/mattpocock-skills-zh-CN",
-        "path": "skills/grill-me"
-      },
-      "version": "0.1.0",
-      "keywords": [
-        "grill"
-      ]
-    },
-    {
-      "name": "improve-codebase-architecture",
-      "description": "架构深化优化（mattpocock-skills-zh-CN）",
-      "source": {
-        "source": "github",
-        "repo": "vinvcn/mattpocock-skills-zh-CN",
-        "path": "skills/improve-codebase-architecture"
-      },
-      "version": "0.1.0",
-      "keywords": [
-        "improve"
-      ]
-    },
-    {
-      "name": "lark-base",
-      "description": "飞书多维表格（larksuite/cli）",
-      "source": {
-        "source": "github",
-        "repo": "larksuite/cli",
-        "path": "skills/lark-base"
-      },
-      "version": "0.1.0",
-      "keywords": [
-        "lark"
-      ]
-    },
-    {
-      "name": "lark-calendar",
-      "description": "飞书日历（larksuite/cli）",
-      "source": {
-        "source": "github",
-        "repo": "larksuite/cli",
-        "path": "skills/lark-calendar"
-      },
-      "version": "0.1.0",
-      "keywords": [
-        "lark"
-      ]
-    },
-    {
-      "name": "lark-doc",
-      "description": "飞书云文档 CRUD（larksuite/cli）",
-      "source": {
-        "source": "github",
-        "repo": "larksuite/cli",
-        "path": "skills/lark-doc"
-      },
-      "version": "0.1.0",
-      "keywords": [
-        "lark"
-      ]
-    },
-    {
-      "name": "lark-drive",
-      "description": "飞书云空间（larksuite/cli）",
-      "source": {
-        "source": "github",
-        "repo": "larksuite/cli",
-        "path": "skills/lark-drive"
-      },
-      "version": "0.1.0",
-      "keywords": [
-        "lark"
-      ]
-    },
-    {
-      "name": "lark-shared",
-      "description": "飞书基础：认证、多账号（larksuite/cli）",
-      "source": {
-        "source": "github",
-        "repo": "larksuite/cli",
-        "path": "skills/lark-shared"
-      },
-      "version": "0.1.0",
-      "keywords": [
-        "lark"
-      ]
-    },
-    {
-      "name": "lark-sheets",
-      "description": "飞书电子表格（larksuite/cli）",
-      "source": {
-        "source": "github",
-        "repo": "larksuite/cli",
-        "path": "skills/lark-sheets"
-      },
-      "version": "0.1.0",
-      "keywords": [
-        "lark"
-      ]
-    },
-    {
-      "name": "lark-whiteboard",
-      "description": "飞书画板（larksuite/cli）",
-      "source": {
-        "source": "github",
-        "repo": "larksuite/cli",
-        "path": "skills/lark-whiteboard"
-      },
-      "version": "0.1.0",
-      "keywords": [
-        "lark"
-      ]
-    },
-    {
-      "name": "lark-wiki",
-      "description": "飞书知识库管理（larksuite/cli）",
-      "source": {
-        "source": "github",
-        "repo": "larksuite/cli",
-        "path": "skills/lark-wiki"
-      },
-      "version": "0.1.0",
-      "keywords": [
-        "lark"
-      ]
-    },
-    {
-      "name": "write-a-skill",
-      "description": "创建新 skill（mattpocock-skills-zh-CN）",
-      "source": {
-        "source": "github",
-        "repo": "vinvcn/mattpocock-skills-zh-CN",
-        "path": "skills/write-a-skill"
-      },
-      "version": "0.1.0",
-      "keywords": [
-        "write"
-      ]
-    },
-    {
-      "name": "zoom-out",
-      "description": "代码全景视角（mattpocock-skills-zh-CN）",
-      "source": {
-        "source": "github",
-        "repo": "vinvcn/mattpocock-skills-zh-CN",
-        "path": "skills/zoom-out"
-      },
-      "version": "0.1.0",
-      "keywords": [
+        "mattpocock",
+        "caveman",
+        "diagnose",
+        "grill",
+        "improve",
+        "write",
         "zoom"
+      ]
+    },
+    {
+      "name": "lark-suite",
+      "description": "飞书全家桶（larksuite/cli 官方 CLI 全部 skill：lark-base/lark-calendar/lark-doc/lark-drive/lark-shared/lark-sheets/lark-whiteboard/lark-wiki/... 共 24+ 个）。一次安装暴露全部 lark-* skill，避免 subdir 拆分导致 8× 重复 cache。",
+      "source": {
+        "source": "github",
+        "repo": "larksuite/cli"
+      },
+      "version": "0.1.0",
+      "keywords": [
+        "lark",
+        "feishu"
       ]
     }
   ]
