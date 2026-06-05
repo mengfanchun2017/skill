@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.0] — 2026-06-06
+
+### Changed
+- **外部 plugin 重塑**：14 个 subdir path 入口 → 2 个 monorepo root 入口
+  - `mattpocock-skills`：装 vinvcn/mattpocock-skills-zh-CN 一次，暴露 18 个 skill
+  - `lark-suite`：装 larksuite/cli 一次，暴露 26 个 lark-* skill
+- 修复 `/skills` 对话框 6×/8× 重复条目（同一 plugin name 被装多份）
+
 ## [0.3.0] — 2026-06-05
 
 ### Added
