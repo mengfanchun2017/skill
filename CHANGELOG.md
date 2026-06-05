@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.0] — 2026-06-05
+
+### Added
+- **8 个自建 plugin**（加 f-report-std — 报告写作横向规范，4 套模板）
+- marketplace.json 版本 → 0.3.0
+
 ## [0.2.0] — 2026-06-05
 
 ### Changed

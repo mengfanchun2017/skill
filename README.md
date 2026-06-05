@@ -1,6 +1,6 @@
 # claude-skills — mengfanchun2017 的 Claude Code skill 集合
 
-> Claude Code 技能聚合仓。**7 个自建 + 14 个外部引用**，一个 marketplace，一次安装。
+> Claude Code 技能聚合仓。**8 个自建 + 14 个外部引用**，一个 marketplace，一次安装。
 > 飞书 / 调研 / 文档 / PPT / PDF / AI 浏览器一站式。
 
 ## 快速开始
@@ -25,7 +25,7 @@
 /plugin marketplace update mengfanchun2017-skills
 ```
 
-## 自建 skill（7 个，仓内）
+## 自建 skill（8 个，仓内）
 
 | Skill | 说明 |
 |-------|------|
@@ -35,6 +35,7 @@
 | `f-research` | 快速研究（三源并行：Tavily + MiniMax + WebSearch） |
 | `f-research-deep` | 深度研究（批量 JSON 输出） |
 | `f-research-report` | 报告生成（JSON/大纲/素材 → 结构化 Markdown） |
+| `f-report-std` | 报告写作横向规范（4 套模板：研究/分析/对比/方案）|
 | `f-vessel` | AI 浏览器操控（Vessel MCP，需配套 option-vessel/ 安装器） |
 
 ## 外部 skill（14 个，marketplace.json 引用，自动跟官方更新）
@@ -90,13 +91,14 @@ bash option-vessel/init.sh   # 仓内已带安装器
 ```
 claude-skills/                          ← 单聚合 marketplace 仓
 ├── .claude-plugin/
-│   └── marketplace.json                # 21 个 plugin 入口（7 本地 + 14 外部）
-├── plugins/                            ← 7 个自建 plugin
+│   └── marketplace.json                # 22 个 plugin 入口（8 本地 + 14 外部）
+├── plugins/                            ← 8 个自建 plugin
 │   ├── f-pdf/SKILL.md
 │   ├── f-ppt/SKILL.md
 │   ├── f-research/SKILL.md
 │   ├── f-research-deep/SKILL.md
 │   ├── f-research-report/SKILL.md
+│   ├── f-report-std/SKILL.md
 │   ├── f-doc/SKILL.md
 │   ├── f-vessel/SKILL.md
 │   └── skill-template/                 # 脚手架（开发用）
@@ -122,7 +124,7 @@ MIT — 见 [LICENSE](LICENSE)
 
 A Claude Code marketplace with 7 original skills + 14 external references:
 
-- **Self-built (in repo)**: f-doc, f-ppt, f-pdf, f-research, f-research-deep, f-research-report, f-vessel
+- **Self-built (in repo)**: f-doc, f-ppt, f-pdf, f-research, f-research-deep, f-research-report, f-report-std, f-vessel
 - **Feishu CLI (from `larksuite/cli`)**: lark-shared, lark-doc, lark-base, lark-sheets, lark-wiki, lark-whiteboard, lark-drive, lark-calendar
 - **Utilities (from `vinvcn/mattpocock-skills-zh-CN`)**: caveman, diagnose, grill-me, improve-codebase-architecture, write-a-skill, zoom-out
 
