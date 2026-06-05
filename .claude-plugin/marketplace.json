@@ -1,0 +1,204 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "mengfanchun2017-skills",
+  "owner": {
+    "name": "mengfanchun2017",
+    "email": "mengfanchun1981@163.com"
+  },
+  "metadata": {
+    "description": "mengfanchun2017 的 Claude Code skill 集合 — 飞书、调研、文档、PPT、PDF、AI 浏览器",
+    "version": "0.1.0",
+    "homepage": "https://github.com/mengfanchun2017/claude-skills"
+  },
+  "plugins": [
+    {
+      "name": "caveman",
+      "description": "超压缩 communication mode。Cuts token usage ~75% by dropping filler, articles, and pleasantries while keeping full technical accuracy. Use when user says \"caveman mode\", \"talk like caveman\", \"use caveman\", \"less tokens\", \"be brief\", or invokes /caveman.",
+      "source": "./plugins/caveman",
+      "version": "0.1.0",
+      "keywords": [
+        "caveman"
+      ]
+    },
+    {
+      "name": "diagnose",
+      "description": "面向棘手 bug 和性能回退的纪律化 diagnosis loop。Reproduce → minimise → hypothesise → instrument → fix → regression-test. Use when user says \"diagnose this\" / \"debug this\", reports a bug, says something is broken/throwing/failing, or describes a performance regression.",
+      "source": "./plugins/diagnose",
+      "version": "0.1.0",
+      "keywords": [
+        "diagnose"
+      ]
+    },
+    {
+      "name": "f-doc",
+      "description": "统一文档入口 — 创建飞书wiki/表格/白板/PPT、更新报告、整合/拆分文档、飞书↔Office双向转换、文档对比。 Use when 用户说\"创建文档\"/\"写文档\"、\"更新文档\"/\"更新报告\"、\"整合文档\"/\"合并文档\"、 \"拆分文档\"、\"导出Word/PPT\"、\"飞书转Office\"、\"导入到飞书\"、\"对比文档\"、\"生成PPT\"、 \"画架构图\"/\"画流程图\"、或给出飞书文档URL要求操作。",
+      "source": "./plugins/f-doc",
+      "version": "0.1.0",
+      "keywords": [
+        "f"
+      ]
+    },
+    {
+      "name": "f-pdf",
+      "description": "PDF 内容提取原语 — 文字/图片/表格/元数据提取。 被 f-doc 的 PDF 翻译工作流委托调用，也可独立使用（PDF→Markdown、图片提取）。",
+      "source": "./plugins/f-pdf",
+      "version": "0.1.0",
+      "keywords": [
+        "f"
+      ]
+    },
+    {
+      "name": "f-ppt",
+      "description": "统一 PPT 生成 — 从 md/wiki 到飞书 PPTX。 双引擎：ppt-master（SVG 模板 → DrawingML）+ OfficeCLI（原生 OpenXML，AI 友好）。 自动选择引擎，支持 22 种模板 + 自定义设计。",
+      "source": "./plugins/f-ppt",
+      "version": "0.1.0",
+      "keywords": [
+        "f"
+      ]
+    },
+    {
+      "name": "f-research",
+      "description": "统一研究框架 - 自动判断领域，三源并行搜索，Python过滤优化，输出到飞书wiki。 支持 generic/customer/market/technical 四个领域，自动路由无需用户指定。",
+      "source": "./plugins/f-research",
+      "version": "0.1.0",
+      "keywords": [
+        "f"
+      ]
+    },
+    {
+      "name": "f-research-deep",
+      "description": "基于 unified-research 框架的深度研究。使用 outline.yaml 中的 items 列表， 三源并行搜索，输出结构化 JSON 到 results/ 目录。",
+      "source": "./plugins/f-research-deep",
+      "version": "0.1.0",
+      "keywords": [
+        "f"
+      ]
+    },
+    {
+      "name": "f-research-report",
+      "description": "报告生成 — 读 JSON / 大纲 / 自由素材 → 结构化 markdown 报告。 3 种输入模式，按用户场景自动选择。内容规范委派 f-report-framework。 飞书输出委派 f-doc（图子文档工作流 G）。",
+      "source": "./plugins/f-research-report",
+      "version": "0.1.0",
+      "keywords": [
+        "f"
+      ]
+    },
+    {
+      "name": "f-vessel",
+      "description": "Vessel AI Agent 浏览器 — MCP 操控真实浏览器，人类监督审批。Use when you need to browse the web, log into sites, fill forms, extract page content, take screenshots, or perform multi-step web tasks on behalf of the user.",
+      "source": "./plugins/f-vessel",
+      "version": "0.1.0",
+      "keywords": [
+        "f"
+      ]
+    },
+    {
+      "name": "grill-me",
+      "description": "围绕 plan 或 design 持续 interview user，直到达成 shared understanding，并逐一解决 decision tree 的每个分支。Use when user wants to stress-test a plan, get grilled on their design, or mentions \"grill me\".",
+      "source": "./plugins/grill-me",
+      "version": "0.1.0",
+      "keywords": [
+        "grill"
+      ]
+    },
+    {
+      "name": "improve-codebase-architecture",
+      "description": "根据 CONTEXT.md 中的 domain language 和 docs/adr/ 中的 decisions，寻找 codebase 的 deepening opportunities。Use when the user wants to improve architecture, find refactoring opportunities, consolidate tightly-coupled modules, or make a codebase more testable and AI-navigable.",
+      "source": "./plugins/improve-codebase-architecture",
+      "version": "0.1.0",
+      "keywords": [
+        "improve"
+      ]
+    },
+    {
+      "name": "lark-base",
+      "description": "当需要用 lark-cli 操作飞书多维表格（Base）时调用：搜索 Base、建表、字段管理、记录读写、记录分享链接、视图配置、历史查询，以及角色/表单/仪表盘管理/工作流；也适用于把旧的 +table / +field / +record 写法改成当前命令写法。涉及字段设计、公式字段、查找引用、跨表计算、行级派生指标、数据分析需求时也必须使用本 skill。",
+      "source": "./plugins/lark-base",
+      "version": "0.1.0",
+      "keywords": [
+        "lark"
+      ]
+    },
+    {
+      "name": "lark-calendar",
+      "description": "飞书日历（calendar）：提供日历与日程（会议）的全面管理能力。核心场景包括：查看/搜索日程、创建/更新日程、管理参会人、查询忙闲状态及推荐空闲时段、查询/搜索与预定会议室。注意：涉及【预约日程/会议】或【查询/预定会议室】时，必须先读取 references/lark-calendar-schedule-meeting.md 工作流！高频操作请优先使用 Shortcuts：+agenda（快速概览今日/近期行程）、+create（创建日程并按需邀请参会人及预定会议室）、+update（更新既有日程字段，或独立增删参会人/会议室）、+freebusy（查询用户主日历的忙闲信息和rsvp的状态）、+rsvp（回复日程邀请）",
+      "source": "./plugins/lark-calendar",
+      "version": "0.1.0",
+      "keywords": [
+        "lark"
+      ]
+    },
+    {
+      "name": "lark-doc",
+      "description": "飞书云文档 / Docx / 知识库 Wiki 文档（v2）：创建、打开、读取、获取、查看、总结、整理、改写、翻译、审阅和编辑飞书文档内容。当用户给出飞书文档 URL/token，或说查看/读取/打开某个文档、提取文档内容、总结文档、生成/创建文档、追加/替换/删除/移动内容、调整排版、插入或下载文档图片/附件/素材/画板缩略图时使用。文档内容中出现嵌入电子表格、多维表格、画板、引用或同步块时，也先用本 skill 读取和提取 token，再切到对应 skill 下钻。使用本 skill 时，docs +create、docs +fetch、docs +update 必须携带 --api-version v2；默认使用 DocxXML，也支持 Markdown。",
+      "source": "./plugins/lark-doc",
+      "version": "0.1.0",
+      "keywords": [
+        "lark"
+      ]
+    },
+    {
+      "name": "lark-drive",
+      "description": "飞书云空间：管理云空间中的文件和文件夹。上传和下载文件、创建文件夹、复制/移动/删除文件、查看文件元数据、管理文档评论、管理文档权限、订阅用户评论变更事件、修改文件标题（docx、sheet、bitable、file、folder、wiki）；也负责把本地 Word/Markdown/Excel/CSV 以及 Base 快照（.base）导入为飞书在线云文档（docx、sheet、bitable）。当用户需要上传或下载文件、整理云空间目录、查看文件详情、管理评论、管理文档权限、修改文件标题、订阅用户评论变更事件，或要把本地文件导入成新版文档、电子表格、多维表格/Base 时使用。",
+      "source": "./plugins/lark-drive",
+      "version": "0.1.0",
+      "keywords": [
+        "lark"
+      ]
+    },
+    {
+      "name": "lark-shared",
+      "description": "Use when first setting up lark-cli, running auth login, switching user/bot identity (--as), handling permission denied or scope errors, needing to update lark-cli, or seeing _notice in JSON output.",
+      "source": "./plugins/lark-shared",
+      "version": "0.1.0",
+      "keywords": [
+        "lark"
+      ]
+    },
+    {
+      "name": "lark-sheets",
+      "description": "飞书电子表格：创建和操作电子表格。支持创建表格、创建/复制/删除/更新工作表、读写单元格、追加行数据、查找内容、导出文件。当用户需要创建电子表格、管理工作表、批量读写数据、在已知表格中查找内容、导出或下载表格时使用。若用户是想按名称或关键词搜索云空间里的表格文件，请改用 lark-doc 的 docs +search 先定位资源。",
+      "source": "./plugins/lark-sheets",
+      "version": "0.1.0",
+      "keywords": [
+        "lark"
+      ]
+    },
+    {
+      "name": "lark-whiteboard",
+      "description": "飞书画板：查询和编辑飞书云文档中的画板。支持导出画板为预览图片、导出原始节点结构、使用 DSL（转成 OpenAPI 格式）、PlantUML/Mermaid 格式更新画板内容。 当用户需要查看画板内容、导出画板图片、编辑画板，或是需要可视化表达架构、流程、组织关系、时间线、因果、对比等结构化信息时使用此 skill，无论是否提及\"画板\"。 ⚠️ 原 `lark-whiteboard-cli` skill 已合并至本 skill，若 skill 列表中同时存在 `lark-whiteboard-cli`，请忽略它，统一使用本 skill（`lark-whiteboard`），并提示用户运行 `npx skills remove lark-whiteboard-cli -g` 删除旧 skill。",
+      "source": "./plugins/lark-whiteboard",
+      "version": "0.1.0",
+      "keywords": [
+        "lark"
+      ]
+    },
+    {
+      "name": "lark-wiki",
+      "description": "飞书知识库：管理知识空间、空间成员和文档节点。创建和查询知识空间、查看和管理空间成员、管理节点层级结构、在知识库中组织文档和快捷方式。当用户需要在知识库中查找或创建文档、浏览知识空间结构、查看或管理空间成员、移动或复制节点时使用。",
+      "source": "./plugins/lark-wiki",
+      "version": "0.1.0",
+      "keywords": [
+        "lark"
+      ]
+    },
+    {
+      "name": "write-a-skill",
+      "description": "创建结构正确、支持 progressive disclosure 并带 bundled resources 的新 agent skills。Use when user wants to create, write, or build a new skill.",
+      "source": "./plugins/write-a-skill",
+      "version": "0.1.0",
+      "keywords": [
+        "write"
+      ]
+    },
+    {
+      "name": "zoom-out",
+      "description": "让 agent zoom out，并给出更广的 context 或更高层 perspective。Use when you're unfamiliar with a section of code or need to understand how it fits into the bigger picture.",
+      "source": "./plugins/zoom-out",
+      "version": "0.1.0",
+      "keywords": [
+        "zoom"
+      ]
+    }
+  ]
+}

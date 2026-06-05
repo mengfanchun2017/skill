@@ -1,0 +1,14 @@
+# 编辑器/工具原子写入残留
+*.tmp.*
+*.bak
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# 临时
+tmp/
