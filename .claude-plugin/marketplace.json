@@ -100,19 +100,6 @@
         "write",
         "zoom"
       ]
-    },
-    {
-      "name": "lark-suite",
-      "description": "飞书全家桶（larksuite/cli 官方 CLI 全部 skill：lark-base/lark-calendar/lark-doc/lark-drive/lark-shared/lark-sheets/lark-whiteboard/lark-wiki/... 共 24+ 个）。一次安装暴露全部 lark-* skill，避免 subdir 拆分导致 8× 重复 cache。",
-      "source": {
-        "source": "github",
-        "repo": "larksuite/cli"
-      },
-      "version": "0.1.0",
-      "keywords": [
-        "lark",
-        "feishu"
-      ]
     }
   ]
 }

@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5.0] — 2026-06-06
+
+### Removed
+- **lark-* 全部 plugin 入口**：larksuite/cli 24+ skill 太噪音，且 f-doc 已封装所有 lark-cli 命令组合
+- 改用 `npm install -g @larksuite/cli` 装 lark-cli binary，f-doc 编排全部飞书操作
+
 ## [0.4.0] — 2026-06-06
 
 ### Changed
