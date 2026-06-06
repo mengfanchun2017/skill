@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.6.0] — 2026-06-06
+
+### Changed
+- **第三方 skill 装法改 user-managed via `npx skills`**：marketplace 不再强制推 mattpocock/lark-* plugin（避免 dialog 噪音）
+- 用户自己用 `npx --yes skills@latest add <source> --skill <name> -g -y` 装（ccconfig 用户的 `init-skill.sh sync` 阶段 3 自动跑）
+- 更新：`npx --yes skills@latest update -g -y`（ccconfig: `scripts/update-third-party-skills.sh`）
+- `mattpocock-skills` entry 仍保留（愿意接受噪音的人可用 marketplace install）
+
 ## [0.5.0] — 2026-06-06
 
 ### Removed
