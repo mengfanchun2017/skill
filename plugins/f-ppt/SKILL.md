@@ -133,7 +133,8 @@ wiki markdown 代码块（```）直接渲染为 SVG `<text>`，不用截图。
 
 ```bash
 # 质检（校验 viewBox、占位符一致性）
-cd /home/francis/git/_ext/ppt-master && \
+# <ppt-master> = config.yaml → engines.ppt-master.path
+cd <ppt-master> && \
 python3 skills/ppt-master/scripts/svg_quality_checker.py /tmp/pptx_project
 
 # 导出 PPTX（--only native = 纯 DrawingML 可编辑形状）

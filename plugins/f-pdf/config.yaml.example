@@ -1,0 +1,6 @@
+# f-pdf 配置（可选）
+# ppt-master 路径（用于 PDF→Markdown 转换，不用可留空）
+
+engines:
+  ppt-master:
+    path: "~/git/_ext/ppt-master"
