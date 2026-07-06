@@ -125,8 +125,8 @@ done
 
 - `f-logme` — OKR 关联
 - `f-doc` — 飞书 wiki 报告输出
-- `f-research-domain` — 技术选型(中大型项目)
-- `f-report-gen` — 立项报告生成
+- `f-research` — 技术选型(中大型项目)
+- `f-research-report` — 立项报告生成
 
 ## 用户配置
 

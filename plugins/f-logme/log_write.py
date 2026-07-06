@@ -28,17 +28,18 @@ from datetime import date
 from pathlib import Path
 
 
+import yaml
+
 def _find_conf():
-    """Locate conf/f-logme.json alongside ccconfig root."""
-    for anchor in [Path(__file__).resolve().parent.parent.parent.parent.parent,
-                   Path.home() / "git" / "ccconfig"]:
-        candidate = anchor / "conf" / "f-logme.json"
-        if candidate.exists():
-            return candidate
-    sys.exit("conf/f-logme.json not found")
+    """Locate config.yaml in skill directory."""
+    skill_dir = Path(__file__).resolve().parent
+    candidate = skill_dir / "config.yaml"
+    if candidate.exists():
+        return candidate
+    sys.exit("config.yaml not found in " + str(skill_dir))
 
 
-CONF = json.loads(_find_conf().read_text())
+CONF = yaml.safe_load(_find_conf().read_text())
 BASE = CONF["bases"]["okr_v2"]["token"]
 T = CONF["bases"]["okr_v2"]["tables"]
 

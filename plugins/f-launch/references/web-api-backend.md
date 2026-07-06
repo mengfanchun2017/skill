@@ -116,4 +116,4 @@ KR3: 部署到 Render/Railway,持续可访问 + 错误率 < 1%
 - Drizzle 文档:https://orm.drizzle.team/
 - better-auth 文档:https://www.better-auth.com/
 - Vitest 文档:https://vitest.dev/
-- f-research-domain 调研:technical 领域
+- f-research 调研:technical 领域
