@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.7.0] — 2026-07-06
+
+### Added
+- marketplace.json 补全 4 个缺失 plugin：f-logme、f-launch、f-moocrec、f-search
+- config.yaml.example 补全 7 个 skill（f-research、f-research-deep、f-research-report、f-search、f-vessel、f-launch、f-report-std）
+
+### Changed
+- **README 全面更新**：skill 数量 8→12，架构图补齐，f-ppt 描述修正
+- **marketplace.json**：f-ppt 描述移除 ppt-master 引用，版本 0.3.0→0.4.0
+
 ## [0.6.0] — 2026-06-06
 
 ### Changed
