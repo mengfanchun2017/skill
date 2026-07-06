@@ -1,0 +1,10 @@
+# f-doc 配置
+# 复制为 config.yaml 并填入你的值
+
+tenant_domain: "your-company.feishu.cn"
+
+wiki_nodes:
+  default: ""    # 新文档默认父 wiki 节点 token
+  okr: ""        # OKR/SUM 文档父节点 token（可选）
+
+lark_account: "ailab"

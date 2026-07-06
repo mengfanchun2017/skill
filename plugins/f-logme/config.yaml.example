@@ -1,0 +1,27 @@
+# f-logme 配置
+# 复制为 config.yaml 并填入你的值
+#
+# 飞书 Base token 获取：https://<tenant>.feishu.cn/base/<token>
+# 表 ID 获取：Base 右上角 ... → 表信息 → 表 ID
+# wiki 节点 token 获取：wiki 页面 URL → /wiki/<token>
+
+lark_cli:
+  config_dir: "~/.lark-cli-ailab"
+
+tenant_domain: "your-company.feishu.cn"
+
+space_id: ""
+okr_wiki_node: ""
+
+kr_route:
+  _default: ""
+
+bases:
+  okr_v2:
+    token: ""
+    description: "OKR Base v2（目标管理 + 反思 + SUM）"
+    tables:
+      O: ""
+      KR: ""
+      Worklog: ""
+      Reflect: ""
