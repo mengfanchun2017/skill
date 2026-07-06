@@ -45,16 +45,16 @@ allowed-tools: Read, Write, Bash, Glob, mcp__minimax__web_search
 
 ## 安装
 
+OfficeCLI 必装，ppt-master 可选（不用模板驱动时 OfficeCLI 即可）。
+
 ```bash
-# ppt-master 引擎（含 Python 依赖 + 仓库克隆）
-bash ccconfig/option-ppt-master/init.sh --install
+# OfficeCLI 引擎（单二进制，必装）
+curl -fsSL https://d.officecli.ai/install.sh | bash
 
-# OfficeCLI 引擎（单二进制下载）
-bash ccconfig/option-officecli/init.sh --install
-
-# 状态检查
-bash ccconfig/option-ppt-master/init.sh --status
-bash ccconfig/option-officecli/init.sh --status
+# ppt-master 引擎（模板驱动，可选）
+# config.yaml → engines.ppt-master.path 配路径
+git clone https://github.com/hugohe3/ppt-master.git ~/git/_ext/ppt-master
+pip3 install python-pptx cairosvg
 ```
 
 ---
@@ -93,7 +93,7 @@ bash ccconfig/option-officecli/init.sh --status
 
 **深色/科技风**：用户说"深色""科技风""暗色"时切换 `anthropic`（深色渐变 + 橙色 `#D97757` 强调）。
 
-模板库：`~/git/_ext/ppt-master/skills/ppt-master/templates/layouts/`（22 种）。
+模板库：`config.yaml` → `engines.ppt-master.path` / `skills/ppt-master/templates/layouts/`（22 种）。
 
 确认模板后，读取 `design_spec.md` 获取颜色/字体/间距规范，以及 5 个模板 SVG：
 `01_cover.svg` `02_toc.svg` `02_chapter.svg` `03_content.svg` `04_ending.svg`
@@ -158,8 +158,8 @@ PPTX 作为 wiki 子文件上传，侧边栏「文件」中可预览编辑，不
 
 ### 依赖
 
-- Python 3 + `python-pptx` + `cairosvg`（通过 `option-ppt-master/init.sh` 安装）
-- ppt-master 仓库：`~/git/_ext/ppt-master/`
+- Python 3 + `python-pptx` + `cairosvg`（`pip3 install python-pptx cairosvg`）
+- ppt-master 仓库：`config.yaml` → `engines.ppt-master.path`（默认 `~/git/_ext/ppt-master`）
 - 无需 Node.js/npm
 
 ### 上传要点
