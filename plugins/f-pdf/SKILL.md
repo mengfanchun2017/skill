@@ -52,7 +52,7 @@ for page in doc:
 提取后 MUST 用 `minimax understand_image` 验证每张图，排除 logo/装饰图。
 
 ```bash
-python3 /home/francis/git/ccconfig/link/skills/f-pdf/references/extract-images.py input.pdf ./output_dir/
+python3 ${CLAUDE_PLUGIN_ROOT}/references/extract-images.py input.pdf ./output_dir/
 ```
 
 ---

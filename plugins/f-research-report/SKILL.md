@@ -8,12 +8,37 @@ description: |
 allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 ---
 
-# Unified Research Report
+# f-research-report — 报告生成
 
 报告生成模块，将研究结果/大纲/自由素材转换为可读报告。
 
 > **格式硬约束** → `../f-report-std/rules.d/f-report-std.md`（全局加载）
 > **飞书格式** → `../f-doc/SKILL.md`（工作流 G 处理图子文档）
+
+### 三层分工
+
+| 层 | skill | 职责 |
+|----|-------|------|
+| 机械层 | f-doc | 怎么调 API（fetch / str_replace / block_insert_after / 验证） |
+| 规范层 | f-report-std | 内容写成什么样（模板骨架、论证三要素、数据呈现约定） |
+| 工作流层 | f-research-report（本 skill） | 内容怎么产出/迭代（3 种输入模式、分轮评审、搜索补素材） |
+
+**更新已有报告时**：f-doc 工作流 A 执行机械操作，本 skill 提供内容迭代流程（v1→v2），f-report-std 提供内容标准。三层各司其职。
+
+## Step 0: 报告卡片（前置产物）
+
+任何模式开始前，先出 1 页报告卡片让用户确认。卡片模板 → `../f-report-std/templates/report-card.md`。
+
+| 字段 | 内容 | 示例 |
+|------|------|------|
+| 目标读者 | 谁会读、用在哪 | 内部决策 / 客户提案 / 公开分享 |
+| 模板 | 选 f-report-std 4 套之一 | research / analysis / comparison / proposal |
+| 字数 | 预期长度（影响深度） | < 2K 简版 / 2-5K 标准 / > 5K 详版 |
+| 章节大纲 | 4-7 个 H1 | 背景 → 现状 → 调研 → 洞察 → 建议 |
+| 数据源 | 已知/待搜（按 f-search 三源） | minimax 中 / tavily 英 / 内部文档 |
+| 不确定项 | 已知的盲点 | 数据时效 / 客户名脱敏 / 国标完整度 |
+
+**不阻塞原则**：用户口头同意即可（"OK" / "开始" / "按这个走"），不必走完整确认流程。
 
 ## 3 种输入模式
 
@@ -21,15 +46,16 @@ allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 |------|----------|----------|--------|
 | **JSON 模式** | 有 `outline.yaml` + `results/*.json` | 已有调研结果 | Step 1-5 原有流程 |
 | **大纲模式** | 用户给章节大纲/题目 | 无 JSON | 大纲模式（见下） |
-| **自由模式** | 用户说"写 X 报告"无素材 | 无 | 委托 f-research 搜索 + 调模板 |
+| **自由模式** | 用户说"写 X 报告"无素材 | 无 | 委托 f-search 搜索 + 调模板 |
 
 ### 模式选择
 
 ```
 用户："写一份 X 报告"
+  ├─ 先出报告卡片 → 用户确认
   ├─ 检查当前目录：有 outline.yaml + results/*.json → JSON 模式
   ├─ 检查用户输入：含章节大纲（如"分析现状/根因/建议"） → 大纲模式
-  └─ 其他 → 自由模式（调 f-report-std 选模板 + f-research 搜索）
+  └─ 其他 → 自由模式（调 f-report-std 选模板 + f-search 搜索）
 ```
 
 ## 模板委派
@@ -120,6 +146,42 @@ allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 #### Step 自由.3: 转 JSON 模式
 搜索结果存为 `results/*.json` → 自动进入 JSON 模式 Step 1-5。
 
+## 分轮迭代评审（v1 → 评审 → v2）
+
+适用场景：分析 / 对比 / 方案 等"需要深挖方向"的报告。简单研究/填空类直接 v1 → 定稿。
+
+**触发**：用户明确说"分轮""迭代""先 v1 看看"；或报告类型 = analysis / comparison / proposal；或字数 > 3K 且涉及多方案选型。
+
+**流程**：
+
+```
+v1（Claude 出）
+  ↓ 70% 完成度，保留不确定项标记
+  ↓
+评审（用户标红）
+  ↓ 评论 / 删 / 改方向 / 加案例
+  ↓
+v2（Claude 改）
+  ↓ 按标红改 + 95% 完成度
+  ↓
+定稿 → f-doc 创建飞书文档
+```
+
+**v1 输出规范**：
+- 故意留 [待确认] [数据有限] 标记，作为评审锚点
+- 数据来源未核实者，标 [未验证] 方便用户聚焦核实
+- 不必打磨文风，结构 + 数据准确优先
+
+**评审交互格式**（用户任选）：
+- 在 markdown 上直接加评论
+- 简单指令："这段删 / 这章重写 / 加 X 案例 / 数据换 2025 的"
+- 列点："1. ... 2. ... 3. ..."
+
+**何时跳过评审**：
+- 简单调研（research 模板）— 一次性输出
+- 模板填空类（对比表已明确）— 一次性输出
+- 用户明确说"一次出完"
+
 ## 工作流 G: 图子文档生成（数据/分析图）
 
 > 架构/流程图走 Mermaid 白板（f-doc 默认）。**数据/分析图走本工作流**——每个图建独立子文档。
@@ -158,6 +220,6 @@ allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 
 ## 关联 Skills
 - `f-report-std` — 内容规范、模板（必读）
-- `f-research` — 搜索调研
+- `f-research` — 领域方法论 (4 领域)
 - `f-research-deep` — 批量研究
 - `f-doc` — 飞书格式 + 图子文档 lark-cli 命令

@@ -1,0 +1,7 @@
+# f-ppt 工具路径配置
+# 复制为 config.yaml 并填入工具路径
+
+engines:
+  ppt-master:
+    path: "/path/to/ppt-master"
+    description: "SVG 模板 → DrawingML 引擎（可选，不配则只用 OfficeCLI）"
