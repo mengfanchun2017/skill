@@ -44,7 +44,7 @@ Supabase (共享课程数据)              飞书 (学生个人数据)
 
 ```
 用户: /f-moocrec
-  ├─ conf/f-moocrec.json 不存在 或 docs.profile 为空
+  ├─ config.yaml 不存在 或 docs.profile 为空
   │   → 工作流 0: 首次使用 — grill me + 创建飞书资源
   │
   ├─ 已有配置
@@ -62,7 +62,7 @@ Supabase (共享课程数据)              飞书 (学生个人数据)
 
 ## 工作流 0: 首次使用 — Grill Me
 
-**触发**: `conf/f-moocrec.json` 无有效个人配置
+**触发**: `config.yaml` 无有效个人配置
 
 ### Step 0.1: Grill 问答
 
@@ -218,7 +218,7 @@ EOF
 ### Step 0.5: 写配置
 
 ```python
-# 更新 conf/f-moocrec.json
+# 更新 config.yaml
 config = {
     "lark_cli": {"config_dir": "~/.lark-cli-<account>"},
     "tenant_domain": "<your-tenant>.feishu.cn",
