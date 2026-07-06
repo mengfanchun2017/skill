@@ -1,0 +1,9 @@
+# f-getnote 配置
+# 复制为 config.yaml 并填入你的值
+
+# API 凭证（也可用 getnote auth login 通过 OAuth 获取）
+api_key: ""
+client_id: ""
+
+# 默认知识库（可选，用于自动归档）
+default_kb: ""
