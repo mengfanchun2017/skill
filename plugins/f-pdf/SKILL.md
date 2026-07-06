@@ -30,21 +30,16 @@ PyMuPDF（fitz）已安装。未安装时：`PIP_BREAK_SYSTEM_PACKAGES=1 pip3 in
 
 ## 工作流 A: 文字提取（PDF → Markdown）
 
-### CLI 快速
-
 ```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/references/extract-text.py input.pdf -o output.md
-```
-
-### 编程调用
-
-```python
+python3 -c "
 import fitz
-doc = fitz.open("input.pdf")
-for page in doc:
-    text = page.get_text("text")
-    # text 可直接传给 Claude 翻译
+doc = fitz.open('input.pdf')
+for i, page in enumerate(doc):
+    print(page.get_text('text'))
+" > output.md
 ```
+
+结构保留（标题/粗体/列表）由 Claude 后续处理——text 传给 Claude 翻译或转换时自动识别。
 
 ---
 
