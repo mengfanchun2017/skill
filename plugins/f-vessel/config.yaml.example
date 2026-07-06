@@ -1,0 +1,9 @@
+# f-vessel 配置
+# 复制此文件为 config.yaml 并填入你的值。
+# ccprivate 覆盖：将真实配置放到 ccprivate/config/f-vessel.yaml
+
+# f-vessel 通过 Vessel MCP 操控浏览器，需先安装 Vessel：
+#   bash claude-skills/option-vessel/init.sh
+#
+# 当前无额外用户可配置项，无需配置。
+# MCP token 在安装时自动配置到 ~/.claude/.config.json。

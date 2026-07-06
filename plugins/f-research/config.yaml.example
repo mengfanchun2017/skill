@@ -1,0 +1,8 @@
+# f-research 配置
+# 复制此文件为 config.yaml 并填入你的值。
+# ccprivate 覆盖：将真实配置放到 ccprivate/config/f-research.yaml
+# init-skill.sh sync 时 apply-config.sh 自动建立 symlink。
+
+# 当前无外部服务依赖，无需配置。
+# API key 通过 ccconfig/conf/claude.json 管理（ccprivate symlink）。
+# 搜索委托 f-search，搜索相关配置见 f-search/config.yaml。

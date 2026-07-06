@@ -1,0 +1,6 @@
+# f-search 配置
+# 复制此文件为 config.yaml 并填入你的值。
+# ccprivate 覆盖：将真实配置放到 ccprivate/config/f-search.yaml
+
+# 当前无用户可配置项，无需配置。
+# API key（Tavily、MiniMax）通过 ccconfig/conf/claude.json 管理（ccprivate symlink）。

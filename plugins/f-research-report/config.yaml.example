@@ -1,0 +1,7 @@
+# f-research-report 配置
+# 复制此文件为 config.yaml 并填入你的值。
+# ccprivate 覆盖：将真实配置放到 ccprivate/config/f-research-report.yaml
+
+# 当前无外部服务依赖，无需配置。
+# 输出委托 f-doc（飞书文档），相关配置见 f-doc/config.yaml。
+# 写作规范委托 f-report-std，相关配置见 f-report-std/config.yaml。

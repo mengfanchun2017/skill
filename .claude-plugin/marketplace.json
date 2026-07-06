@@ -7,7 +7,7 @@
   },
   "metadata": {
     "description": "mengfanchun2017 的 Claude Code skill 集合 — 自建 + 飞书 CLI + 辅助工具",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "homepage": "https://github.com/mengfanchun2017/claude-skills"
   },
   "plugins": [
@@ -40,7 +40,7 @@
     },
     {
       "name": "f-ppt",
-      "description": "统一 PPT 生成 — 从 md/wiki 到飞书 PPTX。 双引擎：ppt-master（SVG 模板 → DrawingML）+ OfficeCLI（原生 OpenXML，AI 友好）。 自动选择引擎，支持 22 种模板 + 自定义设计。",
+      "description": "统一 PPT 生成 — 从 md/wiki 到飞书 PPTX。OfficeCLI 引擎（原生 OpenXML），支持批量 JSON、模板合并、autofit 后处理。",
       "source": "./plugins/f-ppt",
       "version": "0.1.0",
       "keywords": [
@@ -78,6 +78,42 @@
       "name": "f-vessel",
       "description": "Vessel AI Agent 浏览器 — MCP 操控真实浏览器，人类监督审批。Use when you need to browse the web, log into sites, fill forms, extract page content, take screenshots, or perform multi-step web tasks on behalf of the user.",
       "source": "./plugins/f-vessel",
+      "version": "0.1.0",
+      "keywords": [
+        "f"
+      ]
+    },
+    {
+      "name": "f-logme",
+      "description": "个人管理系统 — OKR 目标管理、Worklog 工作日志、Reflect 反思、SUM 周期/领域总结生成。数据存飞书 Base，输出到飞书文档。Use when 用户说\"记录工作\"/\"写日志\"/\"OKR\"/\"目标管理\"/\"反思\"/\"生成总结\"/\"季度报告\"/\"年度报告\"。",
+      "source": "./plugins/f-logme",
+      "version": "0.1.0",
+      "keywords": [
+        "f"
+      ]
+    },
+    {
+      "name": "f-launch",
+      "description": "项目启动脚手架 — 意图到可运行项目（类型检测→脚手架→OKR→风险）。覆盖 8 种项目类型。Use when 用户说\"新建项目\"/\"创建项目\"/\"scaffold\"/\"项目启动\"。",
+      "source": "./plugins/f-launch",
+      "version": "0.1.0",
+      "keywords": [
+        "f"
+      ]
+    },
+    {
+      "name": "f-moocrec",
+      "description": "慕课推荐系统 — 基于 QS 排名大学课程体系，生成个性化学习路径。课程数据存 Supabase，学生画像/进度存飞书。Use when 用户说\"推荐课程\"/\"学习路径\"/\"MOOC\"/\"在线课程\"。",
+      "source": "./plugins/f-moocrec",
+      "version": "0.1.0",
+      "keywords": [
+        "f"
+      ]
+    },
+    {
+      "name": "f-search",
+      "description": "多源搜索编排原语 — 三源并行搜索（Tavily + MiniMax + WebSearch），Python 过滤去重，来源标注。被 f-research/f-research-deep/f-logme 委托调用。",
+      "source": "./plugins/f-search",
       "version": "0.1.0",
       "keywords": [
         "f"
