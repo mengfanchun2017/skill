@@ -129,12 +129,12 @@ officecli query deck.pptx 'picture:no-alt'         # 缺 alt 文本的图片
 
 ## 仓库
 
-`https://my.feishu.cn/base/JnXYbjiR9aZOFrsuOGUc09mXnZd`
+`config.yaml` → `slides_base_url`
 
 | 表 | ID | 说明 |
 |---|----|------|
-| Presentations | `tblgJhdGJlTxf5S7` | PPT 元数据：名称、Wiki URL、Presentation ID |
-| Slides | `tblORDssdq53f3Mz` | 每页内容：Slide ID、页码、标题、文本、图片 |
+| Presentations | `config.yaml` → `tables.presentations` | PPT 元数据：名称、Wiki URL、Presentation ID |
+| Slides | `config.yaml` → `tables.slides` | 每页内容：Slide ID、页码、标题、文本、图片 |
 
 ## 可行操作
 
