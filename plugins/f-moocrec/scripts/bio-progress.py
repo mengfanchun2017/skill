@@ -7,7 +7,7 @@ Usage:
   python3 bio-progress.py stats                   # 统计概览
   python3 bio-progress.py completed <course_name> <date> [cert_url]  # 标记完成
 
-仿 f-logme/log_write.py 模式。读取 conf/f-moocrec.json 获取 Base token。
+仿 f-logme/log_write.py 模式。读取 config.yaml 获取 Base token。
 """
 
 import json
@@ -16,19 +16,17 @@ import subprocess
 import sys
 from pathlib import Path
 from tempfile import mkstemp
+import yaml
 
 
 def find_conf():
-    d = Path(__file__).resolve().parent
-    while d != d.parent:
-        p = d / "conf" / "f-moocrec.json"
-        if p.exists():
-            return p
-        d = d.parent
-    raise FileNotFoundError("conf/f-moocrec.json not found")
+    p = Path(__file__).resolve().parent.parent / "config.yaml"
+    if p.exists():
+        return p
+    raise FileNotFoundError("config.yaml not found")
 
 
-CONF = json.loads(find_conf().read_text())
+CONF = yaml.safe_load(find_conf().read_text())
 BASE = CONF["base"]["token"]
 T = CONF["base"]["tables"]["progress"]
 
