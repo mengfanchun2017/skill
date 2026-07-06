@@ -2,133 +2,23 @@
 name: f-research
 user-invocable: true
 description: |
-  统一研究框架 - 自动判断领域，三源并行搜索，Python过滤优化，输出到飞书wiki。
-  支持 generic/customer/market/technical 四个领域，自动路由无需用户指定。
-allowed-tools: Read, Write, Glob, Bash, WebSearch, Task, AskUserQuestion,
-  mcp__tavily__tavily_search, mcp__tavily__tavily_research,
-  mcp__tavily__tavily_extract, mcp__minimax__web_search
+  4 领域研究方法论 — customer（JTBD）/ generic / market / technical。
+  收到调研主题后自动判断领域，调 f-search 收集数据，再按对应领域框架解读。
+  搜索工具调用委派 f-search，本 skill 不直接调 API。
+allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 ---
 
-# Unified Research Framework
+# f-research — 4 领域研究方法论
 
-统一研究框架，自动判断领域类型，三源并行搜索，Python过滤优化，输出到飞书wiki。
+按领域给"调研方法"，搜索工具调用委派 f-search。
 
-## 搜索策略（可执行详细版）
+## 何时用
 
-> 方向性规则在 `rules/search.md`，本文件提供可执行的详细方法。
-
-### 三源并行（必须同时执行）
-
-1. **WebSearch** — 通用主力
-2. **mcp__minimax__web_search** — 中文搜索
-3. **mcp__tavily__tavily_search** — 英文搜索
-4. **mcp__tavily__tavily_research** — 深度综合
-
-### Python 过滤（避免原始数据污染 context）
-
-原始搜索结果不直接进入 context，通过 Python 过滤后只保留 print() 输出。原始数据保存到 `/tmp/tavily_search_{timestamp}.json`。
-
-```python
-# WRONG — 300K 原始数据污染 context
-tvly search "query" --json
-
-# RIGHT — 只有 print() 输出进 context
-tvly search "query" --json 2>/dev/null | python3 -c "
-import json, sys
-data = json.load(sys.stdin)
-for r in data['results']:
-    print(f'[{r[\"score\"]:.2f}] {r[\"title\"]}')
-    print(f'  {r[\"url\"]}')
-    print(f'  {r[\"content\"][:200]}')
-"
-```
-
-### Tavily 工作流
-
-```
-search → extract → map → crawl → research
-```
-
-| 阶段 | 用途 | MCP 调用 |
-|------|------|----------|
-| search | 查找信息 | `mcp__tavily__tavily_search(query, search_depth, max_results)` |
-| extract | 提取 URL 内容 | `mcp__tavily__tavily_extract(urls, extract_depth)` |
-| map | 发现网站 URL 结构 | `mcp__tavily__tavily_map(url, max_depth)` |
-| crawl | 批量爬取 | `mcp__tavily__tavily_crawl(url, max_depth)` |
-| research | 深度综合 | `mcp__tavily__tavily_research(input, model)` |
-
-### Tavily Search 参数速查
-
-| 参数 | 可选值 | 说明 |
-|------|--------|------|
-| `search_depth` | `basic` / `advanced` / `fast` / `ultra-fast` | fast=低延迟高相关; ultra-fast=极低延迟 |
-| `topic` | `general` / `news` / `finance` | 新闻/金融场景用对应 topic |
-| `time_range` | `day` / `week` / `month` / `year` | 时间范围过滤 |
-| `start_date` / `end_date` | `YYYY-MM-DD` | 自定义日期范围 |
-| `include_images` | `true` / `false` | 返回源链接图片 |
-| `include_image_descriptions` | `true` / `false` | AI 生成的图片描述 |
-| `include_raw_content` | `false` / `markdown` / `text` | 原始页面内容 |
-| `country` | ISO 国家代码 | 地域约束搜索 |
-| `max_results` | `5`-`20` | 结果数量 |
-| `include_domains` / `exclude_domains` | 域名列表 | 限定/排除特定来源 |
-
-默认推荐：普通搜索 `search_depth=basic`；需要速度用 `fast`；新闻类用 `topic=news` + `time_range=week`。
-
-### 聚合去重
-
-```python
-def deduplicate_by_url(results):
-    seen = set()
-    unique = []
-    for r in results:
-        url = r.get('url', '')
-        if url and url not in seen:
-            seen.add(url)
-            unique.append(r)
-    return unique
-```
-
-来源标注：`[tavily]` / `[minimax]` / `[websearch]`
-
-### 搜索来源清单（必须输出到文档末尾）
-
-每次研究输出飞书文档时，**必须在文档末尾附加搜索清单**：
-
-```markdown
-## 搜索清单
-
-> 非正文，不出现在目录
-
-### WebSearch
-| # | 标题 | 链接 |
-|---|------|------|
-| 1 | 标题 | [链接](url) |
-
-### minimax（中文）
-| # | 标题 | 链接 |
-|---|------|------|
-| 1 | 标题 | [链接](url) |
-
-### tavily（英文）
-| # | 标题 | 链接 |
-|---|------|------|
-| 1 | 标题 | [链接](url) |
-
-### 核心引用
-| 来源 | 标题 | 用途 |
-|------|------|------|
-| [web] | ... | 定义 |
-| [mm] | ... | 案例 |
-| [tv] | ... | 对比 |
-```
-
-**规则**：
-- 三源分开展示，每个源 5 条以内
-- 核心引用表选前 3 条，标注在正文中的用途（定义/案例/对比/数据）
-- 目的：检查各源搜索质量，方便追溯
-- 格式：`> 引用` 包裹，不污染飞书目录
-
----
+| 触发 | 行为 |
+|------|------|
+| "调研 XX" / "分析 XX 用户" | 自动判断领域 → 调 f-search → 按框架解读 |
+| f-research-report 需要调研素材 | 委派本 skill（不在模式 1 中直接调 f-search） |
+| f-research-deep 批量研究 | 委派本 skill 做单 item 的领域判断 + 框架 |
 
 ## 自动领域判断
 
@@ -139,17 +29,15 @@ def deduplicate_by_url(results):
 | `market` | 市场/TAM/份额/趋势 | 市场规模、竞争分析 |
 | `technical` | 技术/框架/库/选型 | 技术评估、库对比 |
 
----
-
 ## 领域方法论
 
-### customer 领域（整合自 customer-research）
+### customer 领域
 
 用户研究框架，基于 JTBD (Jobs to Be Done) 和饮水点理论。
 
 **两种模式**：
 - Mode 1: 分析已有素材（访谈、问卷、客服记录）
-- Mode 2: 在线挖掘（Reddit、G2、社区、论坛）
+- Mode 2: 在线挖掘（Reddit、G2、社区、论坛）— 委派 f-search
 
 **饮水点优先级**：
 
@@ -202,25 +90,26 @@ def deduplicate_by_url(results):
 - adoption: github_stars, contributors
 - ecosystem: third_party_packages, community_activity
 
----
-
 ## 流程
 
 ### Step 1: 领域判断
 根据关键词判断领域
 
-### Step 2: 三源并行搜索
-同时执行 WebSearch + minimax + tavily，使用 Python 过滤
+### Step 2: 委派 f-search 收集数据
+调 f-search 做三源并行搜索（中文/英文/深度），拿回搜索结果 + 搜索清单
 
-### Step 3: 聚合去重
-按 URL 去重，标注来源，检测领域偏差自动修正
+### Step 3: 按领域框架解读
+按对应领域的提取框架处理数据：
+- 客户原话、痛点、触发事件（customer）
+- 市场大小、份额、趋势（market）
+- 性能基准、生态、采用率（technical）
+- 概览 + 关键特征（generic）
 
 ### Step 4: 输出
-根据 RESEARCH_OUTPUT 配置：feishu（默认）/ file / both
-
----
+输出结构化领域数据 + 置信度标注，交给调用方（f-research-report / f-research-deep / 用户）
 
 ## 关联 Skills
 
-- `f-research-deep` — 深度研究
-- `f-research-report` — 报告生成
+- `f-search` — 搜索工具（必调用）
+- `f-research-deep` — 批量研究（委托本 skill 做单 item）
+- `f-research-report` — 报告生成（用本 skill 的输出做素材）

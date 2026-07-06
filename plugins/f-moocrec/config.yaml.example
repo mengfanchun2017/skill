@@ -1,0 +1,21 @@
+# f-moocrec 配置
+# 复制为 config.yaml 并填入你的值
+#
+# 首次运行 f-moocrec 时自动 grill 填充
+
+lark_cli:
+  config_dir: "~/.lark-cli-ailab"
+
+tenant_domain: "your-company.feishu.cn"
+
+space_id: ""
+wiki_node: ""
+
+docs:
+  profile: ""    # 学生画像 wiki doc token
+  path: ""       # 学习路径 wiki doc token
+
+base:
+  token: ""      # 学习进度 Base token
+  tables:
+    progress: "" # 进度表 ID
