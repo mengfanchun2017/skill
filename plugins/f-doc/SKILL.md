@@ -84,7 +84,7 @@ fi
 
 ### 父目录
 - **子文档**（用户指定父文档URL）：提取 token 作为 `--parent-token`。**禁止**套用默认值
-- **独立文档**（用户未指定位置）：默认 `--wiki-node TWQbwwbuGiePWZkvlX7c9cQvnph`（Claude 工作 wiki）
+- **独立文档**（用户未指定位置）：默认 `--wiki-node <token>`（config.yaml → wiki_nodes.default）
 
 ---
 
@@ -110,7 +110,7 @@ lark-cli drive +search --query "关键词" --space-ids "space_id_1,space_id_2"
 ### Step 1: 创建
 
 ```bash
-cat << 'EOF' | lark-cli docs +create --api-version v2 --wiki-node TWQbwwbuGiePWZkvlX7c9cQvnph --as user --markdown - --title "标题"
+cat << 'EOF' | lark-cli docs +create --api-version v2 --wiki-node <token> --as user --markdown - --title "标题"
 内容
 EOF
 ```
@@ -441,14 +441,14 @@ cat "$SKILL_DIR/config.yaml"
 
 | 标题 | 链接 | 日期 | 说明 |
 |------|------|------|------|
-| [国航大模型双轨架构深度研究](https://rcnejwuhyp41.feishu.cn/docx/DOwxdvTVMoSMYRx28XGcliH0nte) | 2026-06-01 | 国航AI架构专题研究，对标全球航空业AI最佳实践 |
-| [知识图谱与专业能力提升 — 2026年上半年总结及下半年工作思路](https://rcnejwuhyp41.feishu.cn/docx/XMrHd3bNeowq4KxLyNXccsTpnJf) | 2026-05-31 | 知识图谱半年总结报告，父文档 workreview |
+| [示例：AI架构研究](https://<tenant>.feishu.cn/docx/<token>) | 2026-06-01 | 示例条目，实际操作后替换 |
+| [示例：半年总结报告](https://<tenant>.feishu.cn/docx/<token>) | 2026-05-31 | 示例条目，实际操作后替换 |
 
 ### 常用 Wiki 节点
 
 | 用途 | Token | URL |
 |------|-------|-----|
-| Claude 工作 wiki（默认父目录） | `TWQbwwbuGiePWZkvlX7c9cQvnph` | https://rcnejwuhyp41.feishu.cn/wiki/TWQbwwbuGiePWZkvlX7c9cQvnph |
-| OKR/SUM 文档父目录 | `VPsDw42KsixH77kugfcc8FyInCh` | https://rcnejwuhyp41.feishu.cn/wiki/VPsDw42KsixH77kugfcc8FyInCh |
+| Claude 工作 wiki（默认父目录） | `<token>` | https://<tenant>.feishu.cn/wiki/<token> |
+| OKR/SUM 文档父目录 | `<token>` | https://<tenant>.feishu.cn/wiki/<token> |
 
 > **注意**: f-logme 管辖的文档（OKR/SUM/Worklog）索引在 `skills/f-logme/SKILL.md` 的「线上文档索引」节。f-doc 索引只记录 f-doc 直接创建的文档（研究/翻译/合并等）。
