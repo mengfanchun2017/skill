@@ -7,7 +7,7 @@
   },
   "metadata": {
     "description": "mengfanchun2017 的 Claude Code skill 集合 — 自建 + 飞书 CLI + 辅助工具",
-    "version": "0.4.0",
+    "version": "0.5.0",
     "homepage": "https://github.com/mengfanchun2017/claude-skills"
   },
   "plugins": [
@@ -114,6 +114,15 @@
       "name": "f-search",
       "description": "多源搜索编排原语 — 三源并行搜索（Tavily + MiniMax + WebSearch），Python 过滤去重，来源标注。被 f-research/f-research-deep/f-logme 委托调用。",
       "source": "./plugins/f-search",
+      "version": "0.1.0",
+      "keywords": [
+        "f"
+      ]
+    },
+    {
+      "name": "f-sysarchi",
+      "description": "系统分析师/系统架构设计师随工备考 — 暗号 archi 触发。在日常工作中嵌入软考知识点学习，支持测验(grill)、映射(map)、进度(progress)、深度学习(learn)四种模式。",
+      "source": "./plugins/f-sysarchi",
       "version": "0.1.0",
       "keywords": [
         "f"

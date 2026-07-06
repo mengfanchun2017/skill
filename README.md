@@ -43,7 +43,7 @@ npx --yes skills@latest update -g -y
 
 ccconfig 用户：`bash init-skill.sh sync` 自动从 `conf/third-party-skills.txt` 列表幂等装，update 跑 `scripts/update-third-party-skills.sh`。
 
-## 自建 skill（12 个，仓内）
+## 自建 skill（13 个，仓内）
 
 | Skill | 说明 |
 |-------|------|
@@ -59,6 +59,7 @@ ccconfig 用户：`bash init-skill.sh sync` 自动从 `conf/third-party-skills.t
 | `f-launch` | 项目启动脚手架（8 种项目类型，自动 CLAUDE.md + rules） |
 | `f-moocrec` | 慕课推荐（QS 课程 + 学习路径，飞书 Base + Supabase） |
 | `f-vessel` | AI 浏览器操控（Vessel MCP，需配套 option-vessel/ 安装器） |
+| `f-sysarchi` | 系统分析师备考 — 暗号 `archi` 触发，随工边做边学 |
 
 ## 外部 skill — 三方上游 + 系统层 lark-cli（不通过本仓装）
 
