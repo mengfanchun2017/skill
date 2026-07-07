@@ -1,0 +1,79 @@
+name: Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check SKILL.md frontmatter
+        run: |
+          errors=0
+          for skill in plugins/*/SKILL.md; do
+            [ -f "$skill" ] || continue
+            name=$(head -3 "$skill" | grep '^name:' | sed 's/name: *//')
+            desc=$(head -5 "$skill" | grep '^description:' | sed 's/description: *//')
+            if [ -z "$name" ]; then
+              echo "::error file=$skill::Missing 'name:' in frontmatter"
+              errors=$((errors + 1))
+            fi
+            if [ -z "$desc" ]; then
+              echo "::error file=$skill::Missing 'description:' in frontmatter"
+              errors=$((errors + 1))
+            fi
+          done
+          if [ $errors -gt 0 ]; then
+            echo "::error::$errors skill(s) have invalid frontmatter"
+            exit 1
+          fi
+          echo "✓ All SKILL.md frontmatter valid"
+
+      - name: Check config.yaml hygiene
+        run: |
+          violations=0
+          for config in plugins/*/config.yaml; do
+            [ -f "$config" ] || continue
+            skill=$(echo "$config" | cut -d/ -f2)
+            if [ ! -f "plugins/$skill/config.yaml.example" ]; then
+              echo "::warning file=$config::$skill has config.yaml without config.yaml.example"
+            else
+              echo "::error file=$config::$skill has real config.yaml — should only have config.yaml.example"
+              violations=$((violations + 1))
+            fi
+          done
+          if [ $violations -gt 0 ]; then
+            echo "::error::$violations skill(s) have real config.yaml (should be in ccprivate)"
+            exit 1
+          fi
+          echo "✓ Config hygiene OK (no real config.yaml in public repo)"
+
+      - name: Check marketplace.json
+        run: |
+          if ! python3 -c "import json; json.load(open('.claude-plugin/marketplace.json'))" 2>&1; then
+            echo "::error::marketplace.json is not valid JSON"
+            exit 1
+          fi
+          echo "✓ marketplace.json valid JSON"
+
+      - name: Check marketplace entries match plugins
+        run: |
+          python3 -c "
+          import json, os
+          market = json.load(open('.claude-plugin/marketplace.json'))
+          market_names = {e['name'] for e in market['plugins']}
+          actual = {d for d in os.listdir('plugins') if os.path.isdir(f'plugins/{d}')}
+          missing = actual - market_names
+          extra = market_names - actual
+          if extra:
+              print(f'WARNING: marketplace has entries not in plugins/: {extra}')
+          if missing:
+              print(f'ERROR: plugins/ directories not in marketplace.json: {missing}')
+              exit(1)
+          print(f'✓ All {len(actual)} plugins registered in marketplace.json')
+          "
