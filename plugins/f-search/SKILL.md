@@ -3,8 +3,8 @@ name: f-search
 user-invocable: true
 description: |
   搜索活动统一原语 — 三源并行搜索（tavily/minimax/websearch）、Python 过滤避免 context 污染、
-  聚合去重、来源标注、搜索清单输出。被 f-research / f-research-deep / f-logme 等需要外部调研的 skill 委托调用。
-  不含领域方法论（领域解读由 f-research 负责）。
+  聚合去重、来源标注、搜索清单输出。被 f-research-frame / f-research-frame（Batch Mode） / f-logme 等需要外部调研的 skill 委托调用。
+  不含领域方法论（领域解读由 f-research-frame 负责）。
 allowed-tools: Read, Write, Bash, WebSearch,
   mcp__tavily__tavily_search, mcp__tavily__tavily_research,
   mcp__tavily__tavily_extract, mcp__tavily__tavily_crawl, mcp__tavily__tavily_map,
@@ -15,15 +15,15 @@ allowed-tools: Read, Write, Bash, WebSearch,
 
 完整的"搜索活动"：query 规划 → 调工具 → 过滤 → 聚合 → 标注 → 搜索清单输出。
 
-**不含领域方法论**。领域方法论（customer JTBD / market sizing / technical eval）由 `f-research` 负责。
+**不含领域方法论**。领域方法论（customer JTBD / market sizing / technical eval）由 `f-research-frame` 负责。
 
 ## 何时用
 
 | 触发 | 调用方 |
 |------|--------|
 | "调研 XX" / "搜 XX 资料" | 任何 skill / 用户直接调用 |
-| f-research 调方法论前的数据收集 | f-research |
-| f-research-deep 批量研究 | f-research-deep |
+| f-research-frame 调方法论前的数据收集 | f-research-frame |
+| f-research-frame 批量研究 | f-research-frame（Batch Mode） |
 | f-logme 行业调研 | f-logme |
 | f-feishu 文档调研（如 PDF 翻译查背景） | f-feishu |
 
@@ -155,7 +155,7 @@ def deduplicate_by_url(results):
 
 ## 关联 Skills
 
-- `f-research` — 4 领域方法论（最常调用方）
-- `f-research-deep` — 批量研究
+- `f-research-frame` — 4 领域方法论（最常调用方）
+- `f-research-frame（Batch Mode）` — 批量研究
 - `f-logme` — OKR/SUM 总结前的行业调研
 - `f-feishu` — 文档调研（如 PDF 翻译查背景）

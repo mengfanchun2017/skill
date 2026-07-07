@@ -18,7 +18,7 @@ allowed-tools: Read, Write, Glob, Grep, Bash
 | 本 skill 负责 | 不负责（委派其他 skill） |
 |--------------|---------------------|
 | 内容结构（H1/章节顺序/概括） | 飞书格式（lark-table 822 等）→ f-feishu |
-| 论证规范（数据+因果+不确定） | 搜索/数据收集 → f-research |
+| 论证规范（数据+因果+不确定） | 搜索/数据收集 → f-research-frame |
 | 数据呈现原则（对比用表/数值量级） | 图表生成（python/mermaid）→ f-feishu 工作流 G |
 | 模板（4 套） | 报告工作流执行 → f-research-report |
 | 引用规范（国标/通用性） | 文档索引维护 → f-feishu |
@@ -80,7 +80,7 @@ allowed-tools: Read, Write, Glob, Grep, Bash
 ```
 用户："写一份 X 报告"
   └─→ f-report-std（选模板 + 规范）
-       ├─→ f-research（搜索调研）         [可选]
+       ├─→ f-research-frame（搜索调研）         [可选]
        ├─→ f-research-report（出报告）     [执行]
        │     └─→ f-feishu（飞书格式 + 图子文档）
        └─→ 完成
@@ -98,7 +98,7 @@ cat "$SKILL_DIR/config.yaml"
 
 ## 关联 Skills
 - `f-feishu` — 飞书格式 + 图子文档工作流 G
-- `f-research` — 搜索调研
+- `f-research-frame` — 搜索调研
 - `f-research-report` — 报告生成执行
 - `f-logme` — OKR/SUM 总结可参考本框架
 
