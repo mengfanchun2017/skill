@@ -9,7 +9,7 @@ allowed-tools: Read, Write, Bash, Glob
 
 # f-diagram — 代码驱动图表生成
 
-从代码生成图表。Mermaid 主力，whiteboard-cli 渲染 SVG 白板。飞书文档嵌入委托 f-feishu。
+从代码生成图表。Mermaid 主力，whiteboard-cli 渲染 SVG 白板。调用方负责嵌入飞书文档。
 
 ## 安装
 

@@ -113,3 +113,30 @@ allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 - `f-search` — 搜索工具（必调用）
 - `f-research-deep` — 批量研究（委托本 skill 做单 item）
 - `f-research-report` — 报告生成（用本 skill 的输出做素材）
+
+## Batch Mode（原 f-research-deep）
+
+批量研究模式，用于 outline.yaml 驱动的多项研究。
+
+### 流程
+
+1. 定位当前工作目录下的 `*/outline.yaml`
+2. 检查 `output_dir` 中已完成的 JSON，跳过已完成 items
+3. 每批 `batch_size` 个 items（默认 3），逐个调用本 skill 的领域判断 + 搜索流程
+4. 输出到 `{output_dir}/{item_name_slug}.json`
+
+### JSON 结构
+
+```json
+{
+  "name": "...",
+  "domain": "generic|customer|market|technical",
+  "_sources": ["[tavily] ...", "[minimax] ..."],
+  "_confidence": "High|Medium|Low",
+  "uncertain": []
+}
+```
+
+### 验证
+
+完成后检查每个 JSON 的字段覆盖完整性。

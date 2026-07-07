@@ -4,7 +4,7 @@ user-invocable: true
 description: |
   PPTX 总控 — 从 md/wiki 到 PPTX。
   OfficeCLI 引擎（原生 OpenXML），支持批量 JSON、模板合并、autofit 后处理。
-allowed-tools: Read, Write, Bash, Glob, mcp__minimax__web_search
+allowed-tools: Read, Write, Bash, Glob
 ---
 
 # f-pptx — OfficeCLI PPTX 生成

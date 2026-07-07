@@ -9,7 +9,7 @@ allowed-tools: Read, Write, Bash, mcp__minimax__understand_image
 
 # f-pdf — PDF 内容提取 + 翻译原语
 
-2 级原语，处理 PDF 二进制格式细节。翻译由 Claude LLM，飞书文档创建委托 f-feishu。
+2 级原语，处理 PDF 二进制格式细节。翻译由 Claude LLM。调用方负责嵌入飞书文档。
 
 ## 前置条件
 
