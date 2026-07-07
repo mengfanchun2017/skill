@@ -1,5 +1,5 @@
 ---
-name: f-pptxx
+name: f-pptx
 user-invocable: true
 description: |
   PPTX 总控 — 从 md/wiki 到 PPTX。
@@ -7,7 +7,7 @@ description: |
 allowed-tools: Read, Write, Bash, Glob, mcp__minimax__web_search
 ---
 
-# f-pptxx — OfficeCLI PPTX 生成
+# f-pptx — OfficeCLI PPTX 生成
 
 从 wiki 文档或 Markdown 生成飞书 PPTX。OfficeCLI 单引擎，零外部依赖。
 
