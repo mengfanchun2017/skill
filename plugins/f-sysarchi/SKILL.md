@@ -2,7 +2,7 @@
 name: f-sysarchi
 user-invocable: true
 description: |
-  系统分析师/系统架构设计师备考 — 随工作边做边学。暗号 "archi" 触发。
+  [personal] 系统分析师/系统架构设计师备考 — 随工作边做边学。暗号 "archi" 触发。
   Use when 用户说"archi"/"系统分析师"/"备考"/"出题"/"grill"，
   或想在日常工作中嵌入考试知识点学习。
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebSearch, AskUserQuestion
@@ -10,7 +10,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebSearch, AskUserQuestion
 
 # f-sysarchi — 系统分析师/架构师随工备考
 
-> 目标: 2027 上半年软考系统分析师。边做 ccconfig 产品边学考试内容。
+> [personal] 本 skill 为个人备考定制。目标: 2027 上半年软考系统分析师。学习内容与特定项目（ccconfig）耦合，其他用户需自行适配。
 
 ## 核心理念
 

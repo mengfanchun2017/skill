@@ -1,4 +1,4 @@
-# claude-skills — mengfanchun2017 的 Claude Code skill 集合
+# claude-skills — Claude Code skill 集合
 
 > Claude Code 技能聚合仓。**16 个自建**（plugin 安装）+ **第三方 skill 由用户用 npx skills 自管**（不通过 marketplace）。
 > 飞书 / 调研 / 文档 / PPT / PDF / Excel / 图表 / AI 浏览器一站式。
@@ -41,7 +41,11 @@ npx --yes skills@latest add vinvcn/mattpocock-skills-zh-CN \
 npx --yes skills@latest update -g -y
 ```
 
-ccconfig 用户：`bash init-skill.sh sync` 自动从 `conf/third-party-skills.txt` 列表幂等装，update 跑 `scripts/update-third-party-skills.sh`。
+cconfig 用户：`bash init-skill.sh sync` 自动从 `conf/third-party-skills.txt` 列表幂等装，update 跑 `scripts/update-third-party-skills.sh`。
+
+### 配合 ccconfig 使用
+
+克隆 [ccconfig](https://github.com/mengfanchun2017/ccconfig) 后，`init-skill.sh sync` 自动完成：symlink 自建 skill、注册 marketplace、安装第三方 skill、注入私有配置。详见 ccconfig 文档。
 
 ## 自建 skill（16 个，仓内）
 
@@ -74,7 +78,7 @@ ccconfig 用户：`bash init-skill.sh sync` 自动从 `conf/third-party-skills.t
 
 ```bash
 npm install -g @larksuite/cli   # 拿 lark-cli binary
-lark-cli auth login              # 飞书登录（走 ailab/ailab account）
+lark-cli auth login              # 飞书登录
 ```
 
 | 替代入口 | 说明 |
