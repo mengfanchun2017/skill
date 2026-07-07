@@ -1,7 +1,7 @@
 # claude-skills — mengfanchun2017 的 Claude Code skill 集合
 
-> Claude Code 技能聚合仓。**12 个自建**（plugin 安装）+ **第三方 skill 由用户用 npx skills 自管**（不通过 marketplace）。
-> 飞书 / 调研 / 文档 / PPT / PDF / AI 浏览器一站式。
+> Claude Code 技能聚合仓。**17 个自建**（plugin 安装）+ **第三方 skill 由用户用 npx skills 自管**（不通过 marketplace）。
+> 飞书 / 调研 / 文档 / PPT / PDF / Excel / 图表 / AI 浏览器一站式。
 
 ## 快速开始
 
@@ -43,23 +43,27 @@ npx --yes skills@latest update -g -y
 
 ccconfig 用户：`bash init-skill.sh sync` 自动从 `conf/third-party-skills.txt` 列表幂等装，update 跑 `scripts/update-third-party-skills.sh`。
 
-## 自建 skill（13 个，仓内）
+## 自建 skill（17 个，仓内）
 
 | Skill | 说明 |
 |-------|------|
-| `f-doc` | 飞书文档统一入口（wiki/表格/白板/PPT、报告整合/拆分/转换/对比） |
-| `f-ppt` | PPT 生成（OfficeCLI 引擎：批量 JSON、模板合并） |
-| `f-pdf` | PDF 内容提取（PyMuPDF：文字/图片/表格/元数据） |
-| `f-search` | 多源搜索编排原语（三源并行：Tavily + MiniMax + WebSearch） |
-| `f-research` | 快速研究（领域自动识别 + 三源并行） |
+| `f-feishu` | 飞书文档编排层（wiki/表格/白板、报告整合/拆分/转换/对比） |
+| `f-report-std` | 报告写作横向规范（4 套模板：研究/分析/对比/方案） |
+| `f-pdf` | PDF 内容提取 + 翻译原语（PyMuPDF：文字/图片/表格/元数据） |
+| `f-pptx` | PPTX 总控（OfficeCLI 引擎：批量 JSON、模板合并、autofit） |
+| `f-research-frame` | 4 领域研究方法论（customer/generic/market/technical） |
 | `f-research-deep` | 深度研究（outline.yaml → 批量 JSON 输出） |
 | `f-research-report` | 报告生成（JSON/大纲/素材 → 结构化 Markdown） |
-| `f-report-std` | 报告写作横向规范（4 套模板：研究/分析/对比/方案）|
-| `f-logme` | 个人管理（OKR/Worklog/Reflect/SUM，飞书 Base） |
+| `f-search` | 多源搜索编排原语（三源并行：Tavily + MiniMax + WebSearch） |
+| `f-diagram` | 代码驱动图表生成（Mermaid 架构/流程/时序/ER/类图、白板） |
+| `f-docx` | Word .docx 总控（OfficeCLI 引擎：模板/样式/表格/图片/目录） |
+| `f-xlsx` | Excel .xlsx 总控（OfficeCLI 引擎：公式/图表/条件格式/透视表） |
+| `f-logme` | 个人管理系统（OKR/Worklog/Reflect/SUM，飞书 Base） |
 | `f-launch` | 项目启动脚手架（8 种项目类型，自动 CLAUDE.md + rules） |
 | `f-moocrec` | 慕课推荐（QS 课程 + 学习路径，飞书 Base + Supabase） |
 | `f-vessel` | AI 浏览器操控（Vessel MCP，需配套 option-vessel/ 安装器） |
 | `f-sysarchi` | 系统分析师备考 — 暗号 `archi` 触发，随工边做边学 |
+| `getnote` | 得到大脑集成 — MCP 驱动，笔记 CRUD/搜索/知识库/直播 |
 
 ## 外部 skill — 三方上游 + 系统层 lark-cli（不通过本仓装）
 
@@ -67,7 +71,7 @@ ccconfig 用户：`bash init-skill.sh sync` 自动从 `conf/third-party-skills.t
 
 **飞书 lark-* skill 不在本仓 marketplace**（2026-06-06 重构移除）。
 原因：larksuite/cli 是 monorepo，一次 plugin install 暴露 26 个 lark-* skill，dialog 太噪音。
-解决：`npm install -g @larksuite/cli` 装 CLI，由 **f-doc 编排**所有飞书操作（f-doc 直接调 `lark-cli docs/base/sheets/wiki/...` 命令，不依赖 lark-* skill）。
+解决：`npm install -g @larksuite/cli` 装 CLI，由 **f-feishu 编排**所有飞书操作（f-feishu 直接调 `lark-cli docs/base/sheets/wiki/...` 命令，不依赖 lark-* skill）。
 
 ```bash
 npm install -g @larksuite/cli   # 拿 lark-cli binary
@@ -76,7 +80,7 @@ lark-cli auth login              # 飞书登录（走 ailab/ailab account）
 
 | 替代入口 | 说明 |
 |------|------|
-| f-doc | 飞书文档统一入口，编排所有 lark-cli 命令（wiki/表格/白板/PPT/Base） |
+| f-feishu | 飞书文档统一入口，编排所有 lark-cli 命令（wiki/表格/白板/PPT/Base） |
 
 ### 辅助工具 — 来自 [vinvcn/mattpocock-skills-zh-CN](https://github.com/vinvcn/mattpocock-skills-zh-CN)
 
@@ -93,12 +97,12 @@ lark-cli auth login              # 飞书登录（走 ailab/ailab account）
 
 ## 安装前置
 
-**f-doc** 需要 `lark-cli` binary（f-doc 编排层直接调 lark-cli 命令）：
+**f-feishu** 需要 `lark-cli` binary（f-feishu 编排层直接调 lark-cli 命令）：
 ```bash
 npm install -g @larksuite/cli
 lark-cli auth login
 ```
-> lark-cli 没装 → f-doc 触发时报 "lark-cli: command not found"。
+> lark-cli 没装 → f-feishu 触发时报 "lark-cli: command not found"。
 
 **f-vessel** 需要先装 [Vessel AI 浏览器](https://github.com/unmodeled-tyler/vessel-browser)：
 ```bash
@@ -110,21 +114,25 @@ bash option-vessel/init.sh   # 仓内已带安装器
 ```
 claude-skills/                          ← 单聚合 marketplace 仓
 ├── .claude-plugin/
-│   └── marketplace.json                # 13 个 plugin 入口（12 本地 + 1 monorepo 外部，lark-* 走系统 lark-cli）
-├── plugins/                            ← 12 个自建 plugin
-│   ├── f-doc/SKILL.md
-│   ├── f-ppt/SKILL.md
+│   └── marketplace.json                # 18 个 plugin 入口（17 本地 + 1 monorepo 外部，lark-* 走系统 lark-cli）
+├── plugins/                            ← 17 个自建 plugin
+│   ├── f-feishu/SKILL.md
+│   ├── f-report-std/SKILL.md
 │   ├── f-pdf/SKILL.md
-│   ├── f-search/SKILL.md
-│   ├── f-research/SKILL.md
+│   ├── f-pptx/SKILL.md
+│   ├── f-research-frame/SKILL.md
 │   ├── f-research-deep/SKILL.md
 │   ├── f-research-report/SKILL.md
-│   ├── f-report-std/SKILL.md
+│   ├── f-search/SKILL.md
+│   ├── f-diagram/SKILL.md
+│   ├── f-docx/SKILL.md
+│   ├── f-xlsx/SKILL.md
 │   ├── f-logme/SKILL.md
 │   ├── f-launch/SKILL.md
 │   ├── f-moocrec/SKILL.md
 │   ├── f-vessel/SKILL.md
-│   └── skill-template/                 # 脚手架（开发用）
+│   ├── f-sysarchi/SKILL.md
+│   ├── getnote/SKILL.md
 ├── option-vessel/                      # f-vessel 配套安装器
 │   ├── init.sh
 │   └── README.md
@@ -147,7 +155,7 @@ claude-skills/                          ← 单聚合 marketplace 仓
 **为什么用 marketplace 引用而不是复制**：
 - 三方 skill 来自 mattpocock-skills-zh-CN，**这是上游社区维护**，不在我仓里更对（避免重复维护、跟官方版本错位）
 - 用户想要 lark 完整功能走官方 `npm install -g @larksuite/cli`；其他 skill 走本 marketplace
-- 我的贡献是 `f-*` 编排层（飞书/调研/PPT/PDF/浏览器）和集成经验（option-vessel/）
+- 我的贡献是 `f-*` 编排层（飞书/调研/PPT/PDF/Excel/图表/浏览器）和集成经验（option-vessel/）
 
 ## 许可
 
@@ -155,8 +163,8 @@ MIT — 见 [LICENSE](LICENSE)
 
 ## English Summary
 
-A Claude Code marketplace with 12 self-built skills. Third-party skills use `npx skills` (not /plugin install) for clean dialog UX.
+A Claude Code marketplace with 17 self-built skills. Third-party skills use `npx skills` (not /plugin install) for clean dialog UX.
 
-- **Self-built (in repo)**: f-doc, f-ppt, f-pdf, f-search, f-research, f-research-deep, f-research-report, f-report-std, f-logme, f-launch, f-moocrec, f-vessel
-- **Feishu CLI (system level)**: install `@larksuite/cli` via npm — f-doc orchestrates all `lark-cli` commands
+- **Self-built (in repo)**: f-feishu, f-report-std, f-pdf, f-pptx, f-research-frame, f-research-deep, f-research-report, f-search, f-diagram, f-docx, f-xlsx, f-logme, f-launch, f-moocrec, f-vessel, f-sysarchi, getnote
+- **Feishu CLI (system level)**: install `@larksuite/cli` via npm — f-feishu orchestrates all `lark-cli` commands
 - **Utilities (user-installed via `npx skills`)**: vinvcn/mattpocock-skills-zh-CN sub-skills (caveman, diagnose, grill-me, ...)
