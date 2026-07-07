@@ -52,14 +52,6 @@
       ]
     },
     {
-      "name": "f-research-deep",
-      "description": "基于 unified-research 框架的深度研究。使用 outline.yaml 中的 items 列表， 三源并行搜索，输出结构化 JSON 到 results/ 目录。",
-      "source": "./plugins/f-research-deep",
-      "keywords": [
-        "f"
-      ]
-    },
-    {
       "name": "f-research-report",
       "description": "报告生成 — 读 JSON / 大纲 / 自由素材 → 结构化 markdown 报告。 3 种输入模式，按用户场景自动选择。内容规范委派 f-report-std。 飞书输出委派 f-feishu（图子文档工作流 G）。",
       "source": "./plugins/f-research-report",

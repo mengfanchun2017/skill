@@ -7,7 +7,7 @@ description: |
   "拆分文档"、"导出Word/PPT"、"飞书转Office"、"导入到飞书"、"对比文档"、
   或给出飞书文档URL要求操作。
   PPT 委托 f-pptx，图表委托 f-diagram，PDF 委托 f-pdf。
-allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebSearch, mcp__minimax__understand_image
+allowed-tools: Read, Write, Bash, Glob, Grep, mcp__minimax__understand_image
 ---
 
 # f-feishu — 飞书文档编排
