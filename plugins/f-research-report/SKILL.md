@@ -4,7 +4,7 @@ user-invocable: true
 description: |
   报告生成 — 读 JSON / 大纲 / 自由素材 → 结构化 markdown 报告。
   3 种输入模式，按用户场景自动选择。内容规范委派 f-report-std。
-  飞书输出委派 f-doc（图子文档工作流 G）。
+  飞书输出委派 f-feishu（图子文档工作流 G）。
 allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 ---
 
@@ -13,17 +13,17 @@ allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 报告生成模块，将研究结果/大纲/自由素材转换为可读报告。
 
 > **格式硬约束** → `../f-report-std/rules.d/f-report-std.md`（全局加载）
-> **飞书格式** → `../f-doc/SKILL.md`（工作流 G 处理图子文档）
+> **飞书格式** → `../f-feishu/SKILL.md`（工作流 G 处理图子文档）
 
 ### 三层分工
 
 | 层 | skill | 职责 |
 |----|-------|------|
-| 机械层 | f-doc | 怎么调 API（fetch / str_replace / block_insert_after / 验证） |
+| 机械层 | f-feishu | 怎么调 API（fetch / str_replace / block_insert_after / 验证） |
 | 规范层 | f-report-std | 内容写成什么样（模板骨架、论证三要素、数据呈现约定） |
 | 工作流层 | f-research-report（本 skill） | 内容怎么产出/迭代（3 种输入模式、分轮评审、搜索补素材） |
 
-**更新已有报告时**：f-doc 工作流 A 执行机械操作，本 skill 提供内容迭代流程（v1→v2），f-report-std 提供内容标准。三层各司其职。
+**更新已有报告时**：f-feishu 工作流 A 执行机械操作，本 skill 提供内容迭代流程（v1→v2），f-report-std 提供内容标准。三层各司其职。
 
 ## Step 0: 报告卡片（前置产物）
 
@@ -96,7 +96,7 @@ allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 
 #### Step 5: 输出
 根据 `RESEARCH_OUTPUT` 配置：feishu（默认）/ file / both
-输出到飞书时，委派 f-doc skill（工作流 0 创建新文档）。
+输出到飞书时，委派 f-feishu skill（工作流 0 创建新文档）。
 
 ### 模式 2: 大纲模式
 
@@ -121,7 +121,7 @@ allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 按模板骨架 + f-research 素材生成报告。
 
 #### Step 大纲.5: 输出
-委派 f-doc 创建飞书文档。
+委派 f-feishu 创建飞书文档。
 
 ### 模式 3: 自由模式
 
@@ -164,7 +164,7 @@ v1（Claude 出）
 v2（Claude 改）
   ↓ 按标红改 + 95% 完成度
   ↓
-定稿 → f-doc 创建飞书文档
+定稿 → f-feishu 创建飞书文档
 ```
 
 **v1 输出规范**：
@@ -184,13 +184,13 @@ v2（Claude 改）
 
 ## 工作流 G: 图子文档生成（数据/分析图）
 
-> 架构/流程图走 Mermaid 白板（f-doc 默认）。**数据/分析图走本工作流**——每个图建独立子文档。
+> 架构/流程图走 Mermaid 白板（f-feishu 默认）。**数据/分析图走本工作流**——每个图建独立子文档。
 
 ### 何时用
 
 | 图类型 | 走法 |
 |--------|------|
-| 架构图 / 流程图 / 时序图 | Mermaid 白板嵌入（f-doc） |
+| 架构图 / 流程图 / 时序图 | Mermaid 白板嵌入（f-feishu） |
 | 数据图（折线/柱状/散点/热力图） | **本工作流** → python 脚本 → 子文档 |
 | 对比图 / 占比图 | **本工作流** 或 plotly 交互图 |
 | 示意图（无数据） | Mermaid 白板 |
@@ -216,10 +216,10 @@ v2（Claude 改）
 - 父文档插入位置写一句"详见《<子文档名>》"，引导跳转
 
 ### 详细命令
-见 `../f-doc/SKILL.md` 工作流 G（含 lark-cli 完整命令）。
+见 `../f-feishu/SKILL.md` 工作流 G（含 lark-cli 完整命令）。
 
 ## 关联 Skills
 - `f-report-std` — 内容规范、模板（必读）
 - `f-research` — 领域方法论 (4 领域)
 - `f-research-deep` — 批量研究
-- `f-doc` — 飞书格式 + 图子文档 lark-cli 命令
+- `f-feishu` — 飞书格式 + 图子文档 lark-cli 命令

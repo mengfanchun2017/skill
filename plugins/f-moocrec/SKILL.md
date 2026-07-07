@@ -127,7 +127,7 @@ print(json.dumps(r.json(), ensure_ascii=False))
 
 ### Step 0.3: 创建飞书个人空间
 
-**必须先调 f-doc Skill**（飞书规则硬前置条件）。
+**必须先调 f-feishu Skill**（飞书规则硬前置条件）。
 
 创建资源顺序：
 
@@ -436,21 +436,21 @@ lark-cli base +record-list --base-token $B --table-id $T --format json --limit 2
    阶段一 ─── 阶段二 ─── 阶段三
    ```
    
-   支持的 mermaid 类型：flowchart, pie, gantt, timeline, mindmap。不支持 radar-beta, quadrantChart, sankey-beta, block-beta, architecture-beta。详见 f-doc `references/chart-rendering.md`。
+   支持的 mermaid 类型：flowchart, pie, gantt, timeline, mindmap。不支持 radar-beta, quadrantChart, sankey-beta, block-beta, architecture-beta。详见 f-feishu `references/chart-rendering.md`。
 
 ## 飞书操作委派规则
 
 | 操作 | 执行者 | 命令/工具 |
 |------|--------|----------|
-| 创建 wiki doc | f-doc skill（先调 Skill） | `lark-cli docs +create` |
-| 更新 wiki doc | f-doc skill（先调 Skill） | `lark-cli docs +update --command str_replace` |
+| 创建 wiki doc | f-feishu skill（先调 Skill） | `lark-cli docs +create` |
+| 更新 wiki doc | f-feishu skill（先调 Skill） | `lark-cli docs +update --command str_replace` |
 | 创建 Base/表 | f-moocrec 直接 | `lark-cli base +base-create` |
 | 写进度记录 | f-moocrec 直接 | `lark-cli base +record-batch-create` |
 | 读进度记录 | f-moocrec 直接 | `lark-cli base +record-list --format json` |
 | 课程查询 | f-moocrec 直接 | Supabase API 或 `mcp__supabase__execute_sql` |
 | 课程搜索/更新 | f-moocrec 直接 | Tavily/WebSearch |
 
-**关键**: 写飞书 doc 前必须先调 `f-doc` Skill（全局飞书规则硬前置条件）。Base 操作不需要。
+**关键**: 写飞书 doc 前必须先调 `f-feishu` Skill（全局飞书规则硬前置条件）。Base 操作不需要。
 
 ## 常见陷阱
 
@@ -458,7 +458,7 @@ lark-cli base +record-list --base-token $B --table-id $T --format json --limit 2
 |---------|--------|
 | `lark-cli docs +create --markdown` | `--doc-format markdown --content -` |
 | `--folder-token` 用于 wiki | `--parent-token` + wiki node token |
-| 不调 f-doc 直接裸调 lark-cli docs | 先 `Skill("f-doc")` 再执行 lark-cli |
+| 不调 f-feishu 直接裸调 lark-cli docs | 先 `Skill("f-feishu")` 再执行 lark-cli |
 | Supabase REST API 直连 | 用管理 API (`api.supabase.com`) + access token |
 | stderr 被当作错误 | lark-cli 日志行在 stdout，WSL 注入行需过滤 |
 | `--content` 中换行符直接写 | 用 heredoc `cat << 'EOF' \| lark-cli ...` |

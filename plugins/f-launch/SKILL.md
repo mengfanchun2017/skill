@@ -50,7 +50,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, AskUserQuestion
 | 项目代号 | `~/git/<代号>/`,kebab-case |
 | 一句话目标 | 写进 CLAUDE.md + OKR.O |
 | 合规层级 | 个人/学习 / 商业 / 金融医疗政企 |
-| 是否需要飞书输出 | 是 → 调 f-doc 生成 wiki 报告 |
+| 是否需要飞书输出 | 是 → 调 f-feishu 生成 wiki 报告 |
 
 ### Step 4:脚手架生成
 
@@ -124,7 +124,7 @@ done
 ## 关联 Skills
 
 - `f-logme` — OKR 关联
-- `f-doc` — 飞书 wiki 报告输出
+- `f-feishu` — 飞书 wiki 报告输出
 - `f-research` — 技术选型(中大型项目)
 - `f-research-report` — 立项报告生成
 

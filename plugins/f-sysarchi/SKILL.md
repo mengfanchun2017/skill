@@ -80,7 +80,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebSearch, AskUserQuestion
 | 写/改 BOOTSTRAP | 8. 系统规划与分析（可行性分析） |
 | 写 Bash 脚本（init.sh, update.sh 等） | 5. 软件工程（开发环境与工具） |
 | 安全相关（SECURITY.md, pre-commit hook） | 7. 信息安全（访问控制、安全管理） |
-| 飞书集成（option-bridge, f-doc） | 4. 企业信息化（企业应用集成） |
+| 飞书集成（option-bridge, f-feishu） | 4. 企业信息化（企业应用集成） |
 | monitor.sh 守护进程 | 12. 系统运行与维护（运维管理） |
 | 写 Skill（SKILL.md） | 5. 软件工程（软件重用） |
 | python-requirements.txt 管理 | 1. 计算机系统知识（软件环境） |
@@ -207,7 +207,7 @@ confidence 含义: 0=未学, 1=看过, 2=理解, 3=能应用, 4=能讲授, 5=考
 | 系统 | 关系 |
 |------|------|
 | f-search | 学习模式的三源搜索委托 f-search |
-| f-doc | 学习笔记输出到飞书文档 |
+| f-feishu | 学习笔记输出到飞书文档 |
 | f-logme | 学习记录写入 Worklog 表（关联 OKR_KR "软考备考"）|
 
 ## 首次安装

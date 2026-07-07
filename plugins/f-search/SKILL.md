@@ -25,7 +25,7 @@ allowed-tools: Read, Write, Bash, WebSearch,
 | f-research 调方法论前的数据收集 | f-research |
 | f-research-deep 批量研究 | f-research-deep |
 | f-logme 行业调研 | f-logme |
-| f-doc 文档调研（如 PDF 翻译查背景） | f-doc |
+| f-feishu 文档调研（如 PDF 翻译查背景） | f-feishu |
 
 ## 三源并行（必须同时执行）
 
@@ -158,4 +158,4 @@ def deduplicate_by_url(results):
 - `f-research` — 4 领域方法论（最常调用方）
 - `f-research-deep` — 批量研究
 - `f-logme` — OKR/SUM 总结前的行业调研
-- `f-doc` — 文档调研（如 PDF 翻译查背景）
+- `f-feishu` — 文档调研（如 PDF 翻译查背景）
