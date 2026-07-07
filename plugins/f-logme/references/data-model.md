@@ -57,4 +57,4 @@ Base `okr_v2` 含 4 个表，token 在 ccprivate config.yaml 中。
 
 ## KR_Progress 表（已废弃）
 
-详见 [ADR-0003](../../docs/adr/0003-deprecate-tasks-and-kr-progress.md)。
+KR_Progress 表已于 2025-07 废弃，不再维护。
