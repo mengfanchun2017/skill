@@ -15,7 +15,6 @@
       "name": "f-feishu",
       "description": "飞书文档编排层 — 创建飞书wiki/表格/白板、更新报告、整合/拆分文档、飞书↔Office双向转换、文档对比。Use when 用户说\"创建文档\"/\"写文档\"、\"更新文档\"/\"更新报告\"、\"整合文档\"/\"合并文档\"、 \"拆分文档\"、\"导出Word/PPT\"、\"飞书转Office\"、\"导入到飞书\"、\"对比文档\"、或给出飞书文档URL要求操作。PPT 委托 f-pptx，图表委托 f-diagram，PDF 委托 f-pdf。",
       "source": "./plugins/f-feishu",
-      "version": "0.1.0",
       "keywords": [
         "f"
       ]
@@ -24,7 +23,6 @@
       "name": "f-report-std",
       "description": "报告写作横向规范 — 内容结构、数据呈现、论证逻辑、图表约定。4 套模板（研究/分析/对比/方案）+ 通用规则。Use when 用户说\"写报告\"/\"出报告\"/\"分析报告\"/\"对比报告\"/\"方案报告\"，或任何需要产出\"长篇正式文档\"的场景。被 f-research-report 和 f-logme 委托调用。",
       "source": "./plugins/f-report-std",
-      "version": "0.1.0",
       "keywords": [
         "f"
       ]
@@ -33,7 +31,6 @@
       "name": "f-pdf",
       "description": "PDF 内容提取 + 翻译原语 — 文字/图片/表格/元数据提取，PDF 翻译文档生成。委托 f-feishu 创建飞书文档。",
       "source": "./plugins/f-pdf",
-      "version": "0.1.0",
       "keywords": [
         "f"
       ]
@@ -42,7 +39,6 @@
       "name": "f-pptx",
       "description": "PPTX 总控 — 从 md/wiki 到 PPTX。OfficeCLI 引擎（原生 OpenXML），支持批量 JSON、模板合并、autofit 后处理。",
       "source": "./plugins/f-pptx",
-      "version": "0.1.0",
       "keywords": [
         "f"
       ]
@@ -51,7 +47,6 @@
       "name": "f-research",
       "description": "统一研究框架 - 自动判断领域，三源并行搜索，Python过滤优化，输出到飞书wiki。 支持 generic/customer/market/technical 四个领域，自动路由无需用户指定。",
       "source": "./plugins/f-research",
-      "version": "0.1.0",
       "keywords": [
         "f"
       ]
@@ -60,7 +55,6 @@
       "name": "f-research-deep",
       "description": "基于 unified-research 框架的深度研究。使用 outline.yaml 中的 items 列表， 三源并行搜索，输出结构化 JSON 到 results/ 目录。",
       "source": "./plugins/f-research-deep",
-      "version": "0.1.0",
       "keywords": [
         "f"
       ]
@@ -69,7 +63,6 @@
       "name": "f-research-report",
       "description": "报告生成 — 读 JSON / 大纲 / 自由素材 → 结构化 markdown 报告。 3 种输入模式，按用户场景自动选择。内容规范委派 f-report-std。 飞书输出委派 f-feishu（图子文档工作流 G）。",
       "source": "./plugins/f-research-report",
-      "version": "0.1.0",
       "keywords": [
         "f"
       ]
@@ -78,7 +71,6 @@
       "name": "f-vessel",
       "description": "Vessel AI Agent 浏览器 — MCP 操控真实浏览器，人类监督审批。Use when you need to browse the web, log into sites, fill forms, extract page content, take screenshots, or perform multi-step web tasks on behalf of the user.",
       "source": "./plugins/f-vessel",
-      "version": "0.1.0",
       "keywords": [
         "f"
       ]
@@ -87,7 +79,6 @@
       "name": "f-logme",
       "description": "个人管理系统 — OKR 目标管理、Worklog 工作日志、Reflect 反思、SUM 周期/领域总结生成。数据存飞书 Base，输出到飞书文档。Use when 用户说\"记录工作\"/\"写日志\"/\"OKR\"/\"目标管理\"/\"反思\"/\"生成总结\"/\"季度报告\"/\"年度报告\"。",
       "source": "./plugins/f-logme",
-      "version": "0.1.0",
       "keywords": [
         "f"
       ]
@@ -96,7 +87,6 @@
       "name": "f-launch",
       "description": "项目启动脚手架 — 意图到可运行项目（类型检测→脚手架→OKR→风险）。覆盖 8 种项目类型。Use when 用户说\"新建项目\"/\"创建项目\"/\"scaffold\"/\"项目启动\"。",
       "source": "./plugins/f-launch",
-      "version": "0.1.0",
       "keywords": [
         "f"
       ]
@@ -105,7 +95,6 @@
       "name": "f-moocrec",
       "description": "慕课推荐系统 — 基于 QS 排名大学课程体系，生成个性化学习路径。课程数据存 Supabase，学生画像/进度存飞书。Use when 用户说\"推荐课程\"/\"学习路径\"/\"MOOC\"/\"在线课程\"。",
       "source": "./plugins/f-moocrec",
-      "version": "0.1.0",
       "keywords": [
         "f"
       ]
@@ -114,7 +103,6 @@
       "name": "f-search",
       "description": "多源搜索编排原语 — 三源并行搜索（Tavily + MiniMax + WebSearch），Python 过滤去重，来源标注。被 f-research/f-research-deep/f-logme 委托调用。",
       "source": "./plugins/f-search",
-      "version": "0.1.0",
       "keywords": [
         "f"
       ]
@@ -123,7 +111,6 @@
       "name": "f-sysarchi",
       "description": "系统分析师/系统架构设计师随工备考 — 暗号 archi 触发。在日常工作中嵌入软考知识点学习，支持测验(grill)、映射(map)、进度(progress)、深度学习(learn)四种模式。",
       "source": "./plugins/f-sysarchi",
-      "version": "0.1.0",
       "keywords": [
         "f"
       ]
@@ -132,22 +119,25 @@
       "name": "f-diagram",
       "description": "代码驱动图表生成 — Mermaid 架构/流程/时序/ER/类图、whiteboard-cli SVG 白板。Use when 用户说\"画架构图\"/\"画流程图\"/\"画时序图\"/\"画ER图\"/\"画白板\"。飞书嵌入委托 f-feishu。",
       "source": "./plugins/f-diagram",
-      "version": "0.1.0",
-      "keywords": ["f"]
+      "keywords": [
+        "f"
+      ]
     },
     {
       "name": "f-docx",
       "description": "Word .docx 总控 — OfficeCLI 引擎，支持模板/样式/表格/图片/页眉页脚/目录。Use when 用户说\"创建Word\"/\"写Word文档\"/\"生成docx\"/\"导出Word\"/\"做简历\"。",
       "source": "./plugins/f-docx",
-      "version": "0.1.0",
-      "keywords": ["f"]
+      "keywords": [
+        "f"
+      ]
     },
     {
       "name": "f-xlsx",
       "description": "Excel .xlsx 总控 — OfficeCLI 引擎，支持公式/图表/条件格式/数据透视表/多工作表。Use when 用户说\"创建Excel\"/\"做表格\"/\"生成xlsx\"/\"导出报表\"/\"数据透视表\"。",
       "source": "./plugins/f-xlsx",
-      "version": "0.1.0",
-      "keywords": ["f"]
+      "keywords": [
+        "f"
+      ]
     },
     {
       "name": "mattpocock-skills",
@@ -156,7 +146,6 @@
         "source": "github",
         "repo": "vinvcn/mattpocock-skills-zh-CN"
       },
-      "version": "0.1.0",
       "keywords": [
         "mattpocock",
         "caveman",
