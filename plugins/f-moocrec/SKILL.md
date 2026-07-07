@@ -436,7 +436,7 @@ lark-cli base +record-list --base-token $B --table-id $T --format json --limit 2
    阶段一 ─── 阶段二 ─── 阶段三
    ```
    
-   支持的 mermaid 类型：flowchart, pie, gantt, timeline, mindmap。不支持 radar-beta, quadrantChart, sankey-beta, block-beta, architecture-beta。详见 f-feishu `references/chart-rendering.md`。
+   支持的 mermaid 类型：flowchart, pie, gantt, timeline, mindmap。不支持 radar-beta, quadrantChart, sankey-beta, block-beta, architecture-beta。图表渲染 → f-feishu 工作流 G（图子文档约定）。
 
 ## 飞书操作委派规则
 

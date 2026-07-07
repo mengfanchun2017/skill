@@ -114,11 +114,11 @@ allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 - 候选对比 → `comparison.md`
 - 背景+现状+趋势 → `research.md`
 
-#### Step 大纲.3: 调 f-research 补素材
-对每个章节调 f-research 做轻量搜索（2-3 源），产出每章 200-500 字。
+#### Step 大纲.3: 调 f-research-frame 补素材
+对每个章节调 f-research-frame 做轻量搜索（2-3 源），产出每章 200-500 字。
 
 #### Step 大纲.4: 填充模板
-按模板骨架 + f-research 素材生成报告。
+按模板骨架 + f-research-frame 素材生成报告。
 
 #### Step 大纲.5: 输出
 委派 f-feishu 创建飞书文档。
@@ -136,8 +136,8 @@ allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 
 不确定时用 AskUserQuestion 让用户选。
 
-#### Step 自由.2: 调 f-research 深度搜索
-全流程走 f-research 框架：
+#### Step 自由.2: 调 f-research-frame 深度搜索
+全流程走 f-research-frame 框架：
 - 领域判断
 - 三源并行搜索
 - 聚合去重
@@ -220,6 +220,6 @@ v2（Claude 改）
 
 ## 关联 Skills
 - `f-report-std` — 内容规范、模板（必读）
-- `f-research` — 领域方法论 (4 领域)
-- `f-research-deep` — 批量研究
+- `f-research-frame` — 领域方法论 (4 领域)
+- `f-research-frame（Batch Mode）` — 批量研究
 - `f-feishu` — 飞书格式 + 图子文档 lark-cli 命令
