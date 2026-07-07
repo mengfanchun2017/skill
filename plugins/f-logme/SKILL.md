@@ -269,7 +269,7 @@ SUM 分两条通道：
   → 确定周期和分类
   → 拉取 OKR_O → OKR_KR → Worklog → Reflect
   → 按内置模板填充
-  → 委托 f-doc 创建飞书文档
+  → 委托 f-feishu 创建飞书文档
 ```
 
 | 类型 | 触发示例 | 模板侧重 |
@@ -302,7 +302,7 @@ SUM 分两条通道：
       → 用户补充上下文（对话中提供）
   → Step 4: 生成
       → 按模板结构写 Markdown，数据替换、固定文案保留
-      → 委托 f-doc 创建飞书文档（父目录 = OKR wiki 节点）
+      → 委托 f-feishu 创建飞书文档（父目录 = OKR wiki 节点）
 ```
 
 **模板学习要点**：
@@ -533,7 +533,7 @@ for rec in data['data']['data']:
 
 ### SUM 生成流程
 
-拉取数据后，用 `sum_generate.py` 生成 Markdown，再委托 f-doc 创建飞书文档。
+拉取数据后，用 `sum_generate.py` 生成 Markdown，再委托 f-feishu 创建飞书文档。
 
 ```bash
 D=/tmp/sum_$(date +%s) && mkdir -p $D
@@ -575,28 +575,28 @@ python3 ${CLAUDE_PLUGIN_ROOT}/sum_generate.py \
   --output $D/summary.md
 ```
 
-**Step 3: 委托 f-doc 创建飞书文档**
+**Step 3: 委托 f-feishu 创建飞书文档**
 
-f-logme 不自己调 `lark-cli docs +create`。将生成的 Markdown 交给 f-doc skill，由 f-doc 统一编排 lark-cli 创建飞书文档。f-doc 自动处理表格宽度（822px）、标题层级（≤H3）、文档父目录等格式化规则（详见 f-doc skill 格式约束）。
+f-logme 不自己调 `lark-cli docs +create`。将生成的 Markdown 交给 f-feishu skill，由 f-feishu 统一编排 lark-cli 创建飞书文档。f-feishu 自动处理表格宽度（822px）、标题层级（≤H3）、文档父目录等格式化规则（详见 f-feishu skill 格式约束）。
 
 ## 集成点
 
 | 系统 | 关系 |
 |------|------|
 | f-worklog | 简化版，f-logme 是其升级替代 |
-| f-doc | SUM 输出目标：飞书文档，统一编排 lark-cli（不直接依赖 lark-* skill） |
-| f-ppt | 年度总结可选输出 PPT |
+| f-feishu | SUM 输出目标：飞书文档，统一编排 lark-cli（不直接依赖 lark-* skill） |
+| f-pptx | 年度总结可选输出 PPT |
 | f-research | 领域总结前可联动做行业调研 |
 | lark-cli | 所有飞书操作（文档/Base/表格/日历）通过 lark-cli（npm 全局） |
 
 ## 文档创建规则
 
-SUM 生成飞书文档时，**必须通过 f-doc skill 创建**（不裸调 lark-cli），原因：
-- f-doc → lark-doc → lark-doc-style.md 加载链保证格式化规则完整进 context
-- f-doc skill 被调用时加载，提供父目录/标题/表格等基础规则
+SUM 生成飞书文档时，**必须通过 f-feishu skill 创建**（不裸调 lark-cli），原因：
+- f-feishu → lark-doc → lark-doc-style.md 加载链保证格式化规则完整进 context
+- f-feishu skill 被调用时加载，提供父目录/标题/表格等基础规则
 - 直接裸调会丢失格式化约束，导致编号标题、分割线、窄表格等问题
 
-f-logme 职责：从 Base 聚合数据 → 按模板填 Markdown → 交给 f-doc 创建文档。
+f-logme 职责：从 Base 聚合数据 → 按模板填 Markdown → 交给 f-feishu 创建文档。
 
 ---
 

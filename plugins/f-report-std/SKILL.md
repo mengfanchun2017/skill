@@ -11,17 +11,17 @@ allowed-tools: Read, Write, Glob, Grep, Bash
 
 # f-report-std — 报告写作规范
 
-横向能力，定义"什么是好的报告"。**不绑定任何输出平台**（飞书/Word/Notion 都适用），具体飞书格式委派 `f-doc`。
+横向能力，定义"什么是好的报告"。**不绑定任何输出平台**（飞书/Word/Notion 都适用），具体飞书格式委派 `f-feishu`。
 
 ## 职责边界
 
 | 本 skill 负责 | 不负责（委派其他 skill） |
 |--------------|---------------------|
-| 内容结构（H1/章节顺序/概括） | 飞书格式（lark-table 822 等）→ f-doc |
+| 内容结构（H1/章节顺序/概括） | 飞书格式（lark-table 822 等）→ f-feishu |
 | 论证规范（数据+因果+不确定） | 搜索/数据收集 → f-research |
-| 数据呈现原则（对比用表/数值量级） | 图表生成（python/mermaid）→ f-doc 工作流 G |
+| 数据呈现原则（对比用表/数值量级） | 图表生成（python/mermaid）→ f-feishu 工作流 G |
 | 模板（4 套） | 报告工作流执行 → f-research-report |
-| 引用规范（国标/通用性） | 文档索引维护 → f-doc |
+| 引用规范（国标/通用性） | 文档索引维护 → f-feishu |
 
 ## 4 套模板
 
@@ -60,15 +60,15 @@ allowed-tools: Read, Write, Glob, Grep, Bash
 - **国标/标准引用完整**：三级体系只用到两级也要说全三级
 - **行业报告**：注明来源 + 时间 + 数据范围
 
-## 图子文档约定（与 f-doc 协作）
+## 图子文档约定（与 f-feishu 协作）
 
 | 步骤 | 责任方 | 工具 |
 |------|--------|------|
 | 1. 写 python 脚本（图） | f-research-report | matplotlib/seaborn/plotly |
 | 2. 跑脚本 → /tmp/figs/*.png | f-research-report | python3 |
-| 3. 建子文档（图 + 解读 + 代码 3 段） | f-doc | lark-cli docs +create |
-| 4. 父文档 block_insert_after 嵌入 | f-doc | lark-cli docs +update |
-| 5. 父文档加"详见《<子文档名>》" | f-doc | lark-cli |
+| 3. 建子文档（图 + 解读 + 代码 3 段） | f-feishu | lark-cli docs +create |
+| 4. 父文档 block_insert_after 嵌入 | f-feishu | lark-cli docs +update |
+| 5. 父文档加"详见《<子文档名>》" | f-feishu | lark-cli |
 
 **关键原则**：
 - 子文档 = 详细档案（唯一源，可被多父文档嵌入）
@@ -82,7 +82,7 @@ allowed-tools: Read, Write, Glob, Grep, Bash
   └─→ f-report-std（选模板 + 规范）
        ├─→ f-research（搜索调研）         [可选]
        ├─→ f-research-report（出报告）     [执行]
-       │     └─→ f-doc（飞书格式 + 图子文档）
+       │     └─→ f-feishu（飞书格式 + 图子文档）
        └─→ 完成
 ```
 
@@ -97,7 +97,7 @@ cat "$SKILL_DIR/config.yaml"
 ```
 
 ## 关联 Skills
-- `f-doc` — 飞书格式 + 图子文档工作流 G
+- `f-feishu` — 飞书格式 + 图子文档工作流 G
 - `f-research` — 搜索调研
 - `f-research-report` — 报告生成执行
 - `f-logme` — OKR/SUM 总结可参考本框架
