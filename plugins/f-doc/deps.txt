@@ -1,2 +1,0 @@
-@larksuite/cli  npm:latest  f-doc
-@officecli/officecli  npm:latest  f-doc

@@ -1,7 +1,7 @@
 # 飞书文档写操作参考手册
 
 > 完整格式约束、命令速查、安全规则、验证步骤。**参考手册，非执行入口。**
-> 写操作时关键检查已内联到 `../SKILL.md` 工作流步骤中。全局硬约束 → `rules.d/f-doc.md`
+> 写操作时关键检查已内联到 `../SKILL.md` 工作流步骤中。全局硬约束 → `rules.d/f-feishu.md`
 
 ## 0. 策略决策（写前必问）
 
@@ -50,11 +50,9 @@
 - [ ] 必设属性：`rows="N" cols="N" header-row="true" header-column="true" column-widths="W,W,W"`
 - [ ] 单元格内纯文本，不用 `#` 标题符号
 
-### 图表
-- [ ] Mermaid 代码块或 whiteboard，**禁止 ASCII 字符画**
+### 图表 → 委托 f-diagram skill
+- [ ] 架构图/流程图等由 f-diagram 生成，通过 `block_insert_after` 嵌入
 - [ ] 图表在对应内容位置嵌入，不在末尾堆砌
-- [ ] 白板只能通过 `block_insert_after` 插入，不能通过 `str_replace` 插入 `<whiteboard>` 标签
-- [ ] 已有白板不能通过 `docs +update` 编辑，需用 `lark-whiteboard` skill
 
 ### 文本
 - [ ] 缩写首次出现用 DFN 格式：`中文全称（English Full Name, ABBR）`
@@ -86,7 +84,7 @@
 ## 5. 输出规范
 
 - [ ] 回复中输出：使用的飞书账号 + 文档链接（`my.feishu.cn` 域名）
-- [ ] 追加到 f-doc SKILL.md 底部「线上文档索引」表格
+- [ ] 追加到 f-feishu SKILL.md 底部「线上文档索引」表格
 
 ---
 

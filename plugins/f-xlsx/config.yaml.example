@@ -1,0 +1,3 @@
+# f-xlsx 配置（OfficeCLI 单引擎，无需外部依赖）
+# 个人模板路径（可选）
+# template_dir: "~/templates/xlsx/"

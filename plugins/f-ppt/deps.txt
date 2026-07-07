@@ -1,1 +1,0 @@
-@officecli/officecli  npm:latest  f-ppt
