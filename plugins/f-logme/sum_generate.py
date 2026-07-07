@@ -417,11 +417,14 @@ def generate_okr_review(data: dict, period: str) -> str:
     o_map = data["o"]["map"]
     kr_map = data["kr"]["map"]
     rf_map = data["rf"]["map"]
+    o_col = data["o"]["col"]
+    kr_col = data["kr"]["col"]
+    rf_col = data["rf"]["col"]
 
     # Filter O by period
     matched_o = {}
     for rid, rec in o_map.items():
-        if period_match(rec[6], period):
+        if period_match(rec[o_col["周期"]], period):
             matched_o[rid] = rec
 
     lines = []
@@ -436,9 +439,9 @@ def generate_okr_review(data: dict, period: str) -> str:
     aspirational_total = 0
 
     for o_id, o_rec in matched_o.items():
-        o_title = o_rec[4]
-        o_status = cell(o_rec[2])
-        o_cat = cell(o_rec[5])
+        o_title = o_rec[o_col["标题"]]
+        o_status = cell(o_rec[o_col["状态"]])
+        o_cat = cell(o_rec[o_col["分类"]])
         lines.append(f"## O: {o_title}")
         lines.append(f"状态：{o_status} | 分类：{o_cat}")
         lines.append("")
@@ -446,14 +449,14 @@ def generate_okr_review(data: dict, period: str) -> str:
         lines.append("|----|------|------|------|------|")
 
         for kr_id, kr_rec in kr_map.items():
-            linked_o = extract_link_id(kr_rec[6])
+            linked_o = extract_link_id(kr_rec[kr_col["关联O"]])
             if linked_o != o_id:
                 continue
-            kr_title = kr_rec[7]
-            kr_type = cell(kr_rec[2])
-            kr_confidence = cell(kr_rec[5])
-            kr_progress = f"{kr_rec[8]}%"
-            kr_score = kr_rec[3] if kr_rec[3] else 0
+            kr_title = kr_rec[kr_col["标题"]]
+            kr_type = cell(kr_rec[kr_col["类型"]])
+            kr_confidence = cell(kr_rec[kr_col["信心"]])
+            kr_progress = f"{kr_rec[kr_col['进度']]}%"
+            kr_score = kr_rec[kr_col["最终评分"]] if kr_rec[kr_col["最终评分"]] else 0
 
             lines.append(f"| {kr_title} | {kr_type} | {kr_confidence} | {kr_progress} | {kr_score} |")
 
@@ -461,11 +464,11 @@ def generate_okr_review(data: dict, period: str) -> str:
             total_score += float(kr_score)
             if kr_type == "Committed":
                 committed_total += 1
-                if kr_rec[8] == 100:
+                if kr_rec[kr_col["进度"]] == 100:
                     committed_done += 1
             elif kr_type == "Aspirational":
                 aspirational_total += 1
-                if kr_rec[8] >= 70:
+                if kr_rec[kr_col["进度"]] >= 70:
                     aspirational_done += 1
 
         lines.append("")
@@ -484,27 +487,27 @@ def generate_okr_review(data: dict, period: str) -> str:
     # What went well / needs improvement
     matched_rf = {}
     for rf_id, rf_rec in rf_map.items():
-        linked_o = extract_link_id(rf_rec[3])
+        linked_o = extract_link_id(rf_rec[rf_col["关联O"]])
         if linked_o in matched_o:
             matched_rf[rf_id] = rf_rec
 
     lines.append("## 做得好的")
     for rf_id, rf_rec in matched_rf.items():
-        rf_good = rf_rec[4] if rf_rec[4] else ""
+        rf_good = rf_rec[rf_col["做得好"]] if rf_rec[rf_col["做得好"]] else ""
         if rf_good:
             lines.append(f"- {rf_good}")
     lines.append("")
 
     lines.append("## 待改进的")
     for rf_id, rf_rec in matched_rf.items():
-        rf_bad = rf_rec[6] if rf_rec[6] else ""
+        rf_bad = rf_rec[rf_col["待改进"]] if rf_rec[rf_col["待改进"]] else ""
         if rf_bad:
             lines.append(f"- {rf_bad}")
     lines.append("")
 
     lines.append("## 下周期调整")
     for rf_id, rf_rec in matched_rf.items():
-        rf_next = rf_rec[7] if rf_rec[7] else ""
+        rf_next = rf_rec[rf_col["下阶段"]] if rf_rec[rf_col["下阶段"]] else ""
         if rf_next:
             lines.append(f"- {rf_next}")
     lines.append("")
@@ -518,6 +521,10 @@ def generate_annual_report(data: dict, year: str = "2026") -> str:
     kr_map = data["kr"]["map"]
     wl_map = data["wl"]["map"]
     rf_map = data["rf"]["map"]
+    o_col = data["o"]["col"]
+    kr_col = data["kr"]["col"]
+    wl_col = data["wl"]["col"]
+    rf_col = data["rf"]["col"]
 
     lines = []
     lines.append(f"# {year} 年度个人报告")
@@ -537,36 +544,36 @@ def generate_annual_report(data: dict, year: str = "2026") -> str:
 
     for cat in categories:
         cat_o = {rid: rec for rid, rec in o_map.items()
-                 if (rec[5][0] if isinstance(rec[5], list) else rec[5]) == cat
-                 and period_match(rec[6], year)}
+                 if (rec[o_col["分类"]][0] if isinstance(rec[o_col["分类"]], list) else rec[o_col["分类"]]) == cat
+                 and period_match(rec[o_col["周期"]], year)}
         cat_o_ids = set(cat_o.keys())
 
         cat_kr_count = sum(1 for rid, rec in kr_map.items()
-                          if extract_link_id(rec[6]) in cat_o_ids)
+                          if extract_link_id(rec[kr_col["关联O"]]) in cat_o_ids)
         cat_wl_count = sum(1 for rid, rec in wl_map.items()
-                          if extract_link_id(rec[5]) in
+                          if extract_link_id(rec[wl_col["关联KR"]]) in
                           {krid for krid, krec in kr_map.items()
-                           if extract_link_id(krec[6]) in cat_o_ids})
+                           if extract_link_id(krec[kr_col["关联O"]]) in cat_o_ids})
         cat_rf_count = sum(1 for rid, rec in rf_map.items()
-                          if extract_link_id(rec[3]) in cat_o_ids)
+                          if extract_link_id(rec[rf_col["关联O"]]) in cat_o_ids)
 
         all_wl_ids.update(rid for rid, rec in wl_map.items()
-                         if extract_link_id(rec[5]) in
+                         if extract_link_id(rec[wl_col["关联KR"]]) in
                          {krid for krid, krec in kr_map.items()
-                          if extract_link_id(krec[6]) in cat_o_ids})
+                          if extract_link_id(krec[kr_col["关联O"]]) in cat_o_ids})
         all_rf_ids.update(rid for rid, rec in rf_map.items()
-                         if extract_link_id(rec[3]) in cat_o_ids)
+                         if extract_link_id(rec[rf_col["关联O"]]) in cat_o_ids)
 
         lines.append(f"| {cat_labels[cat]} | {len(cat_o)} | {cat_kr_count} | {cat_wl_count} | {cat_rf_count} |")
 
-    lines.append(f"| **合计** | **{sum(1 for rid, rec in o_map.items() if period_match(rec[6], year))}** | **{sum(1 for rid, rec in kr_map.items() if period_match(rec[1], year))}** | **{len(all_wl_ids)}** | **{len(all_rf_ids)}** |")
+    lines.append(f"| **合计** | **{sum(1 for rid, rec in o_map.items() if period_match(rec[o_col['周期']], year))}** | **{sum(1 for rid, rec in kr_map.items() if period_match(rec[kr_col['周期']], year))}** | **{len(all_wl_ids)}** | **{len(all_rf_ids)}** |")
     lines.append("")
 
     # Category breakdowns
     for cat in categories:
         cat_o = {rid: rec for rid, rec in o_map.items()
-                 if (rec[5][0] if isinstance(rec[5], list) else rec[5]) == cat
-                 and period_match(rec[6], year)}
+                 if (rec[o_col["分类"]][0] if isinstance(rec[o_col["分类"]], list) else rec[o_col["分类"]]) == cat
+                 and period_match(rec[o_col["周期"]], year)}
         if not cat_o:
             continue
 
@@ -574,15 +581,15 @@ def generate_annual_report(data: dict, year: str = "2026") -> str:
         lines.append("")
 
         for o_id, o_rec in list(cat_o.items())[:3]:
-            o_title = o_rec[4]
-            o_status = cell(o_rec[2])
+            o_title = o_rec[o_col["标题"]]
+            o_status = cell(o_rec[o_col["状态"]])
             lines.append(f"**{o_title}**（{o_status}）")
             lines.append("")
 
             for kr_id, kr_rec in kr_map.items():
-                if extract_link_id(kr_rec[6]) == o_id:
-                    kr_title = kr_rec[7]
-                    kr_progress = kr_rec[8]
+                if extract_link_id(kr_rec[kr_col["关联O"]]) == o_id:
+                    kr_title = kr_rec[kr_col["标题"]]
+                    kr_progress = kr_rec[kr_col["进度"]]
                     lines.append(f"- {kr_title}：{kr_progress}%")
             lines.append("")
 
@@ -592,8 +599,8 @@ def generate_annual_report(data: dict, year: str = "2026") -> str:
     if all_rf_ids:
         for rf_id in list(all_rf_ids)[:5]:
             rf_rec = rf_map[rf_id]
-            rf_title = rf_rec[1]
-            rf_learn = rf_rec[5] if rf_rec[5] else ""
+            rf_title = rf_rec[rf_col["标题"]]
+            rf_learn = rf_rec[rf_col["学到"]] if rf_rec[rf_col["学到"]] else ""
             if rf_learn:
                 lines.append(f"- {rf_title} — {rf_learn}")
     lines.append("")
@@ -603,7 +610,7 @@ def generate_annual_report(data: dict, year: str = "2026") -> str:
     lines.append("")
     for rf_id in list(all_rf_ids)[:3]:
         rf_rec = rf_map[rf_id]
-        rf_next = rf_rec[7] if rf_rec[7] else ""
+        rf_next = rf_rec[rf_col["下阶段"]] if rf_rec[rf_col["下阶段"]] else ""
         if rf_next:
             lines.append(f"- {rf_next}")
     lines.append("")
