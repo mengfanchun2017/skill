@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# f-doc 安装/更新脚本 — 符号链接 rules.d → ~/.claude/rules/
+# f-feishu 安装/更新脚本 — 符号链接 rules.d → ~/.claude/rules/
 # 用法: bash init.sh [--config] [--force]
 set -euo pipefail
 
@@ -16,7 +16,7 @@ for arg in "$@"; do
   esac
 done
 
-echo "=== f-doc 安装 ==="
+echo "=== f-feishu 安装 ==="
 
 # ── skill 自身符号链接（独立安装用户）──
 SKILL_NAME="$(basename "$SKILL_DIR")"
@@ -72,4 +72,4 @@ if $DO_CONFIG && [[ -f "${SKILL_DIR}/config.yaml" ]]; then
   [[ "$EDIT" =~ ^[Yy]$ ]] && ${EDITOR:-nano} "${SKILL_DIR}/config.yaml"
 fi
 
-echo "=== f-doc 安装完成 ==="
+echo "=== f-feishu 安装完成 ==="

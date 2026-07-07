@@ -1,13 +1,13 @@
 ---
-name: f-ppt
+name: f-pptxx
 user-invocable: true
 description: |
-  统一 PPT 生成 — 从 md/wiki 到飞书 PPTX。
+  PPTX 总控 — 从 md/wiki 到 PPTX。
   OfficeCLI 引擎（原生 OpenXML），支持批量 JSON、模板合并、autofit 后处理。
 allowed-tools: Read, Write, Bash, Glob, mcp__minimax__web_search
 ---
 
-# f-ppt — OfficeCLI PPT 生成
+# f-pptxx — OfficeCLI PPTX 生成
 
 从 wiki 文档或 Markdown 生成飞书 PPTX。OfficeCLI 单引擎，零外部依赖。
 
