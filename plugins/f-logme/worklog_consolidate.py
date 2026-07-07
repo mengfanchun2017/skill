@@ -219,12 +219,6 @@ def cmd_weekly(records, do_write):
     today = date.today()
     week_ago = today - timedelta(days=7)
 
-
-def cmd_weekly(records, do_write):
-    """每周清理：删空记录 + 找同日期合并候选"""
-    today = date.today()
-    week_ago = today - timedelta(days=7)
-
     # 1. 空 session → 自动删除
     empty = [r for r in records if is_empty_session(r)]
     if empty:

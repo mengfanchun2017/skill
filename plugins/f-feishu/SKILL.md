@@ -7,37 +7,17 @@ description: |
   "拆分文档"、"导出Word/PPT"、"飞书转Office"、"导入到飞书"、"对比文档"、
   或给出飞书文档URL要求操作。
   PPT 委托 f-pptx，图表委托 f-diagram，PDF 委托 f-pdf。
-allowed-tools: Read, Write, Bash, Glob, Grep, mcp__minimax__understand_image
+allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 
 # f-feishu — 飞书文档编排
 
 编排层，不重新实现底层工具。委托飞书操作给 lark-cli，Office 给 OfficeCLI，PPT 给 f-pptx，图表给 f-diagram，PDF 给 f-pdf。
 
-## 首次安装检查（每次调用必须执行）
-
-调用本 skill 时，先检查 rules.d/ 全局约束是否已链接：
-
-```bash
-SKILL_DIR="$(cd "$(dirname "$0")" && pwd)"  # 需替换为实际 skill 路径
-RULE_FILE="$HOME/.claude/rules/f-feishu.md"
-SRC_FILE="$SKILL_DIR/rules.d/f-feishu.md"
-
-if [[ ! -L "$RULE_FILE" ]] || [[ "$(readlink -f "$RULE_FILE" 2>/dev/null)" != "$(readlink -f "$SRC_FILE")" ]]; then
-  mkdir -p "$HOME/.claude/rules"
-  ln -sf "$(readlink -f "$SRC_FILE")" "$RULE_FILE"
-  echo "✓ f-feishu 全局约束已安装到 ~/.claude/rules/"
-fi
-```
-
-执行后输出结果。符号链接存在且正确则跳过。这条确保格式硬约束始终全局加载，不依赖用户手动运行 init.sh。
-
 ## 前置条件
 
-操作前 MUST 读取：
-1. `../lark-shared/SKILL.md` — 认证、权限
-2. `../lark-doc/SKILL.md` — 文档读写（fetch/create/update 参数）
-3. `references/feishu-office-bridge.md` — 跨格式转换（涉及 Office 时）
+- lark-cli 命令参考 → `references/lark-cli-cheatsheet.md`。本 skill 直接调 lark-cli，不依赖 lark-* skill。
+- 跨格式转换（涉及 Office 时）→ `references/feishu-office-bridge.md`
 
 > 完整格式约束+安全规则参考 → `references/write-checklist.md`
 

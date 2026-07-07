@@ -1,6 +1,6 @@
 # claude-skills — mengfanchun2017 的 Claude Code skill 集合
 
-> Claude Code 技能聚合仓。**17 个自建**（plugin 安装）+ **第三方 skill 由用户用 npx skills 自管**（不通过 marketplace）。
+> Claude Code 技能聚合仓。**16 个自建**（plugin 安装）+ **第三方 skill 由用户用 npx skills 自管**（不通过 marketplace）。
 > 飞书 / 调研 / 文档 / PPT / PDF / Excel / 图表 / AI 浏览器一站式。
 
 ## 快速开始
@@ -43,7 +43,7 @@ npx --yes skills@latest update -g -y
 
 ccconfig 用户：`bash init-skill.sh sync` 自动从 `conf/third-party-skills.txt` 列表幂等装，update 跑 `scripts/update-third-party-skills.sh`。
 
-## 自建 skill（17 个，仓内）
+## 自建 skill（16 个，仓内）
 
 | Skill | 说明 |
 |-------|------|
@@ -51,8 +51,7 @@ ccconfig 用户：`bash init-skill.sh sync` 自动从 `conf/third-party-skills.t
 | `f-report-std` | 报告写作横向规范（4 套模板：研究/分析/对比/方案） |
 | `f-pdf` | PDF 内容提取 + 翻译原语（PyMuPDF：文字/图片/表格/元数据） |
 | `f-pptx` | PPTX 总控（OfficeCLI 引擎：批量 JSON、模板合并、autofit） |
-| `f-research-frame` | 4 领域研究方法论（customer/generic/market/technical） |
-| `f-research-deep` | 深度研究（outline.yaml → 批量 JSON 输出） |
+| `f-research-frame` | 4 领域研究方法论 + 批量深度研究（customer/generic/market/technical） |
 | `f-research-report` | 报告生成（JSON/大纲/素材 → 结构化 Markdown） |
 | `f-search` | 多源搜索编排原语（三源并行：Tavily + MiniMax + WebSearch） |
 | `f-diagram` | 代码驱动图表生成（Mermaid 架构/流程/时序/ER/类图、白板） |
@@ -114,14 +113,13 @@ bash option-vessel/init.sh   # 仓内已带安装器
 ```
 claude-skills/                          ← 单聚合 marketplace 仓
 ├── .claude-plugin/
-│   └── marketplace.json                # 18 个 plugin 入口（17 本地 + 1 monorepo 外部，lark-* 走系统 lark-cli）
-├── plugins/                            ← 17 个自建 plugin
+│   └── marketplace.json                # 17 个 plugin 入口（16 本地 + 1 monorepo 外部，lark-* 走系统 lark-cli）
+├── plugins/                            ← 16 个自建 plugin
 │   ├── f-feishu/SKILL.md
 │   ├── f-report-std/SKILL.md
 │   ├── f-pdf/SKILL.md
 │   ├── f-pptx/SKILL.md
 │   ├── f-research-frame/SKILL.md
-│   ├── f-research-deep/SKILL.md
 │   ├── f-research-report/SKILL.md
 │   ├── f-search/SKILL.md
 │   ├── f-diagram/SKILL.md
@@ -163,8 +161,8 @@ MIT — 见 [LICENSE](LICENSE)
 
 ## English Summary
 
-A Claude Code marketplace with 17 self-built skills. Third-party skills use `npx skills` (not /plugin install) for clean dialog UX.
+A Claude Code marketplace with 16 self-built skills. Third-party skills use `npx skills` (not /plugin install) for clean dialog UX.
 
-- **Self-built (in repo)**: f-feishu, f-report-std, f-pdf, f-pptx, f-research-frame, f-research-deep, f-research-report, f-search, f-diagram, f-docx, f-xlsx, f-logme, f-launch, f-moocrec, f-vessel, f-sysarchi, getnote
+- **Self-built (in repo)**: f-feishu, f-report-std, f-pdf, f-pptx, f-research-frame, f-research-report, f-search, f-diagram, f-docx, f-xlsx, f-logme, f-launch, f-moocrec, f-vessel, f-sysarchi, getnote
 - **Feishu CLI (system level)**: install `@larksuite/cli` via npm — f-feishu orchestrates all `lark-cli` commands
 - **Utilities (user-installed via `npx skills`)**: vinvcn/mattpocock-skills-zh-CN sub-skills (caveman, diagnose, grill-me, ...)

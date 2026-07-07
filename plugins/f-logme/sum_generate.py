@@ -27,15 +27,9 @@ def parse_records(data: dict) -> tuple[list[str], list[list]]:
     return data["data"]["fields"], data["data"]["data"]
 
 
-def build_index(records: list[list], key_idx: int = 0) -> dict:
-    """Index records by _record_id (first element after fields mapping)."""
-    idx = {}
-    for rec in records:
-        # lark-cli format: records are arrays matching field order
-        # _record_id is NOT in fields but can be extracted from record_id_list
-        # For now, index by the first field value (ID column)
-        pass
-    return idx
+def field_index(fields: list[str]) -> dict[str, int]:
+    """Build field name → index map for record array access."""
+    return {name: i for i, name in enumerate(fields)}
 
 
 def extract_link_id(val) -> str | None:
@@ -83,13 +77,13 @@ def parse_date(date_val) -> datetime | None:
         return None
 
 
-def category_for_worklog(wl_rec, kr_map: dict, o_map: dict) -> str:
+def category_for_worklog(wl_rec, kr_map: dict, o_map: dict, wl_col: dict, kr_col: dict, o_col: dict) -> str:
     """Walk Worklog → KR → O to get category."""
-    kr_id = extract_link_id(wl_rec[5])  # 关联KR field
+    kr_id = extract_link_id(wl_rec[wl_col["关联KR"]])
     if kr_id and kr_id in kr_map:
-        o_id = extract_link_id(kr_map[kr_id][6])  # 关联O field
+        o_id = extract_link_id(kr_map[kr_id][kr_col["关联O"]])
         if o_id and o_id in o_map:
-            cat = o_map[o_id][5]  # 分类 field
+            cat = o_map[o_id][o_col["分类"]]
             if isinstance(cat, list):
                 return cat[0] if cat else "unknown"
             return str(cat) if cat else "unknown"
@@ -122,10 +116,10 @@ def load_all(okr_o_path, okr_kr_path, worklog_path, reflect_path):
     rf_map = {rid: rec for rid, rec in zip(rf_ids, rf_records)}
 
     return {
-        "o": {"fields": o_fields, "records": o_records, "map": o_map, "ids": o_ids},
-        "kr": {"fields": kr_fields, "records": kr_records, "map": kr_map, "ids": kr_ids},
-        "wl": {"fields": wl_fields, "records": wl_records, "map": wl_map, "ids": wl_ids},
-        "rf": {"fields": rf_fields, "records": rf_records, "map": rf_map, "ids": rf_ids},
+        "o": {"fields": o_fields, "records": o_records, "map": o_map, "ids": o_ids, "col": field_index(o_fields)},
+        "kr": {"fields": kr_fields, "records": kr_records, "map": kr_map, "ids": kr_ids, "col": field_index(kr_fields)},
+        "wl": {"fields": wl_fields, "records": wl_records, "map": wl_map, "ids": wl_ids, "col": field_index(wl_fields)},
+        "rf": {"fields": rf_fields, "records": rf_records, "map": rf_map, "ids": rf_ids, "col": field_index(rf_fields)},
     }
 
 
@@ -138,12 +132,16 @@ def filter_by_period(data: dict, period: str, category: str | None = None):
     kr_map = data["kr"]["map"]
     wl_map = data["wl"]["map"]
     rf_map = data["rf"]["map"]
+    o_col = data["o"]["col"]
+    kr_col = data["kr"]["col"]
+    wl_col = data["wl"]["col"]
+    rf_col = data["rf"]["col"]
 
     # Filter O by period + category
     matched_o_ids = set()
     for rid, rec in o_map.items():
-        rec_period = rec[6]  # 周期 field
-        rec_cat = rec[5]  # 分类 field
+        rec_period = rec[o_col["周期"]]
+        rec_cat = rec[o_col["分类"]]
         if isinstance(rec_cat, list):
             rec_cat = rec_cat[0] if rec_cat else None
 
@@ -159,7 +157,7 @@ def filter_by_period(data: dict, period: str, category: str | None = None):
     matched_kr_ids = set()
     kr_by_o = {}
     for rid, rec in kr_map.items():
-        o_id = extract_link_id(rec[6])  # 关联O
+        o_id = extract_link_id(rec[kr_col["关联O"]])
         if o_id in matched_o_ids:
             matched_kr_ids.add(rid)
             kr_by_o.setdefault(o_id, []).append(rid)
@@ -168,7 +166,7 @@ def filter_by_period(data: dict, period: str, category: str | None = None):
     matched_wl_ids = set()
     wl_by_kr = {}
     for rid, rec in wl_map.items():
-        kr_id = extract_link_id(rec[5])  # 关联KR
+        kr_id = extract_link_id(rec[wl_col["关联KR"]])
         if kr_id in matched_kr_ids:
             matched_wl_ids.add(rid)
             wl_by_kr.setdefault(kr_id, []).append(rid)
@@ -177,7 +175,7 @@ def filter_by_period(data: dict, period: str, category: str | None = None):
     matched_rf_ids = set()
     rf_by_o = {}
     for rid, rec in rf_map.items():
-        o_id = extract_link_id(rec[3])  # 关联O
+        o_id = extract_link_id(rec[rf_col["关联O"]])
         if o_id in matched_o_ids:
             matched_rf_ids.add(rid)
             rf_by_o.setdefault(o_id, []).append(rid)
@@ -210,6 +208,10 @@ def generate_period_summary(data: dict, filtered: dict) -> str:
     kr_map = data["kr"]["map"]
     wl_map = data["wl"]["map"]
     rf_map = data["rf"]["map"]
+    o_col = data["o"]["col"]
+    kr_col = data["kr"]["col"]
+    wl_col = data["wl"]["col"]
+    rf_col = data["rf"]["col"]
 
     period = filtered["period"]
     cat = filtered["category"] or "全部"
@@ -229,16 +231,16 @@ def generate_period_summary(data: dict, filtered: dict) -> str:
 
     for o_id in filtered["o_ids"]:
         o_rec = o_map[o_id]
-        o_title = o_rec[4]
+        o_title = o_rec[o_col["标题"]]
         kr_ids = filtered["kr_by_o"].get(o_id, [])
         if not kr_ids:
             lines.append(f"| {o_title} | — | — | — | — |")
         for i, kr_id in enumerate(kr_ids):
             kr_rec = kr_map[kr_id]
-            kr_title = kr_rec[7]
-            kr_type = cell(kr_rec[2])
-            kr_progress = f"{kr_rec[8]}%"
-            kr_score = cell(kr_rec[3]) if kr_rec[3] else "—"
+            kr_title = kr_rec[kr_col["标题"]]
+            kr_type = cell(kr_rec[kr_col["类型"]])
+            kr_progress = f"{kr_rec[kr_col['进度']]}%"
+            kr_score = cell(kr_rec[kr_col["最终评分"]]) if kr_rec[kr_col["最终评分"]] else "—"
             o_display = o_title if i == 0 else ""
             lines.append(f"| {o_display} | {kr_title} | {kr_type} | {kr_progress} | {kr_score} |")
 
@@ -252,7 +254,7 @@ def generate_period_summary(data: dict, filtered: dict) -> str:
     by_type = {}
     for wl_id in filtered["wl_ids"]:
         wl_rec = wl_map[wl_id]
-        wl_type = cell(wl_rec[3])
+        wl_type = cell(wl_rec[wl_col["成果类型"]])
         by_type.setdefault(wl_type, []).append(wl_rec)
 
     type_order = ["项目交付", "技术调研", "学习输入", "故障应急", "团队建设", "其他"]
@@ -268,9 +270,9 @@ def generate_period_summary(data: dict, filtered: dict) -> str:
     lines.append("")
     for wl_id in list(filtered["wl_ids"])[:10]:
         wl_rec = wl_map[wl_id]
-        wl_title = wl_rec[1]
-        wl_desc = wl_rec[2] if wl_rec[2] else ""
-        wl_quant = wl_rec[4] if wl_rec[4] else ""
+        wl_title = wl_rec[wl_col["标题"]]
+        wl_desc = wl_rec[wl_col["说明"]] if wl_rec[wl_col["说明"]] else ""
+        wl_quant = wl_rec[wl_col["量化结果"]] if wl_rec[wl_col["量化结果"]] else ""
         quant_str = f"（{wl_quant}）" if wl_quant else ""
         lines.append(f"- **{wl_title}**{quant_str}：{wl_desc}")
 
@@ -286,7 +288,7 @@ def generate_period_summary(data: dict, filtered: dict) -> str:
     # 计算完成率
     total_kr = len(filtered["kr_ids"])
     if total_kr > 0:
-        done_kr = sum(1 for kid in filtered["kr_ids"] if kr_map[kid][8] == 100)
+        done_kr = sum(1 for kid in filtered["kr_ids"] if kr_map[kid][kr_col["进度"]] == 100)
         lines.append(f"- KR 完成率：{done_kr}/{total_kr}（{done_kr*100//total_kr}%）")
     lines.append("")
 
@@ -296,10 +298,10 @@ def generate_period_summary(data: dict, filtered: dict) -> str:
         lines.append("")
         for rf_id in list(filtered["rf_ids"])[:5]:
             rf_rec = rf_map[rf_id]
-            rf_title = rf_rec[1]
-            rf_good = rf_rec[4] if rf_rec[4] else ""
-            rf_bad = rf_rec[6] if rf_rec[6] else ""
-            rf_learn = rf_rec[5] if rf_rec[5] else ""
+            rf_title = rf_rec[rf_col["标题"]]
+            rf_good = rf_rec[rf_col["做得好"]] if rf_rec[rf_col["做得好"]] else ""
+            rf_bad = rf_rec[rf_col["待改进"]] if rf_rec[rf_col["待改进"]] else ""
+            rf_learn = rf_rec[rf_col["学到"]] if rf_rec[rf_col["学到"]] else ""
             lines.append(f"**{rf_title}**")
             if rf_good:
                 lines.append(f"- 做得好：{rf_good}")
@@ -314,7 +316,7 @@ def generate_period_summary(data: dict, filtered: dict) -> str:
     lines.append("")
     for rf_id in list(filtered["rf_ids"])[:3]:
         rf_rec = rf_map[rf_id]
-        rf_next = rf_rec[7] if rf_rec[7] else ""
+        rf_next = rf_rec[rf_col["下阶段"]] if rf_rec[rf_col["下阶段"]] else ""
         if rf_next:
             lines.append(f"- {rf_next}")
     lines.append("")
@@ -328,6 +330,10 @@ def generate_domain_summary(data: dict, domain: str, year: str = "2026") -> str:
     kr_map = data["kr"]["map"]
     wl_map = data["wl"]["map"]
     rf_map = data["rf"]["map"]
+    o_col = data["o"]["col"]
+    kr_col = data["kr"]["col"]
+    wl_col = data["wl"]["col"]
+    rf_col = data["rf"]["col"]
 
     lines = []
     lines.append(f"# {year} {domain} 专项总结")
@@ -336,10 +342,10 @@ def generate_domain_summary(data: dict, domain: str, year: str = "2026") -> str:
     # Find O with matching category
     matched_o = {}
     for rid, rec in o_map.items():
-        cat = rec[5]
+        cat = rec[o_col["分类"]]
         if isinstance(cat, list):
             cat = cat[0] if cat else None
-        if cat == domain and period_match(rec[6], year):
+        if cat == domain and period_match(rec[o_col["周期"]], year):
             matched_o[rid] = rec
 
     # Collect all linked KRs and worklogs
@@ -347,18 +353,18 @@ def generate_domain_summary(data: dict, domain: str, year: str = "2026") -> str:
     matched_wl = {}
     for o_id in matched_o:
         for kr_id, kr_rec in kr_map.items():
-            linked_o = extract_link_id(kr_rec[6])
+            linked_o = extract_link_id(kr_rec[kr_col["关联O"]])
             if linked_o == o_id:
                 matched_kr[kr_id] = kr_rec
                 for wl_id, wl_rec in wl_map.items():
-                    linked_kr = extract_link_id(wl_rec[5])
+                    linked_kr = extract_link_id(wl_rec[wl_col["关联KR"]])
                     if linked_kr == kr_id:
                         matched_wl[wl_id] = wl_rec
 
     # Collect reflect
     matched_rf = {}
     for rf_id, rf_rec in rf_map.items():
-        linked_o = extract_link_id(rf_rec[3])
+        linked_o = extract_link_id(rf_rec[rf_col["关联O"]])
         if linked_o in matched_o:
             matched_rf[rf_id] = rf_rec
 
@@ -375,11 +381,11 @@ def generate_domain_summary(data: dict, domain: str, year: str = "2026") -> str:
     lines.append("")
 
     # Sort worklog by date
-    wl_sorted = sorted(matched_wl.items(), key=lambda x: str(x[1][6]) if x[1][6] else "")
+    wl_sorted = sorted(matched_wl.items(), key=lambda x: str(x[1][wl_col["日期"]]) if x[1][wl_col["日期"]] else "")
     for wl_id, wl_rec in wl_sorted[:8]:
-        wl_date = str(wl_rec[6])[:10] if wl_rec[6] else ""
-        wl_title = wl_rec[1]
-        wl_desc = wl_rec[2] if wl_rec[2] else ""
+        wl_date = str(wl_rec[wl_col["日期"]])[:10] if wl_rec[wl_col["日期"]] else ""
+        wl_title = wl_rec[wl_col["标题"]]
+        wl_desc = wl_rec[wl_col["说明"]] if wl_rec[wl_col["说明"]] else ""
         lines.append(f"- {wl_date} — **{wl_title}**：{wl_desc}")
 
     lines.append("")
@@ -389,7 +395,7 @@ def generate_domain_summary(data: dict, domain: str, year: str = "2026") -> str:
     lines.append("")
     if matched_rf:
         for rf_id, rf_rec in list(matched_rf.items())[:5]:
-            rf_learn = rf_rec[5] if rf_rec[5] else ""
+            rf_learn = rf_rec[rf_col["学到"]] if rf_rec[rf_col["学到"]] else ""
             if rf_learn:
                 lines.append(f"- {rf_learn}")
     lines.append("")
@@ -398,7 +404,7 @@ def generate_domain_summary(data: dict, domain: str, year: str = "2026") -> str:
     lines.append("## 来年规划")
     lines.append("")
     for rf_id, rf_rec in list(matched_rf.items())[:3]:
-        rf_next = rf_rec[7] if rf_rec[7] else ""
+        rf_next = rf_rec[rf_col["下阶段"]] if rf_rec[rf_col["下阶段"]] else ""
         if rf_next:
             lines.append(f"- {rf_next}")
     lines.append("")
