@@ -1,0 +1,1 @@
+@getnote/mcp  npm:latest  getnote
