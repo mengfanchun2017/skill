@@ -1,5 +1,5 @@
 ---
-name: f-research
+name: f-research-frame
 user-invocable: true
 description: |
   4 领域研究方法论 — customer（JTBD）/ generic / market / technical。
@@ -8,7 +8,7 @@ description: |
 allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 ---
 
-# f-research — 4 领域研究方法论
+# f-research-frame — 4 领域研究方法论
 
 按领域给"调研方法"，搜索工具调用委派 f-search。
 

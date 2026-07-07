@@ -1,0 +1,1 @@
+@larksuite/cli  npm:latest  f-moocrec
