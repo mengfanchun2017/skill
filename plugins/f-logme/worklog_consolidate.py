@@ -110,7 +110,7 @@ def is_empty_session(rec):
     t = rec.get("标题", "") or ""
     if "0 user msgs" in t:
         return True
-    if rec.get("user_msgs", 0) == 0 and rec.get("asst_msgs", 0) == 0:
+    if rec.get("用户消息数", 0) == 0 and rec.get("助手消息数", 0) == 0:
         return True
     return False
 
@@ -244,16 +244,16 @@ def cmd_daily(records, do_write):
         keep = recs[0]
         rest = recs[1:]
 
-        in_tok = keep.get("input_tokens", 0) or 0
-        out_tok = keep.get("output_tokens", 0) or 0
-        asst = keep.get("asst_msgs", 0) or 0
-        user = keep.get("user_msgs", 0) or 0
+        in_tok = keep.get("输入Token", 0) or 0
+        out_tok = keep.get("输出Token", 0) or 0
+        asst = keep.get("助手消息数", 0) or 0
+        user = keep.get("用户消息数", 0) or 0
         all_notes = [(keep.get("说明") or "").strip()]
         for r in rest:
-            in_tok += r.get("input_tokens", 0) or 0
-            out_tok += r.get("output_tokens", 0) or 0
-            asst += r.get("asst_msgs", 0) or 0
-            user += r.get("user_msgs", 0) or 0
+            in_tok += r.get("输入Token", 0) or 0
+            out_tok += r.get("输出Token", 0) or 0
+            asst += r.get("助手消息数", 0) or 0
+            user += r.get("用户消息数", 0) or 0
             note = (r.get("说明") or "").strip()
             if note and note not in all_notes:
                 all_notes.append(note)
@@ -267,10 +267,10 @@ def cmd_daily(records, do_write):
             merged_note = "\n\n---\n".join(n for n in all_notes if n)
             update_record(keep["_rid"], {
                 "说明": merged_note,
-                "input_tokens": in_tok,
-                "output_tokens": out_tok,
-                "asst_msgs": asst,
-                "user_msgs": user,
+                "输入Token": in_tok,
+                "输出Token": out_tok,
+                "助手消息数": asst,
+                "用户消息数": user,
             })
             for r in rest:
                 delete_record(r["_rid"])
