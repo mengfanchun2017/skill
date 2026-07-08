@@ -21,6 +21,26 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 
 > 完整格式约束+安全规则参考 → `references/write-checklist.md`
 
+## 文档父子层级规则
+
+**默认父目录**：`REDACTED_FEISHU_TOKEN`（Claude 工作 wiki）。
+
+**任务级父目录判断**：
+- 若用户明确给出父文档 URL → 以该 URL token 为 `--parent-token`
+- 若在已有文档基础上"扩展"/"增加"/"修改补充" → 新建子文档/子表格放在**同一父文档下**（从源文档 URL 反推 parent token）
+- 若用户未指定父目录且无法从上下文推断 → 使用默认父目录
+
+**新建 vs 追加**：
+- 补充内容（报价表、规格表、附件清单等独立模块）→ **新建子文档/sheet**，`--parent-token` 用源文档 wiki token
+- 修改原文措辞/删除/替换 → 在原文档内 `str_replace` / `block_*`
+
+**Sheet 导入的特殊处理**：
+- `sheets +workbook-import` 的 `--folder-token` **只接受 Drive folder token，不接受 wiki node token**
+- 导入到 Drive 后，需通过 `wiki +node-create --node-type shortcut --parent-node-token <wiki> --obj-type sheet --origin-node-token <sheet>` 挂到 wiki 父节点下
+
+**Why**：飞书文档没有"移动"到 wiki 节点的直接 API，只能通过创建节点关联。子文档散落在 Drive 根目录会导致用户找不到（2026-07-08 已踩坑）。
+**How to apply**：每次创建/导入文档前，先判断父目录，`--parent-token` 必须显式传递。
+
 ## 快速决策
 
 ```
