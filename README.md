@@ -5,17 +5,42 @@
 
 ## 快速开始
 
-在 Claude Code 里执行一行命令：
+在 Claude Code 里添加 marketplace（一次性）：
 
 ```
 /plugin marketplace add mengfanchun2017/claude-skills
 ```
 
-然后挑你需要的装（**只装自建 f-***）：
+然后按需安装（挑你需要的，`<name>` 替换为下表中的名称）：
 
 ```
-/plugin install f-pdf@mengfanchun2017-skills
+/plugin install <name>@mengfanchun2017-skills
+```
+
+| 你需要… | 安装命令 |
+|---------|---------|
+| 飞书文档操作 | `/plugin install f-feishu@mengfanchun2017-skills` |
+| PPT 生成 | `/plugin install f-pptx@mengfanchun2017-skills` |
+| Word 文档 | `/plugin install f-docx@mengfanchun2017-skills` |
+| Excel 表格 | `/plugin install f-xlsx@mengfanchun2017-skills` |
+| PDF 处理 | `/plugin install f-pdf@mengfanchun2017-skills` |
+| 画架构图/流程图 | `/plugin install f-diagram@mengfanchun2017-skills` |
+| 搜索/调研 | `/plugin install f-search@mengfanchun2017-skills` |
+| 研究报告 | `/plugin install f-research-report@mengfanchun2017-skills` |
+| 个人 OKR/日志 | `/plugin install f-logme@mengfanchun2017-skills` |
+| 新项目脚手架 | `/plugin install f-launch@mengfanchun2017-skills` |
+| 慕课推荐 | `/plugin install f-moocrec@mengfanchun2017-skills` |
+| 系统架构师备考 | `/plugin install f-sysarchi@mengfanchun2017-skills` |
+| 得到笔记 | `/plugin install getnote@mengfanchun2017-skills` |
+| 报告写作规范 | `/plugin install f-report-std@mengfanchun2017-skills` |
+| 研究方法论框架 | `/plugin install f-research-frame@mengfanchun2017-skills` |
+
+可以一次装多个：
+
+```
 /plugin install f-feishu@mengfanchun2017-skills
+/plugin install f-pptx@mengfanchun2017-skills
+/plugin install f-search@mengfanchun2017-skills
 ```
 
 后续更新：
