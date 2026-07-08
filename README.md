@@ -1,6 +1,6 @@
 # claude-skills — Claude Code skill 集合
 
-> Claude Code 技能聚合仓。**16 个自建**（plugin 安装）+ **第三方 skill 由用户用 npx skills 自管**（不通过 marketplace）。
+> Claude Code 技能聚合仓。**15 个自建**（plugin 安装）+ **第三方 skill 由用户用 npx skills 自管**（不通过 marketplace）。
 > 飞书 / 调研 / 文档 / PPT / PDF / Excel / 图表 / AI 浏览器一站式。
 
 ## 快速开始
@@ -15,7 +15,7 @@
 
 ```
 /plugin install f-pdf@mengfanchun2017-skills
-/plugin install f-doc@mengfanchun2017-skills
+/plugin install f-feishu@mengfanchun2017-skills
 ```
 
 后续更新：
@@ -41,13 +41,13 @@ npx --yes skills@latest add vinvcn/mattpocock-skills-zh-CN \
 npx --yes skills@latest update -g -y
 ```
 
-cconfig 用户：`bash init-skill.sh sync` 自动从 `conf/third-party-skills.txt` 列表幂等装，update 跑 `scripts/update-third-party-skills.sh`。
+cconfig 用户：`bash ccconfig/init-skill.sh sync` 自动从 `conf/third-party-skills.txt` 列表幂等装，update 跑 `scripts/update-third-party-skills.sh`。
 
 ### 配合 ccconfig 使用
 
 克隆 [ccconfig](https://github.com/mengfanchun2017/ccconfig) 后，`init-skill.sh sync` 自动完成：symlink 自建 skill、注册 marketplace、安装第三方 skill、注入私有配置。详见 ccconfig 文档。
 
-## 自建 skill（16 个，仓内）
+## 自建 skill（15 个，仓内）
 
 | Skill | 说明 |
 |-------|------|
@@ -64,7 +64,6 @@ cconfig 用户：`bash init-skill.sh sync` 自动从 `conf/third-party-skills.tx
 | `f-logme` | 个人管理系统（OKR/Worklog/Reflect/SUM，飞书 Base） |
 | `f-launch` | 项目启动脚手架（8 种项目类型，自动 CLAUDE.md + rules） |
 | `f-moocrec` | 慕课推荐（QS 课程 + 学习路径，飞书 Base + Supabase） |
-
 | `f-sysarchi` | 系统分析师备考 — 暗号 `archi` 触发，随工边做边学 |
 | `getnote` | 得到大脑集成 — MCP 驱动，笔记 CRUD/搜索/知识库/直播 |
 
@@ -142,7 +141,7 @@ claude-skills/                          ← 单聚合 marketplace 仓
 
 **为什么 lark-* 不在 marketplace**：
 - larksuite/cli monorepo 一次装暴露 26 个 lark-* skill（lark-base/lark-doc/lark-approval/lark-mail/lark-im/...），dialog 太噪音
-- 飞书操作实际只需要 `lark-cli` binary + f-doc 编排层（f-doc 已封装所有 lark-cli 命令组合）
+- 飞书操作实际只需要 `lark-cli` binary + f-feishu 编排层（f-feishu 已封装所有 lark-cli 命令组合）
 - lark-* skill 作为单独 plugin 是冗余中间层
 
 **为什么用 marketplace 引用而不是复制**：
@@ -156,7 +155,7 @@ MIT — 见 [LICENSE](LICENSE)
 
 ## English Summary
 
-A Claude Code marketplace with 16 self-built skills. Third-party skills use `npx skills` (not /plugin install) for clean dialog UX.
+A Claude Code marketplace with 15 self-built skills. Third-party skills use `npx skills` (not /plugin install) for clean dialog UX.
 
 - **Self-built (in repo)**: f-feishu, f-report-std, f-pdf, f-pptx, f-research-frame, f-research-report, f-search, f-diagram, f-docx, f-xlsx, f-logme, f-launch, f-moocrec, f-sysarchi, getnote
 - **Feishu CLI (system level)**: install `@larksuite/cli` via npm — f-feishu orchestrates all `lark-cli` commands
