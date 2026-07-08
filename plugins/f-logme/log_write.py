@@ -54,8 +54,27 @@ ENV = {
 def lark(*args, cwd=None):
     """调 lark-cli, 过滤日志行, 返回解析后 JSON。cwd 默认 /tmp (lark-cli --json @file 需相对路径)"""
     r = subprocess.run(["lark-cli", *args], capture_output=True, text=True, env=ENV, cwd=cwd or "/tmp")
-    lines = [l for l in r.stdout.splitlines() if not l.startswith("[lark-cli]") and not l.startswith("Shell cwd was reset")]
-    return json.loads("\n".join(lines))
+    # lark-cli outputs JSON to stderr (not stdout)
+    output = r.stderr or r.stdout
+    # strip log lines (prefix tags) and terminal escape codes
+    lines = []
+    for l in output.splitlines():
+        s = l.strip()
+        if not s:
+            continue
+        if s.startswith("[lark-cli]") or s.startswith("Shell cwd was reset"):
+            continue
+        # remove terminal color escape sequences
+        while "\x1b[" in s:
+            i = s.index("\x1b[")
+            j = s.index("m", i) + 1 if "m" in s[i:] else i + 4
+            s = s[:i] + s[j:]
+        lines.append(s)
+    text = "\n".join(lines)
+    if not text.strip():
+        sys.stderr.write(f"lark-cli empty output (rc={r.returncode})\n---stderr---\n{r.stderr}\n---stdout---\n{r.stdout}\n")
+        sys.exit(1)
+    return json.loads(text)
 
 
 def write_json_file(payload):
