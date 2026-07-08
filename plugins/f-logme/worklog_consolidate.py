@@ -214,6 +214,75 @@ def cmd_merge(records, do_write):
             print("  人工确认后: --mode merge --write")
 
 
+def cmd_daily(records, do_write):
+    """日聚合：同日 + 同 KR → 合并为一条日 worklog"""
+    from collections import defaultdict
+
+    groups = defaultdict(list)
+    for r in records:
+        d = (r.get("日期") or "")[:10]
+        if not d:
+            continue
+        kr = r.get("关联KR")
+        kr_id = kr[0]["id"] if (kr and isinstance(kr, list) and kr) else "_nokr"
+        groups[(d, kr_id)].append(r)
+
+    merge_groups = {k: v for k, v in groups.items() if len(v) > 1}
+    if not merge_groups:
+        print("\n无日聚合候选（每天每 KR 仅一条记录）")
+        return
+
+    print(f"\n=== 日聚合候选 ({len(merge_groups)} 组) ===")
+    merged_count = 0
+    for (d, kr_id), recs in sorted(merge_groups.items()):
+        def title_score(r):
+            t = (r.get("标题") or "").strip()
+            if t.startswith("session 工作"):
+                return -len(t)
+            return len(t)
+        recs.sort(key=title_score, reverse=True)
+        keep = recs[0]
+        rest = recs[1:]
+
+        in_tok = keep.get("input_tokens", 0) or 0
+        out_tok = keep.get("output_tokens", 0) or 0
+        asst = keep.get("asst_msgs", 0) or 0
+        user = keep.get("user_msgs", 0) or 0
+        all_notes = [(keep.get("说明") or "").strip()]
+        for r in rest:
+            in_tok += r.get("input_tokens", 0) or 0
+            out_tok += r.get("output_tokens", 0) or 0
+            asst += r.get("asst_msgs", 0) or 0
+            user += r.get("user_msgs", 0) or 0
+            note = (r.get("说明") or "").strip()
+            if note and note not in all_notes:
+                all_notes.append(note)
+
+        titles = [r.get("标题", "") for r in recs]
+        print(f"  [{d}] {len(recs)}条 | KR={kr_id[-8:] if kr_id != '_nokr' else '空'}")
+        for t in titles:
+            print(f"       {t[:70]}")
+
+        if do_write:
+            merged_note = "\n\n---\n".join(n for n in all_notes if n)
+            update_record(keep["_rid"], {
+                "说明": merged_note,
+                "input_tokens": in_tok,
+                "output_tokens": out_tok,
+                "asst_msgs": asst,
+                "user_msgs": user,
+            })
+            for r in rest:
+                delete_record(r["_rid"])
+            print(f"       → merged, kept {keep['_rid'][-8:]}, deleted {len(rest)}")
+        merged_count += 1
+
+    if do_write:
+        print(f"\n  已合并 {merged_count} 组")
+    else:
+        print(f"\n  共 {merged_count} 组候选。执行: --mode daily --write")
+
+
 def cmd_weekly(records, do_write):
     """每周清理：删空记录 + 找同日期合并候选"""
     today = date.today()
@@ -332,7 +401,7 @@ def cmd_dry_run(records):
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument("--mode", choices=["weekly", "monthly", "merge", "dry-run"],
+    p.add_argument("--mode", choices=["daily", "weekly", "monthly", "merge", "dry-run"],
                    default="dry-run")
     p.add_argument("--write", action="store_true",
                    help="执行修改（默认仅预览）")
@@ -341,7 +410,9 @@ def main():
     records = fetch_all_worklogs()
     print(f"扫描 {len(records)} 条 worklog...")
 
-    if args.mode == "weekly":
+    if args.mode == "daily":
+        cmd_daily(records, args.write)
+    elif args.mode == "weekly":
         cmd_weekly(records, args.write)
     elif args.mode == "monthly":
         cmd_monthly(records, args.write)
