@@ -64,7 +64,7 @@ cconfig 用户：`bash init-skill.sh sync` 自动从 `conf/third-party-skills.tx
 | `f-logme` | 个人管理系统（OKR/Worklog/Reflect/SUM，飞书 Base） |
 | `f-launch` | 项目启动脚手架（8 种项目类型，自动 CLAUDE.md + rules） |
 | `f-moocrec` | 慕课推荐（QS 课程 + 学习路径，飞书 Base + Supabase） |
-| `f-vessel` | AI 浏览器操控（Vessel MCP，需配套 option-vessel/ 安装器） |
+
 | `f-sysarchi` | 系统分析师备考 — 暗号 `archi` 触发，随工边做边学 |
 | `getnote` | 得到大脑集成 — MCP 驱动，笔记 CRUD/搜索/知识库/直播 |
 
@@ -107,18 +107,13 @@ lark-cli auth login
 ```
 > lark-cli 没装 → f-feishu 触发时报 "lark-cli: command not found"。
 
-**f-vessel** 需要先装 [Vessel AI 浏览器](https://github.com/unmodeled-tyler/vessel-browser)：
-```bash
-bash option-vessel/init.sh   # 仓内已带安装器
-```
-
 ## 架构
 
 ```
 claude-skills/                          ← 单聚合 marketplace 仓
 ├── .claude-plugin/
-│   └── marketplace.json                # 17 个 plugin 入口（16 本地 + 1 monorepo 外部，lark-* 走系统 lark-cli）
-├── plugins/                            ← 16 个自建 plugin
+│   └── marketplace.json                # 16 个 plugin 入口（15 本地 + 1 monorepo 外部，lark-* 走系统 lark-cli）
+├── plugins/                            ← 15 个自建 plugin
 │   ├── f-feishu/SKILL.md
 │   ├── f-report-std/SKILL.md
 │   ├── f-pdf/SKILL.md
@@ -132,12 +127,8 @@ claude-skills/                          ← 单聚合 marketplace 仓
 │   ├── f-logme/SKILL.md
 │   ├── f-launch/SKILL.md
 │   ├── f-moocrec/SKILL.md
-│   ├── f-vessel/SKILL.md
 │   ├── f-sysarchi/SKILL.md
 │   ├── getnote/SKILL.md
-├── option-vessel/                      # f-vessel 配套安装器
-│   ├── init.sh
-│   └── README.md
 ├── README.md
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
@@ -157,7 +148,7 @@ claude-skills/                          ← 单聚合 marketplace 仓
 **为什么用 marketplace 引用而不是复制**：
 - 三方 skill 来自 mattpocock-skills-zh-CN，**这是上游社区维护**，不在我仓里更对（避免重复维护、跟官方版本错位）
 - 用户想要 lark 完整功能走官方 `npm install -g @larksuite/cli`；其他 skill 走本 marketplace
-- 我的贡献是 `f-*` 编排层（飞书/调研/PPT/PDF/Excel/图表/浏览器）和集成经验（option-vessel/）
+- 我的贡献是 `f-*` 编排层（飞书/调研/PPT/PDF/Excel/图表/浏览器）和集成经验
 
 ## 许可
 
@@ -167,6 +158,6 @@ MIT — 见 [LICENSE](LICENSE)
 
 A Claude Code marketplace with 16 self-built skills. Third-party skills use `npx skills` (not /plugin install) for clean dialog UX.
 
-- **Self-built (in repo)**: f-feishu, f-report-std, f-pdf, f-pptx, f-research-frame, f-research-report, f-search, f-diagram, f-docx, f-xlsx, f-logme, f-launch, f-moocrec, f-vessel, f-sysarchi, getnote
+- **Self-built (in repo)**: f-feishu, f-report-std, f-pdf, f-pptx, f-research-frame, f-research-report, f-search, f-diagram, f-docx, f-xlsx, f-logme, f-launch, f-moocrec, f-sysarchi, getnote
 - **Feishu CLI (system level)**: install `@larksuite/cli` via npm — f-feishu orchestrates all `lark-cli` commands
 - **Utilities (user-installed via `npx skills`)**: vinvcn/mattpocock-skills-zh-CN sub-skills (caveman, diagnose, grill-me, ...)
