@@ -12,6 +12,7 @@ Base `okr_v2` 含 4 个表，token 在 ccprivate config.yaml 中。
 | 状态 | 单选 | Active / Completed / Abandoned |
 | 优先级 | 数字 | 1-5，1 最高 |
 | 说明 | 多行文本 | 为什么这个 O 重要 |
+| 更新日期 | 日期 | 最后修改日期 |
 
 ## OKR_KR 表字段
 
@@ -33,14 +34,21 @@ Base `okr_v2` 含 4 个表，token 在 ccprivate config.yaml 中。
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
-| 标题 | 文本 | `claudecode 完成sum skill框架搭建` |
+| 标题 | 文本 | LLM 自动生成，≤60 字 |
 | 关联KR | 关联列 → OKR_KR | 必须关联一个 KR |
-| 成果类型 | 单选 | 项目交付 / 技术方案 / 学习笔记 / 问题排查 / 会议/沟通 / 文档输出 / 工具开发 |
+| 关联KR标题 | 查找引用 | 自动从 KR 表反查 |
+| 成果类型 | 单选 | 工具开发 / 技术方案 / 文档输出 / 学习笔记 / 问题排查 / 项目交付 |
+| 说明 | 多行文本 | 结构化摘要 + commits + edits + user prompts |
+| 日期 | 日期 | 完成日期 |
+| 输入Token | 数字 | transcript 统计 |
+| 输出Token | 数字 | transcript 统计 |
+| 助手消息数 | 数字 | assistant 消息条数 |
+| 用户消息数 | 数字 | user 消息条数 |
 | 量化结果 | 文本 | 可选。数字、百分比、前后对比 |
-| 说明 | 多行文本 | 一句话说明做了什么 |
-| 日期 | 日期 | 完成日期，唯一日期字段（无单独创建日期） |
 
-> 分类（work/learn/project）和领域标签通过关联 KR→O 自动继承，不需要在 Worklog 里重复维护。
+> 已删字段（2026-07）：model, 来源（100% 空值，从未使用）
+> 分类（work/learn/project）通过关联 KR→O 自动继承，Worklog 不重复维护
+> 标签、状态、耗时 — 见 `docs/design/worklog-field-extension.md` 扩展方案
 
 ## Reflect 表字段
 
