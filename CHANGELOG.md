@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.8.0] — 2026-07-08
+
+### Removed
+- **f-vessel**: 删除 Vessel AI 浏览器 skill + option-vessel 安装器（改用 Playwright @playwright/mcp）
+- marketplace.json 从 17→16 个 plugin
+
+### Changed
+- README 更新：架构图移除 vessel 相关条目，插件数更新为 15
+
 ## [0.7.0] — 2026-07-06
 
 ### Added
