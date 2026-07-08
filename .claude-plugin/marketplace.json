@@ -60,14 +60,6 @@
       ]
     },
     {
-      "name": "f-vessel",
-      "description": "Vessel AI Agent 浏览器 — MCP 操控真实浏览器，人类监督审批。Use when you need to browse the web, log into sites, fill forms, extract page content, take screenshots, or perform multi-step web tasks on behalf of the user.",
-      "source": "./plugins/f-vessel",
-      "keywords": [
-        "f"
-      ]
-    },
-    {
       "name": "f-logme",
       "description": "个人管理系统 — OKR 目标管理、Worklog 工作日志、Reflect 反思、SUM 周期/领域总结生成。数据存飞书 Base，输出到飞书文档。",
       "source": "./plugins/f-logme",
