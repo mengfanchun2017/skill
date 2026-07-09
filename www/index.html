@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>claude-skills — Claude Code 技能市场</title>
+<meta name="description" content="15 个精选 Claude Code 技能。飞书文档、PPT、Excel、PDF、图表、调研、OKR 管理 — 按需安装，独立使用。">
+<meta name="color-scheme" content="dark">
+<meta property="og:title" content="claude-skills — Claude Code 技能市场">
+<meta property="og:description" content="15 个精选 Claude Code 技能。按需安装，独立使用。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://claude-skills.pages.dev">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="claude-skills — Claude Code 技能市场">
+<meta name="twitter:description" content="15 个精选 Claude Code 技能。按需安装，独立使用。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230a0a0f'/><text x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-size='18' font-weight='bold' fill='%23a78bfa'>S</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:#0a0a0f;color:#d4d4d8;font-family:Inter,system-ui,-apple-system,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:#a78bfa;text-decoration:none;transition:color .2s}
+a:hover{color:#c4b5fd}
+code,kbd,pre{font-family:"JetBrains Mono","Fira Code",monospace}
+
+.container{max-width:1100px;margin:0 auto;padding:0 24px}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,10,15,.85);backdrop-filter:blur(12px);border-bottom:1px solid #1e1e2e}
+nav .container{display:flex;align-items:center;justify-content:space-between;height:56px}
+.nav-logo{font-weight:700;font-size:18px;color:#e4e4e7}
+.nav-logo span{color:#a78bfa}
+.nav-links{display:flex;gap:24px;align-items:center}
+.nav-links a{font-size:14px;color:#a1a1aa}
+.nav-links a:hover{color:#e4e4e7}
+.nav-links .badge{font-size:11px;background:#1a1a28;color:#a78bfa;border:1px solid #2e2e4e;border-radius:4px;padding:2px 8px}
+.lang-btn{background:none;border:1px solid #2e2e3e;color:#a1a1aa;padding:4px 10px;border-radius:6px;font-size:13px;cursor:pointer;transition:all .2s}
+.lang-btn:hover{color:#e4e4e7;border-color:#52526b}
+
+section{padding:100px 0}
+
+.hero{padding:160px 0 80px;text-align:center}
+.hero h1{font-size:clamp(40px,8vw,64px);font-weight:700;color:#fafafa;line-height:1.1;letter-spacing:-.02em;margin-bottom:20px}
+.hero h1 span{color:#a78bfa}
+.hero .sub{font-size:clamp(16px,3vw,20px);color:#a1a1aa;max-width:640px;margin:0 auto 40px;line-height:1.6}
+.hero-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:48px}
+.hero-cta .primary,.hero-cta .secondary{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:8px;font-size:15px;font-weight:500;cursor:pointer;transition:all .2s}
+.hero-cta .primary{background:#7c3aed;color:#fff;border:none}
+.hero-cta .primary:hover{background:#8b5cf6;transform:translateY(-1px);box-shadow:0 8px 24px rgba(124,58,237,.3)}
+.hero-cta .secondary{background:transparent;color:#a1a1aa;border:1px solid #2e2e3e}
+.hero-cta .secondary:hover{color:#e4e4e7;border-color:#52526b}
+
+.install-bar{max-width:640px;margin:0 auto 16px;background:#0e0e14;border:1px solid #1e1e2e;border-radius:10px;overflow:hidden;text-align:left}
+.install-bar .bar-header{display:flex;align-items:center;gap:8px;padding:12px 16px;background:#13131a;border-bottom:1px solid #1e1e2e;font-size:13px;color:#71717a}
+.install-bar .bar-body{padding:16px 20px;font-size:14px;line-height:1.8;color:#a1a1aa;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.install-bar code{color:#a78bfa}
+.install-bar .cpy-btn{flex-shrink:0;background:#1a1a28;border:1px solid #2e2e4e;color:#a78bfa;padding:6px 14px;border-radius:6px;font-size:13px;cursor:pointer;transition:all .2s;font-family:Inter,system-ui,sans-serif}
+.install-bar .cpy-btn:hover{background:#2e2e4e;color:#c4b5fd}
+.install-bar .cpy-btn.copied{background:#1a2e1a;border-color:#4ade80;color:#4ade80}
+
+.stats{display:flex;gap:32px;justify-content:center;flex-wrap:wrap}
+.stat{text-align:center}
+.stat .num{font-size:28px;font-weight:700;color:#fafafa}
+.stat .label{font-size:13px;color:#71717a;margin-top:4px}
+
+.category-bar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:48px}
+.cat-btn{background:#13131a;border:1px solid #1e1e2e;color:#a1a1aa;padding:8px 18px;border-radius:20px;font-size:14px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;font-family:Inter,system-ui,sans-serif}
+.cat-btn:hover{color:#e4e4e7;border-color:#3e3e5e}
+.cat-btn.active{background:#1a1a2e;border-color:#7c3aed;color:#c4b5fd}
+
+.skill-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px}
+.skill-card{background:#13131a;border:1px solid #1e1e2e;border-radius:12px;overflow:hidden;transition:border-color .2s,transform .2s;display:flex;flex-direction:column}
+.skill-card:hover{border-color:#2e2e4e;transform:translateY(-2px)}
+.skill-card.hidden{display:none}
+.skill-header{padding:24px 24px 0;display:flex;align-items:flex-start;gap:14px}
+.skill-icon{width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:#1a1a28;border-radius:10px;font-size:22px;flex-shrink:0}
+.skill-info{flex:1;min-width:0}
+.skill-name{font-size:16px;font-weight:600;color:#e4e4e7;margin-bottom:2px}
+.skill-tag{font-size:11px;font-family:"JetBrains Mono",monospace;color:#71717a;margin-bottom:10px}
+.skill-desc{font-size:14px;color:#a1a1aa;line-height:1.5;margin-bottom:16px;padding:0 24px}
+.skill-scenarios{padding:0 24px;margin-bottom:16px}
+.skill-scenarios .sc-label{font-size:11px;font-weight:600;color:#52525b;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.scenario{padding:10px 14px;background:#0e0e14;border-radius:6px;margin-bottom:8px;font-size:13px;line-height:1.5}
+.scenario .sc-trigger{font-size:12px;color:#a78bfa;font-family:"JetBrains Mono",monospace;margin-bottom:3px;word-break:break-all}
+.scenario .sc-result{font-size:13px;color:#71717a}
+.skill-footer{margin-top:auto;padding:16px 24px;border-top:1px solid #1e1e2e;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.skill-footer .install-cmd{font-size:12px;font-family:"JetBrains Mono",monospace;color:#a78bfa;flex:1;min-width:0;word-break:break-all}
+.skill-footer .btn-install{flex-shrink:0;background:#1a1a28;border:1px solid #7c3aed;color:#a78bfa;padding:6px 14px;border-radius:6px;font-size:13px;cursor:pointer;transition:all .2s;font-family:Inter,system-ui,sans-serif}
+.skill-footer .btn-install:hover{background:#7c3aed;color:#fff}
+.skill-footer .btn-install.copied{background:#1a2e1a;border-color:#4ade80;color:#4ade80}
+.skill-deps{display:flex;gap:6px;flex-wrap:wrap;padding:0 24px 16px}
+.skill-deps .dep{font-size:11px;padding:3px 8px;background:#0e0e14;border:1px solid #1e1e2e;border-radius:4px;color:#52525b}
+
+.ecosystem{text-align:center;padding:80px 0}
+.ecosystem h2{font-size:clamp(24px,4vw,32px);font-weight:700;color:#fafafa;margin-bottom:12px}
+.ecosystem p{font-size:16px;color:#a1a1aa;margin-bottom:24px;max-width:560px;margin-left:auto;margin-right:auto}
+.eco-links{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.eco-link{display:flex;align-items:center;gap:10px;background:#13131a;border:1px solid #1e1e2e;border-radius:10px;padding:16px 24px;transition:border-color .2s;text-decoration:none}
+.eco-link:hover{border-color:#3e3e5e}
+.eco-link .eco-icon{font-size:24px}
+.eco-link .eco-info{text-align:left}
+.eco-link .eco-name{font-size:15px;font-weight:600;color:#e4e4e7}
+.eco-link .eco-desc{font-size:12px;color:#71717a;margin-top:2px}
+
+footer{padding:32px 0;border-top:1px solid #1e1e2e;text-align:center;font-size:13px;color:#52525b}
+footer a{color:#71717a}
+footer a:hover{color:#a1a1aa}
+
+@media(max-width:768px){
+  .skill-grid{grid-template-columns:1fr}
+  .hero{padding:120px 0 64px}
+  section{padding:64px 0}
+  .stats{gap:20px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .skill-card{transition:none}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <div class="nav-logo">claude<span>-skills</span></div>
+    <div class="nav-links">
+      <a href="#skills" data-i18n="nav_skills">技能</a>
+      <a href="#ecosystem" data-i18n="nav_eco">生态</a>
+      <a href="https://github.com/mengfanchun2017/claude-skills" target="_blank" rel="noopener" data-i18n="nav_gh">GitHub</a>
+      <span class="badge">v0.8.0</span>
+      <button class="lang-btn" onclick="toggleLang()" data-i18n="lang_switch">EN</button>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="container">
+    <h1 data-i18n="hero_title">15 个技能，<br>一个<span>市场</span>。</h1>
+    <p class="sub" data-i18n="hero_sub">Claude Code 技能集合。飞书文档、PPT、Excel、图表、调研、OKR 管理 — 按需安装，独立使用。每个技能都能单独装。</p>
+    <div class="hero-cta">
+      <a href="https://github.com/mengfanchun2017/claude-skills" class="primary" target="_blank" rel="noopener" data-i18n="hero_cta">查看 GitHub →</a>
+      <a href="#skills" class="secondary" data-i18n="hero_browse">浏览技能</a>
+    </div>
+    <div class="install-bar">
+      <div class="bar-header" data-i18n="marketplace_add">① 添加市场（一次性）</div>
+      <div class="bar-body">
+        <code>/plugin marketplace add mengfanchun2017/claude-skills</code>
+        <button class="cpy-btn" onclick="copyText(this,'/plugin marketplace add mengfanchun2017/claude-skills')" data-i18n="copy">复制</button>
+      </div>
+    </div>
+    <div class="install-bar">
+      <div class="bar-header" data-i18n="skill_install">② 安装技能（挑你需要的）</div>
+      <div class="bar-body">
+        <code>/plugin install &lt;name&gt;@mengfanchun2017-skills</code>
+        <button class="cpy-btn" onclick="copyText(this,'/plugin install @mengfanchun2017-skills')" data-i18n="copy">复制</button>
+      </div>
+    </div>
+    <div class="stats" style="margin-top:32px">
+      <div class="stat"><div class="num">15</div><div class="label" data-i18n="stat_skills">自建技能</div></div>
+      <div class="stat"><div class="num">3</div><div class="label" data-i18n="stat_cats">分类</div></div>
+      <div class="stat"><div class="num">1</div><div class="label" data-i18n="stat_cmd">条命令安装</div></div>
+      <div class="stat"><div class="num">MIT</div><div class="label" data-i18n="stat_license">开源协议</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="container">
+    <div class="category-bar">
+      <button class="cat-btn active" onclick="filterSkills('all',this)" data-i18n="cat_all">🔮 全部</button>
+      <button class="cat-btn" onclick="filterSkills('docs',this)" data-i18n="cat_docs">📄 文档办公</button>
+      <button class="cat-btn" onclick="filterSkills('research',this)" data-i18n="cat_research">🔍 调研分析</button>
+      <button class="cat-btn" onclick="filterSkills('productivity',this)" data-i18n="cat_productivity">⚡ 效率工具</button>
+    </div>
+    <div class="skill-grid" id="skillGrid"></div>
+  </div>
+</section>
+
+<section id="ecosystem" class="ecosystem">
+  <div class="container">
+    <h2 data-i18n="eco_title">技能市场 × 环境配置</h2>
+    <p data-i18n="eco_desc">claude-skills 提供技能，ccconfig 提供环境。两者独立部署，互相链接，形成 Claude Code 完整工作流。</p>
+    <div class="eco-links">
+      <a href="https://ccconfigfrancis.pages.dev" class="eco-link" target="_blank" rel="noopener">
+        <div class="eco-icon">⚙️</div>
+        <div class="eco-info">
+          <div class="eco-name">ccconfig</div>
+          <div class="eco-desc" data-i18n="eco_ccconfig">Claude Code 环境配置，一键搞定</div>
+        </div>
+      </a>
+      <a href="https://github.com/mengfanchun2017/claude-skills" class="eco-link" target="_blank" rel="noopener">
+        <div class="eco-icon">📦</div>
+        <div class="eco-info">
+          <div class="eco-name">GitHub</div>
+          <div class="eco-desc" data-i18n="eco_gh">源码 & 安装文档</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p><a href="https://github.com/mengfanchun2017/claude-skills" target="_blank" rel="noopener">GitHub</a> &middot; MIT License &middot; <a href="https://ccconfigfrancis.pages.dev" target="_blank" rel="noopener">ccconfig</a></p>
+  </div>
+</footer>
+
+<script>
+const SKILLS = [
+  {
+    id: "f-feishu",
+    name: "f-feishu",
+    icon: "🪶",
+    cat: "docs",
+    desc_zh: "飞书文档编排层。创建 wiki/表格/白板、更新报告、整合/拆分文档、飞书 ↔ Office 双向转换、文档对比。",
+    desc_en: "Feishu doc orchestration. Create wikis/sheets/whiteboards, update reports, merge/split docs, Feishu ↔ Office conversion, document diff.",
+    scenarios_zh: [
+      {trigger: '"帮我创建一篇 AI 架构的 wiki 文档"', result: "→ 自动调 lark-cli 创建飞书文档，格式化输出"},
+      {trigger: '"把这份 Word 报告导入飞书"', result: "→ Office → 飞书双向转换，保留格式"},
+      {trigger: '"对比 v1 和 v2 两个版本的差异"', result: "→ 逐段对比，高亮变更，输出 diff 文档"}
+    ],
+    scenarios_en: [
+      {trigger: '"Create a wiki doc about AI architecture"', result: "→ Auto-creates Feishu doc via lark-cli"},
+      {trigger: '"Import this Word report to Feishu"', result: "→ Office ↔ Feishu bidirectional conversion"},
+      {trigger: '"Diff v1 and v2 of this document"', result: "→ Paragraph-level diff with highlighted changes"}
+    ],
+    deps: ["lark-cli", "officecli"]
+  },
+  {
+    id: "f-pptx",
+    name: "f-pptx",
+    icon: "📊",
+    cat: "docs",
+    desc_zh: "PPT 生成引擎。从 md/wiki 生成 PPTX，支持批量 JSON、模板合并、5 套配色主题、文字溢出自动修复。",
+    desc_en: "PPTX generation engine. From md/wiki to PPTX, batch JSON, template merging, 5 color themes, text overflow autofit.",
+    scenarios_zh: [
+      {trigger: '"生成一份 50 页的备考 PPT"', result: "→ 批量 JSON 模式，并行子代理生成"},
+      {trigger: '"把季度报告转成演示文稿"', result: "→ 模板合并，自动排版，一键导出"},
+      {trigger: '"用科技蓝主题做产品发布会 deck"', result: "→ 5 套设计主题可选，字体/配色自动应用"}
+    ],
+    scenarios_en: [
+      {trigger: '"Generate a 50-page exam prep deck"', result: "→ Batch JSON mode with parallel subagents"},
+      {trigger: '"Turn this quarterly report into slides"', result: "→ Template merge, auto layout, one-click export"},
+      {trigger: '"Make a product launch deck with tech-blue theme"', result: "→ 5 design themes, auto font/color application"}
+    ],
+    deps: ["officecli"]
+  },
+  {
+    id: "f-docx",
+    name: "f-docx",
+    icon: "📝",
+    cat: "docs",
+    desc_zh: "Word 文档原生生成。模板、样式、表格、图片、页眉页脚、目录，全部通过 OfficeCLI 引擎。",
+    desc_en: "Native .docx generation. Templates, styles, tables, images, headers/footers, TOC via OfficeCLI engine.",
+    scenarios_zh: [
+      {trigger: '"生成一份正式的项目提案 .docx"', result: "→ 自动排版、目录生成、封面设计"},
+      {trigger: '"用这个模板生成 100 份合同"', result: "→ 模板 + JSON 数据，批量生成替换"},
+      {trigger: '"创建一份带图表的分析报告"', result: "→ 内嵌表格、图片、页眉页脚"}
+    ],
+    scenarios_en: [
+      {trigger: '"Generate a formal project proposal .docx"', result: "→ Auto formatting, TOC, cover design"},
+      {trigger: '"Generate 100 contracts from this template"', result: "→ Template + JSON data, batch generation"},
+      {trigger: '"Create an analysis report with charts"', result: "→ Embedded tables, images, headers/footers"}
+    ],
+    deps: ["officecli"]
+  },
+  {
+    id: "f-xlsx",
+    name: "f-xlsx",
+    icon: "📈",
+    cat: "docs",
+    desc_zh: "Excel 电子表格原生生成。公式、图表、条件格式、数据透视表、多工作表，数字以数值而非字符串写入。",
+    desc_en: "Native .xlsx generation. Formulas, charts, conditional formatting, pivot tables, multi-sheet. Numbers as values, not strings.",
+    scenarios_zh: [
+      {trigger: '"生成一份财务分析报表"', result: "→ 公式自动计算、图表联动、多工作表"},
+      {trigger: '"创建销售数据透视表"', result: "→ 数据透视表 + 条件格式高亮"},
+      {trigger: '"做一个竞品对比表带雷达图"', result: "→ 表格 + 嵌入式雷达图"}
+    ],
+    scenarios_en: [
+      {trigger: '"Generate a financial analysis report"', result: "→ Auto formulas, linked charts, multi-sheet"},
+      {trigger: '"Create a sales pivot table"', result: "→ Pivot table + conditional formatting highlights"},
+      {trigger: '"Make a competitor comparison with radar chart"', result: "→ Table + embedded radar chart"}
+    ],
+    deps: ["officecli"]
+  },
+  {
+    id: "f-pdf",
+    name: "f-pdf",
+    icon: "📄",
+    cat: "docs",
+    desc_zh: "PDF 内容提取与翻译。PyMuPDF 提取文字/图片/表格/元数据，图片智能过滤（去 logo），生成中英对照翻译文档。",
+    desc_en: "PDF extraction & translation. PyMuPDF for text/images/tables/metadata, smart image filtering, bilingual translation output.",
+    scenarios_zh: [
+      {trigger: '"提取这份 PDF 的全部文字和图片"', result: "→ 结构化提取，自动过滤装饰性图片"},
+      {trigger: '"把这篇英文论文翻译成中文"', result: "→ 中英对照输出到飞书文档"},
+      {trigger: '"分析这份 PDF 的章节结构"', result: "→ 目录 + 元数据 + 页码映射"}
+    ],
+    scenarios_en: [
+      {trigger: '"Extract all text and images from this PDF"', result: "→ Structured extraction, auto-filter decorative images"},
+      {trigger: '"Translate this English paper to Chinese"', result: "→ Bilingual output to Feishu doc"},
+      {trigger: '"Analyze the chapter structure of this PDF"', result: "→ TOC + metadata + page mapping"}
+    ],
+    deps: ["PyMuPDF", "minimax"]
+  },
+  {
+    id: "f-diagram",
+    name: "f-diagram",
+    icon: "🎨",
+    cat: "docs",
+    desc_zh: "代码驱动图表生成。Mermaid（流程图/时序图/ER/类图/状态图/甘特图/饼图/思维导图）+ SVG 白板，可嵌入飞书文档。",
+    desc_en: "Code-driven diagrams. Mermaid (flowchart/sequence/ER/class/state/gantt/pie/mindmap) + SVG whiteboards, embeddable in Feishu docs.",
+    scenarios_zh: [
+      {trigger: '"画一个微服务架构图"', result: "→ Mermaid flowchart，自动渲染为 SVG"},
+      {trigger: '"生成项目甘特图"', result: "→ 任务依赖 + 时间线可视化"},
+      {trigger: '"画登录流程的时序图"', result: "→ 客户端/服务端/数据库交互序列"}
+    ],
+    scenarios_en: [
+      {trigger: '"Draw a microservice architecture diagram"', result: "→ Mermaid flowchart, auto-rendered to SVG"},
+      {trigger: '"Generate a project Gantt chart"', result: "→ Task dependencies + timeline visualization"},
+      {trigger: '"Draw a login flow sequence diagram"', result: "→ Client/server/database interaction sequence"}
+    ],
+    deps: ["whiteboard-cli"]
+  },
+  {
+    id: "f-search",
+    name: "f-search",
+    icon: "🔍",
+    cat: "research",
+    desc_zh: "三源并行搜索原语。Tavily（英文）+ MiniMax（中文）+ WebSearch（通用）同时搜，Python 过滤去重，输出带来源标注的搜索结果。",
+    desc_en: "Three-source parallel search. Tavily (EN) + MiniMax (ZH) + WebSearch (general), Python dedup/filter, annotated results.",
+    scenarios_zh: [
+      {trigger: '"搜索 AI Agent 的最新进展"', result: "→ 三源并行，去重合并，标注来源"},
+      {trigger: '"调研中国大模型市场格局"', result: "→ 中英文双语搜索，聚合结果"},
+      {trigger: '"帮我找 React 19 的新特性文档"', result: "→ Tavily 深度搜索 + 官方文档提取"}
+    ],
+    scenarios_en: [
+      {trigger: '"Search latest advances in AI Agents"', result: "→ 3-source parallel, deduped, source-annotated"},
+      {trigger: '"Research China LLM market landscape"', result: "→ Bilingual search, aggregated results"},
+      {trigger: '"Find React 19 new features docs"', result: "→ Tavily deep search + official doc extraction"}
+    ],
+    deps: ["Tavily MCP", "MiniMax MCP"]
+  },
+  {
+    id: "f-research-frame",
+    name: "f-research-frame",
+    icon: "🧭",
+    cat: "research",
+    desc_zh: "四领域研究方法论。客户（JTBD）/ 通用 / 市场（TAM）/ 技术四维度，自动判断领域，委托 f-search 搜索，带置信度标注。",
+    desc_en: "4-domain research methodology. Customer (JTBD) / Generic / Market (TAM) / Technical, auto domain detection, delegates to f-search, confidence-annotated.",
+    scenarios_zh: [
+      {trigger: '"调研 AI 编程助手市场"', result: "→ 自动识为市场研究，TAM/SAM/SOM 分析"},
+      {trigger: '"分析我们 SaaS 产品的用户痛点"', result: "→ JTBD 框架 + 用户访谈指南"},
+      {trigger: '"对比 React vs Vue 技术选型"', result: "→ 技术维度：能力 + 生态 + 采用率"}
+    ],
+    scenarios_en: [
+      {trigger: '"Research the AI coding assistant market"', result: "→ Auto-detected as market research, TAM/SAM/SOM"},
+      {trigger: '"Analyze user pain points for our SaaS"', result: "→ JTBD framework + user interview guide"},
+      {trigger: '"Compare React vs Vue for tech choice"', result: "→ Technical dimension: capability + ecosystem + adoption"}
+    ],
+    deps: ["f-search"]
+  },
+  {
+    id: "f-research-report",
+    name: "f-research-report",
+    icon: "📋",
+    cat: "research",
+    desc_zh: "研究报告生成器。三种输入模式（JSON/大纲/自由），v1 → 审查 → v2 迭代流程，委托 f-report-std 质量标准，输出到 f-feishu。",
+    desc_en: "Report generator. 3 input modes (JSON/outline/free), v1 → review → v2 iteration, delegates to f-report-std for standards, outputs to f-feishu.",
+    scenarios_zh: [
+      {trigger: '"根据这份调研数据写报告"', result: "→ JSON 输入模式，结构化生成"},
+      {trigger: '"写一份 X vs Y 竞品分析"', result: "→ 自动搜索 + 对比框架 + 结论"},
+      {trigger: '"深度调研量子计算产业"', result: "→ outline.yaml 批量，逐章搜索+撰写"}
+    ],
+    scenarios_en: [
+      {trigger: '"Write a report from this research data"', result: "→ JSON input mode, structured generation"},
+      {trigger: '"Write an X vs Y competitive analysis"', result: "→ Auto search + comparison framework + conclusions"},
+      {trigger: '"Deep research on quantum computing industry"', result: "→ outline.yaml batch, per-chapter search + write"}
+    ],
+    deps: ["f-report-std", "f-research-frame", "f-feishu"]
+  },
+  {
+    id: "f-report-std",
+    name: "f-report-std",
+    icon: "📏",
+    cat: "research",
+    desc_zh: "报告写作横向规范。4 套模板（研究/分析/对比/方案），结构规则（H1-H3 仅）、数据呈现（对比用表不用列表）、论证规则、引注规范。",
+    desc_en: "Report writing standards. 4 templates (research/analysis/comparison/proposal), structure rules, data presentation, argumentation, citation standards.",
+    scenarios_zh: [
+      {trigger: "任何报告生成场景", result: "→ 被 f-research-report 和 f-logme 自动调用"},
+      {trigger: '"确保报告符合规范"', result: "→ 结构检查、数据呈现验证、引注审核"},
+      {trigger: '"我需要一份对比报告的模板"', result: "→ 4 套模板按场景选用"}
+    ],
+    scenarios_en: [
+      {trigger: "Any report generation scenario", result: "→ Auto-invoked by f-research-report and f-logme"},
+      {trigger: '"Ensure report meets standards"', result: "→ Structure check, data presentation validation, citation audit"},
+      {trigger: '"I need a comparison report template"', result: "→ 4 templates, chosen by scenario"}
+    ],
+    deps: []
+  },
+  {
+    id: "f-logme",
+    name: "f-logme",
+    icon: "📓",
+    cat: "productivity",
+    desc_zh: "个人管理系统。OKR 目标 → KR 关键结果 → Worklog 日志 → Reflect 反思 → SUM 总结，五层架构，数据存飞书 Base，输出到飞书文档。",
+    desc_en: "Personal management system. OKR → KR → Worklog → Reflect → SUM, 5-layer architecture, data in Feishu Base, output to Feishu docs.",
+    scenarios_zh: [
+      {trigger: '"设定 Q3 的个人 OKR"', result: "→ 创建 O + KR 结构，关联飞书 Base"},
+      {trigger: '"记录今天在 KR-3 上的工作"', result: "→ Worklog 写入，自动累积工时"},
+      {trigger: '"生成 Q2 工作总结"', result: "→ SUM 模式，从 Base 数据自动聚合生成"}
+    ],
+    scenarios_en: [
+      {trigger: '"Set Q3 personal OKRs"', result: "→ Create O + KR structure, linked to Feishu Base"},
+      {trigger: '"Log today\'s work on KR-3"', result: "→ Worklog entry, auto time accumulation"},
+      {trigger: '"Generate Q2 work summary"', result: "→ SUM mode, auto-aggregated from Base data"}
+    ],
+    deps: ["lark-cli", "Feishu Base"]
+  },
+  {
+    id: "f-launch",
+    name: "f-launch",
+    icon: "🚀",
+    cat: "productivity",
+    desc_zh: "项目脚手架。从意图到可运行项目，8 种项目类型识别，自动生成 CLAUDE.md + README + ROADMAP + LICENSE + .gitignore。",
+    desc_en: "Project scaffold. From intent to runnable project, 8 project types, auto-generate CLAUDE.md + README + ROADMAP + LICENSE + .gitignore.",
+    scenarios_zh: [
+      {trigger: '"我想做个个人网站"', result: "→ 识别为 static-web-personal，生成全套脚手架"},
+      {trigger: '"启动一个新的后端 API 项目"', result: "→ web-api-backend 模板，Express/FastAPI 选项"},
+      {trigger: '"创建一个 CLI 工具项目"', result: "→ cli-tool 模板，参数解析 + 发布配置"}
+    ],
+    scenarios_en: [
+      {trigger: '"I want to build a personal website"', result: "→ Detected as static-web-personal, full scaffold"},
+      {trigger: '"Start a new backend API project"', result: "→ web-api-backend template, Express/FastAPI options"},
+      {trigger: '"Create a CLI tool project"', result: "→ cli-tool template, arg parsing + publish config"}
+    ],
+    deps: ["f-logme(可选)"]
+  },
+  {
+    id: "f-moocrec",
+    name: "f-moocrec",
+    icon: "🎓",
+    cat: "productivity",
+    desc_zh: "MOOC 课程推荐助手。基于 QS 世界排名顶级学府课程体系，个性化学习路径，双轨推荐（免费旁听 vs 付费证书），证书验证指导。",
+    desc_en: "MOOC course recommender. QS-ranked university curricula, personalized learning paths, dual-track (free audit vs paid certificate), certificate verification.",
+    scenarios_zh: [
+      {trigger: '"推荐我生物方向的在线课程"', result: "→ 个性化诊断 + 课程匹配 + 学习路线图"},
+      {trigger: '"我学完了 MITx 7.00x，接下来学什么"', result: "→ 先修关系检查 + 进阶推荐"},
+      {trigger: '"哪些课程的证书值得付费"', result: "→ edX 认证、Credly 区块链徽章、LinkedIn 集成建议"}
+    ],
+    scenarios_en: [
+      {trigger: '"Recommend biology online courses for me"', result: "→ Personalized diagnosis + course matching + roadmap"},
+      {trigger: '"I finished MITx 7.00x, what next?"', result: "→ Prerequisite check + advanced recommendations"},
+      {trigger: '"Which course certificates are worth paying for?"', result: "→ edX verification, Credly badges, LinkedIn advice"}
+    ],
+    deps: ["Supabase", "lark-cli", "Feishu Base"]
+  },
+  {
+    id: "f-sysarchi",
+    name: "f-sysarchi",
+    icon: "🏗️",
+    cat: "productivity",
+    desc_zh: "系统架构师备考助手。触发词 archi 将日常工作映射到 13 章考点，随机测验（grill），进度追踪，逐章深度学习 + 飞书笔记。",
+    desc_en: "System Analyst exam prep. Trigger word 'archi' maps daily work to 13 exam chapters, grill quizzes, progress tracking, deep learning + Feishu notes.",
+    scenarios_zh: [
+      {trigger: '"archi"（工作中说）', result: "→ 自动映射当前任务到考试章节"},
+      {trigger: '"archi grill 需求工程"', result: "→ 随机出题测验，即时反馈"},
+      {trigger: '"archi learn 数据库设计"', result: "→ 深度搜索 + 结构化笔记输出到飞书"}
+    ],
+    scenarios_en: [
+      {trigger: '"archi" (say during work)', result: "→ Auto-map current task to exam chapter"},
+      {trigger: '"archi grill requirements engineering"', result: "→ Random quiz, instant feedback"},
+      {trigger: '"archi learn database design"', result: "→ Deep search + structured notes to Feishu"}
+    ],
+    deps: ["f-search", "f-feishu", "f-logme"]
+  },
+  {
+    id: "getnote",
+    name: "getnote",
+    icon: "🧠",
+    cat: "productivity",
+    desc_zh: "得到笔记集成。27 个 MCP 工具，笔记增删改查、语义搜索、知识库管理、图片上传、博主内容浏览、直播回看。",
+    desc_en: "DeDao (Get Note) integration. 27 MCP tools, note CRUD, semantic search, knowledge base management, image upload, blogger content, livestreams.",
+    scenarios_zh: [
+      {trigger: '"记一条关于 RAG 架构的笔记"', result: "→ 创建笔记 + 自动标签 + 语义索引"},
+      {trigger: '"在我的知识库里搜索微服务"', result: "→ 语义搜索，跨笔记关联"},
+      {trigger: '"把我关注的博主最新文章列出来"', result: "→ 订阅博主内容聚合"}
+    ],
+    scenarios_en: [
+      {trigger: '"Take a note about RAG architecture"', result: "→ Create note + auto-tag + semantic index"},
+      {trigger: '"Search my knowledge base for microservices"', result: "→ Semantic search, cross-note linking"},
+      {trigger: '"List latest posts from bloggers I follow"', result: "→ Subscribed blogger content aggregation"}
+    ],
+    deps: ["GetNote MCP"]
+  }
+];
+
+const I18N = {
+  zh: {
+    nav_skills: "技能",
+    nav_eco: "生态",
+    nav_gh: "GitHub",
+    lang_switch: "EN",
+    hero_title: '15 个技能，<br>一个<span>市场</span>。',
+    hero_sub: "Claude Code 技能集合。飞书文档、PPT、Excel、图表、调研、OKR 管理 — 按需安装，独立使用。每个技能都能单独装。",
+    hero_cta: "查看 GitHub →",
+    hero_browse: "浏览技能",
+    marketplace_add: "① 添加市场（一次性）",
+    skill_install: "② 安装技能（挑你需要的）",
+    copy: "复制",
+    copied: "已复制 ✓",
+    stat_skills: "自建技能",
+    stat_cats: "分类",
+    stat_cmd: "条命令安装",
+    stat_license: "开源协议",
+    cat_all: "🔮 全部",
+    cat_docs: "📄 文档办公",
+    cat_research: "🔍 调研分析",
+    cat_productivity: "⚡ 效率工具",
+    scenarios_label: "使用场景",
+    eco_title: "技能市场 × 环境配置",
+    eco_desc: "claude-skills 提供技能，ccconfig 提供环境。两者独立部署，互相链接，形成 Claude Code 完整工作流。",
+    eco_ccconfig: "Claude Code 环境配置，一键搞定",
+    eco_gh: "源码 & 安装文档"
+  },
+  en: {
+    nav_skills: "Skills",
+    nav_eco: "Ecosystem",
+    nav_gh: "GitHub",
+    lang_switch: "中文",
+    hero_title: '15 Skills,<br>One <span>Marketplace</span>.',
+    hero_sub: "Claude Code skill collection. Feishu docs, PPT, Excel, diagrams, research, OKR management — install what you need, each skill works standalone.",
+    hero_cta: "View on GitHub →",
+    hero_browse: "Browse Skills",
+    marketplace_add: "① Add marketplace (one-time)",
+    skill_install: "② Install skills (pick what you need)",
+    copy: "Copy",
+    copied: "Copied ✓",
+    stat_skills: "Self-built Skills",
+    stat_cats: "Categories",
+    stat_cmd: "One Command",
+    stat_license: "Open Source",
+    cat_all: "🔮 All",
+    cat_docs: "📄 Document & Office",
+    cat_research: "🔍 Research & Analysis",
+    cat_productivity: "⚡ Productivity",
+    scenarios_label: "Scenarios",
+    eco_title: "Skill Marketplace × Environment Config",
+    eco_desc: "claude-skills provides the skills, ccconfig provides the environment. Independently deployed, cross-linked, forming a complete Claude Code workflow.",
+    eco_ccconfig: "Claude Code environment, one command setup",
+    eco_gh: "Source & install docs"
+  }
+};
+
+let currentLang = 'zh';
+
+function detectLang() {
+  const saved = localStorage.getItem('claude-skills-lang');
+  if (saved === 'en' || saved === 'zh') return saved;
+  const browser = navigator.language || (navigator.languages && navigator.languages[0]) || '';
+  return browser.startsWith('zh') ? 'zh' : 'en';
+}
+
+function setLang(lang) {
+  currentLang = lang;
+  document.documentElement.lang = lang;
+  localStorage.setItem('claude-skills-lang', lang);
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (I18N[lang] && I18N[lang][key]) {
+      el.innerHTML = I18N[lang][key];
+    }
+  });
+  renderSkills();
+}
+
+function toggleLang() {
+  setLang(currentLang === 'zh' ? 'en' : 'zh');
+}
+
+function copyText(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = I18N[currentLang].copied;
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = orig;
+      btn.classList.remove('copied');
+    }, 1500);
+  });
+}
+
+let currentCat = 'all';
+
+function filterSkills(cat, btn) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderSkills();
+}
+
+function renderSkills() {
+  const grid = document.getElementById('skillGrid');
+  const lang = currentLang;
+  grid.innerHTML = SKILLS.filter(s => currentCat === 'all' || s.cat === currentCat).map(s => `
+    <div class="skill-card" data-cat="${s.cat}">
+      <div class="skill-header">
+        <div class="skill-icon">${s.icon}</div>
+        <div class="skill-info">
+          <div class="skill-name">${s.name}</div>
+          <div class="skill-tag">/plugin install ${s.name}@mengfanchun2017-skills</div>
+        </div>
+      </div>
+      <div class="skill-desc">${lang === 'zh' ? s.desc_zh : s.desc_en}</div>
+      ${s.deps.length ? `<div class="skill-deps">${s.deps.map(d => `<span class="dep">${d}</span>`).join('')}</div>` : ''}
+      <div class="skill-scenarios">
+        <div class="sc-label">${I18N[lang].scenarios_label}</div>
+        ${(lang === 'zh' ? s.scenarios_zh : s.scenarios_en).map(sc => `
+          <div class="scenario">
+            <div class="sc-trigger">${sc.trigger}</div>
+            <div class="sc-result">${sc.result}</div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="skill-footer">
+        <span class="install-cmd">/plugin install ${s.name}@mengfanchun2017-skills</span>
+        <button class="btn-install" onclick="copyText(this,'/plugin install ${s.name}@mengfanchun2017-skills')">${I18N[lang].copy}</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+setLang(detectLang());
+</script>
+
+</body>
+</html>
