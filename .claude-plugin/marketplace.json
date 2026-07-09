@@ -85,7 +85,7 @@
     },
     {
       "name": "f-search",
-      "description": "搜索活动统一原语 — 三源并行搜索（tavily/minimax/websearch）、Python 过滤避免 context 污染、 聚合去重、来源标注、搜索清单输出。被 f-research / f-research-deep / f-logme 等需要外部调研的 skill 委托调用。 不含领域方法论（领域解读由 f-research 负责）。",
+      "description": "搜索活动统一原语 — 三源并行搜索（tavily/minimax/websearch）、Python 过滤避免 context 污染、 聚合去重、来源标注、搜索清单输出。被 f-research-frame / f-research-frame（Batch Mode） / f-logme 等需要外部调研的 skill 委托调用。 不含领域方法论（领域解读由 f-research-frame 负责）。",
       "source": "./plugins/f-search",
       "keywords": [
         "f"
@@ -93,7 +93,7 @@
     },
     {
       "name": "f-sysarchi",
-      "description": "系统分析师/系统架构设计师备考 — 随工作边做边学。暗号 \"archi\" 触发。 Use when 用户说\"archi\"/\"系统分析师\"/\"备考\"/\"出题\"/\"grill\"， 或想在日常工作中嵌入考试知识点学习。",
+      "description": "[personal] 系统分析师/系统架构设计师备考 — 随工作边做边学。暗号 \"archi\" 触发。 Use when 用户说\"archi\"/\"系统分析师\"/\"备考\"/\"出题\"/\"grill\"， 或想在日常工作中嵌入考试知识点学习。",
       "source": "./plugins/f-sysarchi",
       "keywords": [
         "f"
