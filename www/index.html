@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ccskills — Claude Code 技能市场</title>
-<meta name="description" content="15 个精选 Claude Code 技能。飞书文档、PPT、Excel、PDF、图表、调研、OKR 管理 — 按需安装，独立使用。底层工具由 ccconfig 一键安装。">
+<meta name="description" content="15 个精选 Claude Code 技能。飞书文档、PPT、Excel、PDF、图表、调研、OKR 管理 — 按需安装，独立使用。ccconfig 一键装好底层工具 + 自动 clone 本仓库。">
 <meta name="color-scheme" content="dark">
 <meta property="og:title" content="ccskills — Claude Code 技能市场">
 <meta property="og:description" content="15 个精选 Claude Code 技能，与 ccconfig 环境配置配套使用。按需安装，独立使用。">
@@ -161,7 +161,7 @@ footer a:hover{color:#a1a1aa}
 <section class="hero">
   <div class="container">
     <h1 data-i18n="hero_title">15 个技能，<br>一个<span>市场</span>。</h1>
-    <p class="sub" data-i18n="hero_sub">Claude Code 技能集合。飞书文档、PPT、Excel、图表、调研、OKR 管理 — 按需安装，独立使用。底层工具由 ccconfig 一键装好。</p>
+    <p class="sub" data-i18n="hero_sub">Claude Code 技能集合。飞书文档、PPT、Excel、图表、调研、OKR 管理 — 按需安装，独立使用。ccconfig 一条命令装好底层工具 + 自动 clone 本仓库。</p>
     <div class="hero-cta">
       <a href="https://github.com/mengfanchun2017/claude-skills" class="primary" target="_blank" rel="noopener" data-i18n="hero_cta">查看 GitHub →</a>
       <a href="https://ccconfiged.pages.dev" class="secondary" target="_blank" rel="noopener" data-i18n="hero_ccconfig">⚙️ ccconfig 环境配置</a>
@@ -211,18 +211,18 @@ footer a:hover{color:#a1a1aa}
   <div class="container" style="max-width:720px">
     <div class="dep-notice" style="margin-bottom:0">
       <div class="dn-text">
-        <div style="font-size:16px;font-weight:600;color:#e4e4e7;margin-bottom:12px" data-i18n="how_title_block">推荐安装流程</div>
+        <div style="font-size:16px;font-weight:600;color:#e4e4e7;margin-bottom:12px" data-i18n="how_title_block">推荐安装流程（3 步）</div>
         <div class="eco-flow" style="margin:0 0 16px">
           <div class="flow-step">
-            <div class="fs-icon">⚙️</div>
-            <div class="fs-title">ccconfig</div>
-            <div class="fs-desc" data-i18n="how_step1">装好全部底层工具<br>lark-cli / officecli / …</div>
+            <div class="fs-icon">🔐</div>
+            <div class="fs-title">ccprivate</div>
+            <div class="fs-desc" data-i18n="how_step1">一条命令创建<br>API Key + 配置自动生成</div>
           </div>
           <div class="flow-arrow">→</div>
           <div class="flow-step">
-            <div class="fs-icon">📦</div>
-            <div class="fs-title">ccskills</div>
-            <div class="fs-desc" data-i18n="how_step2">挑你需要的技能<br>每个独立安装</div>
+            <div class="fs-icon">⚙️</div>
+            <div class="fs-title">ccconfig</div>
+            <div class="fs-desc" data-i18n="how_step2">装好全部底层工具<br>+ 自动 clone ccskills</div>
           </div>
           <div class="flow-arrow">→</div>
           <div class="flow-step">
@@ -233,8 +233,8 @@ footer a:hover{color:#a1a1aa}
         </div>
         <div class="tag-row">
           <span class="tag" style="color:#4ade80">🏆 推荐</span>
-          <code style="color:#a78bfa">git clone --branch release https://github.com/mengfanchun2017/ccconfig.git && bash ccconfig/setup-links.sh</code>
-          <button class="cpy-btn" onclick="copyText(this,'git clone --branch release https://github.com/mengfanchun2017/ccconfig.git && bash ccconfig/setup-links.sh')" data-i18n="copy" style="margin-left:auto">复制</button>
+          <code style="color:#a78bfa">bash ~/git/ccconfig/init.sh all</code>
+          <button class="cpy-btn" onclick="copyText(this,'bash ~/git/ccconfig/init.sh all')" data-i18n="copy" style="margin-left:auto">复制</button>
         </div>
       </div>
     </div>
@@ -572,9 +572,9 @@ const I18N = {
     eco_desc: "ccconfig 装好底层工具（lark-cli、officecli、MCP 服务器），ccskills 提供 Claude 操作指南。两者独立部署、独立版本、互不干扰，通过互相链接形成生态。",
     eco_ccconfig: "装工具：一条命令配好 Claude Code 环境",
     eco_gh: "源码 & 安装文档",
-    how_title_block: "推荐安装流程",
-    how_step1: "装好全部底层工具<br>lark-cli / officecli / …",
-    how_step2: "挑你需要的技能<br>每个独立安装",
+    how_title_block: "推荐安装流程（3 步）",
+    how_step1: "一条命令创建<br>API Key + 配置自动生成",
+    how_step2: "装好全部底层工具<br>+ 自动 clone ccskills",
     how_step3_title: "开箱即用",
     how_step3: "技能 + 工具齐全<br>直接跟 Claude 说需求"
   },
@@ -605,9 +605,9 @@ const I18N = {
     eco_desc: "ccconfig installs the underlying tools (lark-cli, officecli, MCP servers), ccskills provides Claude's operating instructions. Independently deployed, independently versioned, linked together as an ecosystem.",
     eco_ccconfig: "Installs tools: one-command Claude Code environment",
     eco_gh: "Source & install docs",
-    how_title_block: "Recommended Setup Flow",
-    how_step1: "Install all underlying tools<br>lark-cli / officecli / …",
-    how_step2: "Pick the skills you need<br>each installs independently",
+    how_title_block: "Recommended Setup Flow (3 steps)",
+    how_step1: "One command to create<br>API keys + config auto-gen",
+    how_step2: "Installs all underlying tools<br>+ auto-clones ccskills",
     how_step3_title: "Ready to Use",
     how_step3: "Skills + tools complete<br>just tell Claude what to do"
   }
