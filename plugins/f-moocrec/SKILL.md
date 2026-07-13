@@ -29,6 +29,18 @@ Supabase (共享课程数据)              飞书 (学生个人数据)
 
 **资源配置**: `config.yaml` — 飞书 token（wiki node、doc tokens、base token、table ID）
 
+## 配置
+
+> 📖 完整说明 → [config.aiagt.dev](https://config.aiagt.dev/f-moocrec)
+
+**ccconfig 用户**：真实值放 `ccprivate/skill-config/f-moocrec.yaml`，`init-skill.sh sync` 自动覆盖。
+**独立用户**：`cp config.yaml.example config.yaml` 填入真实值。
+
+需提前准备：
+- 飞书 Base（手动创建）→ 学习进度表
+- 飞书 Wiki 节点 → 学生画像 + 学习路径文档
+- Supabase（共享课程数据，只读，无需用户配置）
+
 ### 配置文件管理
 
 `config.yaml` 含真实 token → **复制 config.yaml.example 填入你的值**。个人真实配置放 ccprivate，不进入公开仓库。

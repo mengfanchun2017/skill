@@ -17,6 +17,16 @@ allowed-tools: Read, Write, Bash, WebSearch,
 
 **不含领域方法论**。领域方法论（customer JTBD / market sizing / technical eval）由 `f-research-frame` 负责。
 
+## 配置
+
+> 📖 完整说明 → [config.aiagt.dev](https://config.aiagt.dev/f-search)
+
+本 skill 搜索工具（Tavily/MiniMax/WebSearch）需 MCP server。API key 通过 Claude Code 的 MCP 配置管理：
+- **ccconfig 用户**：真实 key 放 `ccprivate/conf/claude.json`（symlink 到 `conf/claude.json`）
+- **独立用户**：在 `~/.claude/settings.json` 的 `mcpServers` 中配置 Tavily + MiniMax
+
+当前 `config.yaml.example` 无需用户可配项（所有 API key 通过 MCP 配置管理）。
+
 ## 何时用
 
 | 触发 | 调用方 |

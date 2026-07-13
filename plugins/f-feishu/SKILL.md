@@ -19,6 +19,18 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 - lark-cli 命令参考 → `references/lark-cli-cheatsheet.md`。本 skill 直接调 lark-cli，不依赖 lark-* skill。
 - 跨格式转换（涉及 Office 时）→ `references/feishu-office-bridge.md`
 
+## 配置
+
+> 📖 完整说明 → [config.aiagt.dev](https://config.aiagt.dev/f-feishu)
+
+**ccconfig 用户**：真实值放 `ccprivate/skill-config/f-feishu.yaml`，`init-skill.sh sync` 自动覆盖。
+**独立用户**：`cp config.yaml.example config.yaml` 填入真实值。
+
+需提前准备：
+- 飞书租户（企业版/个人版）
+- `npm install -g @larksuite/cli` → `lark-cli auth login`
+- wiki 节点 token（新文档默认父目录）
+
 > 完整格式约束+安全规则参考 → `references/write-checklist.md`
 
 ## 文档父子层级规则

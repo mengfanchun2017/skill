@@ -24,6 +24,26 @@ allowed-tools: Bash, Read, Write,
 
 27 个 MCP tools 覆盖得到大脑全部功能。所有操作通过 MCP tool call 直接执行，不走 Bash CLI。
 
+## 配置
+
+> 📖 完整说明 → [config.aiagt.dev](https://config.aiagt.dev/getnote)
+
+**ccconfig 用户**：MCP server 配置由 `init-mcp.sh` 管理，API key 在 `ccprivate/conf/claude.json`。
+**独立用户**：在 `~/.claude/settings.json` 的 `mcpServers` 中添加 getnote MCP server：
+```json
+{
+  "mcpServers": {
+    "getnote": {
+      "command": "npx",
+      "args": ["-y", "@getnote/mcp"],
+      "env": { "GETNOTE_API_KEY": "<your-api-key>" }
+    }
+  }
+}
+```
+
+获取 API key：下载「得到」App → 我的 → 设置 → 开发者 → 创建 API Key。
+
 ## 意图 → Tool 映射
 
 ### 笔记 CRUD

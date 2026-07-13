@@ -1,14 +1,14 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
-  "name": "mengfanchun2017-skills",
+  "name": "<your-github-username>-skills",
   "owner": {
-    "name": "mengfanchun2017",
-    "email": "mengfanchun1981@163.com"
+    "name": "<your-github-username>",
+    "email": "<your-email>"
   },
   "metadata": {
-    "description": "mengfanchun2017 的 Claude Code skill 集合 — 自建 + 飞书 CLI + 辅助工具",
+    "description": "Claude Code skill 集合 — 自建 + 飞书 CLI + 辅助工具",
     "version": "0.8.0",
-    "homepage": "https://github.com/mengfanchun2017/skill"
+    "homepage": "https://github.com/<your-username>/skill"
   },
   "plugins": [
     {
@@ -124,6 +124,14 @@
       ]
     },
     {
+      "name": "f-libaudit",
+      "description": "仓库全面审计 — 从架构到代码到文档到测试，输出审计报告到飞书文档。Use when 用户说"审计仓库"/"代码审计"/"lib审计"/"上线前审计"/"发布审计"、或需要对仓库做多维度质量审查。",
+      "source": "./plugins/f-libaudit",
+      "keywords": [
+        "f"
+      ]
+    },
+    {
       "name": "getnote",
       "source": "./plugins/getnote",
       "description": "得到大脑(Get笔记) 集成 — MCP 工具驱动。笔记 CRUD、语义搜索、知识库管理、图片上传、博主内容、直播。 Use when 用户说\"记笔记\"/\"保存到得到\"/\"搜笔记\"/\"搜知识库\"/\"我的笔记\"/\"知识库\"/\"博主\"/\"直播\"/\"上传图片到得到\"。",
@@ -134,22 +142,5 @@
         "knowledge"
       ]
     },
-    {
-      "name": "mattpocock-skills",
-      "description": "mattpocock/skills 简体中文本地化版（18 个 skill：caveman/diagnose/grill-me/grill-with-docs/improve-codebase-architecture/tdd/to-issues/to-prd/triage/zoom-out/prototype/handoff/write-a-skill/git-guardrails-claude-code/migrate-to-shoehorn/scaffold-exercises/setup-pre-commit/setup-matt-pocock-skills）。一次安装暴露全部 skill，避免 subdir 拆分导致 6× 重复 cache。",
-      "source": {
-        "source": "github",
-        "repo": "vinvcn/mattpocock-skills-zh-CN"
-      },
-      "keywords": [
-        "mattpocock",
-        "caveman",
-        "diagnose",
-        "grill",
-        "improve",
-        "write",
-        "zoom"
-      ]
-    }
   ]
 }
