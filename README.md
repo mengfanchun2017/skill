@@ -8,45 +8,45 @@
 在 Claude Code 里添加 marketplace（一次性）：
 
 ```
-/plugin marketplace add mengfanchun2017/claude-skills
+/plugin marketplace add <your-github-username>/claude-skills
 ```
 
 然后按需安装（挑你需要的，`<name>` 替换为下表中的名称）：
 
 ```
-/plugin install <name>@mengfanchun2017-skills
+/plugin install <name>@<your-github-username>-skills
 ```
 
 | 你需要… | 安装命令 |
 |---------|---------|
-| 飞书文档操作 | `/plugin install f-feishu@mengfanchun2017-skills` |
-| PPT 生成 | `/plugin install f-pptx@mengfanchun2017-skills` |
-| Word 文档 | `/plugin install f-docx@mengfanchun2017-skills` |
-| Excel 表格 | `/plugin install f-xlsx@mengfanchun2017-skills` |
-| PDF 处理 | `/plugin install f-pdf@mengfanchun2017-skills` |
-| 画架构图/流程图 | `/plugin install f-diagram@mengfanchun2017-skills` |
-| 搜索/调研 | `/plugin install f-search@mengfanchun2017-skills` |
-| 研究报告 | `/plugin install f-research-report@mengfanchun2017-skills` |
-| 个人 OKR/日志 | `/plugin install f-logme@mengfanchun2017-skills` |
-| 新项目脚手架 | `/plugin install f-launch@mengfanchun2017-skills` |
-| 慕课推荐 | `/plugin install f-moocrec@mengfanchun2017-skills` |
-| 系统架构师备考 | `/plugin install f-sysarchi@mengfanchun2017-skills` |
-| 得到笔记 | `/plugin install getnote@mengfanchun2017-skills` |
-| 报告写作规范 | `/plugin install f-report-std@mengfanchun2017-skills` |
-| 研究方法论框架 | `/plugin install f-research-frame@mengfanchun2017-skills` |
+| 飞书文档操作 | `/plugin install f-feishu@<your-github-username>-skills` |
+| PPT 生成 | `/plugin install f-pptx@<your-github-username>-skills` |
+| Word 文档 | `/plugin install f-docx@<your-github-username>-skills` |
+| Excel 表格 | `/plugin install f-xlsx@<your-github-username>-skills` |
+| PDF 处理 | `/plugin install f-pdf@<your-github-username>-skills` |
+| 画架构图/流程图 | `/plugin install f-diagram@<your-github-username>-skills` |
+| 搜索/调研 | `/plugin install f-search@<your-github-username>-skills` |
+| 研究报告 | `/plugin install f-research-report@<your-github-username>-skills` |
+| 个人 OKR/日志 | `/plugin install f-logme@<your-github-username>-skills` |
+| 新项目脚手架 | `/plugin install f-launch@<your-github-username>-skills` |
+| 慕课推荐 | `/plugin install f-moocrec@<your-github-username>-skills` |
+| 系统架构师备考 | `/plugin install f-sysarchi@<your-github-username>-skills` |
+| 得到笔记 | `/plugin install getnote@<your-github-username>-skills` |
+| 报告写作规范 | `/plugin install f-report-std@<your-github-username>-skills` |
+| 研究方法论框架 | `/plugin install f-research-frame@<your-github-username>-skills` |
 
 可以一次装多个：
 
 ```
-/plugin install f-feishu@mengfanchun2017-skills
-/plugin install f-pptx@mengfanchun2017-skills
-/plugin install f-search@mengfanchun2017-skills
+/plugin install f-feishu@<your-github-username>-skills
+/plugin install f-pptx@<your-github-username>-skills
+/plugin install f-search@<your-github-username>-skills
 ```
 
 后续更新：
 
 ```
-/plugin marketplace update mengfanchun2017-skills
+/plugin marketplace update <your-github-username>-skills
 ```
 
 ## 第三方 skill 装法（不通过 marketplace）
@@ -56,10 +56,10 @@
 
 ```bash
 # 装单个 skill
-npx --yes skills@latest add vinvcn/mattpocock-skills-zh-CN --skill caveman -g -y
+npx --yes skills@latest add mattpocock/skills --skill caveman -g -y
 
 # 装多个 skill
-npx --yes skills@latest add vinvcn/mattpocock-skills-zh-CN \
+npx --yes skills@latest add mattpocock/skills \
   --skill caveman --skill diagnose --skill grill-me --skill improve-codebase-architecture --skill write-a-skill --skill zoom-out -g -y
 
 # 跟上游更新
@@ -70,7 +70,7 @@ cconfig 用户：`bash ccconfig/init-skill.sh sync` 自动从 `conf/third-party-
 
 ### 配合 ccconfig 使用
 
-克隆 [ccconfig](https://github.com/mengfanchun2017/ccconfig) 后，`init-skill.sh sync` 自动完成：symlink 自建 skill、注册 marketplace、安装第三方 skill、注入私有配置。详见 ccconfig 文档。
+克隆 [ccconfig](https://github.com/<your-github-username>/ccconfig) 后，`init-skill.sh sync` 自动完成：symlink 自建 skill、注册 marketplace、安装第三方 skill、注入私有配置。详见 ccconfig 文档。
 
 ## 自建 skill（15 个，仓内）
 
@@ -109,7 +109,7 @@ lark-cli auth login              # 飞书登录
 |------|------|
 | f-feishu | 飞书文档统一入口，编排所有 lark-cli 命令（wiki/表格/白板/PPT/Base） |
 
-### 辅助工具 — 来自 [vinvcn/mattpocock-skills-zh-CN](https://github.com/vinvcn/mattpocock-skills-zh-CN)
+### 辅助工具 — 来自 [mattpocock/skills](https://github.com/mattpocock/skills)
 
 **用户装法**：见上文"第三方 skill 装法"（用 `npx skills add` 装指定 sub-skill）。本仓 marketplace 不强制装（避免 dialog 噪音），但保留 `mattpocock-skills` entry 给愿意接受噪音的人。
 
@@ -160,7 +160,7 @@ claude-skills/                          ← 单聚合 marketplace 仓
 ```
 
 **为什么 monorepo 一次装而不是 subdir 拆开**：
-- vinvcn 是 monorepo，`path: "skills/caveman"` 拆 6 个 entry 实际每次都 clone 整个仓
+- mattpocock/skills 是 monorepo，`path: "skills/caveman"` 拆 6 个 entry 实际每次都 clone 整个仓
 - 同一 plugin（`name: mattpocock-skills`）被装 6 份 = /skills 对话框出现 6 份重复条目
 - 改为 root 一次装：cache 省 ~10× 空间，UI 干净，install 速度 5×+
 
@@ -184,4 +184,4 @@ A Claude Code marketplace with 15 self-built skills. Third-party skills use `npx
 
 - **Self-built (in repo)**: f-feishu, f-report-std, f-pdf, f-pptx, f-research-frame, f-research-report, f-search, f-diagram, f-docx, f-xlsx, f-logme, f-launch, f-moocrec, f-sysarchi, getnote
 - **Feishu CLI (system level)**: install `@larksuite/cli` via npm — f-feishu orchestrates all `lark-cli` commands
-- **Utilities (user-installed via `npx skills`)**: vinvcn/mattpocock-skills-zh-CN sub-skills (caveman, diagnose, grill-me, ...)
+- **Utilities (user-installed via `npx skills`)**: mattpocock/skills sub-skills (caveman, diagnose, grill-me, ...)

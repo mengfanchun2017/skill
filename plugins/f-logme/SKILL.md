@@ -35,8 +35,17 @@ OKR → KR → Worklog → Reflect → SUM 五层架构，全部数据存飞书 
 
 ## 配置
 
+> 📖 完整说明 → [config.aiagt.dev](https://config.aiagt.dev/f-logme)
+
+**ccconfig 用户**：真实值放 `ccprivate/skill-config/f-logme.yaml`，`init-skill.sh sync` 自动覆盖。
+**独立用户**：`cp config.yaml.example config.yaml` 填入真实值。
+
+需提前准备：
+- 飞书 Base（手动创建）→ 获取 Base token + 表 ID
+- wiki 节点 token → OKR/SUM 文档输出位置
+- `config.yaml.example` 含所有字段获取方式
+
 config.yaml 在 ccprivate，含 Base tokens + table IDs + wiki node。数据结构见 [references/data-model.md](references/data-model.md)。
-首次使用：`cp config.yaml.example config.yaml`，填入你的飞书 Base token / 表 ID。
 
 ## 数据模型
 
