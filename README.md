@@ -66,7 +66,7 @@ npx --yes skills@latest add mattpocock/skills \
 npx --yes skills@latest update -g -y
 ```
 
-cconfig 用户：`bash ccconfig/init-skill.sh sync` 自动从 `conf/third-party-skills.txt` 列表幂等装，update 跑 `scripts/update-third-party-skills.sh`。
+cconfig 用户：`bash ccconfig/lib/init-skill.sh sync` 自动从 `conf/third-party-skills.txt` 列表幂等装，update 跑 `bash ccconfig/lib/update.sh`。
 
 ### 配合 ccconfig 使用
 
