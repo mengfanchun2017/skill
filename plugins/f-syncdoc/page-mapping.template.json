@@ -1,0 +1,23 @@
+{
+  "ccconfig": {
+    "repo_path": "~/git/ccconfig",
+    "page": {
+      "site_dir": "~/git/aiagt/sites/config",
+      "domain": "config.aiagt.dev"
+    }
+  },
+  "skill": {
+    "repo_path": "~/git/skill",
+    "page": {
+      "site_dir": "~/git/aiagt/sites/skill",
+      "domain": "skill.aiagt.dev"
+    }
+  },
+  "aiagt": {
+    "repo_path": "~/git/aiagt",
+    "page": {
+      "site_dir": "~/git/aiagt/sites/main",
+      "domain": "aiagt.dev"
+    }
+  }
+}
