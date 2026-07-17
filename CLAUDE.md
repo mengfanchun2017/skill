@@ -35,7 +35,7 @@ skill/
 | f-report-std | 报告写作规范 |
 | getnote | 得到笔记 |
 | f-libaudit | Library 审计 |
-| f-syncpage | 同步页面（内部工具）|
+| f-syncdoc | 文档同步 + 产品页同步（内部工具）|
 
 ## 硬约束
 1. **每个 plugin 是独立 Claude Code plugin**：有自己的 `commands/` `skills/` `scripts/`，可独立 `/plugin install <name>`

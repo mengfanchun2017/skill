@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.9.0] — 2026-07-17
+
+### Changed
+- **f-syncpage → f-syncdoc**: 扩展为两阶段流水线 — doc sync（源码→文档）+ 条件 page sync（aiagt 产品页）。映射外置到 ccprivate，开源用户配置自己的 mapping 即可。
+- f-syncdoc CLI: `/f-syncdoc` 无参交互选择 / 指定仓库直走
+
+### Added
+- f-syncdoc: `page-mapping.template.json` 映射模板（公开）
+- f-syncdoc: `.gitignore` 排除私有 `page-mapping.json`
+
 ## [0.8.0] — 2026-07-08
 
 ### Removed
