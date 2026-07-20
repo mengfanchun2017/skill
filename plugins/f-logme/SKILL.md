@@ -66,7 +66,11 @@ KR 写法：✅ "模型分流系统上线，P99 延迟降低 50%" ❌ "完成模
 
 ### 2. Worklog 写入
 
-两条路径：**自动**（SessionEnd hook）和**手动**（`log_write.py worklog --title ... --kr recXXX ...`）。
+**手动**：用户说"写日志"/"记录工作" → agent 判断 → 调 f-logme skill → 写飞书 Base。
+或直接运行 `log_write.py worklog --title ... --kr recXXX ...`。
+
+**日合并**：每天 12:01 自动 consolidate 当日 worklog，去重合并。
+（配置方式见下方 § 日合并定时器配置）
 
 KR 自动路由、质量规则、合并策略、字段规范 → [references/worklog-quality.md](references/worklog-quality.md)。
 整合脚本用法 → `worklog_consolidate.py --mode merge|weekly|monthly|dry-run`，详见 [references/worklog-quality.md](references/worklog-quality.md)。
@@ -133,6 +137,22 @@ SUM 生成飞书文档时，**必须通过 f-feishu skill 创建**（不裸调 l
 - 直接裸调会丢失格式化约束，导致编号标题、分割线、窄表格等问题
 
 f-logme 职责：从 Base 聚合数据 → 按模板填 Markdown → 交给 f-feishu 创建文档。
+
+## 日合并定时器配置
+
+Worklog 日合并通过 Claude 的 durable cron 机制运行（非系统 cron），需在 Claude 对话中创建：
+
+> **首次配置**：在 Claude 对话中说"设 worklog 日合并每天中午12:01执行"即可。
+> **改时间**：说"改 worklog 日合并时间到 HH:MM"。
+
+底层命令：
+```
+CronCreate(cron="1 12 * * *",
+  prompt="cd ~/git/skill/plugins/f-logme && python3 worklog_consolidate.py --mode merge --write 2>&1",
+  recurring=true, durable=true)
+```
+
+> ⚠️ `durable=true` 会将任务持久化到 `.claude/scheduled_tasks.json`，重启 Claude 后继续生效。
 
 ## 参考
 
