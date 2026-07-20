@@ -1,0 +1,2 @@
+@larksuite/cli  npm:latest  ffeishu
+@officecli/officecli  npm:latest  ffeishu

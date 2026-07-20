@@ -19,28 +19,28 @@
 
 | 你需要… | 安装命令 |
 |---------|---------|
-| 飞书文档操作 | `/plugin install f-feishu@<your-github-username>-skills` |
-| PPT 生成 | `/plugin install f-pptx@<your-github-username>-skills` |
-| Word 文档 | `/plugin install f-docx@<your-github-username>-skills` |
-| Excel 表格 | `/plugin install f-xlsx@<your-github-username>-skills` |
-| PDF 处理 | `/plugin install f-pdf@<your-github-username>-skills` |
-| 画架构图/流程图 | `/plugin install f-diagram@<your-github-username>-skills` |
-| 搜索/调研 | `/plugin install f-search@<your-github-username>-skills` |
-| 研究报告 | `/plugin install f-research-report@<your-github-username>-skills` |
-| 个人 OKR/日志 | `/plugin install f-logme@<your-github-username>-skills` |
-| 新项目脚手架 | `/plugin install f-launch@<your-github-username>-skills` |
-| 慕课推荐 | `/plugin install f-moocrec@<your-github-username>-skills` |
-| 系统架构师备考 | `/plugin install f-sysarchi@<your-github-username>-skills` |
+| 飞书文档操作 | `/plugin install ffeishu@<your-github-username>-skills` |
+| PPT 生成 | `/plugin install fpptx@<your-github-username>-skills` |
+| Word 文档 | `/plugin install fdocx@<your-github-username>-skills` |
+| Excel 表格 | `/plugin install fxlsx@<your-github-username>-skills` |
+| PDF 处理 | `/plugin install fpdf@<your-github-username>-skills` |
+| 画架构图/流程图 | `/plugin install fdiagram@<your-github-username>-skills` |
+| 搜索/调研 | `/plugin install fsearch@<your-github-username>-skills` |
+| 研究报告 | `/plugin install fresearchreport@<your-github-username>-skills` |
+| 个人 OKR/日志 | `/plugin install flogme@<your-github-username>-skills` |
+| 新项目脚手架 | `/plugin install flaunch@<your-github-username>-skills` |
+| 慕课推荐 | `/plugin install fmoocrec@<your-github-username>-skills` |
+| 系统架构师备考 | `/plugin install fsysarchi@<your-github-username>-skills` |
 | 得到笔记 | `/plugin install getnote@<your-github-username>-skills` |
-| 报告写作规范 | `/plugin install f-report-std@<your-github-username>-skills` |
-| 研究方法论框架 | `/plugin install f-research-frame@<your-github-username>-skills` |
+| 报告写作规范 | `/plugin install freportstd@<your-github-username>-skills` |
+| 研究方法论框架 | `/plugin install fresearchframe@<your-github-username>-skills` |
 
 可以一次装多个：
 
 ```
-/plugin install f-feishu@<your-github-username>-skills
-/plugin install f-pptx@<your-github-username>-skills
-/plugin install f-search@<your-github-username>-skills
+/plugin install ffeishu@<your-github-username>-skills
+/plugin install fpptx@<your-github-username>-skills
+/plugin install fsearch@<your-github-username>-skills
 ```
 
 后续更新：
@@ -72,24 +72,22 @@ cconfig 用户：`bash ccconfig/lib/init-skill.sh sync` 自动从 `conf/third-pa
 
 克隆 [ccconfig](https://github.com/<your-github-username>/ccconfig) 后，`init-skill.sh sync` 自动完成：symlink 自建 skill、注册 marketplace、安装第三方 skill、注入私有配置。详见 ccconfig 文档。
 
-## 自建 skill（15 个，仓内）
+## 自建 skill（13 个，仓内）
 
 | Skill | 说明 |
 |-------|------|
-| `f-feishu` | 飞书文档编排层（wiki/表格/白板、报告整合/拆分/转换/对比） |
-| `f-report-std` | 报告写作横向规范（4 套模板：研究/分析/对比/方案） |
-| `f-pdf` | PDF 内容提取 + 翻译原语（PyMuPDF：文字/图片/表格/元数据） |
-| `f-pptx` | PPTX 总控（OfficeCLI 引擎：批量 JSON、模板合并、autofit） |
-| `f-research-frame` | 4 领域研究方法论 + 批量深度研究（customer/generic/market/technical） |
-| `f-research-report` | 报告生成（JSON/大纲/素材 → 结构化 Markdown） |
-| `f-search` | 多源搜索编排原语（三源并行：Tavily + MiniMax + WebSearch） |
-| `f-diagram` | 代码驱动图表生成（Mermaid 架构/流程/时序/ER/类图、白板） |
-| `f-docx` | Word .docx 总控（OfficeCLI 引擎：模板/样式/表格/图片/目录） |
-| `f-xlsx` | Excel .xlsx 总控（OfficeCLI 引擎：公式/图表/条件格式/透视表） |
-| `f-logme` | 个人管理系统（OKR/Worklog/Reflect/SUM，飞书 Base） |
-| `f-launch` | 项目启动脚手架（8 种项目类型，自动 CLAUDE.md + rules） |
-| `f-moocrec` | 慕课推荐（QS 课程 + 学习路径，飞书 Base + Supabase） |
-| `f-sysarchi` | 系统分析师备考 — 暗号 `archi` 触发，随工边做边学 |
+| `ffeishu` | 飞书文档编排层（wiki/表格/白板、报告整合/拆分/转换/对比） |
+| `freportstd` | 报告写作横向规范（4 套模板：研究/分析/对比/方案） |
+| `fpptx` | PPTX 总控（OfficeCLI 引擎：批量 JSON、模板合并、autofit） |
+| `fresearchframe` | 4 领域研究方法论 + 批量深度研究（customer/generic/market/technical） |
+| `fresearchreport` | 报告生成（JSON/大纲/素材 → 结构化 Markdown） |
+| `fsearch` | 多源搜索编排原语（三源并行：Tavily + MiniMax + WebSearch） |
+| `fdiagram` | 代码驱动图表生成（Mermaid 架构/流程/时序/ER/类图、白板） |
+| `fdocx` | Word .docx 总控（OfficeCLI 引擎：模板/样式/表格/图片/目录） |
+| `fxlsx` | Excel .xlsx 总控（OfficeCLI 引擎：公式/图表/条件格式/透视表） |
+| `flogme` | 个人管理系统（OKR/Worklog/Reflect/SUM，飞书 Base） |
+| `fmoocrec` | 慕课推荐（QS 课程 + 学习路径，飞书 Base + Supabase） |
+| `fsysarchi` | 系统分析师备考 — 暗号 `archi` 触发，随工边做边学 |
 | `getnote` | 得到大脑集成 — MCP 驱动，笔记 CRUD/搜索/知识库/直播 |
 
 ## 外部 skill — 三方上游 + 系统层 lark-cli（不通过本仓装）
@@ -98,7 +96,7 @@ cconfig 用户：`bash ccconfig/lib/init-skill.sh sync` 自动从 `conf/third-pa
 
 **飞书 lark-* skill 不在本仓 marketplace**（2026-06-06 重构移除）。
 原因：larksuite/cli 是 monorepo，一次 plugin install 暴露 26 个 lark-* skill，dialog 太噪音。
-解决：`npm install -g @larksuite/cli` 装 CLI，由 **f-feishu 编排**所有飞书操作（f-feishu 直接调 `lark-cli docs/base/sheets/wiki/...` 命令，不依赖 lark-* skill）。
+解决：`npm install -g @larksuite/cli` 装 CLI，由 **ffeishu 编排**所有飞书操作（ffeishu 直接调 `lark-cli docs/base/sheets/wiki/...` 命令，不依赖 lark-* skill）。
 
 ```bash
 npm install -g @larksuite/cli   # 拿 lark-cli binary
@@ -107,7 +105,7 @@ lark-cli auth login              # 飞书登录
 
 | 替代入口 | 说明 |
 |------|------|
-| f-feishu | 飞书文档统一入口，编排所有 lark-cli 命令（wiki/表格/白板/PPT/Base） |
+| ffeishu | 飞书文档统一入口，编排所有 lark-cli 命令（wiki/表格/白板/PPT/Base） |
 
 ### 辅助工具 — 来自 [mattpocock/skills](https://github.com/mattpocock/skills)
 
@@ -124,34 +122,32 @@ lark-cli auth login              # 飞书登录
 
 ## 安装前置
 
-**f-feishu** 需要 `lark-cli` binary（f-feishu 编排层直接调 lark-cli 命令）：
+**ffeishu** 需要 `lark-cli` binary（ffeishu 编排层直接调 lark-cli 命令）：
 ```bash
 npm install -g @larksuite/cli
 lark-cli auth login
 ```
-> lark-cli 没装 → f-feishu 触发时报 "lark-cli: command not found"。
+> lark-cli 没装 → ffeishu 触发时报 "lark-cli: command not found"。
 
 ## 架构
 
 ```
 claude-skills/                          ← 单聚合 marketplace 仓
 ├── .claude-plugin/
-│   └── marketplace.json                # 16 个 plugin 入口（15 本地 + 1 monorepo 外部，lark-* 走系统 lark-cli）
-├── plugins/                            ← 15 个自建 plugin
-│   ├── f-feishu/SKILL.md
-│   ├── f-report-std/SKILL.md
-│   ├── f-pdf/SKILL.md
-│   ├── f-pptx/SKILL.md
-│   ├── f-research-frame/SKILL.md
-│   ├── f-research-report/SKILL.md
-│   ├── f-search/SKILL.md
-│   ├── f-diagram/SKILL.md
-│   ├── f-docx/SKILL.md
-│   ├── f-xlsx/SKILL.md
-│   ├── f-logme/SKILL.md
-│   ├── f-launch/SKILL.md
-│   ├── f-moocrec/SKILL.md
-│   ├── f-sysarchi/SKILL.md
+│   └── marketplace.json                # 13 plugin 入口（12 本地 + 1 getnote，lark-* 走系统 lark-cli）
+├── plugins/                            ← 13 个自建 plugin
+│   ├── ffeishu/SKILL.md
+│   ├── freportstd/SKILL.md
+│   ├── fpptx/SKILL.md
+│   ├── fresearchframe/SKILL.md
+│   ├── fresearchreport/SKILL.md
+│   ├── fsearch/SKILL.md
+│   ├── fdiagram/SKILL.md
+│   ├── fdocx/SKILL.md
+│   ├── fxlsx/SKILL.md
+│   ├── flogme/SKILL.md
+│   ├── fmoocrec/SKILL.md
+│   ├── fsysarchi/SKILL.md
 │   ├── getnote/SKILL.md
 ├── README.md
 ├── CHANGELOG.md
@@ -166,7 +162,7 @@ claude-skills/                          ← 单聚合 marketplace 仓
 
 **为什么 lark-* 不在 marketplace**：
 - larksuite/cli monorepo 一次装暴露 26 个 lark-* skill（lark-base/lark-doc/lark-approval/lark-mail/lark-im/...），dialog 太噪音
-- 飞书操作实际只需要 `lark-cli` binary + f-feishu 编排层（f-feishu 已封装所有 lark-cli 命令组合）
+- 飞书操作实际只需要 `lark-cli` binary + ffeishu 编排层（ffeishu 已封装所有 lark-cli 命令组合）
 - lark-* skill 作为单独 plugin 是冗余中间层
 
 **为什么用 marketplace 引用而不是复制**：
@@ -180,8 +176,8 @@ MIT — 见 [LICENSE](LICENSE)
 
 ## English Summary
 
-A Claude Code marketplace with 15 self-built skills. Third-party skills use `npx skills` (not /plugin install) for clean dialog UX.
+A Claude Code marketplace with 13 self-built skills. Third-party skills use `npx skills` (not /plugin install) for clean dialog UX.
 
-- **Self-built (in repo)**: f-feishu, f-report-std, f-pdf, f-pptx, f-research-frame, f-research-report, f-search, f-diagram, f-docx, f-xlsx, f-logme, f-launch, f-moocrec, f-sysarchi, getnote
-- **Feishu CLI (system level)**: install `@larksuite/cli` via npm — f-feishu orchestrates all `lark-cli` commands
+- **Self-built (in repo)**: ffeishu, freportstd, fpptx, fresearchframe, fresearchreport, fsearch, fdiagram, fdocx, fxlsx, flogme, fmoocrec, fsysarchi, getnote
+- **Feishu CLI (system level)**: install `@larksuite/cli` via npm — ffeishu orchestrates all `lark-cli` commands
 - **Utilities (user-installed via `npx skills`)**: mattpocock/skills sub-skills (caveman, diagnose, grill-me, ...)

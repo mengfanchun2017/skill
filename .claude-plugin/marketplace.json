@@ -12,121 +12,105 @@
   },
   "plugins": [
     {
-      "name": "f-feishu",
-      "description": "飞书文档编排层 — 创建飞书wiki/表格/白板、更新报告、整合/拆分文档、飞书↔Office双向转换、文档对比。 Use when 用户说\"创建文档\"/\"写文档\"、\"更新文档\"/\"更新报告\"、\"整合文档\"/\"合并文档\"、 \"拆分文档\"、\"导出Word/PPT\"、\"飞书转Office\"、\"导入到飞书\"、\"对比文档\"、 或给出飞书文档URL要求操作。 PPT 委托 f-pptx，图表委托 f-diagram，PDF 委托 f-pdf。",
-      "source": "./plugins/f-feishu",
+      "name": "ffeishu",
+      "description": "飞书文档编排层 — 创建飞书wiki/表格/白板、更新报告、整合/拆分文档、飞书↔Office双向转换、文档对比。 Use when 用户说\"创建文档\"/\"写文档\"、\"更新文档\"/\"更新报告\"、\"整合文档\"/\"合并文档\"、 \"拆分文档\"、\"导出Word/PPT\"、\"飞书转Office\"、\"导入到飞书\"、\"对比文档\"、 或给出飞书文档URL要求操作。 PPT 委托 fpptx，图表委托 fdiagram，PDF 委托 fpdf。",
+      "source": "./plugins/ffeishu",
       "keywords": [
         "f"
       ]
     },
     {
-      "name": "f-report-std",
+      "name": "freportstd",
       "description": "报告写作横向规范 — 内容结构、数据呈现、论证逻辑、图表约定。 4 套模板（研究/分析/对比/方案）+ 通用规则。 Use when 用户说\"写报告\"/\"出报告\"/\"分析报告\"/\"对比报告\"/\"方案报告\"， 或任何需要产出\"长篇正式文档\"的场景。",
-      "source": "./plugins/f-report-std",
+      "source": "./plugins/freportstd",
       "keywords": [
         "f"
       ]
     },
     {
-      "name": "f-pdf",
-      "description": "PDF 内容提取 + 翻译原语 — 文字/图片/表格/元数据提取，PDF 翻译文档生成。 独立使用或委托 f-feishu 创建飞书文档。",
-      "source": "./plugins/f-pdf",
-      "keywords": [
-        "f"
-      ]
-    },
-    {
-      "name": "f-pptx",
+      "name": "fpptx",
       "description": "PPTX 总控 — 从 md/wiki 到 PPTX。 OfficeCLI 引擎（原生 OpenXML），支持批量 JSON、模板合并、autofit 后处理。",
-      "source": "./plugins/f-pptx",
+      "source": "./plugins/fpptx",
       "keywords": [
         "f"
       ]
     },
     {
-      "name": "f-research-frame",
-      "description": "4 领域研究方法论 — customer（JTBD）/ generic / market / technical。 收到调研主题后自动判断领域，调 f-search 收集数据，再按对应领域框架解读。 搜索工具调用委派 f-search，本 skill 不直接调 API。",
-      "source": "./plugins/f-research-frame",
+      "name": "fresearchframe",
+      "description": "4 领域研究方法论 — customer（JTBD）/ generic / market / technical。 收到调研主题后自动判断领域，调 fsearch 收集数据，再按对应领域框架解读。 搜索工具调用委派 fsearch，本 skill 不直接调 API。",
+      "source": "./plugins/fresearchframe",
       "keywords": [
         "f"
       ]
     },
     {
-      "name": "f-research-report",
-      "description": "报告生成 — 读 JSON / 大纲 / 自由素材 → 结构化 markdown 报告。 3 种输入模式，按用户场景自动选择。内容规范委派 f-report-std。 飞书输出委派 f-feishu（图子文档工作流 G）。",
-      "source": "./plugins/f-research-report",
+      "name": "fresearchreport",
+      "description": "报告生成 — 读 JSON / 大纲 / 自由素材 → 结构化 markdown 报告。 3 种输入模式，按用户场景自动选择。内容规范委派 freportstd。 飞书输出委派 ffeishu（图子文档工作流 G）。",
+      "source": "./plugins/fresearchreport",
       "keywords": [
         "f"
       ]
     },
     {
-      "name": "f-logme",
+      "name": "flogme",
       "description": "个人管理系统 — OKR 目标管理、Worklog 工作日志、Reflect 反思、SUM 周期/领域总结生成。数据存飞书 Base，输出到飞书文档。",
-      "source": "./plugins/f-logme",
+      "source": "./plugins/flogme",
       "keywords": [
         "f"
       ]
     },
     {
-      "name": "f-launch",
-      "description": "项目启动 skill — 从意图到可运行项目的全流程(类型判断 → 脚手架 → OKR → 风险)。 覆盖 8 类项目模板:static-web-personal / web-api-backend / cli-tool / ai-agent-tool / data-pipeline / mobile-app / desktop-app / game。 Use when 用户说\"新项目\" / \"建项目\" / \"scaffold\" / \"项目启动\" / \"项目立项\" / \"我想做一个 X\" / \"init project\"。",
-      "source": "./plugins/f-launch",
-      "keywords": [
-        "f"
-      ]
-    },
-    {
-      "name": "f-moocrec",
+      "name": "fmoocrec",
       "description": "MOOC 课程推荐助手 — 基于 QS 世界排名顶级学府课程体系，为学生生成个性化 MOOC 学习路径。课程数据存 Supabase（共享），学生画像/进度存飞书 Wiki + Base（个人持久化）。Use when 用户说\"课程推荐\"/\"MOOC\"/\"在线课程\"/\"自学路径\"/\"学习规划\"、问\"有什么好的网课\"/\"想系统学生物\"。",
-      "source": "./plugins/f-moocrec",
+      "source": "./plugins/fmoocrec",
       "keywords": [
         "f"
       ]
     },
     {
-      "name": "f-search",
-      "description": "搜索活动统一原语 — 三源并行搜索（tavily/minimax/websearch）、Python 过滤避免 context 污染、 聚合去重、来源标注、搜索清单输出。被 f-research-frame / f-research-frame（Batch Mode） / f-logme 等需要外部调研的 skill 委托调用。 不含领域方法论（领域解读由 f-research-frame 负责）。",
-      "source": "./plugins/f-search",
+      "name": "fsearch",
+      "description": "搜索活动统一原语 — 三源并行搜索（tavily/minimax/websearch）、Python 过滤避免 context 污染、 聚合去重、来源标注、搜索清单输出。被 fresearchframe / fresearchframe（Batch Mode） / flogme 等需要外部调研的 skill 委托调用。 不含领域方法论（领域解读由 fresearchframe 负责）。",
+      "source": "./plugins/fsearch",
       "keywords": [
         "f"
       ]
     },
     {
-      "name": "f-sysarchi",
+      "name": "fsysarchi",
       "description": "[personal] 系统分析师/系统架构设计师备考 — 随工作边做边学。暗号 \"archi\" 触发。 Use when 用户说\"archi\"/\"系统分析师\"/\"备考\"/\"出题\"/\"grill\"， 或想在日常工作中嵌入考试知识点学习。",
-      "source": "./plugins/f-sysarchi",
+      "source": "./plugins/fsysarchi",
       "keywords": [
         "f"
       ]
     },
     {
-      "name": "f-diagram",
+      "name": "fdiagram",
       "description": "代码驱动图表生成 — Mermaid 架构/流程/时序/ER/类图、whiteboard-cli SVG 白板。 Use when 用户说\"画架构图\"/\"画流程图\"/\"画时序图\"/\"画ER图\"/\"画类图\"/\"画甘特图\"/\"画白板\"。",
-      "source": "./plugins/f-diagram",
+      "source": "./plugins/fdiagram",
       "keywords": [
         "f"
       ]
     },
     {
-      "name": "f-docx",
+      "name": "fdocx",
       "description": "Word .docx 原生生成 — OfficeCLI 引擎，支持模板/样式/表格/图片/页眉页脚/目录。 Use when 用户说\"创建Word\"/\"写Word文档\"/\"生成docx\"/\"导出Word\"/\"做简历\"/\"写报告docx\"。",
-      "source": "./plugins/f-docx",
+      "source": "./plugins/fdocx",
       "keywords": [
         "f"
       ]
     },
     {
-      "name": "f-xlsx",
+      "name": "fxlsx",
       "description": "Excel .xlsx 原生生成 — OfficeCLI 引擎，支持公式/图表/条件格式/数据透视表/多工作表。 Use when 用户说\"创建Excel\"/\"做表格\"/\"生成xlsx\"/\"导出报表\"/\"数据透视表\"/\"画图表(Excel)\"。",
-      "source": "./plugins/f-xlsx",
+      "source": "./plugins/fxlsx",
       "keywords": [
         "f"
       ]
     },
     {
-      "name": "f-libaudit",
-      "description": "仓库全面审计 — 从架构到代码到文档到测试，输出审计报告到飞书文档。Use when 用户说审计仓库/代码审计/lib审计/上线前审计/发布审计、或需要对仓库做多维度质量审查。",
-      "source": "./plugins/f-libaudit",
+      "name": "flibaudit",
+      "description": "仓库全面审计 — 从架构到代码到文档到测试，输出审计报告到飞书文档。Use when 用户说\"审计仓库\"/\"代码审计\"/\"lib审计\"/\"上线前审计\"/\"发布审计\"、或需要对仓库做多维度质量审查。",
+      "source": "./plugins/flibaudit",
       "keywords": [
         "f"
       ]

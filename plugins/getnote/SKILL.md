@@ -128,10 +128,10 @@ allowed-tools: Bash, Read, Write,
 3. update_note(note_id="<id>", content="...补充内容")
 ```
 
-### 3. 研究 → 保存到得到（与 f-research-frame 协作）
+### 3. 研究 → 保存到得到（与 fresearchframe 协作）
 
 ```
-1. f-research-frame 执行搜索研究
+1. fresearchframe 执行搜索研究
 2. 整理结论后 save_note(content="研究结论：...")
 3. add_note_tags(tags=["调研", "<topic>"])
 ```
@@ -153,10 +153,10 @@ allowed-tools: Bash, Read, Write,
 
 ## 集成
 
-- `f-research-frame` — 研究完成后 `save_note` 保存结论
-- `f-logme` — SUM/OKR 总结时可搜笔记做回顾
-- `f-diagram` — 生成的架构图可 `upload_image` 到得到
-- `f-feishu` — 飞书文档内容可提取后 `save_note` 到得到
+- `fresearchframe` — 研究完成后 `save_note` 保存结论
+- `flogme` — SUM/OKR 总结时可搜笔记做回顾
+- `fdiagram` — 生成的架构图可 `upload_image` 到得到
+- `ffeishu` — 飞书文档内容可提取后 `save_note` 到得到
 
 ## 升级
 

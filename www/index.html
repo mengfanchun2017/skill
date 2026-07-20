@@ -273,7 +273,7 @@ footer a:hover{color:#a1a1aa}
 <script>
 const SKILLS = [
   {
-    id: "f-feishu", name: "f-feishu", icon: "🪶", cat: "docs", needs_ccconfig: true,
+    id: "ffeishu", name: "ffeishu", icon: "🪶", cat: "docs", needs_ccconfig: true,
     ccconfig_zh: "ccconfig 已装：lark-cli、officecli",
     ccconfig_en: "ccconfig installs: lark-cli, officecli",
     desc_zh: "飞书文档编排层。创建 wiki/表格/白板、更新报告、整合/拆分文档、飞书 ↔ Office 双向转换、文档对比。",
@@ -291,7 +291,7 @@ const SKILLS = [
     deps: ["lark-cli", "officecli"]
   },
   {
-    id: "f-pptx", name: "f-pptx", icon: "📊", cat: "docs", needs_ccconfig: true,
+    id: "fpptx", name: "fpptx", icon: "📊", cat: "docs", needs_ccconfig: true,
     ccconfig_zh: "ccconfig 已装：officecli",
     ccconfig_en: "ccconfig installs: officecli",
     desc_zh: "PPT 生成引擎。从 md/wiki 生成 PPTX，支持批量 JSON、模板合并、5 套配色主题、文字溢出自动修复。",
@@ -309,7 +309,7 @@ const SKILLS = [
     deps: ["officecli"]
   },
   {
-    id: "f-docx", name: "f-docx", icon: "📝", cat: "docs", needs_ccconfig: true,
+    id: "fdocx", name: "fdocx", icon: "📝", cat: "docs", needs_ccconfig: true,
     ccconfig_zh: "ccconfig 已装：officecli",
     ccconfig_en: "ccconfig installs: officecli",
     desc_zh: "Word 文档原生生成。模板、样式、表格、图片、页眉页脚、目录，全部通过 OfficeCLI 引擎。",
@@ -327,7 +327,7 @@ const SKILLS = [
     deps: ["officecli"]
   },
   {
-    id: "f-xlsx", name: "f-xlsx", icon: "📈", cat: "docs", needs_ccconfig: true,
+    id: "fxlsx", name: "fxlsx", icon: "📈", cat: "docs", needs_ccconfig: true,
     ccconfig_zh: "ccconfig 已装：officecli",
     ccconfig_en: "ccconfig installs: officecli",
     desc_zh: "Excel 电子表格原生生成。公式、图表、条件格式、数据透视表、多工作表，数字以数值而非字符串写入。",
@@ -345,25 +345,7 @@ const SKILLS = [
     deps: ["officecli"]
   },
   {
-    id: "f-pdf", name: "f-pdf", icon: "📄", cat: "docs", needs_ccconfig: true,
-    ccconfig_zh: "ccconfig 已装：PyMuPDF",
-    ccconfig_en: "ccconfig installs: PyMuPDF",
-    desc_zh: "PDF 内容提取与翻译。PyMuPDF 提取文字/图片/表格/元数据，图片智能过滤（去 logo），生成中英对照翻译文档。",
-    desc_en: "PDF extraction & translation. PyMuPDF for text/images/tables/metadata, smart image filtering, bilingual translation output.",
-    scenarios_zh: [
-      {trigger: '"提取这份 PDF 的全部文字和图片"', result: "→ 结构化提取，自动过滤装饰性图片"},
-      {trigger: '"把这篇英文论文翻译成中文"', result: "→ 中英对照输出到飞书文档"},
-      {trigger: '"分析这份 PDF 的章节结构"', result: "→ 目录 + 元数据 + 页码映射"}
-    ],
-    scenarios_en: [
-      {trigger: '"Extract all text and images from this PDF"', result: "→ Structured extraction, auto-filter decorative"},
-      {trigger: '"Translate this English paper to Chinese"', result: "→ Bilingual output to Feishu doc"},
-      {trigger: '"Analyze the chapter structure of this PDF"', result: "→ TOC + metadata + page mapping"}
-    ],
-    deps: ["PyMuPDF", "minimax"]
-  },
-  {
-    id: "f-diagram", name: "f-diagram", icon: "🎨", cat: "docs", needs_ccconfig: true,
+    id: "fdiagram", name: "fdiagram", icon: "🎨", cat: "docs", needs_ccconfig: true,
     ccconfig_zh: "ccconfig 已装：whiteboard-cli",
     ccconfig_en: "ccconfig installs: whiteboard-cli",
     desc_zh: "代码驱动图表生成。Mermaid（流程图/时序图/ER/类图/状态图/甘特图/饼图/思维导图）+ SVG 白板，可嵌入飞书文档。",
@@ -381,7 +363,7 @@ const SKILLS = [
     deps: ["whiteboard-cli"]
   },
   {
-    id: "f-search", name: "f-search", icon: "🔍", cat: "research", needs_ccconfig: false,
+    id: "fsearch", name: "fsearch", icon: "🔍", cat: "research", needs_ccconfig: false,
     ccconfig_zh: "仅需 MCP 配置（Tavily + MiniMax），ccconfig 已配好",
     ccconfig_en: "Only needs MCP config (Tavily + MiniMax), ccconfig pre-configures",
     desc_zh: "三源并行搜索原语。Tavily（英文）+ MiniMax（中文）+ WebSearch（通用）同时搜，Python 过滤去重，输出带来源标注的结果。",
@@ -399,11 +381,11 @@ const SKILLS = [
     deps: ["Tavily MCP", "MiniMax MCP"]
   },
   {
-    id: "f-research-frame", name: "f-research-frame", icon: "🧭", cat: "research", needs_ccconfig: false,
+    id: "fresearchframe", name: "fresearchframe", icon: "🧭", cat: "research", needs_ccconfig: false,
     ccconfig_zh: "纯技能，无外部工具依赖",
     ccconfig_en: "Pure skill, no external tool dependencies",
-    desc_zh: "四领域研究方法论。客户（JTBD）/ 通用 / 市场（TAM）/ 技术四维度，自动判断领域，委托 f-search 搜索，带置信度标注。",
-    desc_en: "4-domain research methodology. Customer (JTBD) / Generic / Market (TAM) / Technical, auto domain detection, delegates to f-search, confidence-annotated.",
+    desc_zh: "四领域研究方法论。客户（JTBD）/ 通用 / 市场（TAM）/ 技术四维度，自动判断领域，委托 fsearch 搜索，带置信度标注。",
+    desc_en: "4-domain research methodology. Customer (JTBD) / Generic / Market (TAM) / Technical, auto domain detection, delegates to fsearch, confidence-annotated.",
     scenarios_zh: [
       {trigger: '"调研 AI 编程助手市场"', result: "→ 自动识为市场研究，TAM/SAM/SOM 分析"},
       {trigger: '"分析我们 SaaS 产品的用户痛点"', result: "→ JTBD 框架 + 用户访谈指南"},
@@ -414,14 +396,14 @@ const SKILLS = [
       {trigger: '"Analyze user pain points for our SaaS"', result: "→ JTBD framework + user interview guide"},
       {trigger: '"Compare React vs Vue for tech choice"', result: "→ Technical: capability + ecosystem + adoption"}
     ],
-    deps: ["f-search"]
+    deps: ["fsearch"]
   },
   {
-    id: "f-research-report", name: "f-research-report", icon: "📋", cat: "research", needs_ccconfig: false,
-    ccconfig_zh: "纯技能，依赖 f-report-std + f-research-frame + f-feishu",
-    ccconfig_en: "Pure skill, depends on f-report-std + f-research-frame + f-feishu",
-    desc_zh: "研究报告生成器。三种输入模式（JSON/大纲/自由），v1 → 审查 → v2 迭代流程，委托 f-report-std 质量标准，输出到 f-feishu。",
-    desc_en: "Report generator. 3 input modes (JSON/outline/free), v1 → review → v2 iteration, delegates to f-report-std for standards, outputs to f-feishu.",
+    id: "fresearchreport", name: "fresearchreport", icon: "📋", cat: "research", needs_ccconfig: false,
+    ccconfig_zh: "纯技能，依赖 freportstd + fresearchframe + ffeishu",
+    ccconfig_en: "Pure skill, depends on freportstd + fresearchframe + ffeishu",
+    desc_zh: "研究报告生成器。三种输入模式（JSON/大纲/自由），v1 → 审查 → v2 迭代流程，委托 freportstd 质量标准，输出到 ffeishu。",
+    desc_en: "Report generator. 3 input modes (JSON/outline/free), v1 → review → v2 iteration, delegates to freportstd for standards, outputs to ffeishu.",
     scenarios_zh: [
       {trigger: '"根据这份调研数据写报告"', result: "→ JSON 输入模式，结构化生成"},
       {trigger: '"写一份 X vs Y 竞品分析"', result: "→ 自动搜索 + 对比框架 + 结论"},
@@ -432,28 +414,28 @@ const SKILLS = [
       {trigger: '"Write an X vs Y competitive analysis"', result: "→ Auto search + comparison + conclusions"},
       {trigger: '"Deep research on quantum computing industry"', result: "→ outline.yaml batch, per-chapter write"}
     ],
-    deps: ["f-report-std", "f-research-frame", "f-feishu"]
+    deps: ["freportstd", "fresearchframe", "ffeishu"]
   },
   {
-    id: "f-report-std", name: "f-report-std", icon: "📏", cat: "research", needs_ccconfig: false,
+    id: "freportstd", name: "freportstd", icon: "📏", cat: "research", needs_ccconfig: false,
     ccconfig_zh: "纯技能，零外部依赖，装了就能用",
     ccconfig_en: "Pure skill, zero external deps, works immediately",
     desc_zh: "报告写作横向规范。4 套模板（研究/分析/对比/方案），结构规则（H1-H3 仅）、数据呈现（对比用表不用列表）、论证规则、引注规范。",
     desc_en: "Report writing standards. 4 templates (research/analysis/comparison/proposal), structure rules, data presentation, argumentation, citation standards.",
     scenarios_zh: [
-      {trigger: "任何报告生成场景", result: "→ 被 f-research-report 和 f-logme 自动调用"},
+      {trigger: "任何报告生成场景", result: "→ 被 fresearchreport 和 flogme 自动调用"},
       {trigger: '"确保报告符合规范"', result: "→ 结构检查、数据呈现验证、引注审核"},
       {trigger: '"我需要一份对比报告的模板"', result: "→ 4 套模板按场景选用"}
     ],
     scenarios_en: [
-      {trigger: "Any report generation scenario", result: "→ Auto-invoked by f-research-report and f-logme"},
+      {trigger: "Any report generation scenario", result: "→ Auto-invoked by fresearchreport and flogme"},
       {trigger: '"Ensure report meets standards"', result: "→ Structure check, data presentation, citation audit"},
       {trigger: '"I need a comparison report template"', result: "→ 4 templates, chosen by scenario"}
     ],
     deps: []
   },
   {
-    id: "f-logme", name: "f-logme", icon: "📓", cat: "productivity", needs_ccconfig: true,
+    id: "flogme", name: "flogme", icon: "📓", cat: "productivity", needs_ccconfig: true,
     ccconfig_zh: "ccconfig 已装：lark-cli、飞书 Base 配置",
     ccconfig_en: "ccconfig installs: lark-cli, Feishu Base config",
     desc_zh: "个人管理系统。OKR 目标 → KR 关键结果 → Worklog 日志 → Reflect 反思 → SUM 总结，五层架构，数据存飞书 Base，输出到飞书文档。",
@@ -471,25 +453,7 @@ const SKILLS = [
     deps: ["lark-cli", "Feishu Base"]
   },
   {
-    id: "f-launch", name: "f-launch", icon: "🚀", cat: "productivity", needs_ccconfig: true,
-    ccconfig_zh: "ccconfig 已装：bash 环境、init.sh 脚手架脚本",
-    ccconfig_en: "ccconfig installs: bash env, init.sh scaffold scripts",
-    desc_zh: "项目脚手架。从意图到可运行项目，8 种项目类型识别，自动生成 CLAUDE.md + README + ROADMAP + LICENSE + .gitignore。",
-    desc_en: "Project scaffold. From intent to runnable project, 8 project types, auto-generate CLAUDE.md + README + ROADMAP + LICENSE + .gitignore.",
-    scenarios_zh: [
-      {trigger: '"我想做个个人网站"', result: "→ 识别为 static-web-personal，生成全套脚手架"},
-      {trigger: '"启动一个新的后端 API 项目"', result: "→ web-api-backend 模板，Express/FastAPI 选项"},
-      {trigger: '"创建一个 CLI 工具项目"', result: "→ cli-tool 模板，参数解析 + 发布配置"}
-    ],
-    scenarios_en: [
-      {trigger: '"I want to build a personal website"', result: "→ Detected static-web-personal, full scaffold"},
-      {trigger: '"Start a new backend API project"', result: "→ web-api-backend template, Express/FastAPI"},
-      {trigger: '"Create a CLI tool project"', result: "→ cli-tool template, arg parsing + publish config"}
-    ],
-    deps: ["f-logme(可选)"]
-  },
-  {
-    id: "f-moocrec", name: "f-moocrec", icon: "🎓", cat: "productivity", needs_ccconfig: true,
+    id: "fmoocrec", name: "fmoocrec", icon: "🎓", cat: "productivity", needs_ccconfig: true,
     ccconfig_zh: "ccconfig 已装：lark-cli、Supabase MCP 配置",
     ccconfig_en: "ccconfig installs: lark-cli, Supabase MCP config",
     desc_zh: "MOOC 课程推荐助手。基于 QS 世界排名顶级学府课程体系，个性化学习路径，双轨推荐（免费旁听 vs 付费证书），证书验证指导。",
@@ -507,9 +471,9 @@ const SKILLS = [
     deps: ["Supabase", "lark-cli", "Feishu Base"]
   },
   {
-    id: "f-sysarchi", name: "f-sysarchi", icon: "🏗️", cat: "productivity", needs_ccconfig: true,
-    ccconfig_zh: "ccconfig 已装：lark-cli、f-search、f-feishu、f-logme",
-    ccconfig_en: "ccconfig installs: lark-cli, f-search, f-feishu, f-logme",
+    id: "fsysarchi", name: "fsysarchi", icon: "🏗️", cat: "productivity", needs_ccconfig: true,
+    ccconfig_zh: "ccconfig 已装：lark-cli、fsearch、ffeishu、flogme",
+    ccconfig_en: "ccconfig installs: lark-cli, fsearch, ffeishu, flogme",
     desc_zh: "系统架构师备考助手。触发词 archi 将日常工作映射到 13 章考点，随机测验（grill），进度追踪，逐章深度学习 + 飞书笔记。",
     desc_en: "System Analyst exam prep. Trigger word 'archi' maps work to 13 exam chapters, grill quizzes, progress tracking, deep learning + Feishu notes.",
     scenarios_zh: [
@@ -522,7 +486,7 @@ const SKILLS = [
       {trigger: '"archi grill requirements engineering"', result: "→ Random quiz, instant feedback"},
       {trigger: '"archi learn database design"', result: "→ Deep search + structured notes to Feishu"}
     ],
-    deps: ["f-search", "f-feishu", "f-logme"]
+    deps: ["fsearch", "ffeishu", "flogme"]
   },
   {
     id: "getnote", name: "getnote", icon: "🧠", cat: "productivity", needs_ccconfig: true,
