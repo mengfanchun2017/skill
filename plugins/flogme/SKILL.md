@@ -148,7 +148,7 @@ Worklog 日合并通过 Claude 的 durable cron 机制运行（非系统 cron）
 底层命令：
 ```
 CronCreate(cron="1 12 * * *",
-  prompt="cd ~/git/skill/plugins/f-logme && python3 worklog_consolidate.py --mode merge --write 2>&1",
+  prompt="cd ~/git/skill/plugins/flogme && python3 worklog_consolidate.py --mode merge --write 2>&1",
   recurring=true, durable=true)
 ```
 
