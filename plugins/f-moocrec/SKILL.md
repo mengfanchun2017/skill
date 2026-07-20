@@ -1,5 +1,5 @@
 ---
-name: f-moocrec
+name: fmoocrec
 description: MOOC 课程推荐助手 — 基于 QS 世界排名顶级学府课程体系，为学生生成个性化 MOOC 学习路径。课程数据存 Supabase（共享），学生画像/进度存飞书 Wiki + Base（个人持久化）。Use when 用户说"课程推荐"/"MOOC"/"在线课程"/"自学路径"/"学习规划"、问"有什么好的网课"/"想系统学生物"。
 user-invocable: true
 allowed-tools: Bash, Read, Write, Edit, Agent, WebSearch, WebFetch, mcp__tavily__tavily_search, mcp__minimax__web_search, mcp__supabase__execute_sql

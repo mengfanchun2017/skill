@@ -1,5 +1,5 @@
 ---
-name: f-xlsx
+name: fxlsx
 user-invocable: true
 description: |
   Excel .xlsx 原生生成 — OfficeCLI 引擎，支持公式/图表/条件格式/数据透视表/多工作表。

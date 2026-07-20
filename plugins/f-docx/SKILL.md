@@ -1,5 +1,5 @@
 ---
-name: f-docx
+name: fdocx
 user-invocable: true
 description: |
   Word .docx 原生生成 — OfficeCLI 引擎，支持模板/样式/表格/图片/页眉页脚/目录。

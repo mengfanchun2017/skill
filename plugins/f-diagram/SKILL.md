@@ -1,5 +1,5 @@
 ---
-name: f-diagram
+name: fdiagram
 user-invocable: true
 description: |
   代码驱动图表生成 — Mermaid 架构/流程/时序/ER/类图、whiteboard-cli SVG 白板。

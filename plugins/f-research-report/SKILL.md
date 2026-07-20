@@ -1,5 +1,5 @@
 ---
-name: f-research-report
+name: fresearch-report
 user-invocable: true
 description: |
   报告生成 — 读 JSON / 大纲 / 自由素材 → 结构化 markdown 报告。
