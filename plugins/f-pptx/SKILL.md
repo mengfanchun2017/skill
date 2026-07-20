@@ -1,5 +1,5 @@
 ---
-name: f-pptx
+name: fpptx
 user-invocable: true
 description: |
   PPTX 总控 — 从 md/wiki 到 PPTX。

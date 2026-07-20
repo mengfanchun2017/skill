@@ -1,5 +1,5 @@
 ---
-name: f-report-std
+name: freport-std
 user-invocable: true
 description: |
   报告写作横向规范 — 内容结构、数据呈现、论证逻辑、图表约定。

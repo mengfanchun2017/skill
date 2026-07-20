@@ -1,5 +1,5 @@
 ---
-name: f-sysarchi
+name: fsysarchi
 user-invocable: true
 description: |
   [personal] 系统分析师/系统架构设计师备考 — 随工作边做边学。暗号 "archi" 触发。

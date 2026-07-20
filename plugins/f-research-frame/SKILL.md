@@ -1,5 +1,5 @@
 ---
-name: f-research-frame
+name: fresearch-frame
 user-invocable: true
 description: |
   4 领域研究方法论 — customer（JTBD）/ generic / market / technical。

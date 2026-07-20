@@ -1,5 +1,5 @@
 ---
-name: f-syncdoc
+name: fsyncdoc
 user-invocable: true
 disable-model-invocation: true
 description: Sync source repo docs + optional aiagt product page. Two-phase pipeline.

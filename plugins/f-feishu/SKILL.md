@@ -1,5 +1,5 @@
 ---
-name: f-feishu
+name: ffeishu
 user-invocable: true
 description: |
   飞书文档编排层 — 创建飞书wiki/表格/白板、更新报告、整合/拆分文档、飞书↔Office双向转换、文档对比。

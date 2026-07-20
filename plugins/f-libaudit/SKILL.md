@@ -1,5 +1,5 @@
 ---
-name: f-libaudit
+name: flibaudit
 description: 仓库全面审计 — 从架构到代码到文档到测试，输出审计报告到飞书文档。Use when 用户说"审计仓库"/"代码审计"/"lib审计"/"上线前审计"/"发布审计"、或需要对仓库做多维度质量审查。
 ---
 

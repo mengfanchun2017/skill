@@ -1,5 +1,5 @@
 ---
-name: f-skillcreat
+name: fskillcreat
 description: Skill 写作参考手册 — 从 invocation 选择到信息层级到常见失败模式，让 skill 行为可预测。
 disable-model-invocation: true
 ---

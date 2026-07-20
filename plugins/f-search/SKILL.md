@@ -1,5 +1,5 @@
 ---
-name: f-search
+name: fsearch
 user-invocable: true
 description: |
   搜索活动统一原语 — 三源并行搜索（tavily/minimax/websearch）、Python 过滤避免 context 污染、
