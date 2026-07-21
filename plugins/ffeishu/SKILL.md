@@ -437,4 +437,4 @@ cat "$SKILL_DIR/config.yaml"
 | Claude 工作 wiki（默认父目录） | `<token>` | https://<tenant>.feishu.cn/wiki/<token> |
 | OKR/SUM 文档父目录 | `<token>` | https://<tenant>.feishu.cn/wiki/<token> |
 
-> **注意**: flogme 管辖的文档（OKR/SUM/Worklog）索引在 `skills/f-logme/SKILL.md` 的「线上文档索引」节。ffeishu 索引只记录 ffeishu 直接创建的文档（研究/合并等）。
+> **注意**: flogme 管辖的文档（OKR/SUM/Worklog）索引在 `skills/flogme/SKILL.md` 的「线上文档索引」节。ffeishu 索引只记录 ffeishu 直接创建的文档（研究/合并等）。

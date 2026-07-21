@@ -37,7 +37,7 @@ OKR → KR → Worklog → Reflect → SUM 五层架构，全部数据存飞书 
 
 > 📖 完整说明 → [config.aiagt.dev](https://config.aiagt.dev/flogme)
 
-**ccconfig 用户**：真实值放 `ccprivate/skill-config/f-logme.yaml`，`init-skill.sh sync` 自动覆盖。
+**ccconfig 用户**：真实值放 `ccprivate/skill-config/flogme.yaml`，`init-skill.sh sync` 自动覆盖。
 **独立用户**：`cp config.yaml.example config.yaml` 填入真实值。
 
 需提前准备：

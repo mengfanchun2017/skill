@@ -51,7 +51,7 @@
 | 阶段（~30天） | 提醒（hook 写入 notes 文件，下次对话可见） | `--mode monthly` 预览 |
 | 手动 | 用户说 "做周整合" / "阶段总结" | 立即执行 |
 
-状态文件：`/tmp/f-logme_last_merge`、`/tmp/f-logme_last_monthly`（记录上次执行时间戳）。
+状态文件：`/tmp/flogme_last_merge`、`/tmp/flogme_last_monthly`（记录上次执行时间戳）。
 
 ## 脚本用法
 
