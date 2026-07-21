@@ -18,7 +18,7 @@ allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 |------|------|
 | "调研 XX" / "分析 XX 用户" | 自动判断领域 → 调 fsearch → 按框架解读 |
 | fresearchreport 需要调研素材 | 委派本 skill（不在模式 1 中直接调 fsearch） |
-| f-research-deep 批量研究 | 委派本 skill 做单 item 的领域判断 + 框架 |
+| Batch Mode（批量研究） | 委派本 skill 做单 item 的领域判断 + 框架 |
 
 ## 自动领域判断
 
@@ -106,12 +106,12 @@ allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 - 概览 + 关键特征（generic）
 
 ### Step 4: 输出
-输出结构化领域数据 + 置信度标注，交给调用方（fresearchreport / f-research-deep / 用户）
+输出结构化领域数据 + 置信度标注，交给调用方（fresearchreport / Batch Mode / 用户）
 
 ## 关联 Skills
 
 - `fsearch` — 搜索工具（必调用）
-- `f-research-deep` — 批量研究（委托本 skill 做单 item）
+- `Batch Mode` — 批量研究（委托本 skill 做单 item）
 - `fresearchreport` — 报告生成（用本 skill 的输出做素材）
 
 ## Batch Mode（原 f-research-deep）
