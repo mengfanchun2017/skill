@@ -33,7 +33,7 @@ Supabase (共享课程数据)              飞书 (学生个人数据)
 
 > 📖 完整说明 → [config.aiagt.dev](https://config.aiagt.dev/fmoocrec)
 
-**ccconfig 用户**：真实值放 `ccprivate/skill-config/f-moocrec.yaml`，`init-skill.sh sync` 自动覆盖。
+**ccconfig 用户**：真实值放 `ccprivate/skill-config/fmoocrec.yaml`，`init-skill.sh sync` 自动覆盖。
 **独立用户**：`cp config.yaml.example config.yaml` 填入真实值。
 
 需提前准备：

@@ -23,7 +23,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 
 > 📖 完整说明 → [config.aiagt.dev](https://config.aiagt.dev/ffeishu)
 
-**ccconfig 用户**：真实值放 `ccprivate/skill-config/f-feishu.yaml`，`init-skill.sh sync` 自动覆盖。
+**ccconfig 用户**：真实值放 `ccprivate/skill-config/ffeishu.yaml`，`init-skill.sh sync` 自动覆盖。
 **独立用户**：`cp config.yaml.example config.yaml` 填入真实值。
 
 需提前准备：
