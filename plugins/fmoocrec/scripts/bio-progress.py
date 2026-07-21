@@ -7,7 +7,7 @@ Usage:
   python3 bio-progress.py stats                   # 统计概览
   python3 bio-progress.py completed <course_name> <date> [cert_url]  # 标记完成
 
-仿 f-logme/log_write.py 模式。读取 config.yaml 获取 Base token。
+仿 flogme/log_write.py 模式。读取 config.yaml 获取 Base token。
 """
 
 import json

@@ -104,4 +104,4 @@ cat "$SKILL_DIR/config.yaml"
 
 ## 线上文档索引
 
-> freportstd 直接创建的文档。通常通过 f-research-report/f-logme 创建，不直接索引。
+> freportstd 直接创建的文档。通常通过 f-research-report/flogme 创建，不直接索引。
