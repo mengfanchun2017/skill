@@ -5,4 +5,4 @@
 
 # 当前无外部服务依赖，无需配置。
 # API key 通过 ccconfig/conf/claude.json 管理（ccprivate symlink）。
-# 搜索委托 fsearch，搜索相关配置见 f-search/config.yaml。
+# 搜索委托 fsearch，搜索相关配置见 fsearch/config.yaml。

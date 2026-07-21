@@ -3,5 +3,5 @@
 # ccprivate 覆盖：将真实配置放到 ccprivate/config/f-research-report.yaml
 
 # 当前无外部服务依赖，无需配置。
-# 输出委托 f-doc（飞书文档），相关配置见 f-doc/config.yaml。
-# 写作规范委托 freportstd，相关配置见 f-report-std/config.yaml。
+# 输出委托 ffeishu（飞书文档），相关配置见 ffeishu/config.yaml。
+# 写作规范委托 freportstd，相关配置见 freportstd/config.yaml。

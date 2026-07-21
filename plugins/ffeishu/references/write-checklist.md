@@ -1,7 +1,7 @@
 # 飞书文档写操作参考手册
 
 > 完整格式约束、命令速查、安全规则、验证步骤。**参考手册，非执行入口。**
-> 写操作时关键检查已内联到 `../SKILL.md` 工作流步骤中。全局硬约束 → `rules.d/f-feishu.md`
+> 写操作时关键检查已内联到 `../SKILL.md` 工作流步骤中。全局硬约束 → `rules.d/ffeishu.md`
 
 ## 0. 策略决策（写前必问）
 
@@ -88,6 +88,6 @@
 
 ---
 
-> **研究类报告额外约束** → `skills/f-research-report/rules.d/f-research-report.md`（全局加载）
+> **研究类报告额外约束** → `skills/fresearchreport/rules.d/fresearchreport.md`（全局加载）
 > **lark-cli 命令完整速查** → `rules/feishu-cli-cheatsheet.md`
 > **增量更新详细工作流** → `references/update-workflow.md`

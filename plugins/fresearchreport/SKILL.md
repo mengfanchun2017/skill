@@ -12,8 +12,8 @@ allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 
 报告生成模块，将研究结果/大纲/自由素材转换为可读报告。
 
-> **格式硬约束** → `../f-report-std/rules.d/f-report-std.md`（全局加载）
-> **飞书格式** → `../f-feishu/SKILL.md`（工作流 G 处理图子文档）
+> **格式硬约束** → `../freportstd/rules.d/freportstd.md`（全局加载）
+> **飞书格式** → `../ffeishu/SKILL.md`（工作流 G 处理图子文档）
 
 ### 三层分工
 
@@ -27,7 +27,7 @@ allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 
 ## Step 0: 报告卡片（前置产物）
 
-任何模式开始前，先出 1 页报告卡片让用户确认。卡片模板 → `../f-report-std/templates/report-card.md`。
+任何模式开始前，先出 1 页报告卡片让用户确认。卡片模板 → `../freportstd/templates/report-card.md`。
 
 | 字段 | 内容 | 示例 |
 |------|------|------|
@@ -66,7 +66,7 @@ allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 - `comparison` — 对比/选型
 - `proposal` — 方案/规划
 
-模板在 `../f-report-std/templates/`。
+模板在 `../freportstd/templates/`。
 
 ## 工作流（按模式）
 
@@ -109,7 +109,7 @@ allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 - "技术调研：背景/现状/趋势/建议"
 
 #### Step 大纲.2: 选模板
-按大纲结构匹配 `f-report-std/templates/`：
+按大纲结构匹配 `freportstd/templates/`：
 - 现状+原因+建议 → `analysis.md`
 - 候选对比 → `comparison.md`
 - 背景+现状+趋势 → `research.md`
@@ -216,7 +216,7 @@ v2（Claude 改）
 - 父文档插入位置写一句"详见《<子文档名>》"，引导跳转
 
 ### 详细命令
-见 `../f-feishu/SKILL.md` 工作流 G（含 lark-cli 完整命令）。
+见 `../ffeishu/SKILL.md` 工作流 G（含 lark-cli 完整命令）。
 
 ## 关联 Skills
 - `freportstd` — 内容规范、模板（必读）
