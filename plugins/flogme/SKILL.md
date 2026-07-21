@@ -67,7 +67,7 @@ KR 写法：✅ "模型分流系统上线，P99 延迟降低 50%" ❌ "完成模
 ### 2. Worklog 写入
 
 **手动**：用户说"写日志"/"记录工作" → agent 判断 → 调 flogme skill → 写飞书 Base。
-或直接运行 `log_write.py worklog --title ... --kr recXXX ...`。
+或直接运行 `log_write.py worklog --title ... --kr recXXX [--tokens-in N --tokens-out N --asst-msgs N --user-msgs N]`。
 
 **日合并**：每天 12:01 自动 consolidate 当日 worklog，去重合并。
 （配置方式见下方 § 日合并定时器配置）
