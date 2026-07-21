@@ -95,13 +95,18 @@ def update_kr_field(kr_id, fields_dict):
 def cmd_worklog(args):
     date_str = args.date or date.today().isoformat()
 
-    fields = ["标题", "成果类型", "关联KR", "日期", "说明"]
+    fields = ["标题", "成果类型", "关联KR", "日期", "说明",
+              "输入Token", "输出Token", "助手消息数", "用户消息数"]
     row = [
         args.title,
         args.type or "工具开发",
         [{"id": args.kr}] if args.kr else None,
         date_str,
         args.note or "",
+        args.tokens_in or 0,
+        args.tokens_out or 0,
+        args.asst_msgs or 0,
+        args.user_msgs or 0,
     ]
     payload = {"fields": fields, "rows": [row]}
     path = write_json_file(payload)
@@ -162,6 +167,10 @@ def main():
     w.add_argument("--kr", help="关联 KR record_id")
     w.add_argument("--type", help="成果类型")
     w.add_argument("--note", help="说明")
+    w.add_argument("--tokens-in", type=int, help="输入Token")
+    w.add_argument("--tokens-out", type=int, help="输出Token")
+    w.add_argument("--asst-msgs", type=int, help="助手消息数")
+    w.add_argument("--user-msgs", type=int, help="用户消息数")
     w.add_argument("--date", help="日期 YYYY-MM-DD")
     w.set_defaults(func=cmd_worklog)
 
