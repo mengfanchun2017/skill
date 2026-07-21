@@ -1,4 +1,4 @@
-# flogme 数据模型
+# flogme 数据模型与质量规范
 
 Base `okr_v2` 含 4 个表，token 在 ccprivate config.yaml 中。
 
@@ -32,23 +32,20 @@ Base `okr_v2` 含 4 个表，token 在 ccprivate config.yaml 中。
 
 ## Worklog 表字段
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| 标题 | 文本 | LLM 自动生成，≤60 字 |
-| 关联KR | 关联列 → OKR_KR | 必须关联一个 KR |
-| 关联KR标题 | 查找引用 | 自动从 KR 表反查 |
-| 成果类型 | 单选 | 工具开发 / 技术方案 / 文档输出 / 学习笔记 / 问题排查 / 项目交付 |
-| 说明 | 多行文本 | 结构化摘要 + commits + edits + user prompts |
-| 日期 | 日期 | 完成日期 |
-| 输入Token | 数字 | transcript 统计 |
-| 输出Token | 数字 | transcript 统计 |
-| 助手消息数 | 数字 | assistant 消息条数 |
-| 用户消息数 | 数字 | user 消息条数 |
-| 量化结果 | 文本 | 可选。数字、百分比、前后对比 |
+| 字段 | 类型 | 写入方式 |
+|------|------|---------|
+| 标题 | 文本 | LLM 生成，≤60 字，无 `##`/`【】` 前缀 |
+| 成果类型 | 单选 | `log_write.py --type`，默认为工具开发 |
+| 关联KR | 链接 → OKR_KR | kr_route 自动匹配，每条必须关联一个 |
+| 日期 | 日期 | 当天 |
+| 说明 | 多行文本 | 结构化摘要 + commits + edits |
+| 输入Token | 数字 | `--tokens-in` 传 |
+| 输出Token | 数字 | `--tokens-out` 传 |
+| 助手消息数 | 数字 | `--asst-msgs` 传 |
+| 用户消息数 | 数字 | `--user-msgs` 传 |
+| 关联KR标题 | 查找引用 | 自动从 KR 表反查（只读） |
 
-> 已删字段（2026-07）：model, 来源（100% 空值，从未使用）
-> 分类（work/learn/project）通过关联 KR→O 自动继承，Worklog 不重复维护
-> 标签、状态、耗时 — 见 `docs/design/worklog-field-extension.md` 扩展方案
+分类（work/learn/project）通过关联 KR→O 自动继承，Worklog 不重复维护。
 
 ## Reflect 表字段
 
@@ -63,6 +60,41 @@ Base `okr_v2` 含 4 个表，token 在 ccprivate config.yaml 中。
 | 下阶段 | 文本 | 下阶段聚焦什么 |
 | 日期 | 日期 | |
 
-## KR_Progress 表（已废弃）
+## 质量规则
 
-KR_Progress 表已于 2025-07 废弃，不再维护。
+| 规则 | 动作 |
+|------|------|
+| 0 条 user 消息 | **跳过**，不写入（空 session 噪音） |
+| LLM 标题生成失败 | fallback → commit message → 首条 user prompt |
+| 标题为 `session 工作` 格式 | 标记为低质量，待人工修正 |
+| 同 session 多次触发 | **合并**到第一条（累加 token/轮数，标题取较长者） |
+
+**KR 自动路由**：根据 session cwd 匹配 `config.yaml` → `kr_route` 配置，自动关联到对应 KR。
+
+## 合并策略
+
+| 条件 | 动作 | 是否自动 |
+|------|------|---------|
+| 完全同标题 | 保留说明最长记录，合并说明，删除其余 | ✅ 自动 |
+| 标题相似 > 85% + 同日期 | 候选合并 | ❌ 人工 |
+| 标题相似 > 85% + 跨日期 + 递进更新 | 合并说明到最早记录 | ✅ 自动 |
+| 0 user_msgs 且 0 commits 0 edits | 删除 | ✅ 自动 |
+
+### 调度
+
+| 频率 | 触发方式 | 命令 |
+|------|---------|------|
+| 每周 | 自动（距上次 merge > 7 天时 hook 自动执行） | `python3 worklog_consolidate.py --mode merge --write` |
+| 阶段（~30天） | 提醒 | `worklog_consolidate.py --mode monthly` 预览 |
+| 手动 | 用户说 "做周整合" / "阶段总结" | 立即执行 |
+
+## 已删字段
+
+| 字段 | 表 | 删除时间 | 原因 |
+|------|----|---------|------|
+| 量化结果 | Worklog | 2026-07 | 100% 空值，从未使用 |
+| model | Worklog | 2026-07 | 100% 空值，从未使用 |
+| 来源 | Worklog | 2026-07 | 100% 空值，从未使用 |
+| 分类 | Worklog | 2026-06 | 通过 KR→O 自动继承 |
+| 标签/状态/耗时 | Worklog | — | 见 extension 方案 |
+| KR_Progress 表 | — | 2025-07 | 表废弃，详见 ADR-0003 |

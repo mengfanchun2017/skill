@@ -72,8 +72,8 @@ KR 写法：✅ "模型分流系统上线，P99 延迟降低 50%" ❌ "完成模
 **日合并**：每天 12:01 自动 consolidate 当日 worklog，去重合并。
 （配置方式见下方 § 日合并定时器配置）
 
-KR 自动路由、质量规则、合并策略、字段规范 → [references/worklog-quality.md](references/worklog-quality.md)。
-整合脚本用法 → `worklog_consolidate.py --mode merge|weekly|monthly|dry-run`，详见 [references/worklog-quality.md](references/worklog-quality.md)。
+KR 自动路由、质量规则、合并策略、字段规范 → [references/data-model.md](references/data-model.md)。
+整合脚本用法 → `worklog_consolidate.py --mode merge|weekly|monthly|dry-run`，详见 [references/data-model.md](references/data-model.md)。
 
 ### 3. Reflect 写入
 
