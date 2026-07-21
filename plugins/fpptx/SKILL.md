@@ -15,7 +15,7 @@ allowed-tools: Read, Write, Bash, Glob
 
 > 📖 完整说明 → [config.aiagt.dev](https://config.aiagt.dev/fpptx)
 
-**ccconfig 用户**：真实值放 `ccprivate/skill-config/f-pptx.yaml`，`init-skill.sh sync` 自动覆盖。
+**ccconfig 用户**：真实值放 `ccprivate/skill-config/fpptx.yaml`，`init-skill.sh sync` 自动覆盖。
 **独立用户**：OfficeCLI 免费安装即可使用，无需额外配置。
 
 ## 安装
