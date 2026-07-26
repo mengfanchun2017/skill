@@ -1,9 +1,8 @@
 ---
 name: fsyncdoc
 user-invocable: true
-disable-model-invocation: true
-description: Sync source repo docs + optional aiagt product page. Two-phase pipeline.
-allowed-tools: Read, Write, Edit, Bash, Glob, Grep, AskUserQuestion
+description: Sync source repo docs + optional aiagt product page. Two-phase pipeline. Agent-runnable.
+allowed-tools: Read, Write, Edit, Bash, Grep
 ---
 
 # fsyncdoc — 源码文档同步 + 产品页同步
@@ -59,7 +58,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, AskUserQuestion
 
 加载 mapping.json 取所有源仓库列表。
 
-无参数 → `AskUserQuestion` 勾选要同步的仓库。有参数（如 `ccconfig`）→ 直走。
+无参数 → 同步 mapping 中所有仓库。有参数（如 `ccconfig`）→ 只同步指定仓库。
 
 ### Phase 1 — Doc sync：读源码 → 更新文档
 
@@ -90,7 +89,7 @@ Read 每个存在的文档。
 
 严重度：**高**=错步骤/死链/错版本，**中**=过时描述/缺文件，**低**=文案优化。
 
-`AskUserQuestion` 逐项确认（高严重度默认勾选）。
+高+中严重度自动应用，低严重度酌情应用。输出差异表供审查。
 
 **1d. 应用更新**
 
@@ -123,9 +122,9 @@ Read `<site_dir>/index.html`，定位：
 - SKILLS 数组 vs 实际 plugin 列表（skill）
 - 产品卡片描述（main）
 
-**2c. 报告 → 确认 → 应用**
+**2c. 应用更新**
 
-同上差异表 + Edit。注意：
+输出差异表并自动应用 Edit。注意：
 - HTML 内联文本和 `<script>` i18n 数据**两处都要改**
 - 转义：`&&` → `&amp;&amp;`
 - 改域名时 grep 全文件
