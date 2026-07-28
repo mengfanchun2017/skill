@@ -1,6 +1,6 @@
 # claude-skills — Claude Code skill 集合
 
-> Claude Code 技能聚合仓。**15 个自建**（plugin 安装）+ **第三方 skill 由用户用 npx skills 自管**（不通过 marketplace）。
+> Claude Code 技能聚合仓。**16 个自建**（14 marketplace + 2 内部）+ **第三方 skill 由用户用 npx skills 自管**（不通过 marketplace）。
 > 飞书 / 调研 / 文档 / PPT / PDF / Excel / 图表 / AI 浏览器一站式。
 
 ## 快速开始
@@ -32,8 +32,11 @@
 | 慕课推荐 | `/plugin install fmoocrec@<your-github-username>-skills` |
 | 系统架构师备考 | `/plugin install fsysarchi@<your-github-username>-skills` |
 | 得到笔记 | `/plugin install getnote@<your-github-username>-skills` |
+| 库审计 | `/plugin install flibaudit@<your-github-username>-skills` |
 | 报告写作规范 | `/plugin install freportstd@<your-github-username>-skills` |
 | 研究方法论框架 | `/plugin install fresearchframe@<your-github-username>-skills` |
+| 文档同步 | `/plugin install fsyncdoc@<your-github-username>-skills` |
+| Skill 脚手架 | `/plugin install fskillcreat@<your-github-username>-skills` |
 
 可以一次装多个：
 
@@ -70,9 +73,9 @@ cconfig 用户：`bash ccconfig/lib/init-skill.sh sync` 自动从 `conf/third-pa
 
 ### 配合 ccconfig 使用
 
-克隆 [ccconfig](https://github.com/<your-github-username>/ccconfig) 后，`init-skill.sh sync` 自动完成：symlink 自建 skill、注册 marketplace、安装第三方 skill、注入私有配置。详见 ccconfig 文档。
+克隆 [ccconfig](https://github.com/<your-github-username>/ccconfig) 后，`bash lib/init-skill.sh sync` 自动完成：symlink 自建 skill、注册 marketplace、安装第三方 skill、注入私有配置。详见 ccconfig 文档。
 
-## 自建 skill（13 个，仓内）
+## 自建 skill（16 个，仓内）
 
 | Skill | 说明 |
 |-------|------|
@@ -87,6 +90,9 @@ cconfig 用户：`bash ccconfig/lib/init-skill.sh sync` 自动从 `conf/third-pa
 | `fxlsx` | Excel .xlsx 总控（OfficeCLI 引擎：公式/图表/条件格式/透视表） |
 | `flogme` | 个人管理系统（OKR/Worklog/Reflect/SUM，飞书 Base） |
 | `fmoocrec` | 慕课推荐（QS 课程 + 学习路径，飞书 Base + Supabase） |
+| `flibaudit` | 库审计 — 依赖分析 + 安全漏洞 + 版本兼容性 |
+| `fsyncdoc` | 源码文档同步 + 产品页同步（aiagt） |
+| `fskillcreat` | Skill 开发脚手架 — 快速创建新 skill 骨架 |
 | `fsysarchi` | 系统分析师备考 — 暗号 `archi` 触发，随工边做边学 |
 | `getnote` | 得到大脑集成 — MCP 驱动，笔记 CRUD/搜索/知识库/直播 |
 
@@ -134,8 +140,8 @@ lark-cli auth login
 ```
 claude-skills/                          ← 单聚合 marketplace 仓
 ├── .claude-plugin/
-│   └── marketplace.json                # 13 plugin 入口（12 本地 + 1 getnote，lark-* 走系统 lark-cli）
-├── plugins/                            ← 13 个自建 plugin
+│   └── marketplace.json                # 14 plugin 入口（13 本地 + 1 getnote）
+├── plugins/                            ← 16 个自建 plugin（14 marketplace + 2 内部）
 │   ├── ffeishu/SKILL.md
 │   ├── freportstd/SKILL.md
 │   ├── fpptx/SKILL.md
@@ -147,6 +153,9 @@ claude-skills/                          ← 单聚合 marketplace 仓
 │   ├── fxlsx/SKILL.md
 │   ├── flogme/SKILL.md
 │   ├── fmoocrec/SKILL.md
+│   ├── flibaudit/SKILL.md
+│   ├── fsyncdoc/SKILL.md
+│   ├── fskillcreat/SKILL.md
 │   ├── fsysarchi/SKILL.md
 │   ├── getnote/SKILL.md
 ├── README.md
@@ -176,8 +185,8 @@ MIT — 见 [LICENSE](LICENSE)
 
 ## English Summary
 
-A Claude Code marketplace with 13 self-built skills. Third-party skills use `npx skills` (not /plugin install) for clean dialog UX.
+A Claude Code marketplace with 16 self-built skills (14 in marketplace + 2 internal). Third-party skills use `npx skills` (not /plugin install) for clean dialog UX.
 
-- **Self-built (in repo)**: ffeishu, freportstd, fpptx, fresearchframe, fresearchreport, fsearch, fdiagram, fdocx, fxlsx, flogme, fmoocrec, fsysarchi, getnote
+- **Self-built (in repo)**: ffeishu, freportstd, fpptx, fresearchframe, fresearchreport, fsearch, fdiagram, fdocx, fxlsx, flogme, fmoocrec, flibaudit, fsyncdoc, fskillcreat, fsysarchi, getnote
 - **Feishu CLI (system level)**: install `@larksuite/cli` via npm — ffeishu orchestrates all `lark-cli` commands
 - **Utilities (user-installed via `npx skills`)**: mattpocock/skills sub-skills (caveman, diagnose, grill-me, ...)
