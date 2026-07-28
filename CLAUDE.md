@@ -3,12 +3,12 @@
 > 项目级 AI 行为指南。**仅在 `/home/francis/git/skill/` 工作时加载**。全局规则在 `~/.claude/CLAUDE.md`。
 
 ## 项目定位
-Claude Code skill 聚合仓。**13 个自建 plugin**（每个 `plugins/<name>/` 是独立 Claude Code plugin），第三方 skill 由用户用 `npx skills` 自管（不通过 marketplace）。
+Claude Code skill 聚合仓。**14 个 marketplace plugin + 2 内部 plugin**（每个 `plugins/<name>/` 是独立 Claude Code plugin），第三方 skill 由用户用 `npx skills` 自管（不通过 marketplace）。
 
 ## 目录结构
 ```
 skill/
-├── plugins/                # 13 个自建 plugin（每个含 commands/skills/scripts 等）
+├── plugins/                # 16 个自建 plugin（14 marketplace + 2 内部）
 ├── scripts/                # marketplace 工具脚本
 ├── .claude-plugin/         # Claude Code plugin 元数据
 ├── .github/                # CI
@@ -18,7 +18,7 @@ skill/
 └── www/                    # 静态展示页（部署到 skills.aiagt.dev）
 ```
 
-## 13 个 plugin
+## 16 个 plugin
 | Plugin | 用途 |
 |--------|------|
 | ffeishu | 飞书文档/PPT/表格/Base 操作统一入口 |
@@ -33,9 +33,10 @@ skill/
 | fmoocrec | 慕课推荐 |
 | fsysarchi | 系统架构师备考 |
 | freportstd | 报告写作规范 |
-| getnote | 得到笔记 |
-| flibaudit | Library 审计 |
+| flibaudit | 库审计 |
 | fsyncdoc | 文档同步 + 产品页同步（内部工具）|
+| fskillcreat | Skill 开发脚手架（内部工具）|
+| getnote | 得到笔记 |
 
 ## 硬约束
 1. **每个 plugin 是独立 Claude Code plugin**：有自己的 `commands/` `skills/` `scripts/`，可独立 `/plugin install <name>`
