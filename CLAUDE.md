@@ -57,12 +57,18 @@ cat .claude-plugin/marketplace.json | python3 -m json.tool
 git status  # 确认干净
 ```
 
-## 添加新 plugin 流程
+## 添加新 plugin 流程（marketplace）
 1. `mkdir plugins/<name>` — 目录名 = plugin 名（小写、无连字符）
-2. 写 `commands/` 和/或 `skills/` 和 `README.md`
-3. 在 `.claude-plugin/marketplace.json` 注册
-4. 写 CHANGELOG 一行：`### Added - <name>: ...`
-5. `git commit && git push` → auto-sync 推送
+2. 写 `SKILL.md`，frontmatter 含 `name` 和 `description`（description 是单一真相源）
+3. 在 `.claude-plugin/marketplace.json` 添加 entry（`name`, `source`, `keywords`，不用写 description）
+4. `python3 scripts/sync-marketplace.py --write` — 从 SKILL.md 同步 description
+5. 写 CHANGELOG 一行：`### Added - <name>: ...`
+6. `git commit && git push` → auto-sync 推送
+
+## 添加内部 plugin（不在 marketplace）
+1. `mkdir plugins/<name>`
+2. 写 `SKILL.md`，设 `disable-model-invocation: true`（零 context load）
+3. 在 `README.md` 的自建 skill 表加一行
 
 ## 与 ccconfig 的关系
 - `~/git/ccconfig/` 提供通用编码规范（rules/）+ init-skill.sh 同步脚本
@@ -73,3 +79,34 @@ git status  # 确认干净
 - 完整 skill 列表 → [README.md](README.md)
 - 变更历史 → [CHANGELOG.md](CHANGELOG.md)
 - 贡献指南 → [CONTRIBUTING.md](CONTRIBUTING.md)
+
+## Plugin 类型
+| 类型 | 特点 | 示例 |
+|------|------|------|
+| marketplace | 在 `marketplace.json` 注册，用户 `/plugin install` | ffeishu, fpptx, fsearch |
+| 内部（internal）| 不在 marketplace，仅开发者本地可用 | fsyncdoc, fskillcreat |
+
+内部 plugin 的 `disable-model-invocation: true` = 零 context load，需手动 /invoke 触发。fsyncdoc 的 pipeline 自动化也通过手动触发。
+
+## 依赖管理
+每个 plugin 用 `deps.txt` 声明底层 npm 包依赖（仅声明，不自动安装）：
+```
+<package> <type:version> <skill-name>
+```
+- 运行时 skill 本身应在首次调用时检测依赖是否可用（`which <binary>` 或 `command -v`）
+- 缺失时提示用户安装，不强制自动安装（避免公开仓库的安装脚本风险）
+- Config 在 `config.yaml.example`，真实值通过 ccprivate 注入
+
+## 配置注入模式
+```
+ccprivate/skill-config/<name>.yaml  →  symlink  →  ~/.claude/skills/<name>/config.yaml
+```
+Skill 运行时读 config.yaml 拿 API key/私有参数。公开仓只放 `config.yaml.example`（占位值/文档）。
+CI 检查 `plugins/*/config.yaml` 是否存在——有真实配置 = CI 报错。
+
+## 同步流程
+```bash
+python3 scripts/sync-marketplace.py           # 检查：SKILL.md frontmatter 与 marketplace.json 一致？
+python3 scripts/sync-marketplace.py --write   # 写入：SKILL.md description → marketplace.json
+```
+**SKILL.md 的 `description` 是单一真相源**。新增 plugin 时：写 SKILL.md frontmatter → `--write` 同步 → 提交。
