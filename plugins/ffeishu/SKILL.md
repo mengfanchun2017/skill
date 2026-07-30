@@ -6,13 +6,13 @@ description: |
   Use when 用户说"创建文档"/"写文档"、"更新文档"/"更新报告"、"整合文档"/"合并文档"、
   "拆分文档"、"导出Word/PPT"、"飞书转Office"、"导入到飞书"、"对比文档"、
   或给出飞书文档URL要求操作。
-  PPT 委托 fpptx，图表委托 fdiagram，PDF 委托 fpdf。
+  PPT 委托 fpptx，图表委托 fdiagram，
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 
 # ffeishu — 飞书文档编排
 
-编排层，不重新实现底层工具。委托飞书操作给 lark-cli，Office 给 OfficeCLI，PPT 给 fpptx，图表给 fdiagram，PDF 给 fpdf。
+编排层，不重新实现底层工具。委托飞书操作给 lark-cli，Office 给 OfficeCLI，PPT 给 fpptx，图表给 fdiagram
 
 ## 前置条件
 
@@ -67,7 +67,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep
   ├─ "导出Word/PPT"/"转Office"            → 工作流 D: 飞书→Office
   ├─ "导入飞书"                           → 工作流 D: Office→飞书
   ├─ "对比"/"diff"                        → 工作流 E: 文档对比
-  ├─ "翻译PDF"                            → 委托 fpdf skill
+  ├─ "翻译PDF"                            → PDF 提取 + 翻译
   └─ "找文档"/"有哪些关于X的文档"         → Step S: 文档发现
 ```
 
@@ -399,7 +399,7 @@ lark-cli docs +fetch --api-version v2 --doc "$PARENT_TOKEN" --detail full | grep
 | 画图表 | fdiagram | 委托 fdiagram skill |
 | 数据图（图子文档） | ffeishu 本工作流 G | lark-cli + python |
 | 文件上传 | lark-drive | `lark-cli drive +upload` |
-| PDF 提取+翻译 | fpdf | 委托 fpdf skill |
+| PDF 提取+翻译 | — | 用 MCP/外部工具 |
 
 ---
 

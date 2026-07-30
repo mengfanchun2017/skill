@@ -1,7 +1,7 @@
 # claude-skills — Claude Code skill 集合
 
 > Claude Code 技能聚合仓。**16 个自建**（14 marketplace + 2 内部）+ **第三方 skill 由用户用 npx skills 自管**（不通过 marketplace）。
-> 飞书 / 调研 / 文档 / PPT / PDF / Excel / 图表 / AI 浏览器一站式。
+> 飞书 / 调研 / 文档 / PPT / Excel / 图表一站式。
 
 ## 快速开始
 
@@ -23,20 +23,16 @@
 | PPT 生成 | `/plugin install fpptx@<your-github-username>-skills` |
 | Word 文档 | `/plugin install fdocx@<your-github-username>-skills` |
 | Excel 表格 | `/plugin install fxlsx@<your-github-username>-skills` |
-| PDF 处理 | `/plugin install fpdf@<your-github-username>-skills` |
 | 画架构图/流程图 | `/plugin install fdiagram@<your-github-username>-skills` |
 | 搜索/调研 | `/plugin install fsearch@<your-github-username>-skills` |
 | 研究报告 | `/plugin install fresearchreport@<your-github-username>-skills` |
 | 个人 OKR/日志 | `/plugin install flogme@<your-github-username>-skills` |
-| 新项目脚手架 | `/plugin install flaunch@<your-github-username>-skills` |
 | 慕课推荐 | `/plugin install fmoocrec@<your-github-username>-skills` |
 | 系统架构师备考 | `/plugin install fsysarchi@<your-github-username>-skills` |
 | 得到笔记 | `/plugin install getnote@<your-github-username>-skills` |
 | 库审计 | `/plugin install flibaudit@<your-github-username>-skills` |
 | 报告写作规范 | `/plugin install freportstd@<your-github-username>-skills` |
 | 研究方法论框架 | `/plugin install fresearchframe@<your-github-username>-skills` |
-| 文档同步 | `/plugin install fsyncdoc@<your-github-username>-skills` |
-| Skill 脚手架 | `/plugin install fskillcreat@<your-github-username>-skills` |
 
 可以一次装多个：
 

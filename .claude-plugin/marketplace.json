@@ -13,7 +13,7 @@
   "plugins": [
     {
       "name": "ffeishu",
-      "description": "飞书文档编排层 — 创建飞书wiki/表格/白板、更新报告、整合/拆分文档、飞书↔Office双向转换、文档对比。 Use when 用户说\"创建文档\"/\"写文档\"、\"更新文档\"/\"更新报告\"、\"整合文档\"/\"合并文档\"、 \"拆分文档\"、\"导出Word/PPT\"、\"飞书转Office\"、\"导入到飞书\"、\"对比文档\"、 或给出飞书文档URL要求操作。 PPT 委托 fpptx，图表委托 fdiagram，PDF 委托 fpdf。",
+      "description": "飞书文档编排层 — 创建飞书wiki/表格/白板、更新报告、整合/拆分文档、飞书↔Office双向转换、文档对比。 Use when 用户说\"创建文档\"/\"写文档\"、\"更新文档\"/\"更新报告\"、\"整合文档\"/\"合并文档\"、 \"拆分文档\"、\"导出Word/PPT\"、\"飞书转Office\"、\"导入到飞书\"、\"对比文档\"、 或给出飞书文档URL要求操作。 PPT 委托 fpptx，图表委托 fdiagram，",
       "source": "./plugins/ffeishu",
       "keywords": [
         "f"
