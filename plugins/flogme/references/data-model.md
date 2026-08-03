@@ -39,10 +39,6 @@ Base `okr_v2` 含 4 个表，token 在 ccprivate config.yaml 中。
 | 关联KR | 链接 → OKR_KR | kr_route 自动匹配，每条必须关联一个 |
 | 日期 | 日期 | 当天 |
 | 说明 | 多行文本 | 结构化摘要 + commits + edits |
-| 输入Token | 数字 | `--tokens-in` 传 |
-| 输出Token | 数字 | `--tokens-out` 传 |
-| 助手消息数 | 数字 | `--asst-msgs` 传 |
-| 用户消息数 | 数字 | `--user-msgs` 传 |
 | 关联KR标题 | 查找引用 | 自动从 KR 表反查（只读） |
 
 分类（work/learn/project）通过关联 KR→O 自动继承，Worklog 不重复维护。
@@ -96,5 +92,9 @@ Base `okr_v2` 含 4 个表，token 在 ccprivate config.yaml 中。
 | model | Worklog | 2026-07 | 100% 空值，从未使用 |
 | 来源 | Worklog | 2026-07 | 100% 空值，从未使用 |
 | 分类 | Worklog | 2026-06 | 通过 KR→O 自动继承 |
+| 输入Token | Worklog | 2026-08 | 用量拆到 maintain.sh token → 飞书多维表格 |
+| 输出Token | Worklog | 2026-08 | 同上 |
+| 助手消息数 | Worklog | 2026-08 | 同上 |
+| 用户消息数 | Worklog | 2026-08 | 同上 |
 | 标签/状态/耗时 | Worklog | — | 见 extension 方案 |
 | KR_Progress 表 | — | 2025-07 | 表废弃，详见 ADR-0003 |
