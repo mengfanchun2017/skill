@@ -5,9 +5,13 @@
 - [ ] 目录树获取完整（`tree -L 3`）
 - [ ] 识别核心模块 vs 工具模块 vs 胶水代码
 - [ ] 依赖方向检查（核心不依赖工具，工具可依赖核心）
+- [ ] 调用树检查：根脚本（根下 *.sh）不互相调用；所有次级脚本至少被一个根脚本按层级调用
+- [ ] **间接调用规则**：`option-*/init.sh` 通过 `init-option.sh` 动态枚举（`has_init_script` / `install_option`）或 `option_status` 调用即视为有根入口。不要求根脚本硬编码调用每个 option init.sh
 - [ ] 超大文件标记（>500 行建议审查是否需拆分）
 - [ ] 无用文件标记（空文件、注释全部删除的文件）
+- [ ] 死代码检测：无人 source/调用且无生产引用的文件标记删除
 - [ ] 目录命名一致性（kebab-case / snake_case 统一）
+- [ ] `improve-codebase-architecture` skill 建议与手动发现交叉验证
 
 ## Phase 2: 代码审计清单
 
@@ -31,6 +35,32 @@
 - [ ] 缺少错误处理（网络请求、文件操作）
 - [ ] 文件组织（相关文件散落多处）
 - [ ] 过时的 TODO/FIXME
+
+## SH 审计清单（项目含 `.sh` 文件时启用）
+
+以 ccconfig `sh-script-standards.md` 为检查标准。
+
+### P0 — 安全/阻断
+- [ ] 危险命令：`rm -rf` 无保护、`git reset --hard`、`chmod 777`、`sudo`（apt-get 除外）
+- [ ] 密钥/Token 硬编码在脚本中
+- [ ] 存在命令注入（未引用的变量接 `eval` / 动态拼接用户输入）
+
+### P1 — 质量
+- [ ] 缺少 `set -euo pipefail`（不可预期错误不终止）
+- [ ] `SCRIPT_DIR` 未用 `BASH_SOURCE[0]` 定义（用 `$0` 或硬编码路径）
+- [ ] 自定颜色变量（`RED='\033[0;31m'` 等）而非 `source lib/colors.sh`
+- [ ] 菜单 `case` 无 `0)` 返回/退出路径（死循环无法退出）
+- [ ] 菜单输入检查未用 `[[ "$choice" =~ ^[0-9]+$ ]]`
+- [ ] 写操作类脚本（调 MCP/LLM/网络请求）未 source `lib/dry-run.sh`
+- [ ] `--status` 首行非 `OK | WARN | MISSING` 格式（供 init-option 解析）
+- [ ] 函数用 `function` 关键字（非 `name()` 格式）
+
+### P2 — 改进
+- [ ] 缩进 tab/4空格混合（统一 4 空格）
+- [ ] 函数内未用 `local` 声明局部变量
+- [ ] 无 `#!/bin/bash` shebang
+- [ ] 文件头缺少功能描述注释（`# xxx.sh — 一句话描述`）
+- [ ] case 的 `;;` 未与 `case`/`esac` 对齐
 
 ## Phase 3: 文档审计清单
 
@@ -65,6 +95,16 @@
 - [ ] 依赖无过期且有安全漏洞的版本
 - [ ] git tag 存在且推送到 remote
 
+## Phase 2 并行审计 Agent 分配
+
+| Agent | Label | 审计内容 | 产出 |
+|-------|-------|----------|------|
+| Agent A | `audit:security` | P0 安全项 | 密钥发现 + 注入点列表 |
+| Agent B | `audit:quality` | P1-P2 质量项 | 重复/死代码/硬编码清单 |
+| Agent C | `audit:sh` | SH 专项 | SH 脚本合规问题清单 |
+
+Phase 2 启动时用 Agent 并行创建这些子任务。各 Agent 独立扫描，结果汇总到 Phase 5。
+
 ## 审计报告模板
 
 ```markdown
@@ -82,7 +122,7 @@
 | 代码 | A/B/C/D | 一句话 |
 | 文档 | A/B/C/D | 一句话 |
 | 安全 | A/B/C/D | 一句话 |
-| 发布就绪 | ✅/⚠️/❌ | 一句话 |
+| 发布就绪 | ✅/⚠/❌ | 一句话 |
 
 ## 2. 发现汇总
 
