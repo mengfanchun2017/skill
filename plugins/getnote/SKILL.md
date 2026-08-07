@@ -28,7 +28,7 @@ allowed-tools: Bash, Read, Write,
 
 > 📖 完整说明 → [config.aiagt.dev](https://config.aiagt.dev/getnote)
 
-**ccconfig 用户**：MCP server 配置由 `init-mcp.sh` 管理，API key 在 `ccprivate/conf/claude.json`。
+**ccconfig 用户**：MCP server 配置由 `init-mcp.sh` 管理，Key 在 `ccprivate/conf/claude.json`。运行 `bash init-mcp.sh keys` 交互填 Key。
 **独立用户**：在 `~/.claude/settings.json` 的 `mcpServers` 中添加 getnote MCP server：
 ```json
 {
@@ -36,13 +36,18 @@ allowed-tools: Bash, Read, Write,
     "getnote": {
       "command": "npx",
       "args": ["-y", "@getnote/mcp"],
-      "env": { "GETNOTE_API_KEY": "<your-api-key>" }
+      "env": {
+        "GETNOTE_API_KEY": "<your-api-key>",
+        "GETNOTE_CLIENT_ID": "<your-client-id>"
+      }
     }
   }
 }
 ```
 
-获取 API key：下载「得到」App → 我的 → 设置 → 开发者 → 创建 API Key。
+获取 API Key 和 Client ID：打开 [biji.com/openapi](https://www.biji.com/openapi) → 创建应用。
+- API Key 格式：`gk_live_xxx`
+- Client ID 格式：`cli_xxx`
 
 ## 意图 → Tool 映射
 
