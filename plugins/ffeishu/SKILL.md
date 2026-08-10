@@ -123,12 +123,12 @@ lark-cli drive +search --query "关键词" --space-ids "space_id_1,space_id_2"
 ### Step 1: 创建
 
 ```bash
-cat << 'EOF' | lark-cli docs +create --api-version v2 --wiki-node <token> --as user --markdown - --title "标题"
+cat << 'EOF' | lark-cli docs +create --api-version v2 --wiki-node <token> --as user --doc-format markdown --content - --title "标题"
 内容
 EOF
 ```
 
-常见错误: ❌ `--folder-token` | ❌ `--markdown "内容"` | ✅ `--markdown -` + heredoc
+常见错误: ❌ `--folder-token` | ❌ `--markdown "内容"` | ✅ `--doc-format markdown --content -` + heredoc
 
 ### Step 2: 验证（必做）
 
@@ -194,10 +194,10 @@ lark-cli docs +fetch --api-version v2 --doc "{token}" --detail full
 
 ```bash
 # 追加（示例）
-cat << 'EOF' | lark-cli docs +update --api-version v2 --doc <doc_id> --as user --mode append --markdown -
+cat << 'EOF' | lark-cli docs +update --api-version v2 --doc <doc_id> --as user --mode append --doc-format markdown --content -
 
 # 替换章节（示例）
-cat << 'EOF' | lark-cli docs +update --api-version v2 --doc <doc_id> --as user --mode replace_range --selection-by-title "章节标题" --markdown -
+cat << 'EOF' | lark-cli docs +update --api-version v2 --doc <doc_id> --as user --mode replace_range --selection-by-title "章节标题" --doc-format markdown --content -
 ```
 
 详见 `references/update-workflow.md`
@@ -302,7 +302,7 @@ FIG_NAME="<图名，简洁中文>"
 
 cat << EOF | lark-cli docs +create --api-version v2 \
   --parent-token "$PARENT_TOKEN" --as user \
-  --title "$FIG_NAME" --markdown -
+  --title "$FIG_NAME" --doc-format markdown --content -
 
 # $FIG_NAME
 
@@ -350,7 +350,7 @@ CHILD_URL="<子文档 URL>"
 # 在目标 block 后插入图块（链接到子文档）
 cat << EOF | lark-cli docs +update --api-version v2 \
   --doc "$PARENT_TOKEN" --as user --mode block_insert_after \
-  --block-id "<target_block_id>" --markdown -
+  --block-id "<target_block_id>" --doc-format markdown --content -
 
 **$FIG_NAME**：详见 [$FIG_NAME]($CHILD_URL)
 
