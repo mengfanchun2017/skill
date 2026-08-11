@@ -1,6 +1,6 @@
 # claude-skills — Claude Code skill 集合
 
-> Claude Code 技能聚合仓。**16 个自建**（14 marketplace + 2 内部）+ **第三方 skill 由用户用 npx skills 自管**（不通过 marketplace）。
+> Claude Code 技能聚合仓。**16 个自建**（14 marketplace + 2 内部 fsyncdoc/fskillcreat）+ **第三方 skill 由用户用 npx skills 自管**（不通过 marketplace）。
 > 飞书 / 调研 / 文档 / PPT / Excel / 图表一站式。
 
 ## 快速开始
