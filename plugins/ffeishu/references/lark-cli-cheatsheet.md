@@ -19,7 +19,7 @@ lark-cli drive +search --query test --page-size 1 --as user 2>&1 | sed '/^\[lark
 
 | 命令 | 关键 flag | 易错 |
 |------|----------|------|
-| `docs +create` | `--doc-format markdown --content "..."` | help 写 `--markdown`，实际 `--content` |
+| `docs +create` | `--doc-format markdown --content "..."` | `--markdown` 已废弃，用 `--doc-format markdown` |
 | `docs +update` | v2: `--command overwrite\|block_insert_after\|str_replace\|block_delete` + `--content` | `--command` 不是 `--mode` |
 | `docs +fetch` | v2: `--detail full\|with-ids\|simple` | full 含 colgroup width |
 | `whiteboard +update` | `--source @file.mmd --input_format mermaid` | mermaid 不支持 subgraph |

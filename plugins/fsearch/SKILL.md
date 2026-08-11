@@ -2,13 +2,13 @@
 name: fsearch
 user-invocable: true
 description: |
-  搜索活动统一原语 — 三源并行搜索（tavily/minimax/websearch）、Python 过滤避免 context 污染、
+  搜索活动统一原语 — 四源并行搜索（tavily/exa/websearch/tavily-research）、Python 过滤避免 context 污染、
   聚合去重、来源标注、搜索清单输出。被 fresearchframe / fresearchframe（Batch Mode） / flogme 等需要外部调研的 skill 委托调用。
   不含领域方法论（领域解读由 fresearchframe 负责）。
 allowed-tools: Read, Write, Bash, WebSearch,
   mcp__tavily__tavily_search, mcp__tavily__tavily_research,
   mcp__tavily__tavily_extract, mcp__tavily__tavily_crawl, mcp__tavily__tavily_map,
-  mcp__minimax__web_search, mcp__minimax__understand_image
+  mcp__exa__web_search_exa, mcp__exa__web_fetch_exa
 ---
 
 # fsearch — 搜索活动统一原语
@@ -37,12 +37,16 @@ allowed-tools: Read, Write, Bash, WebSearch,
 | flogme 行业调研 | flogme |
 | ffeishu 文档调研（如 PDF 翻译查背景） | ffeishu |
 
-## 三源并行（必须同时执行）
+## 四源并行（必须同时执行）
 
-1. **WebSearch** — 通用主力
-2. **mcp__minimax__web_search** — 中文搜索
-3. **mcp__tavily__tavily_search** — 英文搜索
-4. **mcp__tavily__tavily_research** — 深度综合
+> 执行后必须逐条标注来源标签：`[tavily]`、`[exa]`、`[websearch]`、`[tavily-research]`。每一条结果都标注来源。
+
+1. **mcp__tavily__tavily_search** — 英文搜索（主力）
+2. **mcp__exa__web_search_exa** — 语义/英文补充搜索
+3. **WebSearch** — 通用后备
+4. **mcp__tavily__tavily_research** — 深度综合（仅需深度时）
+
+**优先级**：Tavily/Exa MCP 优先，WebSearch 作为 fallback。WebSearch 是 Claude 内置搜索，无法禁用，仅在 MCP 搜索不可用时使用。
 
 ## Python 过滤（避免原始数据污染 context）
 
@@ -98,12 +102,14 @@ search → extract → map → crawl → research
 
 ```
 Tavily extract（主力）→ 拿到内容 → 直接用
+                      → Exa fetch（补充） → 直接用
                       → 空壳/被拦截/需要登录/JS渲染 → Vessel 浏览器提取
 ```
 
 - **Tavily extract** 速度快、成本低、可并行，适合所有公开静态页面
-- **Vessel** 是最后 fallback，仅用于 Tavily 无法提取的页面：登录墙、SPA（Vue/React 渲染）、需要交互才能展示内容、反爬页面
-- Vessel 不是搜索工具，是浏览器操控工具。搜索本身始终用 Tavily
+- **Exa fetch** (`mcp__exa__web_fetch_exa`) 适合 Exa 搜索结果页面的内容提取
+- **Vessel** 是最后 fallback，仅用于 Tavily/Exa 都无法提取的页面：登录墙、SPA（Vue/React 渲染）、需要交互才能展示内容、反爬页面
+- Vessel 不是搜索工具，是浏览器操控工具。搜索本身始终用 Taivly/Exa
 
 ### 双语搜索
 
@@ -123,7 +129,9 @@ def deduplicate_by_url(results):
     return unique
 ```
 
-来源标注：`[tavily]` / `[minimax]` / `[websearch]`
+来源标注：`[tavily]` / `[exa]` / `[websearch]`
+
+**重要**：每次搜索结果展示，每条结果都必须标注来源标签，不允许混在一起不标注。
 
 ## 搜索清单（必须输出到调用方）
 
@@ -134,17 +142,17 @@ def deduplicate_by_url(results):
 
 > 非正文，不出现在目录
 
-### WebSearch
+### Tavily（英文）
 | # | 标题 | 链接 |
 |---|------|------|
 | 1 | 标题 | [链接](url) |
 
-### minimax（中文）
+### Exa（语义/英文）
 | # | 标题 | 链接 |
 |---|------|------|
 | 1 | 标题 | [链接](url) |
 
-### tavily（英文）
+### WebSearch（通用后备）
 | # | 标题 | 链接 |
 |---|------|------|
 | 1 | 标题 | [链接](url) |
@@ -152,13 +160,13 @@ def deduplicate_by_url(results):
 ### 核心引用
 | 来源 | 标题 | 用途 |
 |------|------|------|
-| [web] | ... | 定义 |
-| [mm] | ... | 案例 |
-| [tv] | ... | 对比 |
+| [tv] | ... | 定义 |
+| [exa] | ... | 案例 |
+| [web] | ... | 对比 |
 ```
 
 **规则**：
-- 三源分开展示，每个源 5 条以内
+- 每源 5 条以内，每条标注 `[tavily]` / `[exa]` / `[websearch]`
 - 核心引用表选前 3 条，标注在正文中的用途（定义/案例/对比/数据）
 - 目的：检查各源搜索质量，方便追溯
 - 格式：`> 引用` 包裹，不污染飞书目录
