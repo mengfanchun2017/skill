@@ -131,7 +131,7 @@ allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 {
   "name": "...",
   "domain": "generic|customer|market|technical",
-  "_sources": ["[tavily] ...", "[minimax] ..."],
+  "_sources": ["[tavily] ...", "[exa] ...", "[websearch] ..."],
   "_confidence": "High|Medium|Low",
   "uncertain": []
 }
