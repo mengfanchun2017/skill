@@ -3,4 +3,4 @@
 # ccprivate 覆盖：将真实配置放到 ccprivate/config/f-search.yaml
 
 # 当前无用户可配置项，无需配置。
-# API key（Tavily、MiniMax）通过 ccconfig/conf/claude.json 管理（ccprivate symlink）。
+# API key（Tavily、Exa）通过 ccconfig/conf/claude.json 管理（ccprivate symlink）。
