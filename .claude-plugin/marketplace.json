@@ -1,14 +1,14 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
-  "name": "<your-github-username>-skills",
+  "name": "mengfanchun2017-skills",
   "owner": {
-    "name": "<your-github-username>",
-    "email": "<your-email>"
+    "name": "mengfanchun2017",
+    "email": "fanchun.meng@gmail.com"
   },
   "metadata": {
     "description": "Claude Code skill 集合 — 自建 + 飞书 CLI + 辅助工具",
-    "version": "0.8.0",
-    "homepage": "https://github.com/<your-username>/skill"
+    "version": "0.9.0",
+    "homepage": "https://github.com/mengfanchun2017/skill"
   },
   "plugins": [
     {
@@ -69,7 +69,7 @@
     },
     {
       "name": "fsearch",
-      "description": "搜索活动统一原语 — 三源并行搜索（tavily/minimax/websearch）、Python 过滤避免 context 污染、 聚合去重、来源标注、搜索清单输出。被 fresearchframe / fresearchframe（Batch Mode） / flogme 等需要外部调研的 skill 委托调用。 不含领域方法论（领域解读由 fresearchframe 负责）。",
+      "description": "搜索活动统一原语 — 四源并行搜索（tavily/exa/websearch/tavily-research）、Python 过滤避免 context 污染、 聚合去重、来源标注、搜索清单输出。被 fresearchframe / fresearchframe（Batch Mode） / flogme 等需要外部调研的 skill 委托调用。 不含领域方法论（领域解读由 fresearchframe 负责）。",
       "source": "./plugins/fsearch",
       "keywords": [
         "f"
@@ -114,6 +114,14 @@
       "keywords": [
         "f"
       ]
+    },
+    {
+      "name": "fsyncdoc",
+      "source": "./plugins/fsyncdoc",
+      "keywords": [
+        "f"
+      ],
+      "description": "Sync source repo docs + optional aiagt product page. Two-phase pipeline. Agent-runnable."
     },
     {
       "name": "getnote",

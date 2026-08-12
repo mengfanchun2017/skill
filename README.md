@@ -1,6 +1,6 @@
 # claude-skills — Claude Code skill 集合
 
-> Claude Code 技能聚合仓。**16 个自建**（14 marketplace + 2 内部 fsyncdoc/fskillcreat）+ **第三方 skill 由用户用 npx skills 自管**（不通过 marketplace）。
+> Claude Code 技能聚合仓。**16 个自建**（15 marketplace + 1 内部 fskillcreat）+ **第三方 skill 由用户用 npx skills 自管**（不通过 marketplace）。
 > 飞书 / 调研 / 文档 / PPT / Excel / 图表一站式。
 
 ## 快速开始
@@ -8,44 +8,45 @@
 在 Claude Code 里添加 marketplace（一次性）：
 
 ```
-/plugin marketplace add <your-github-username>/claude-skills
+/plugin marketplace add mengfanchun2017/claude-skills
 ```
 
 然后按需安装（挑你需要的，`<name>` 替换为下表中的名称）：
 
 ```
-/plugin install <name>@<your-github-username>-skills
+/plugin install <name>@mengfanchun2017-skills
 ```
 
 | 你需要… | 安装命令 |
 |---------|---------|
-| 飞书文档操作 | `/plugin install ffeishu@<your-github-username>-skills` |
-| PPT 生成 | `/plugin install fpptx@<your-github-username>-skills` |
-| Word 文档 | `/plugin install fdocx@<your-github-username>-skills` |
-| Excel 表格 | `/plugin install fxlsx@<your-github-username>-skills` |
-| 画架构图/流程图 | `/plugin install fdiagram@<your-github-username>-skills` |
-| 搜索/调研 | `/plugin install fsearch@<your-github-username>-skills` |
-| 研究报告 | `/plugin install fresearchreport@<your-github-username>-skills` |
-| 个人 OKR/日志 | `/plugin install flogme@<your-github-username>-skills` |
-| 慕课推荐 | `/plugin install fmoocrec@<your-github-username>-skills` |
-| 系统架构师备考 | `/plugin install fsysarchi@<your-github-username>-skills` |
-| 得到笔记 | `/plugin install getnote@<your-github-username>-skills` |
-| 库审计 | `/plugin install flibaudit@<your-github-username>-skills` |
-| 报告写作规范 | `/plugin install freportstd@<your-github-username>-skills` |
-| 研究方法论框架 | `/plugin install fresearchframe@<your-github-username>-skills` |
+| 飞书文档操作 | `/plugin install ffeishu@mengfanchun2017-skills` |
+| PPT 生成 | `/plugin install fpptx@mengfanchun2017-skills` |
+| Word 文档 | `/plugin install fdocx@mengfanchun2017-skills` |
+| Excel 表格 | `/plugin install fxlsx@mengfanchun2017-skills` |
+| 画架构图/流程图 | `/plugin install fdiagram@mengfanchun2017-skills` |
+| 搜索/调研 | `/plugin install fsearch@mengfanchun2017-skills` |
+| 研究报告 | `/plugin install fresearchreport@mengfanchun2017-skills` |
+| 个人 OKR/日志 | `/plugin install flogme@mengfanchun2017-skills` |
+| 慕课推荐 | `/plugin install fmoocrec@mengfanchun2017-skills` |
+| 系统架构师备考 | `/plugin install fsysarchi@mengfanchun2017-skills` |
+| 得到笔记 | `/plugin install getnote@mengfanchun2017-skills` |
+| 源码文档同步 | `/plugin install fsyncdoc@mengfanchun2017-skills` |
+| 库审计 | `/plugin install flibaudit@mengfanchun2017-skills` |
+| 报告写作规范 | `/plugin install freportstd@mengfanchun2017-skills` |
+| 研究方法论框架 | `/plugin install fresearchframe@mengfanchun2017-skills` |
 
 可以一次装多个：
 
 ```
-/plugin install ffeishu@<your-github-username>-skills
-/plugin install fpptx@<your-github-username>-skills
-/plugin install fsearch@<your-github-username>-skills
+/plugin install ffeishu@mengfanchun2017-skills
+/plugin install fpptx@mengfanchun2017-skills
+/plugin install fsearch@mengfanchun2017-skills
 ```
 
 后续更新：
 
 ```
-/plugin marketplace update <your-github-username>-skills
+/plugin marketplace update mengfanchun2017-skills
 ```
 
 ## 第三方 skill 装法（不通过 marketplace）
@@ -69,7 +70,7 @@ cconfig 用户：`bash ccconfig/lib/init-skill.sh sync` 自动从 `conf/third-pa
 
 ### 配合 ccconfig 使用
 
-克隆 [ccconfig](https://github.com/<your-github-username>/ccconfig) 后，`bash lib/init-skill.sh sync` 自动完成：symlink 自建 skill、注册 marketplace、安装第三方 skill、注入私有配置。详见 ccconfig 文档。
+克隆 [ccconfig](https://github.com/mengfanchun2017/ccconfig) 后，`bash lib/init-skill.sh sync` 自动完成：symlink 自建 skill、注册 marketplace、安装第三方 skill、注入私有配置。详见 ccconfig 文档。
 
 ## 自建 skill（16 个，仓内）
 
@@ -80,7 +81,7 @@ cconfig 用户：`bash ccconfig/lib/init-skill.sh sync` 自动从 `conf/third-pa
 | `fpptx` | PPTX 总控（OfficeCLI 引擎：批量 JSON、模板合并、autofit） |
 | `fresearchframe` | 4 领域研究方法论 + 批量深度研究（customer/generic/market/technical） |
 | `fresearchreport` | 报告生成（JSON/大纲/素材 → 结构化 Markdown） |
-| `fsearch` | 多源搜索编排原语（三源并行：Tavily + MiniMax + WebSearch） |
+| `fsearch` | 多源搜索编排原语（四源并行：Tavily + Exa + WebSearch + Tavily Research） |
 | `fdiagram` | 代码驱动图表生成（Mermaid 架构/流程/时序/ER/类图、白板） |
 | `fdocx` | Word .docx 总控（OfficeCLI 引擎：模板/样式/表格/图片/目录） |
 | `fxlsx` | Excel .xlsx 总控（OfficeCLI 引擎：公式/图表/条件格式/透视表） |
@@ -136,8 +137,8 @@ lark-cli auth login
 ```
 claude-skills/                          ← 单聚合 marketplace 仓
 ├── .claude-plugin/
-│   └── marketplace.json                # 14 plugin 入口（13 本地 + 1 getnote）
-├── plugins/                            ← 16 个自建 plugin（14 marketplace + 2 内部）
+│   └── marketplace.json                # 15 plugin 入口（14 本地 + 1 getnote）
+├── plugins/                            ← 16 个自建 plugin（15 marketplace + 1 内部）
 │   ├── ffeishu/SKILL.md
 │   ├── freportstd/SKILL.md
 │   ├── fpptx/SKILL.md
@@ -181,7 +182,7 @@ MIT — 见 [LICENSE](LICENSE)
 
 ## English Summary
 
-A Claude Code marketplace with 16 self-built skills (14 in marketplace + 2 internal). Third-party skills use `npx skills` (not /plugin install) for clean dialog UX.
+A Claude Code marketplace with 16 self-built skills (15 in marketplace + 1 internal). Third-party skills use `npx skills` (not /plugin install) for clean dialog UX.
 
 - **Self-built (in repo)**: ffeishu, freportstd, fpptx, fresearchframe, fresearchreport, fsearch, fdiagram, fdocx, fxlsx, flogme, fmoocrec, flibaudit, fsyncdoc, fskillcreat, fsysarchi, getnote
 - **Feishu CLI (system level)**: install `@larksuite/cli` via npm — ffeishu orchestrates all `lark-cli` commands
