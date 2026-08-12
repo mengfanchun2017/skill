@@ -364,21 +364,21 @@ const SKILLS = [
   },
   {
     id: "fsearch", name: "fsearch", icon: "🔍", cat: "research", needs_ccconfig: false,
-    ccconfig_zh: "仅需 MCP 配置（Tavily + MiniMax），ccconfig 已配好",
-    ccconfig_en: "Only needs MCP config (Tavily + MiniMax), ccconfig pre-configures",
-    desc_zh: "三源并行搜索原语。Tavily（英文）+ MiniMax（中文）+ WebSearch（通用）同时搜，Python 过滤去重，输出带来源标注的结果。",
-    desc_en: "Three-source parallel search. Tavily (EN) + MiniMax (ZH) + WebSearch (general), Python dedup/filter, source-annotated results.",
+    ccconfig_zh: "仅需 MCP 配置（Tavily + Exa），ccconfig 已配好",
+    ccconfig_en: "Only needs MCP config (Tavily + Exa), ccconfig pre-configures",
+    desc_zh: "四源并行搜索原语。Tavily（英文）+ Exa（语义）+ WebSearch（通用）+ Tavily Research（深度）同时搜，Python 过滤去重，输出带来源标注的结果。",
+    desc_en: "Four-source parallel search. Tavily (EN) + Exa (semantic) + WebSearch (general) + Tavily Research (deep), Python dedup/filter, source-annotated results.",
     scenarios_zh: [
-      {trigger: '"搜索 AI Agent 的最新进展"', result: "→ 三源并行，去重合并，标注来源"},
+      {trigger: '"搜索 AI Agent 的最新进展"', result: "→ 四源并行，去重合并，标注来源"},
       {trigger: '"调研中国大模型市场格局"', result: "→ 中英文双语搜索，聚合结果"},
       {trigger: '"帮我找 React 19 的新特性文档"', result: "→ Tavily 深度搜索 + 官方文档提取"}
     ],
     scenarios_en: [
-      {trigger: '"Search latest advances in AI Agents"', result: "→ 3-source parallel, deduped, annotated"},
+      {trigger: '"Search latest advances in AI Agents"', result: "→ 4-source parallel, deduped, annotated"},
       {trigger: '"Research China LLM market landscape"', result: "→ Bilingual search, aggregated results"},
       {trigger: '"Find React 19 new features docs"', result: "→ Tavily deep search + official doc extraction"}
     ],
-    deps: ["Tavily MCP", "MiniMax MCP"]
+    deps: ["Tavily MCP", "Exa MCP"]
   },
   {
     id: "fresearchframe", name: "fresearchframe", icon: "🧭", cat: "research", needs_ccconfig: false,
@@ -582,7 +582,7 @@ const I18N = {
     nav_eco: "Ecosystem",
     nav_gh: "GitHub",
     lang_switch: "中文",
-    hero_title: '15 Skills,<br>One <span>Marketplace</span>.',
+    hero_title: '16 Skills,<br>One <span>Marketplace</span>.',
     hero_sub: "Claude Code skill collection. Feishu docs, PPT, Excel, diagrams, research, OKR — install individually. Underlying tools installed by ccconfig in one command.",
     hero_cta: "View on GitHub →",
     hero_ccconfig: "⚙️ ccconfig Environment",

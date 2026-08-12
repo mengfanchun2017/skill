@@ -3,12 +3,12 @@
 > 项目级 AI 行为指南。**仅在 `/home/francis/git/skill/` 工作时加载**。全局规则在 `~/.claude/CLAUDE.md`。
 
 ## 项目定位
-Claude Code skill 聚合仓。**14 个 marketplace plugin + 2 内部 plugin**（每个 `plugins/<name>/` 是独立 Claude Code plugin），第三方 skill 由用户用 `npx skills` 自管（不通过 marketplace）。
+Claude Code skill 聚合仓。**15 个 marketplace plugin + 1 内部 plugin**（每个 `plugins/<name>/` 是独立 Claude Code plugin），第三方 skill 由用户用 `npx skills` 自管（不通过 marketplace）。
 
 ## 目录结构
 ```
 skill/
-├── plugins/                # 16 个自建 plugin（14 marketplace + 2 内部）
+├── plugins/                # 16 个自建 plugin（15 marketplace + 1 内部）
 ├── scripts/                # marketplace 工具脚本
 ├── .claude-plugin/         # Claude Code plugin 元数据
 ├── .github/                # CI
@@ -34,8 +34,8 @@ skill/
 | fsysarchi | 系统架构师备考 |
 | freportstd | 报告写作规范 |
 | flibaudit | 库审计 |
-| fsyncdoc | 文档同步 + 产品页同步（内部工具）|
-| fskillcreat | Skill 开发脚手架（内部工具）|
+| fsyncdoc | 源码文档同步 + 产品页同步（通用工具）|
+| fskillcreat | Skill 开发脚手架（内部）|
 | getnote | 得到笔记 |
 
 ## 硬约束
@@ -84,9 +84,9 @@ git status  # 确认干净
 | 类型 | 特点 | 示例 |
 |------|------|------|
 | marketplace | 在 `marketplace.json` 注册，用户 `/plugin install` | ffeishu, fpptx, fsearch |
-| 内部（internal）| 不在 marketplace，仅开发者本地可用 | fsyncdoc, fskillcreat |
+| 内部（internal）| 不在 marketplace，仅开发者本地可用 | fskillcreat |
 
-内部 plugin 的 `disable-model-invocation: true` = 零 context load，需手动 /invoke 触发。fsyncdoc 的 pipeline 自动化也通过手动触发。
+内部 plugin 的 `disable-model-invocation: true` = 零 context load，需手动 /invoke 触发。
 
 ## 依赖管理
 每个 plugin 用 `deps.txt` 声明底层 npm 包依赖（仅声明，不自动安装）：
