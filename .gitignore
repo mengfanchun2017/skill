@@ -13,6 +13,10 @@ Thumbs.db
 # 临时
 tmp/
 
+# Python
+__pycache__/
+*.pyc
+
 # Wrangler
 .wrangler/
 
