@@ -9,7 +9,7 @@ allowed-tools: Read, Write, Bash, Glob
 
 # fpptx — OfficeCLI PPTX 生成
 
-从 wiki 文档或 Markdown 生成飞书 PPTX。OfficeCLI 单引擎，零外部依赖。
+从 wiki 文档或 Markdown 生成飞书 PPTX。OfficeCLI 单引擎（依赖 libicu）。
 
 ## 配置
 
@@ -23,6 +23,8 @@ allowed-tools: Read, Write, Bash, Glob
 ```bash
 curl -fsSL https://d.officecli.ai/install.sh | bash
 ```
+
+> ⚠ OfficeCLI 是 .NET 应用，依赖 libicu。缺库启动即报 `Couldn't find a valid ICU package`。安装：`sudo apt-get install -y libicu78`（Ubuntu 26.04；其他版本 `apt-cache search libicu`）。ccconfig 用户 `init-skill.sh sync` 会自动装（deps.txt 已声明）。
 
 ---
 

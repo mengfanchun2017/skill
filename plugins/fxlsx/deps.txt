@@ -1,1 +1,2 @@
 @officecli/officecli  npm:latest  fxlsx
+libicu78  apt:latest  fxlsx
