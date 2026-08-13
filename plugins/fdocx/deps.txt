@@ -1,1 +1,2 @@
 @officecli/officecli  npm:latest  fdocx
+libicu78  apt:latest  fdocx

@@ -1,1 +1,2 @@
 @officecli/officecli  npm:latest  fpptx
+libicu78  apt:latest  fpptx
