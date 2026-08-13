@@ -49,19 +49,19 @@ allowed-tools: Read, Write, Bash, Glob
 ### 6. 校验
 逐页检查：文字溢出、元素重叠、字号可读、边距、颜色对比、风格统一
 
-### 7. 问用户输出方式
+### 7. 输出方式（默认飞书 Slides 直出）
+默认直接创建飞书在线 Slides（`lark-cli slides`），PPTX 为备选。见 ADR-001。
+
 ```
-你要怎么交付？
-A) PPTX 文件
-B) 飞书在线 Slides
-C) 都要
+默认：飞书在线 Slides（lark-cli slides 直出）
+备选：PPTX 文件（用户明确要求本地文件时）
 ```
-- 选 B/C 前先检查 lark-cli 在线生成能力 → [飞书 Slides 前提检查](#飞书-slides-前提检查)
-- 若选 B/C 但 lark-cli 无法在线生成 → 仅输出 A 并说明原因
+- 飞书 Slides 直出前检查 lark-cli 在线能力 → [飞书 Slides 前提检查](#飞书-slides-前提检查)
+- lark-cli 无法在线生成 → 降级为 OfficeCLI PPTX 并说明原因
 
 ### 8. 交付
-- PPTX：`close && validate && ls -lh` 三连确认 → 输出文件路径
-- 飞书 Slides：返回 slides 链接
+- 飞书 Slides：`lark-cli slides +create/+add-slide` → 挂 wiki shortcut → 返回链接
+- PPTX（备选）：`close && validate && ls -lh` 三连确认 → 输出文件路径
 - 输出：页数 + 风格主题 + 校验结果
 
 ---
