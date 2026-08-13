@@ -60,7 +60,7 @@ allowed-tools: Read, Write, Bash, Glob
 - lark-cli 无法在线生成 → 降级为 OfficeCLI PPTX 并说明原因
 
 ### 8. 交付
-- 飞书 Slides：`lark-cli slides +create/+add-slide` → 挂 wiki shortcut → 返回链接
+- 飞书 Slides：`lark-cli wiki +node-create --obj-type slides` 直接在父 wiki 下 origin 创建 → `+add-slide` 逐页添加 → 返回链接
 - PPTX（备选）：`close && validate && ls -lh` 三连确认 → 输出文件路径
 - 输出：页数 + 风格主题 + 校验结果
 
@@ -268,9 +268,9 @@ officecli query deck.pptx 'picture:no-alt'         # 缺 alt 文本的图片
 # 本地 PPTX 直接导入为飞书在线 Slides
 lark-cli drive +import --file ./deck.pptx --type slides --name "标题" --as user
 
-# 挂到 wiki 节点下（import 的 folder-token 只收 Drive folder token，用 shortcut 挂 wiki）
-lark-cli wiki +node-create --node-type shortcut --obj-type slides \
-  --origin-node-token <slide_token> --parent-node-token <wiki_parent> --title "标题" --as user
+# 注：PPTX import 到 drive 后再挂 wiki 需 shortcut；但新流程直接用 wiki +node-create --obj-type slides 在父 wiki 下 origin 创建，无需 import
+lark-cli wiki +node-create --obj-type slides --parent-node-token <wiki父节点> --title "标题" --as user
+# → 返回 node_token + obj_token（obj_token 即 xml_presentation_id），随后 +add-slide 逐页添加
 ```
 
 已验证：PPTX 导入 Slides 后 **图片完整保留**（`<img>` 引用 file_token），页数/顺序/文本全部保留。
@@ -283,7 +283,7 @@ lark-cli wiki +node-create --node-type shortcut --obj-type slides \
 | 新建空 PPT | `lark-cli slides +create --title "<name>" --as user` |
 | 新建页 | `lark-cli slides +add-slide --presentation <id> --slide @page.xml --as user` |
 | 替换整页 | `lark-cli slides +replace-slide --presentation <id> --slide-id <sid> --slide @page.xml --as user` |
-| PPTX 上传为 wiki 子文件 | `lark-cli drive +upload --file ./out.pptx --wiki-token <token> --as user` |
+| 父 wiki 下创建 origin slides | `lark-cli wiki +node-create --obj-type slides --parent-node-token <父节点> --title ... --as user` |
 | 上传图片到 Slides | `lark-cli slides +media-upload --presentation <id> --image @./img.png --as user` |
 
 ## 从飞书文档提取图片（已验证 ✅）
