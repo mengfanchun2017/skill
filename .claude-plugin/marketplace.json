@@ -29,7 +29,7 @@
     },
     {
       "name": "fpptx",
-      "description": "PPTX 总控 — 从 md/wiki 到 PPTX。 OfficeCLI 引擎（原生 OpenXML），支持批量 JSON、模板合并、autofit 后处理。",
+      "description": "PPT/X 总控 — 从 md/wiki/材料到 PPTX 或飞书 Slides。 OfficeCLI 引擎（原生 OpenXML），也支持 lark-cli 生成飞书在线幻灯片。 内置 6 套设计主题，图表委托 fdiagram，内容规范委托 freportstd。",
       "source": "./plugins/fpptx",
       "keywords": [
         "f"
