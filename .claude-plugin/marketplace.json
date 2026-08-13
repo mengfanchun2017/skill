@@ -85,7 +85,7 @@
     },
     {
       "name": "fdiagram",
-      "description": "代码驱动图表生成 — Mermaid 架构/流程/时序/ER/类图、whiteboard-cli SVG 白板。 Use when 用户说\"画架构图\"/\"画流程图\"/\"画时序图\"/\"画ER图\"/\"画类图\"/\"画甘特图\"/\"画白板\"。",
+      "description": "代码驱动图表生成 — Mermaid 架构/流程/时序/ER/类图、whiteboard-cli SVG 白板。 用法：用户说\"画架构图\"、\"画流程图\"、\"画时序图\"、\"画ER图\"、\"画类图\"、\"画甘特图\"、\"画白板\"触发。",
       "source": "./plugins/fdiagram",
       "keywords": [
         "f"
@@ -121,7 +121,7 @@
       "keywords": [
         "f"
       ],
-      "description": "Sync source repo docs + optional aiagt product page. Two-phase pipeline. Agent-runnable."
+      "description": "源码文档同步 + 可选 aiagt 产品页同步。两阶段流水线，可被其他 agent 调用。 用法：代码变更后同步文档，有对应产品页则顺带更新。"
     },
     {
       "name": "getnote",
