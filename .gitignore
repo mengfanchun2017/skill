@@ -29,3 +29,6 @@ config.yaml
 
 # PPT 测试产物
 .ppt-test/
+
+# 飞书 Slides 本地规划状态（不入库）
+.lark-slides/
