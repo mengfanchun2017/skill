@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.10.0] — 2026-08-13
+
+### Changed
+- **fpptx**: PPT 生成默认飞书在线 Slides 直出（`lark-cli slides`），替代「先 OfficeCLI 生成 PPTX 再上传」旧流程
+- fpptx SKILL.md: 执行流程更新，PPTX 降级为备选输出方式
+- 新增 ADR-001: 决策记录 — PPT 优先飞书 Slides 直出（在线可编辑）
+
+### Added
+- fpptx: 飞书 Slides XML 生成支持（原生元素 + 图片 `@` 占位符自动上传）
+- fpptx: 飞书文档图片无损提取工作流（docs +media-download → 嵌入）
+
 ## [0.9.0] — 2026-07-17
 
 ### Changed
