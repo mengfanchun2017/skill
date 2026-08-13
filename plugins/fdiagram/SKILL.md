@@ -3,7 +3,7 @@ name: fdiagram
 user-invocable: true
 description: |
   代码驱动图表生成 — Mermaid 架构/流程/时序/ER/类图、whiteboard-cli SVG 白板。
-  Use when 用户说"画架构图"/"画流程图"/"画时序图"/"画ER图"/"画类图"/"画甘特图"/"画白板"。
+  用法：用户说"画架构图"、"画流程图"、"画时序图"、"画ER图"、"画类图"、"画甘特图"、"画白板"触发。
 allowed-tools: Read, Write, Bash, Glob
 ---
 
@@ -109,10 +109,12 @@ mindmap
 ## whiteboard-cli
 
 ```bash
-npx -y @larksuite/whiteboard-cli@^0.2.10
+npx -y @larksuite/whiteboard-cli@^0.2.11
 ```
 
 SVG 白板用于 Mermaid 不支持的场景（自由布局、标注、手绘风格）。
+
+**SVG 白板详细规则 → [.whiteboard-rules.md](.whiteboard-rules.md)**（每张板必读：形状语义、箭头、颜色、阴影约束）
 
 ## 飞书文档嵌入
 
@@ -146,5 +148,5 @@ radar-beta, quadrantChart, gitGraph, timeline（飞书白板限制）
 | 操作 | 工具 | 命令 |
 |------|------|------|
 | 生成图表代码 | Claude LLM | 本 skill 语法速查 |
-| 渲染 SVG 白板 | whiteboard-cli | `npx -y @larksuite/whiteboard-cli@^0.2.10` |
+| 渲染 SVG 白板 | whiteboard-cli | `npx -y @larksuite/whiteboard-cli@^0.2.11` |
 | 嵌入飞书文档 | ffeishu | 委托 ffeishu skill |

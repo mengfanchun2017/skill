@@ -1,7 +1,9 @@
 ---
 name: fsyncdoc
 user-invocable: true
-description: Sync source repo docs + optional aiagt product page. Two-phase pipeline. Agent-runnable.
+description: |
+  源码文档同步 + 可选 aiagt 产品页同步。两阶段流水线，可被其他 agent 调用。
+  用法：代码变更后同步文档，有对应产品页则顺带更新。
 allowed-tools: Read, Write, Edit, Bash, Grep
 ---
 
