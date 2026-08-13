@@ -26,3 +26,6 @@ config.yaml
 
 # worktree 临时目录（EnterWorktree 产物，不入库）
 .claude/worktrees/
+
+# PPT 测试产物
+.ppt-test/
