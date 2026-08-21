@@ -131,6 +131,31 @@ Read `<site_dir>/index.html`，定位：
 - 转义：`&&` → `&amp;&amp;`
 - 改域名时 grep 全文件
 
+### 2d. 注入 ccconfig commit hash（config 站点 badge）
+
+当前仓库 page 的目标是 config.aiagt.dev（即 ccprivate 相关）时，注入最新 ccconfig commit hash：
+
+```bash
+CCCONFIG_COMMIT=$(git ls-remote https://github.com/mengfanchun2017/ccconfig.git main 2>/dev/null | awk '{print substr($1,1,7)}')
+: "${CCCONFIG_COMMIT:=unknown}"
+```
+
+幂等替换 `index.html` 中 commit hash（占位符或已有 hash 都匹配）：
+
+```bash
+CCCONFIG_COMMIT="$CCCONFIG_COMMIT" python3 - "$site_dir/index.html" << 'PYEOF'
+import re, sys, os
+p = sys.argv[1]
+new_hash = os.environ["CCCONFIG_COMMIT"]
+with open(p) as f:
+    s = f.read()
+s = re.sub(r'__CCCONFIG_COMMIT__', new_hash, s)
+s = re.sub(r'(<span id="commit-hash">)[a-f0-9]{7,40}(</span>)', r'\g<1>' + new_hash + r'\g<2>', s)
+with open(p, 'w') as f:
+    f.write(s)
+PYEOF
+```
+
 ### Step 3: 提交
 
 Phase 1 有变更：
