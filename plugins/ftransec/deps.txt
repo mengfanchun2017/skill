@@ -1,0 +1,7 @@
+# ftransec 依赖（仅声明，init-skill.sh sync 自动安装）
+# 科研 PDF 解析（表格/公式/代码保真）— 可选，有 PDF 需求时启用
+# magic-pdf  pip:latest  ftransec
+# pandoc 换 DocBook XML 做格式还原 — 可选
+# pandoc  apt:latest  ftransec
+# COMET reference-free QE — 可选（自动评分精确版，默认可用 LLM-judge 替代）
+# unbabel-comet  pip:latest  ftransec

@@ -1,0 +1,31 @@
+# ftransec config — 科研翻译流水线
+
+# 目标语言对（科研翻译默认英→中）
+source_lang: en
+target_lang: zh
+
+# 翻译引擎：复用当前 LLM 网关。默认从环境取，无需配置。
+# 如需独立模型/端点，取消注释并填入（OpenAI 兼容格式）：
+# llm:
+#   base_url: "http://127.0.0.1:8897"
+#   model: "DeepSeek-V4-Flash-0731"
+#   api_key: ""
+
+# 术语库位置映射（默认：跨项目学科库 + 每项目 build/glossary.csv）
+glossaries_dir: "~/.claude/skills/ftransec/glossaries/"
+
+# 切分参数
+chunk:
+  soft_limit_token: 800      # 软上限 (token)
+  context_tail_chars: 350    # 前文 context 注入字符数
+
+# 质量评分阈值（ISO 17100 五维）
+qc:
+  pass_score: 85             # 总分 >= 85 通过
+  no_critical: true          # 且无 critical
+
+# 并发（云端 API 可 >1；本地桥接建议 1）
+concurrency: 4
+
+# 交付形态偏好（可被用户即时覆盖）
+deliver: "word_bilingual"    # word_bilingual | feishu | markdown | zh_only
