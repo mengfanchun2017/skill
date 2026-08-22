@@ -2,7 +2,7 @@
 name: ftransec
 user-invocable: true
 description: |
-  科研/学术英文资料翻译流水线 — 术语库+翻译记忆驱动，分���翻译→质量评分→双语对照交付。
+  科研/学术英文资料翻译流水线 — 术语库+翻译记忆驱动，分段翻译→质量评分→双语对照交付。
   Use when 用户说"翻译论文"/"翻译英文资料"/"科研翻译"/"翻译这个文档"/"英译中"/"批量翻译"，
   或给 PDF/Word/网页/文本 要求翻译成中文、要求双语对照/术语表/翻译报告。
 allowed-tools: Read, Write, Edit, Bash, Glob, AskUserQuestion
@@ -33,7 +33,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, AskUserQuestion
 | ② 注入 | 命中当前 chunk 的术语（上限20条）+ 禁译表 + 禁止译法 + 风格预设，按 chunk 过滤 | 每 chunk 的 prompt |
 | ③ 翻译 | System(角色+语言硬约束+输出契约+术语) + User(前文 context ~350字 + 正文)；代码/公式/URL 用 placeholder | `chunks/out/*.md`(含置信分) |
 | ④ 评分 | 全量 reference-free 评分滤低分 + 低分/随机5% LLMjudge 细审 | `chunks/reviews/*.json` |
-| ⑤ 后编辑 | 低分/关键段走 review pass（保守 QA 修正，非重译） | 修正后译文 |
+| ⑤ 后编辑 | 低分/关键段走 review pass（保守 QA 修正，非重译，见 references/qc-rubric.md） | 修正后译文 |
 | ⑥ Stitch | 按 manifest + `join_with` 还原顺序，不凭空造段内断行 | 全文译文 |
 | ⑦ 格式还原 | 公式/图表/引用/数字逐字保真，还原 placeholder | 结构化文档 |
 | ⑧ 交付 | 双语正文 + 术语表 + 评审报告 + 置信度标注 + 翻译说明 | `build/` 交付包 |
@@ -61,15 +61,15 @@ forbiddenTranslations → 禁止译法 {source, forbidden, prefer}
 
 ### "越用越准"反馈回路
 每次翻译结束：**从评审报告挖新术语/术语纠错 → 回灌 glossary → 下次注入**。
-第 0 批无术语库时，先跑**术语抽取**（采样 10 段×600 字跨文分布，LLM 结构化抽取，跑 2-3 轮收敛）生成初始库。
+第 0 批无术语库时，先跑**术语抽取**（采样 10 段×600 字跨文分布，LLM 结构化抽取，跑 2-3 轮收敛，见 references/terminology-extraction-prompt.md）生成初始库。
 
 ### 术语注入策略（省 token）
 不把整个术语表塞进每个 chunk——**只注入当前 chunk 实际出现且命中的术语**，命中上限 20 条。
 
 ### TM 副作用规避（必须遵守）
 - 错误传播 → 纠错后回写 tm
-- sentence-salad → 要求全文终审
-- peephole → 禁改写风格凑复用
+- sentence-salad（多段拼接缺连贯） → 要求全文终审
+- peephole（改风格凑复用） → 禁改写风格凑复用
 
 ## 翻译引擎（prompt 契约）
 
@@ -109,7 +109,7 @@ forbiddenTranslations → 禁止译法 {source, forbidden, prefer}
 - 全量 reference-free（COMET/LLMjudge）滤低分
 - 低分 + 随机 5-10%：LLM-as-judge 细审（锚定"专业人类译者"，1-10 分+扣分表，temperature=0.1）
 - 关键/高价值论文补 review pass（保守 QA，只改真缺陷）
-- 产出可审计错误轨迹（位置/类型/严重度/源文/译文/建议替换）
+- 产出可审计错误轨迹（位置/类型/严重度/源文/译文/建议替换），详见 references/qc-rubric.md
 
 ### 中文科研语体规范（规避翻译腔，详见 references/chinese-academic-style.md）
 - 切分长句、化被动为主动/无主句；术语用规范译名；首次出现缩略语标全称
