@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.11.0] — 2026-08-23
+
+### Added
+- **ftransec**（科研英文翻译流水线）：8 步流水线 — ①结构感知切分 ②术语/风格注入 ③LLM 分段翻译(带置信分) ④五维 QE 评分+阈值路由 ⑤后编辑/复核 ⑥stitch 还原 ⑦格式还原 ⑧交付包
+- ftransec: 三级术语体系（glossary / doNotTranslate / forbiddenTranslations）+ severity 分级 QC
+- ftransec: 5 件交付包 — 双语正文 + 术语表 + 评审报告 + 置信度标注 + 翻译说明
+- ftransec: `references/chinese-academic-style.md`（规避翻译腔）+ `references/qc-rubric.md`（五维评分细则）+ `references/terminology-extraction-prompt.md`（术语抽取 prompt 模板）
+- ftransec: `config.yaml.example` + `deps.txt`（声明 LLM 网关依赖）
+- 设计文档：`docs/translation-system-design.md`（10 节完整方案，自建 vs DeepL/CAT 决策依据）
+
+### Changed
+- marketplace.json: 注册 ftransec 插件（16→17）
+- marketplace.json: 同步 fsearch SKILL.md 描述更新（双源 + 自动 extract）
+
 ## [0.10.0] — 2026-08-13
 
 ### Changed

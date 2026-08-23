@@ -20,6 +20,14 @@
       ]
     },
     {
+      "name": "ftransec",
+      "description": "科研/学术英文资料翻译流水线 — 术语库+翻译记忆驱动，分段翻译→质量评分→双语对照交付。 Use when 用户说\"翻译论文\"/\"翻译英文资料\"/\"科研翻译\"/\"翻译这个文档\"/\"英译中\"/\"批量翻译\"， 或给 PDF/Word/网页/文本 要求翻译成中文、要求双语对照/术语表/翻译报告。",
+      "source": "./plugins/ftransec",
+      "keywords": [
+        "f"
+      ]
+    },
+    {
       "name": "freportstd",
       "description": "报告写作横向规范 — 内容结构、数据呈现、论证逻辑、图表约定。 4 套模板（研究/分析/对比/方案）+ 通用规则。 Use when 用户说\"写报告\"/\"出报告\"/\"分析报告\"/\"对比报告\"/\"方案报告\"， 或任何需要产出\"长篇正式文档\"的场景。",
       "source": "./plugins/freportstd",
@@ -69,7 +77,7 @@
     },
     {
       "name": "fsearch",
-      "description": "搜索活动统一原语 — 四源并行搜索（tavily/exa/websearch/tavily-research）、Python 过滤避免 context 污染、 聚合去重、来源标注、搜索清单输出。被 fresearchframe / fresearchframe（Batch Mode） / flogme 等需要外部调研的 skill 委托调用。 不含领域方法论（领域解读由 fresearchframe 负责）。",
+      "description": "搜索活动统一原语 — 双源并行搜索（Tavily+Exa）、自动 extract、按需 research、 聚合去重、来源标注、搜索清单输出。被 fresearchframe / flogme / ffeishu 等需要外部调研的 skill 委托调用。 不含领域方法论（领域解读由 fresearchframe 负责）。",
       "source": "./plugins/fsearch",
       "keywords": [
         "f"
