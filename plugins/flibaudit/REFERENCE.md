@@ -1,17 +1,22 @@
 # flibaudit 审计清单
 
+> SKILL.md 的展开参考。Phase 编号与 SKILL.md 一致。
+
 ## Phase 1: 架构审计清单
 
-- [ ] 目录树获取完整（`tree -L 3`）
+- [ ] 目录树获取完整（`tree -L 3 -I 'node_modules|.git|__pycache__|*.log'`）
 - [ ] 识别核心模块 vs 工具模块 vs 胶水代码
 - [ ] 依赖方向检查（核心不依赖工具，工具可依赖核心）
 - [ ] 调用树检查：根脚本（根下 *.sh）不互相调用；所有次级脚本至少被一个根脚本按层级调用
 - [ ] **间接调用规则**：`option-*/init.sh` 通过 `init-option.sh` 动态枚举（`has_init_script` / `install_option`）或 `option_status` 调用即视为有根入口。不要求根脚本硬编码调用每个 option init.sh
+- [ ] **串接契约**：根脚本能串接 option（`init-base.sh all` → `init-option.sh all`），用户无需单独跑 option
+- [ ] **option 独立可执行**：每个 `option-*/init.sh` 支持 `--install`/`--run` 手动单独跑
+- [ ] **auth 类 option 非交互跳过**：`--yes` 模式下 larkcli/getnote 等需手动配置的 option 自动跳过 + 提示
 - [ ] 超大文件标记（>500 行建议审查是否需拆分）
 - [ ] 无用文件标记（空文件、注释全部删除的文件）
 - [ ] 死代码检测：无人 source/调用且无生产引用的文件标记删除
 - [ ] 目录命名一致性（kebab-case / snake_case 统一）
-- [ ] `improve-codebase-architecture` skill 建议与手动发现交叉验证
+- [ ] Plan agent / 内联分析建议与手动发现交叉验证
 
 ## Phase 2: 代码审计清单
 
@@ -54,6 +59,7 @@
 - [ ] 写操作类脚本（调 MCP/LLM/网络请求）未 source `lib/dry-run.sh`
 - [ ] `--status` 首行非 `OK | WARN | MISSING` 格式（供 init-option 解析）
 - [ ] 函数用 `function` 关键字（非 `name()` 格式）
+- [ ] `local var` 未初始化（set -u 下立即引用触发 unbound，须 `local var=""`）
 
 ### P2 — 改进
 - [ ] 缩进 tab/4空格混合（统一 4 空格）
@@ -61,8 +67,24 @@
 - [ ] 无 `#!/bin/bash` shebang
 - [ ] 文件头缺少功能描述注释（`# xxx.sh — 一句话描述`）
 - [ ] case 的 `;;` 未与 `case`/`esac` 对齐
+- [ ] Edit 后未跑 `bash -n`（防 P0 行合并 bug）
 
-## Phase 3: 文档审计清单
+## Phase 3: 文件卫生审计清单（solo 项目重点）
+
+逐文件评估必要性，不确定先问用户：
+
+- [ ] `CITATION.cff` — 非学术发布则删
+- [ ] `CODE_OF_CONDUCT.md` — 无协作方则删
+- [ ] `CONTRIBUTING.md` — 无外部贡献者则删
+- [ ] `SECURITY.md` — 无外部安全上报需求则删
+- [ ] `ROADMAP.md` — 基本功能完成后无意义则删
+- [ ] `skills-lock.json` / 其他 lock — 评估有无对应管理机制，无则删
+- [ ] 项目级 `CLAUDE.md` — 与 user 级 `~/CLAUDE.md` 对比，删重复部分，保留独有内容（暗号/常用命令/项目约束）
+- [ ] 删文件前 `grep -r <filename>` 确认无引用
+- [ ] `.example` 模板同步方向（只跟踪模板，真实值在 ccprivate/`.gitignore`）
+- [ ] 无用的 `.snapshot`/`.bak`/`*.tmp` 残留
+
+## Phase 4: 文档审计清单
 
 ### 准确性
 - [ ] 所有路径引用指向存在的文件
@@ -80,13 +102,20 @@
 
 ### 完整性
 - [ ] `README.md` — 项目说明
-- [ ] `BOOTSTRAP.md` 或 `SETUP.md` — 初始化
-- [ ] `CONTRIBUTING.md` — 贡献指南
+- [ ] `BOOTSTRAP.md` — 初始化（solo 项目核心文档）
 - [ ] `CHANGELOG.md` — 变更记录
 - [ ] `docs/` — 补充文档
 - [ ] 单 skill/模块的安装说明
+- [ ] CONTRIBUTING/SECURITY — solo 项目非必须（Phase 3 已评估删除）
 
-## Phase 4: 发布就绪清单
+### ADR 审计
+- [ ] `docs/adr/` 存在的决策状态反映现状
+- [ ] 状态合法：Proposed / Accepted / Superseded / Deprecated
+- [ ] 被 supersede 的旧 ADR 标注指向新 ADR 编号
+- [ ] 无断链（引用不存在的 ADR）
+- [ ] 决策内容与当前代码实际一致（过时决策标 Deprecated）
+
+## Phase 5: 发布就绪清单
 
 - [ ] 可见性：公开→public、私有→private
 - [ ] 安全终扫：`grep -rE '(api.?key|token|secret|password|AUTH_TOKEN)\s*[=:]\s*["\x27]?[a-zA-Z0-9_-]{20,}' --include='*.{yaml,yml,json,sh,js,ts,env}'` 无命中
@@ -94,6 +123,7 @@
 - [ ] 版本一致性交叉验证
 - [ ] 依赖无过期且有安全漏洞的版本
 - [ ] git tag 存在且推送到 remote
+- [ ] 公开仓库保密：无真实 IP/域名/密钥/用户名/邮箱/公司名
 
 ## Phase 2 并行审计 Agent 分配
 
@@ -103,7 +133,7 @@
 | Agent B | `audit:quality` | P1-P2 质量项 | 重复/死代码/硬编码清单 |
 | Agent C | `audit:sh` | SH 专项 | SH 脚本合规问题清单 |
 
-Phase 2 启动时用 Agent 并行创建这些子任务。各 Agent 独立扫描，结果汇总到 Phase 5。
+小仓库（<20 文件）内联扫，不分 Agent。中大仓库用 Agent 并行，结果汇总到 Phase 6。
 
 ## 审计报告模板
 
@@ -111,8 +141,9 @@ Phase 2 启动时用 Agent 并行创建这些子任务。各 Agent 独立扫描�
 # {仓库名} v{版本号} 审计报告
 
 **日期**: YYYY-MM-DD
-**审计范围**: 架构 / 代码 / 文档 / 测试
+**审计范围**: 架构 / 代码 / 文件卫生 / 文档 / 发布就绪
 **审计级别**: 快速 / 标准 / 深度
+**输出**: 本地 markdown / 飞书文档
 
 ## 1. 总体评估
 
@@ -120,6 +151,7 @@ Phase 2 启动时用 Agent 并行创建这些子任务。各 Agent 独立扫描�
 |------|------|------|
 | 架构 | A/B/C/D | 一句话 |
 | 代码 | A/B/C/D | 一句话 |
+| 文件卫生 | A/B/C/D | 一句话 |
 | 文档 | A/B/C/D | 一句话 |
 | 安全 | A/B/C/D | 一句话 |
 | 发布就绪 | ✅/⚠/❌ | 一句话 |
@@ -134,32 +166,37 @@ Phase 2 启动时用 Agent 并行创建这些子任务。各 Agent 独立扫描�
 
 ## 3. P0 发现
 
-| # | 仓库 | 文件 | 问题 | 修复 |
-|---|------|------|------|------|
+| # | 文件 | 问题 | 修复 |
 
 ## 4. P1 发现
 
-| # | 仓库 | 文件 | 问题 | 修复 |
-|---|------|------|------|------|
+| # | 文件 | 问题 | 修复 |
 
 ## 5. P2 改进
 
-| # | 仓库 | 文件 | 建议 | 状态 |
-|---|------|------|------|------|
+| # | 文件 | 建议 | 状态 |
 
-## 6. 文档修复
+## 6. 文件卫生
+
+| 文件 | 处理 | 原因 |
+
+## 7. 文档修复
 
 | 文件 | 修复数 | 主要问题 |
 
-## 7. 变更文件汇总
+## 8. ADR 状态
+
+| ADR | 原状态 | 现状态 | 说明 |
+
+## 9. 变更文件汇总
 
 | 文件 | 变更类型 | 说明 |
 
-## 8. 残余风险
+## 10. 残余风险
 
 {如果 P0/P1 有未修复项，在此列出原因和缓解措施}
 
-## 9. 结论
+## 11. 结论
 
 {是否可以发布。如有阻塞项，说明条件。}
 ```
