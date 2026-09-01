@@ -1,122 +1,127 @@
 ---
 name: flibaudit
 user-invocable: true
-description: 仓库全面审计 — 从架构到代码到文档到测试，输出审计报告到飞书文档。Use when 用户说"审计仓库"/"代码审计"/"lib审计"/"上线前审计"/"发布审计"、或需要对仓库做多维度质量审查。
-allowed-tools: Bash, Read, Write, Edit, Agent, Grep, Glob, WebSearch, mcp__tavily__tavily_search, mcp__minimax__web_search
+description: 仓库全面审计 — 架构/代码/文件卫生/文档/发布就绪，面向个人小项目。默认本地 markdown 报告，飞书 opt-in。用法：用户说"审计仓库"/"代码审计"/"lib审计"/"上线前审计"/"发布审计"、或需要对仓库做多维度质量审查时触发。
+allowed-tools: Bash, Read, Write, Edit, Agent, Grep, Glob, WebSearch, mcp__tavily__tavily_search, mcp__tavily__tavily_extract, Skill, EnterPlanMode, ExitPlanMode
 ---
 
 # flibaudit — 仓库全面审计
 
 ## 概述
 
-对仓库执行结构化审计：架构 → 代码 → 文档 → 发布就绪。利用 Claude 内置工具（`/review`、`diagnosing-bugs`、`improve-codebase-architecture`、`grill-me`）自动化和并行化审计。审计报告写入飞书文档。
+对仓库执行结构化审计：架构 → 代码 → 文件卫生 → 文档 → 发布就绪。**面向个人/小团队项目**（单人维护、无 review 流程、main 直推）。审计报告默认输出本地 markdown，飞书文档为 opt-in。
+
+## 定位
+
+- **目标项目**：个人项目、小团队仓库。不追求企业级合规审计
+- **单仓库为主**：多仓库审计可选，最后汇总
+- **轻量优先**：能内联做的不用 Agent，能本地输出的不上飞书
+- **实用导向**：solo 项目不需要的治理文件（CITATION/CONDUCT/SECURITY/ROADMAP）直接标删
 
 ## 配置
 
-> 完整说明 → [config.aiagt.dev](https://config.aiagt.dev/flibaudit)
-
-审计报告输出到飞书文档 → 需 lark-cli 已认证。
-飞书文档格式约束由 `ffeishu` 编排，本 skill 委托 ffeishu 创建文档。
-
-## 前置
-
-审计开始前先 `lark-cli auth` 预检（参考 [[feishu.md]] § auth 预检）。飞书文档格式约束调用 `ffeishu` Skill。
+报告输出选择：
+- **本地 markdown（默认）** → `docs/audit/audit-YYYY-MM-DD.md`（或仓库根）
+- **飞书文档（opt-in）** → 仅当用户明确要求"写飞书"/"出飞书报告"。需 lark-cli 已认证 + 委托 `ffeishu` skill 编排格式
 
 ## 审计流程
 
 ### Phase 0: 范围确认
 
-询问用户：
-- 审计哪些仓库？（多仓库用 Agent 并行审计，最后汇总）
-- 审计深度？（快速扫描 / 标准审计 / 深度审计）
-- 是否有特定关注领域？（安全、性能、可维护性...）
-- 仓库类型？（ccconfig / 普通项目 / 第三方 fork — 不同仓库审计重点不同）
+快速确认（有默认值，不卡流程）：
+- 审计哪个仓库？（默认：当前仓库）
+- 深度？（快速扫描 / 标准 / 深度，默认标准）
+- 关注领域？（默认全维度；可指定安全/性能/可维护性）
+- 仓库类型？（ccconfig 型 / 普通项目 / 第三方 fork — 影响检查重点）
 
-**深度审计时**：先调 `grill-me` skill 走设计审查 interview，输出设计问题清单作为审计输入。
+**深度审计时**：设计审查用 Claude 内置能力——直接对关键设计决策提问（架构边界、依赖方向、扩展策略），或 spawn `Plan` agent 出设计问题清单作为审计输入。不依赖 grill-me skill（已废弃）。
 
 ### Phase 1: 架构审计
 
-1. 获取仓库目录树（`tree -L 3 -I 'node_modules|.git|__pycache__'`）
+1. 目录树（`tree -L 3 -I 'node_modules|.git|__pycache__|*.log'`）
 2. 识别组件边界：核心 vs 工具 vs 胶水
-3. 检查依赖方向：有无循环依赖、跨层调用
-4. 检查文件大小分布（超大文件需拆分）
-5. 检查模块间耦合度
+3. 依赖方向：有无循环依赖、跨层调用
+4. 文件大小分布（超大文件 >500 行标记审查）
+5. 模块耦合度
 
-**调 `improve-codebase-architecture` skill** 获取自动化架构优化建议，与手动发现交叉验证。
+**关键架构规则（ccconfig 型仓库）**：
+- **根脚本串接 option**：根入口脚本（`init-base.sh`/`init-option.sh`/`maintain.sh`）通过动态枚举（`has_init_script`/`install_option`）串接 `option-*/init.sh`，用户无需单独跑 option 即可全装
+- **option 可独立执行**：每个 `option-*/init.sh` 支持手动单独跑（`--install`/`--run` 子命令），这是必须保留的契约
+- **根脚本间不互相直调**：除定义的入口点外，根脚本不直接调用彼此
+- **auth 类 option 自动跳过**：`--yes` 非交互模式下，需扫码/配 key 的 option（larkcli/getnote）自动跳过 + 提示
 
-输出：架构图（文字/文字时序） + 发现列表
+调 `Plan` agent 或内联分析获取架构优化建议。
 
 ### Phase 2: 代码审计
 
-**并行分维度**：用 Agent 并行跑多个维度审计，而非串行：
+**按项目规模选模式**：
+- 小仓库（<20 文件）：内联扫，不分 Agent
+- 中大仓库：Agent 并行跑维度
 
 | Agent | 审计内容 |
 |-------|----------|
-| Agent A: 安全审计 | 密钥泄露、注入、权限风险 |
-| Agent B: 质量审计 | 重复代码、死代码、硬编码、错误处理 |
-| Agent C: SH 审计 | `.sh` 文件专项（见 SH 专项清单） |
+| Agent A: 安全 | 密钥泄露、注入、权限风险 |
+| Agent B: 质量 | 重复代码、死代码、硬编码、错误处理 |
+| Agent C: SH 专项 | `.sh` 文件（项目含 shell 时启用，清单见 REFERENCE.md） |
 
-**深度审计时**：额外调 `/review` 命令对全仓库做自动化代码审查，结果纳入审计报告。
+严重程度分级（P0/P1/P2，详见 REFERENCE.md）：
+- **P0 安全/阻断**：密钥泄露、`.gitignore` 与 track 冲突、注入、公开仓库含私有数据
+- **P1 代码质量**：重复 3+、死代码、硬编码、错误处理缺失
+- **P2 改进**：可提取公共库、命名不一致、注释过期
 
-按严重程度分级（详见 REFERENCE.md § Phase 2 清单）：
+每个 P0/P1 发现先与用户讨论再修，不擅自改。P2 批量处理。
 
-**P0 — 安全/阻断**：
-- 密钥泄露（API key, token, password）
-- `.gitignore` 与已 track 文件冲突
-- 命令注入、SQL 注入
-- 公开仓库含私有数据
+### Phase 3: 文件卫生审计（solo 项目重点）
 
-**P1 — 代码质量**：
-- 重复代码（同逻辑出现 3+ 次）
-- 死代码（已删除功能残留）
-- 硬编码路径/URL
-- 错误处理缺失
+solo 项目不需要企业治理开销。逐文件评估必要性：
 
-**P2 — 改进建议**：
-- 可提取的公共库
-- 命名不一致
-- 注释过期
-- 文件组织优化
+| 文件 | solo 项目处理 |
+|------|--------------|
+| `CITATION.cff` | 删（除非学术发布） |
+| `CODE_OF_CONDUCT.md` | 删（无协作方） |
+| `CONTRIBUTING.md` | 删（无外部贡献者） |
+| `SECURITY.md` | 删（除非有外部安全上报需求） |
+| `ROADMAP.md` | 删（基本功能完成后无意义） |
+| `skills-lock.json` / 其他 lock | 评估：有对应 skill 管理机制则留，否则删 |
+| 项目级 `CLAUDE.md` | **必要性评估**：若项目对应 user 级配置（如 ccconfig 对应 `~/CLAUDE.md` 存 ccprivate），检查项目级是否有独有内容（暗号、常用命令、项目约束）。有独有内容则留，与 user 级重复则删重复部分 |
+| `LICENSE` | 留（开源必备） |
 
-### SH 脚本专项（项目含 `.sh` 文件时启用）
+原则：**不确定先问用户，不擅自删文件**。删之前 grep 确认无引用。
 
-以 ccconfig `sh-script-standards.md` 为标准，检查项详见 REFERENCE.md § SH 审计清单。
+### Phase 4: 文档审计
 
-每发现一个 P0/P1 问题，先与用户讨论再修。P2 批量处理。
-`diagnosing-bugs` skill 可用于深入分析可疑的 bug 模式。
-
-### Phase 3: 文档审计
-
-三个维度：
-
+三维度：
 1. **准确性** — 路径引用存在？版本号正确？命令可执行？
 2. **清晰度** — 新手能看懂？步骤无跳跃？术语一致？
-3. **完整性** — README/BOOTSTRAP/CONTRIBUTING/CHANGELOG 齐全？
+3. **完整性** — README/BOOTSTRAP/CHANGELOG 齐全？（solo 项目 CONTRIBUTING 非必须）
 
-重点检查文件：
-- `README.md` — 项目说明、安装、使用
-- `BOOTSTRAP.md` — 初始化流程
-- `CONTRIBUTING.md` — 贡献指南
-- `CHANGELOG.md` — 变更记录
-- `docs/` — 所有子文档
+重点文件：`README.md`、`BOOTSTRAP.md`、`CHANGELOG.md`、`docs/`（含 `docs/adr/`）。
 
-### Phase 4: 发布就绪
+**ADR 审计**：检查 `docs/adr/` 是否过期/失效。ADR 状态应反映现状（Proposed/Accepted/Superseded/Deprecated）。被 supersede 的旧 ADR 标注指向新 ADR。断链（引用不存在的 ADR）标修。
 
-1. **可见性检查** — 公开仓库是否为 public？私有仓库是否 private？
+### Phase 5: 发布就绪
+
+1. **可见性** — 公开仓库 public？私有 private？
 2. **安全终扫** — `grep -rE '(api_key|token|secret|password)\s*=' --include='*.{yaml,yml,json,sh,py,js,ts}'` 排除占位符
-3. **初始化模拟** — 从零开始走一遍安装流程，验证 BOOTSTRAP 可执行
+3. **初始化模拟** — 干净环境走一遍 BOOTSTRAP，验证可执行
 4. **版本一致性** — `conf/versions.json` vs `package.json` vs git tag
+5. **公开仓库保密** — 无真实 IP/域名/密钥/用户名（ccconfig 型仓库重点）
 
-### Phase 5: 审计报告汇总
+### Phase 6: 审计报告汇总
 
-各维度 Agent 返回结果后，用 **Agent 汇总合并**为统一审计报告（格式见 REFERENCE.md）。**默认写入飞书文档**。更新 `recent_feishu_docs.md`。
+各维度结果汇总为统一报告（模板见 REFERENCE.md）。
 
-写入飞书前再次 `lark-cli auth` 预检（避免创建时过期）。
+**输出选择**：
+- **本地 markdown（默认）**：写 `docs/audit/audit-YYYY-MM-DD.md`，终端输出路径链接
+- **飞书文档（opt-in）**：仅当用户明确要求。写前 lark-cli auth 预检，格式委托 `ffeishu` skill，写后更新 `recent_feishu_docs.md`
+
+报告必须包含：日期、范围、发现汇总、修复记录、残余风险、结论。
 
 ## 关键约束
 
-- 每个 P0/P1 发现先讨论再修，不擅自改动
-- 每个阶段修改代码后更新对应文档
-- 多仓库审计先分别审计，最后出汇总报告
-- 审计报告必须包含：日期、范围、发现汇总、修复记录、残余风险
-- 调 external skill 时遵守目标 skill 的前置条件
+- 每个 P0/P1 发现先讨论再修，不擅自改
+- 每阶段修改代码后更新对应文档（README/BOOTSTRAP/CHANGELOG）
+- 删文件前 grep 确认无引用，不确定问用户
+- 审计报告必须含：日期、范围、发现汇总、修复记录、残余风险、结论
+- 调 external skill（ffeishu）时遵守目标 skill 前置条件
+- **不默认上飞书**：小项目本地 markdown 足够，飞书是可选项
