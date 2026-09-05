@@ -3,8 +3,9 @@ name: ftransec
 user-invocable: true
 description: |
   科研/学术英文资料翻译流水线 — 术语库+翻译记忆驱动，分段翻译→质量评分→双语对照交付。
-  Use when 用户说"翻译论文"/"翻译英文资料"/"科研翻译"/"翻译这个文档"/"英译中"/"批量翻译"，
-  或给 PDF/Word/网页/文本 要求翻译成中文、要求双语对照/术语表/翻译报告。
+  Use when 用户说"翻译论文"/"科研翻译"/"翻译学术论文"/"英译中论文"/"翻译这篇论文"，
+  或给单篇 PDF/Word/网页 要求翻译成中文、要求双语对照/术语表/翻译报告。
+  **批量翻译 zip / 翻译 briefing 压缩包 → 走 translate skill（run-batch.sh），不走本 skill。**
 allowed-tools: Read, Write, Edit, Bash, Glob, AskUserQuestion
 ---
 
