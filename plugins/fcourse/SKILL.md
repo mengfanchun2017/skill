@@ -1,10 +1,6 @@
 ---
 name: fcourse
-description: |
-  系列课程创作 — 需求文档 → 调研 → 课程体系 → 逐课教案 → 练习设计。
-  场景：商业分析 / 数据分析 / AI 能力 / 知识管理。
-  所有产物存飞书文档。
-  触发："做课程" / "创作课程" / "设计课程" / "课程系列"
+description: 系列课程创作 — 需求文档 → 调研 → 课程体系 → 逐课教案 → 练习。所有产物存飞书
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, AskUserQuestion
 ---
 
@@ -14,7 +10,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, AskUserQuestion
 > **输出**：飞书父文档 + 子文档体系（调研 → 体系 → 逐课教案 → 练习）
 > **定位**：商业分析 / 数据分析 / AI 能力 / 知识管理
 
-**前置条件**：本 skill 依赖 ffeishu 做飞书文档操作（新建/更新/验证）。
+**前置条件**：本 skill 依赖 ffeishu 做飞书文档操作。
 
 ## 整体流程
 
@@ -38,7 +34,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, AskUserQuestion
 
 你给飞书文档链接，我：
 
-1. 调 ffeishu 工作流 Step S 或直接 fetch 文档内容
+1. 调 ffeishu fetch 文档内容
 2. 提取：课程主题、目标受众、受众水平、课程概览、核心方向
 3. 问清你不确定的信息
 
@@ -52,7 +48,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, AskUserQuestion
 
 ### 调研框架
 
-按 3 个课程方向选择调研框架：
+按课程方向选择框架：
 
 **商业分析方向**：
 - 行业现状与趋势
@@ -82,7 +78,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, AskUserQuestion
 
 ### 执行
 
-1. 委派 fsearch skill 做三源并行搜索（中文/英文/深度）
+1. 委派 fsearch 做三源并行搜索（中文/英文/深度）
 2. 按对应方向框架整理
 3. 输出调研文档 → 调 ffeishu 创建子文档
 4. 展示链接 → 你审 → 改 → 确认
@@ -110,7 +106,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, AskUserQuestion
 ### 执行
 
 1. 基于调研报告设计体系
-2. 重点模块：逐模块展示章节规划，每块你确认再下一块
+2. 逐模块展示章节规划，每块你确认再下一块
 3. 全部确认后飞书输出
 
 ---
@@ -141,8 +137,8 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, AskUserQuestion
 
 ### 内容辅助
 
-- 需要图示（架构图/流程图）→ 委派 fdiagram skill
-- 需要补充数据/资料 → 委派 fsearch skill
+- 需要图示（架构图/流程图）→ 委派 fdiagram
+- 需要补充数据/资料 → 委派 fsearch
 
 ---
 
@@ -195,4 +191,9 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, AskUserQuestion
 - `fsearch` — 搜索素材
 - `fresearchframe` — 调研方法论
 - `fdiagram` — 图（按需）
-- `fresearchreport` — 报告结构参考
+
+---
+
+## 参考文件
+
+教案模板、课程体系模板、练习设计模板 → `references/`
