@@ -141,6 +141,14 @@
         "notes",
         "knowledge"
       ]
+    },
+    {
+      "name": "fcourse",
+      "source": "./plugins/fcourse",
+      "description": "系列课程创作 — 需求文档 → 调研 → 课程体系 → 逐课教案 → 练习。所有产物存飞书",
+      "keywords": [
+        "f"
+      ]
     }
   ]
 }
