@@ -3,7 +3,7 @@ name: fcaselib
 user-invocable: false
 description: |
   案例库管理。读 ccprivate/conf/fcaselib/<slug>.yaml 案例配置，
-  按方向/标签检索案例，读取案例飞书文档注入课程上下文。
+  按方向/标签检索，读取案例飞书文档注入课程上下文。
   被 fcourse orchestrator 按需调用。
 allowed-tools: Read, Write, Bash, Glob, Grep
 ---
@@ -45,29 +45,24 @@ feishu:
 ## 操作
 
 ### 列出案例
-
 ```bash
 ls ~/git/ccprivate/conf/fcaselib/*.yaml 2>/dev/null
 ```
 
 ### 按方向检索
-
 ```bash
 grep -l "direction: \"商业分析\"" ~/git/ccprivate/conf/fcaselib/*.yaml 2>/dev/null
 ```
 
 ### 按标签检索
-
 ```bash
 grep -l "retail" ~/git/ccprivate/conf/fcaselib/*.yaml 2>/dev/null
 ```
 
 ### 读案例内容
-
 调 ffeishu fetch 案例根文档或指定子文档。
 
 ### 注入课程
-
 fcourse orchestrator 在 Step 2/3 时调用本 skill：
 1. 读课程配置的 caselib_slugs
 2. 对每个 slug 读对应案例配置
