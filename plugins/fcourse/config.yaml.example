@@ -1,18 +1,18 @@
-# fcourse 课程配置模板
-# 复制到 ccprivate/conf/fcourse/<slug>.yaml 使用
-
 slug: "baintro"
 name: "商业分析入门"
 direction: "商业分析"  # 商业分析 / 数据分析 / AI 能力 / 知识管理
-status: "draft"        # draft / in_progress / completed
+status: "draft"  # draft / in_progress / completed
 
 feishu:
-  root_doc_url: ""           # 飞书父文档 URL（所有子文档挂此，必填）
+  root_doc_url: ""           # 飞书父文档（所有子文档挂此，必填）
   requirement_doc_url: ""    # 需求文档（你提供）
   research_doc_url: ""
   syllabus_doc_url: ""
   overview_doc_url: ""
   lesson_docs: []
+    # - chapter: 1
+    #   title: "导入"
+    #   url: ""
   exercise_doc_url: ""
   summary_doc_url: ""
 
