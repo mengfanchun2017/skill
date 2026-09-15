@@ -18,6 +18,8 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 
 ## 案例配置结构
 
+每个案例一个 yaml 文件：
+
 ```yaml
 slug: "retail-analytics"
 name: "零售行业分析案例集"
@@ -68,8 +70,9 @@ grep -l "retail" ~/git/ccprivate/conf/fcaselib/*.yaml 2>/dev/null
 
 fcourse orchestrator 在 Step 2/3 时调用本 skill：
 1. 读课程配置的 caselib_slugs
-2. 对每个 slug 读配置 → fetch 案例飞书文档
-3. 案例内容作为上下文注入教案/练习生成
+2. 对每个 slug 读对应案例配置
+3. fetch 案例飞书文档内容
+4. 案例内容作为上下文注入教案/练习生成
 
 ---
 

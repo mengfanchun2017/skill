@@ -9,21 +9,26 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 
 # fcourse-exercise — 练习与测验
 
-被 orchestrator 委派。
+被 fcourse orchestrator 委派。
 
-输入：全部教案（fetch 飞书）
-输出：飞书子文档《<课程名>-练习与测验》
+## 输入
+
+全部教案（fetch 飞书）
+
+## 输出
+
+飞书子文档《<课程名>-练习与测验》
 
 ---
 
 ## 设计内容
 
-每章测验（10 题）：
+**每章测验**（10 题）：
 - 5 道知识点题（选择/判断/填空）
 - 3 道理解题（场景分析）
 - 2 道实操题
 
-课程级项目：场景 + 任务 + 评分标准 + 参考答案
+**课程级项目**：场景 + 任务 + 评分标准 + 参考答案
 
 ---
 
@@ -39,4 +44,3 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 ## 依赖
 
 - ffeishu — 飞书操作
-
