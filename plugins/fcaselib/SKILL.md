@@ -16,7 +16,7 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 
 ---
 
-## 案例配置结构
+## 案例配置
 
 ```yaml
 slug: "retail-analytics"
@@ -42,7 +42,7 @@ feishu:
 
 ## 操作
 
-### 列出案例
+### 列出
 
 ```bash
 ls ~/git/ccprivate/conf/fcaselib/*.yaml 2>/dev/null
@@ -60,15 +60,15 @@ grep -l "direction: \"商业分析\"" ~/git/ccprivate/conf/fcaselib/*.yaml 2>/de
 grep -l "retail" ~/git/ccprivate/conf/fcaselib/*.yaml 2>/dev/null
 ```
 
-### 读取案例内容
+### 读取内容
 
 调 ffeishu fetch 案例根文档或指定子文档。
 
-### 注入到课程
+### 注入课程
 
 fcourse 在 Step 2/3 时调用：
 1. 读课程配置的 caselib_slugs
-2. 对每个 slug fetch 案例飞书文档
+2. 对每个 slug 读配置 → fetch 案例飞书文档
 3. 案例内容作为上下文注入教案/练习生成
 
 ---

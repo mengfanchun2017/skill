@@ -8,7 +8,5 @@ description: ""
 tags: []
 
 feishu:
-  root_doc_url: ""  # 案例飞书根文档
+  root_doc_url: ""
   docs: []
-    # - title: "案例概述"
-    #   url: ""
