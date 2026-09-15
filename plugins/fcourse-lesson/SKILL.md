@@ -37,7 +37,7 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 ## 流程
 
 1. fetch 课程体系获取当前章信息
-2. 如有 caselib_slugs，读取案例内容注入上下文
+2. 如有 caselib_slugs，调 fcaselib 注入案例内容
 3. 调 fsearch 补充素材
 4. 写教案
 5. 调 ffeishu 创建飞书子文档（父文档 = root_doc_url）
@@ -49,3 +49,4 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 
 - ffeishu — 飞书操作
 - fsearch — 搜索补充
+- fcaselib — 案例注入（按需）
