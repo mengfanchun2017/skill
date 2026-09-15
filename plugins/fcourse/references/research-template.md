@@ -1,1 +1,1 @@
-# $sm template
+# research template

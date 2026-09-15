@@ -1,1 +1,1 @@
-# $sm template
+# exercise template
