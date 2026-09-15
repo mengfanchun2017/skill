@@ -9,10 +9,16 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 
 # fcourse-summary — 课程完结总结
 
-被 orchestrator 委派。
+被 fcourse orchestrator 委派。
 
-输入：课程体系 + 全部教案（fetch 飞书）
-输出：飞书子文档《<课程名>-完结总结》
+## 输入
+
+- 课程体系（fetch 飞书）
+- 全部教案（fetch 飞书）
+
+## 输出
+
+飞书子文档《<课程名>-完结总结》
 
 ---
 
@@ -39,5 +45,4 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 ## 依赖
 
 - ffeishu — 飞书操作
-- fdiagram — 知识图谱（按需）
-
+- fdiagram — 图（按需）

@@ -9,10 +9,16 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 
 # fcourse-lesson — 逐课教案
 
-被 orchestrator 按章循环调用。
+被 fcourse orchestrator 按章循环调用。
 
-输入：课程体系（fetch 飞书）+ 章号
-输出：飞书子文档《N-章标题》
+## 输入
+
+- 课程体系（fetch 飞书）
+- 章号（orchestrator 传入）
+
+## 输出
+
+飞书子文档《N-章标题》
 
 ---
 
@@ -43,5 +49,4 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 
 - ffeishu — 飞书操作
 - fsearch — 搜索补充
-- fcaselib — 案例注入（按需）
-
+- fcaselib — 案例（按需）
