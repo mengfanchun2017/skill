@@ -9,16 +9,10 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 
 # fcourse-syllabus — 课程体系设计
 
-被 fcourse orchestrator 委派。
+被 orchestrator 委派。
 
-## 输入
-
-调研报告（fetch 飞书）
-
-## 输出
-
-- 《<课程名>-课程体系》飞书子文档
-- 《<课程名>-课程总览》飞书子文档
+输入：调研报告（fetch 飞书）
+输出：《<课程名>-课程体系》《<课程名>-课程总览》飞书子文档
 
 ---
 
@@ -54,3 +48,4 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 
 - ffeishu — 飞书操作
 - fdiagram — 图（按需）
+

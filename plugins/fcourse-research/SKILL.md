@@ -9,16 +9,10 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 
 # fcourse-research — 课程调研
 
-被 fcourse orchestrator 委派。
+被 orchestrator 委派。
 
-## 输入
-
-- 需求摘要（主题/受众/方向）
-- 课程方向（来自配置）
-
-## 输出
-
-飞书子文档《<课程名>-调研报告》
+输入：需求摘要 + 课程方向
+输出：飞书子文档《<课程名>-调研报告》
 
 ---
 
@@ -45,3 +39,4 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 - fsearch — 搜索
 - fresearchframe — 方法论
 - ffeishu — 飞书操作
+
