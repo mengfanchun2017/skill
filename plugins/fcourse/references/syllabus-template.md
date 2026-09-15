@@ -1,3 +1,6 @@
-# syllabus template
-
-template content
+## 课程定位
+## 课程级目标
+## 模块划分
+## 各章结构
+## 评估设计
+## 时间线
