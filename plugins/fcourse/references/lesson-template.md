@@ -1,3 +1,1 @@
 # lesson template
-
-template content
