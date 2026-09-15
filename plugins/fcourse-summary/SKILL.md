@@ -9,7 +9,7 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 
 # fcourse-summary — 课程完结总结
 
-本 skill 被 fcourse orchestrator 委派。
+被 fcourse orchestrator 委派。
 
 ## 输入
 
@@ -20,6 +20,8 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 
 飞书子文档《<课程名>-完结总结》
 
+---
+
 ## 内容
 
 - 课程知识图谱（知识点关系图，调 fdiagram）
@@ -28,6 +30,8 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 - 后续学习路径推荐
 - 认证/考试指引（如有）
 
+---
+
 ## 流程
 
 1. fetch 课程体系 + 教案
@@ -35,6 +39,8 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 3. 调 ffeishu 创建文档
 4. 展示链接 → 你改 → 定稿
 5. 通知 orchestrator status=completed
+
+---
 
 ## 依赖
 
