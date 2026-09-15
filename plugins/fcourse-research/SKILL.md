@@ -14,7 +14,7 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 ## 输入
 
 - 需求摘要（主题/受众/方向）
-- 课程方向
+- 课程方向（来自配置）
 
 ## 输出
 
@@ -25,7 +25,7 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 ## 调研框架
 
 **商业分析**：行业现状 + 方法论（SWOT/PEST/波特五力/商业画布） + 工具数据源 + 岗位能力 + 竞品课程
-**数据分析**：技术栈（SQL/Python/BI/可视化） + 方法论（CRISP-DM/A/B Test） + 案例 + 竞品
+**数据分析**：技术栈（SQL/Python/BI/可视化） + 方法论（CRISP-DM/A/B Test） + 行业案例 + 竞品
 **AI 能力**：技术栈（LLM/RAG/Agent/传统ML） + 应用场景成熟度 + 工具链 + 竞品
 **知识管理**：方法论（SECI/Zettelkasten/PARA/CODE） + 工具生态 + 实施案例 + 竞品
 
