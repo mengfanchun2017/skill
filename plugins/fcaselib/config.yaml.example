@@ -8,9 +8,7 @@ description: ""
 tags: []
 
 feishu:
-  root_doc_url: ""       # 案例飞书根文档（所有子文档挂此，必填）
+  root_doc_url: ""           # 案例飞书根文档（所有子文档挂此）
   docs: []
     # - title: "案例概述"
-    #   url: ""
-    # - title: "数据集说明"
     #   url: ""
