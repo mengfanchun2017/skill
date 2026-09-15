@@ -63,7 +63,7 @@ grep -l "direction: \"商业分析\"" ~/git/ccprivate/conf/fcaselib/*.yaml 2>/de
 grep -l "retail" ~/git/ccprivate/conf/fcaselib/*.yaml 2>/dev/null
 ```
 
-### 读取案例内容
+### 读完案例内容
 
 调 ffeishu fetch 案例根文档或指定子文档。
 
@@ -73,7 +73,7 @@ fcourse orchestrator 在 Step 2/3 时调用本 skill：
 1. 读课程配置的 caselib_slugs
 2. 对每个 slug 读对应案例 yaml
 3. fetch 案例飞书文档内容
-4. 案例内容作为上下文注入教案/练习生成
+4. 案例内容注入教案/练习生成上下文
 
 ---
 
