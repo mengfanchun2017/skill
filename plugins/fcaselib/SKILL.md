@@ -3,7 +3,7 @@ name: fcaselib
 user-invocable: true
 description: |
   案例库管理。读 ccprivate/conf/fcaselib/<slug>.yaml 案例配置，
-  按方向/标签检索案例，读取案例飞书文档注入到课程上下文。
+  按方向/标签检索案例，读取案例飞书文档注入课程上下文。
   被 fcourse orchestrator 按需调用，也可独立使用。
   用法：用户说"案例库"/"案例"/"补充案例"触发
 allowed-tools: Read, Write, Bash, Glob, Grep
@@ -31,7 +31,7 @@ tags:
   - "beginner"
   - "python"
 feishu:
-  root_doc_url: "..."       # 案例飞书根文档（所有子文档挂此）
+  root_doc_url: "..."       # 案例飞书根文档（所有内容挂此）
   docs:
     - title: "案例概述"
       url: "..."
@@ -50,6 +50,8 @@ feishu:
 ```bash
 ls ~/git/ccprivate/conf/fcaselib/*.yaml 2>/dev/null
 ```
+
+输出：slug | 名称 | 方向 | 标签
 
 ### 按方向检索
 
@@ -71,7 +73,7 @@ grep -l "retail" ~/git/ccprivate/conf/fcaselib/*.yaml 2>/dev/null
 
 fcourse orchestrator 在 Step 2/3 时调用本 skill：
 1. 读课程配置的 caselib_slugs
-2. 对每个 slug 读对应案例 yaml → 获取 feishu URL
+2. 对每个 slug 读对应案例配置
 3. fetch 案例飞书文档内容
 4. 案例内容作为上下文注入教案/练习生成
 
@@ -79,7 +81,7 @@ fcourse orchestrator 在 Step 2/3 时调用本 skill：
 
 ## 依赖
 
-- ffeishu — 飞书文档操作
+- ffeishu — 飞书操作
 
 ---
 
