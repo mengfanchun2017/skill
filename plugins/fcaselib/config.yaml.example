@@ -4,7 +4,7 @@
 slug: "retail-analytics"
 name: "零售行业分析案例集"
 direction: "商业分析"  # 商业分析 / 数据分析 / AI 能力 / 知识管理
-description: "一个门店的销售数据分析全流程案例"
+description: "一个零售门店的销售数据分析全流程案例"
 tags:
   - "retail"
   - "beginner"
