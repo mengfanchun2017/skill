@@ -9,8 +9,9 @@ tags:
   - "retail"
   - "beginner"
   - "python"
+
 feishu:
-  root_doc_url: ""       # 案例飞书根文档（所有子文档挂此）
+  root_doc_url: ""       # 案例飞书根文档（所有子文档挂此，必填）
   docs:
     - title: "案例概述"
       url: ""
