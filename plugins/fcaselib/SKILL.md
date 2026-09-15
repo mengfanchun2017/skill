@@ -8,11 +8,11 @@ description: |
 allowed-tools: Read, Write, Bash, Glob, Grep
 ---
 
-# fcasib — 案例库管理
+# fcaselib — 案例库管理
 
-职责：管理案例配置 + 按需读案例飞书文档 + 注入课程上下文
+职责：管理案例配置 → 按需读案例飞书文档 → 注入课程上下文
 配置：`ccprivate/conf/fcaselib/<slug>.yaml`
-调用方：fcourse orchestrator（Step 2 体系 + Step 3 教案时注入）
+调用方：fcourse orchestrator（Step 2 体系 + Step 3 教案时）
 
 ---
 
@@ -70,7 +70,7 @@ grep -l "retail" ~/git/ccprivate/conf/fcaselib/*.yaml 2>/dev/null
 
 fcourse orchestrator 在 Step 2/3 时调用本 skill：
 1. 读课程配置的 caselib_slugs
-2. 对每个 slug 读对应案例 yaml
+2. 对每个 slug 读对应案例配置
 3. fetch 案例飞书文档内容
 4. 案例内容作为上下文注入教案/练习生成
 
