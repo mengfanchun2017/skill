@@ -145,7 +145,7 @@
     {
       "name": "fcourse",
       "source": "./plugins/fcourse",
-      "description": "系列课程创作 — 需求文档 → 调研 → 课程体系 → 逐课教案 → 练习。所有产物存飞书",
+      "description": "系列课程创作 orchestrator。读 ccprivate/conf/fcourse/<slug>.yaml 配置 -> 判断当前课程进度 -> 委派子 skill 完成对应步骤 -> 更新配置。 所有产物存飞书父文档下的子文档。案例库委派 fcaselib。 用法：用户说\"做课程\"/\"创作课程\"/\"设计课程\"/\"继续课程\"触发",
       "keywords": [
         "f"
       ]
