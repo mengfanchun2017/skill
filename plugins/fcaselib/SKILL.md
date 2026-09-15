@@ -19,7 +19,7 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 
 ## 案例配置结构
 
-每个案例一个 yaml：
+每个案例一个 yaml 文件：
 
 ```yaml
 slug: "retail-analytics"
@@ -51,6 +51,8 @@ feishu:
 ls ~/git/ccprivate/conf/fcaselib/*.yaml 2>/dev/null
 ```
 
+列出后展示表格：slug | 名称 | 方向 | 标签
+
 ### 按方向检索
 
 ```bash
@@ -60,7 +62,7 @@ grep -l "direction: \"商业分析\"" ~/git/ccprivate/conf/fcaselib/*.yaml 2>/de
 ### 按标签检索
 
 ```bash
-grep -l "retail" ~/git/ccprivate/conf/fcaselib/*.yaml 2>/dev/null
+g -l "retail" ~/git/ccprivate/conf/fcaselib/*.yaml 2>/dev/null
 ```
 
 ### 读取案例内容
@@ -71,7 +73,7 @@ grep -l "retail" ~/git/ccprivate/conf/fcaselib/*.yaml 2>/dev/null
 
 fcourse orchestrator 在 Step 2/3 时调用本 skill：
 1. 读课程配置的 caselib_slugs
-2. 对每个 slug 读对应案例配置
+2. 对每个 slug 读对应案例 yaml → 获取 feishu URL
 3. fetch 案例飞书文档内容
 4. 案例内容作为上下文注入教案/练习生成
 
