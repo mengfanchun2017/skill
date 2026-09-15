@@ -1,3 +1,1 @@
 # summary template
-
-template content
