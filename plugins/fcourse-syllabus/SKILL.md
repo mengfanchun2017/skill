@@ -1,6 +1,5 @@
 ---
 name: fcourse-syllabus
-user-invocable: false
 description: |
   课程体系设计子 skill。被 fcourse orchestrator 委派。
   基于调研报告产出课程体系+课程总览飞书文档。
@@ -34,7 +33,7 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 ## 课程总览
 
 - 完整目录（各章目标/时长）
-- 模块依赖 Mermaid 图
+- 模块依赖图
 - 授课方式说明
 - 配套资产清单
 

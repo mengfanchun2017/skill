@@ -1,6 +1,5 @@
 ---
 name: fcourse-research
-user-invocable: false
 description: |
   课程调研子 skill。被 fcourse orchestrator 委派。
   按方向框架做三源搜索，产出飞书调研报告。
@@ -35,7 +34,7 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 
 1. 调 fsearch 三源并行（中文/英文/深度）
 2. 按方向框架整理
-3. 调 ffeishu 创建飞书子文档（父文档 = root_doc_url）
+3. 调 ffeishu 创建飞书子文档（父文档 = 配置的 root_doc_url）
 4. 返回文档 URL
 
 ---
