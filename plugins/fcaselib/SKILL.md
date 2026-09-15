@@ -3,14 +3,14 @@ name: fcaselib
 user-invocable: false
 description: |
   案例库管理。读 ccprivate/conf/fcaselib/<slug>.yaml 案例配置，
-  按方向/标签检索案例，读取案例飞书文档注入课程上下文。
+  按方向/标签检索案例，读取案例飞书文档注入到课程上下文。
   被 fcourse orchestrator 按需调用。
 allowed-tools: Read, Write, Bash, Glob, Grep
 ---
 
 # fcaselib — 案例库管理
 
-职责：管理案例配置 → 按需读案例飞书文档 → 注入课程上下文
+职责：管理案例配置 + 按需读案例飞书文档 + 注入课程上下文
 配置：`ccprivate/conf/fcaselib/<slug>.yaml`
 调用方：fcourse orchestrator（Step 2 体系 + Step 3 教案时注入）
 

@@ -35,7 +35,7 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 
 1. 调 fsearch 三源并行（中文/英文/深度）
 2. 按方向框架整理
-3. 调 ffeishu 创建飞书子文档（父文档 = root_doc_url）
+3. 调 ffeishu 创建飞书子文档（父文档 = 配置的 root_doc_url）
 4. 返回文档 URL
 
 ---
