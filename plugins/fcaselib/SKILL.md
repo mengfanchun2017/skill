@@ -20,14 +20,14 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 ```yaml
 slug: "retail-analytics"
 name: "零售行业分析案例集"
-direction: "商业分析"
+direction: "商业分析"  # 商业分析 / 数据分析 / AI 能力 / 知识管理
 description: "一个零售门店的销售数据分析全流程案例"
 tags:
   - "retail"
   - "beginner"
   - "python"
 feishu:
-  root_doc_url: "..."       # 案例飞书根文档
+  root_doc_url: "..."       # 案例飞书根文档（所有内容挂此）
   docs:
     - title: "案例概述"
       url: "..."
@@ -67,8 +67,9 @@ grep -l "retail" ~/git/ccprivate/conf/fcaselib/*.yaml 2>/dev/null
 
 fcourse orchestrator 在 Step 2/3 时调用本 skill：
 1. 读课程配置的 caselib_slugs
-2. 对每个 slug 读配置 → fetch 案例飞书文档
-3. 案例内容作为上下文注入教案/练习生成
+2. 对每个 slug 读对应案例配置
+3. fetch 案例飞书文档
+4. 案例内容作为上下文注入教案/练习生成
 
 ---
 

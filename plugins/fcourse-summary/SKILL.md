@@ -1,5 +1,6 @@
 ---
 name: fcourse-summary
+user-invocable: false
 description: |
   课程完结总结子 skill。被 fcourse orchestrator 委派。
   生成知识图谱/易错点/推荐路径飞书文档。
