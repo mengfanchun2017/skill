@@ -1,7 +1,11 @@
 ---
 name: fcaselib
 user-invocable: true
-description: 案例库管理。读 ccprivate/conf/fcaselib/<slug>.yaml 配置，按方向/标签检索，读取飞书文档注入课程上下文。被 fcourse 按需调。用法：用户说"案例库"/"案例"触发
+description: |
+  案例库管理。读 ccprivate/conf/fcaselib/<slug>.yaml 配置，
+  按方向/标签检索案例，读取案例飞书文档注入课程上下文。
+  被 fcourse orchestrator 按需调用，也可独立使用。
+  用法：用户说"案例库"/"案例"/"补充案例"触发
 allowed-tools: Read, Write, Bash, Glob, Grep
 ---
 
@@ -46,8 +50,6 @@ feishu:
 ```bash
 ls ~/git/ccprivate/conf/fcaselib/*.yaml 2>/dev/null
 ```
-
-展示：slug | 名称 | 方向 | 标签
 
 ### 按方向检索
 
