@@ -1,1 +1,1 @@
-# syllabus template
+# $sm template

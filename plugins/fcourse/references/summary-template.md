@@ -1,1 +1,1 @@
-# summary template
+# $sm template

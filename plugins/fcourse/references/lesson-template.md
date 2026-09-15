@@ -1,1 +1,1 @@
-# lesson template
+# $sm template
