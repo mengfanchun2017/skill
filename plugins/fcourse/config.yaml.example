@@ -1,11 +1,11 @@
-slug: "baintro"
-name: "商业分析入门"
-direction: "商业分析"  # 商业分析 / 数据分析 / AI 能力 / 知识管理
+slug: ""
+name: ""
+direction: ""  # 商业分析 / 数据分析 / AI 能力 / 知识管理
 status: "draft"  # draft / in_progress / completed
 
 feishu:
   root_doc_url: ""           # 飞书父文档（所有子文档挂此，必填）
-  requirement_doc_url: ""    # 需求文档（你提供）
+  requirement_doc_url: ""    # 需求文档 URL（你提供）
   research_doc_url: ""
   syllabus_doc_url: ""
   overview_doc_url: ""

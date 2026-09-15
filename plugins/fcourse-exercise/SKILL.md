@@ -1,6 +1,5 @@
 ---
 name: fcourse-exercise
-user-invocable: false
 description: |
   练习/测验设计子 skill。被 fcourse orchestrator 委派。
   基于全部教案产出练习集飞书文档。

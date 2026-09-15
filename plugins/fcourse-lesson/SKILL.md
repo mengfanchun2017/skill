@@ -1,6 +1,5 @@
 ---
 name: fcourse-lesson
-user-invocable: false
 description: |
   逐课教案子 skill。被 fcourse orchestrator 每课委派一次。
   基于课程体系生成单课教案飞书文档。
