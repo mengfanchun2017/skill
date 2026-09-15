@@ -1,7 +1,3 @@
-## 章测验
-- 5 道知识点题
-- 3 道理解题
-- 2 道实操题
+# exercise template
 
-## 课程级项目
-- 场景 + 任务 + 评分标准 + 参考答案
+template content
