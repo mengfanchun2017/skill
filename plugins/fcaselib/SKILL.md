@@ -1,17 +1,19 @@
 ---
 name: fcaselib
-user-invocable: false
+user-invocable: true
 description: |
   案例库管理。读 ccprivate/conf/fcaselib/<slug>.yaml 案例配置，
   按方向/标签检索案例，读取案例飞书文档注入课程上下文。
   被 fcourse orchestrator 按需调用。
+  用法：用户说"案例库"/"案例"/"补充案例"触发
 allowed-tools: Read, Write, Bash, Glob, Grep
 ---
 
 # fcaselib — 案例库管理
 
 职责：管理案例配置 + 按需读案例飞书文档 + 注入课程上下文
-配置：ccprivate/conf/fcaselib/<slug>.yaml
+配置：`ccprivate/conf/fcaselib/<slug>.yaml`
+调用方：fcourse orchestrator（Step 2 体系 + Step 3 教案时注入）
 
 ---
 
@@ -22,14 +24,14 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 ```yaml
 slug: "retail-analytics"
 name: "零售行业分析案例集"
-direction: "商业分析"  # 商业分析 / 数据分析 / AI 能力 / 知识管理
+direction: "商业分析"
 description: "一个零售门店的销售数据分析全流程案例"
 tags:
   - "retail"
   - "beginner"
   - "python"
 feishu:
-  root_doc_url: "..."       # 案例飞书根文档（所有子文档挂此）
+  root_doc_url: "..."       # 案例飞书根文档（所有内容挂此）
   docs:
     - title: "案例概述"
       url: "..."
