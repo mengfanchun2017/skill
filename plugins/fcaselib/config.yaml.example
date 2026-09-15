@@ -1,14 +1,18 @@
 # fcaselib 案例配置模板
 # 复制到 ccprivate/conf/fcaselib/<slug>.yaml 使用
 
-slug: ""
-name: ""
-direction: ""  # 商业分析 / 数据分析 / AI 能力 / 知识管理
-description: ""
-tags: []
-
+slug: "retail-analytics"
+name: "零售行业分析案例集"
+direction: "商业分析"  # 商业分析 / 数据分析 / AI 能力 / 知识管理
+description: "一个零售门店的销售数据分析全流程案例"
+tags:
+  - "retail"
+  - "beginner"
+  - "python"
 feishu:
-  root_doc_url: ""
-  docs: []
-    # - title: "案例概述"
-    #   url: ""
+  root_doc_url: ""       # 案例飞书根文档（所有子文档挂此）
+  docs:
+    - title: "案例概述"
+      url: ""
+    - title: "数据集说明"
+      url: ""
