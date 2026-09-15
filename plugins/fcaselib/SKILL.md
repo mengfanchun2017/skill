@@ -30,7 +30,7 @@ tags:
   - "beginner"
   - "python"
 feishu:
-  root_doc_url: "..."       # 案例飞书根文档（所有内容挂此）
+  root_doc_url: "..."       # 案例飞书根文档（所有子文档挂此）
   docs:
     - title: "案例概述"
       url: "..."
@@ -70,7 +70,7 @@ grep -l "retail" ~/git/ccprivate/conf/fcaselib/*.yaml 2>/dev/null
 
 fcourse orchestrator 在 Step 2/3 时调用本 skill：
 1. 读课程配置的 caselib_slugs
-2. 对每个 slug 读对应案例 yaml
+2. 对每个 slug 读对应案例配置
 3. fetch 案例飞书文档内容
 4. 案例内容作为上下文注入教案/练习生成
 
