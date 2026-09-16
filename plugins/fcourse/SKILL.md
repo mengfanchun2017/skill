@@ -148,7 +148,7 @@ fetch 课程体系 + 全部教案 → 知识图谱/易错点/推荐路径
 - fcourse-lesson — 教案
 - fcourse-exercise — 练习
 - fcourse-summary — 完结
-- fcaselib — 案例库（按需）
+- fcaselab — 案例库（按需）
 - ffeishu — 飞书操作
 - fsearch / fresearchframe — 搜索
 - fdiagram — 图
