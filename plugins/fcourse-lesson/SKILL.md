@@ -49,4 +49,4 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 
 - ffeishu — 飞书操作
 - fsearch — 搜索补充
-- fcaselib — 案例（按需）
+- fcaselab — 案例（按需）
