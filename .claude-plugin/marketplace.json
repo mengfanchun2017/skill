@@ -133,6 +133,14 @@
         "notes",
         "knowledge"
       ]
+    },
+    {
+      "name": "fskillcreat",
+      "source": "./plugins/fskillcreat",
+      "description": "创建新 Skill，问公开/私有，生成骨架，注册 symlink",
+      "keywords": [
+        "f"
+      ]
     }
 ]
 }
