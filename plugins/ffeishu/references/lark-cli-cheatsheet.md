@@ -3,9 +3,15 @@
 > 完整踩坑记录 → `skills/ffeishu/references/lark-cli-cheatsheet.md`
 
 ## 运行前缀
+
+**从 marker 读取当前账号目录**（`lark-switch.sh` 维护，切账号自动跟随）：
+
 ```bash
-export LARKSUITE_CLI_CONFIG_DIR="${LARKSUITE_CLI_CONFIG_DIR:-$HOME/.lark-cli}" && export PATH="$HOME/.local/bin:$PATH"
+export LARKSUITE_CLI_CONFIG_DIR="$(grep '^configDir=' ~/.lark-cli-account | cut -d= -f2)" && export PATH="$HOME/.local/bin:$PATH"
 ```
+
+⚠️ 不要写死 `~/.lark-cli`——该目录不存在。当前默认账号 ailab 实际目录是 `~/.lark-cli-ailab`（appId `cli_a97077...`），`lark-switch.sh ailab -p` 会写入 marker `~/.lark-cli-account`。
+⚠️ 不要用 `"${LARKSUITE_CLI_CONFIG_DIR:-...}"` 回退默认——env 若已被设成错误目录会静默生效不报错。
 
 ## auth 预检（写操作前必做）
 
