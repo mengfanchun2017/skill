@@ -427,6 +427,7 @@ cat "$SKILL_DIR/config.yaml"
 
 | 标题 | 链接 | 日期 | 说明 |
 |------|------|------|------|
+| [通道选型 — AI 浏览器自动化调研（meshwork）](https://rcnejwuhyp41.feishu.cn/docx/T5aid9Z8oogYwyxhwquc1HktnMd) | 2026-11-01 | 创建 meshwork 子文档（AI 浏览器自动化选型，4 表格） |
 | [示例：AI架构研究](https://<tenant>.feishu.cn/docx/<token>) | 2026-06-01 | 示例条目，实际操作后替换 |
 | [示例：半年总结报告](https://<tenant>.feishu.cn/docx/<token>) | 2026-05-31 | 示例条目，实际操作后替换 |
 
