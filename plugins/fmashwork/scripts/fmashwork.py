@@ -71,20 +71,25 @@ def cmd_check_env(args):
     ok = ok and py_ok
 
     # 关键库
-    libs = [
-        ("trimesh", "trimesh"),
-        ("pymeshfix", "pymeshfix"),
-        ("pygltflib", "pygltflib"),
-        ("numpy", "numpy"),
-    ]
-    for label, mod in libs:
+    libs = ["trimesh", "pymeshfix", "pygltflib", "numpy"]
+    missing = []
+    for label in libs:
         try:
-            m = importlib.import_module(mod)
+            m = importlib.import_module(label)
             ver = getattr(m, "__version__", "?")
             print(f"  {label}: {ver} ✅")
         except ImportError:
-            print(f"  {label}: ❌ 未装 (`pip install {mod}`)")
+            print(f"  {label}: ❌ 未装")
+            missing.append(label)
             ok = False
+
+    if missing:
+        print("\n  安装依赖（推荐 venv，多数发行版 PEP-668 禁系统级 pip）:")
+        print("    python3 -m venv ~/venvs/meshwork")
+        print(f"    ~/venvs/meshwork/bin/pip install {' '.join(missing)}")
+        print("  之后用 `~/venvs/meshwork/bin/python3 scripts/fmashwork.py` 运行本脚本。")
+        print("  若 venv 报缺 python3-venv：`sudo apt-get install python3.x-venv`")
+        print("  ⚠️  `--break-system-packages` 可绕过但会污染系统 Python，不推荐给他人环境。")
 
     # 配置
     cfg = load_config()
