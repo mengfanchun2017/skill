@@ -1,0 +1,21 @@
+# fmashwork 配置模板 — 复制为 config.yaml 填入你的真实值
+# ccconfig 用户请改用 ccprivate/skill/fmashwork.yaml（init-skill.sh sync 自动覆盖）
+
+# 飞书 — meshwork 孵化项目文档目录
+feishu:
+  space_id: "your_space_id_here"
+  root_node_token: "your_wiki_node_token"
+  root_node_url: "https://your-tenant.feishu.cn/wiki/your_wiki_node_token"
+
+# 共享下载目录（WSL ↔ Windows 互通）
+shared_dir: "/mnt/c/Users/your-name/3dprints"
+
+# 拓竹打印机
+printer:
+  model: "X1C"  # X1C / P1S / A1 / 其他
+  studio_windows_path: "C:/Program Files/Bambu Studio/bambu-studio.exe"
+
+# 生成通道
+channels:
+  hunyuan_web: "https://3d.hunyuan.tencent.com"
+  meshy_web: "https://www.meshy.ai"
