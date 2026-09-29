@@ -1,0 +1,10 @@
+# 个人配置文件（真实 wiki token / 账号由 ccprivate/skill/fmashwork.yaml 提供）
+config.yaml
+
+# 临时下载/生成的模型
+*.glb
+*.stl
+*.obj
+*.3mf
+__pycache__/
+*.pyc

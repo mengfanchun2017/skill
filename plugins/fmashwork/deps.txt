@@ -1,0 +1,8 @@
+# fmashwork 依赖
+# init-skill.sh sync 自动装
+# 格式: <package>  <manager>:<version>  <skill_name>
+
+trimesh  pip:latest  fmashwork
+pymeshfix  pip:latest  fmashwork
+pygltflib  pip:latest  fmashwork
+numpy  pip:latest  fmashwork
