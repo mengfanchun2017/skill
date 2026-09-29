@@ -84,6 +84,16 @@
       ]
     },
     {
+      "name": "fmashwork",
+      "description": "AI 图生 3D → 拓竹打印自动化工作流。Claude 编排：免费生成（混元3D/Meshy 网页版，Playwright MCP） → 本地校验（trimesh 水密/体积/流形）→ pymeshfix 修复 → 导出 STL/3MF → Bambu Studio 人工确认打印。 用法：用户说 \"meshwork\" / \"fmashwork\" / \"跑图生3D\" / \"3D 打印工作流\" / \"校验模型\" 触发",
+      "source": "./plugins/fmashwork",
+      "keywords": [
+        "f",
+        "3d-print",
+        "meshwork"
+      ]
+    },
+    {
       "name": "fdiagram",
       "description": "代码驱动图表生成 — Mermaid 架构/流程/时序/ER/类图、whiteboard-cli SVG 白板。 用法：用户说\"画架构图\"、\"画流程图\"、\"画时序图\"、\"画ER图\"、\"画类图\"、\"画甘特图\"、\"画白板\"触发。",
       "source": "./plugins/fdiagram",
