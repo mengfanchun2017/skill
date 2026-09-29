@@ -46,7 +46,7 @@ bash ~/.claude/skills/fmashwork/scripts/setup.sh
 #    sudo apt-get install python3.14-venv
 
 # 3. 校验
-~/ .fmashwork-venv/bin/python scripts/fmashwork.py check-env   # → 或直接跑 python3 scripts/fmashwork.py check-env
+~/.fmashwork-venv/bin/python scripts/fmashwork.py check-env   # → 或直接跑 python3 scripts/fmashwork.py check-env
 ```
 
 > 为什么 venv：新版 Ubuntu/Debian 的 pip 有 PEP-668 保护，`pip install` 系统级会报 `externally-managed-environment`。skill 用隔离 venv，不污染系统 Python。`fmashwork.py` 会**自动优先用 `~/.fmashwork-venv`**（不存在则用系统 python3 并提示装）。
