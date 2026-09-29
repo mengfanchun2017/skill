@@ -107,9 +107,10 @@ def cmd_check_env(args):
         if sd_path.exists():
             print(f"  shared_dir: ✅ {sd}")
         else:
-            print(f"  shared_dir: ⚠️  {sd} 路径不存在（mkdir -p 后重跑）")
+            print(f"  shared_dir: ⚠️  {sd} 路径不存在")
+            print(f"    → mkdir -p {sd}")
     else:
-        print("  shared_dir: ⚠️  未配置")
+        print("  shared_dir: ⚠️  未配置（ccprivate/skill/fmashwork.yaml 设 shared_dir）")
 
     # channels
     if cfg.get("channels"):
