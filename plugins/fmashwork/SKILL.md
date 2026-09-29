@@ -36,6 +36,21 @@ allowed-tools: Read, Write, Bash, Glob, Grep,
   Bambu Studio（人工最后确认：方向/支撑/切片）→ 拓竹打印
 ```
 
+## 首次安装（一次）
+
+```bash
+# 1. 建隔离 venv + 装依赖（幂等，重复跑安全）
+bash ~/.claude/skills/fmashwork/scripts/setup.sh
+
+# 2. 若提示缺 python3.x-venv，先装一次（只要一次 sudo）再重跑上一条
+#    sudo apt-get install python3.14-venv
+
+# 3. 校验
+~/ .fmashwork-venv/bin/python3 scripts/fmashwork.py check-env   # → 或直接跑 python3 scripts/fmashwork.py check-env
+```
+
+> 为什么 venv：新版 Ubuntu/Debian 的 pip 有 PEP-668 保护，`pip install` 系统级会报 `externally-managed-environment`。skill 用隔离 venv，不污染系统 Python。`fmashwork.py` 会**自动优先用 `~/.fmashwork-venv`**（不存在则用系统 python3 并提示装）。
+
 ## 配置
 
 **ccconfig 用户**：真实值放 `ccprivate/skill/fmashwork.yaml`，`init-skill.sh sync` 自动 symlink 到 `~/.claude/skills/fmashwork/config.yaml`。
