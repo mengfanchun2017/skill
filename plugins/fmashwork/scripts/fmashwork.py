@@ -33,6 +33,16 @@ from pathlib import Path
 SKILL_DIR = Path(__file__).resolve().parent.parent
 CONFIG_PATH = SKILL_DIR / "config.yaml"
 
+# 自动切换到项目 venv（若已用 setup.sh 建好）：保证依赖隔离，且不污染系统 Python
+_FMEASHWORK_VENV = os.environ.get(
+    "FMEASHWORK_VENV", f"{Path.home()}/.fmashwork-venv/bin/python"
+)
+if (
+    os.path.exists(_FMEASHWORK_VENV)
+    and os.path.realpath(sys.executable) != os.path.realpath(_FMEASHWORK_VENV)
+):
+    os.execv(_FMEASHWORK_VENV, [_FMEASHWORK_VENV, *sys.argv])  # noqa: S606
+
 
 def load_config():
     """加载个人配置；不存在则返回空 dict（独立用户用 config.yaml.example 自行复制）。"""
