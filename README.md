@@ -1,7 +1,7 @@
 # claude-skills — Claude Code skill 集合
 
-> Claude Code 技能聚合仓。**16 个自建**（15 marketplace + 1 内部 fskillcreat）+ **第三方 skill 由用户用 npx skills 自管**（不通过 marketplace）。
-> 飞书 / 调研 / 文档 / PPT / Excel / 图表一站式。
+> Claude Code 技能聚合仓。**17 个自建**（16 marketplace + 1 内部 fskillcreat）+ **第三方 skill 由用户用 npx skills 自管**（不通过 marketplace）。
+> 飞书 / 调研 / 文档 / PPT / Excel / 图表 / 3D 打印 一站式。
 
 ## 快速开始
 
@@ -34,6 +34,7 @@
 | 库审计 | `/plugin install flibaudit@mengfanchun2017-skills` |
 | 报告写作规范 | `/plugin install freportstd@mengfanchun2017-skills` |
 | 研究方法论框架 | `/plugin install fresearchframe@mengfanchun2017-skills` |
+| AI 图生 3D → 拓竹打印 | `/plugin install fmashwork@mengfanchun2017-skills` |
 
 可以一次装多个：
 
@@ -182,8 +183,26 @@ MIT — 见 [LICENSE](LICENSE)
 
 ## English Summary
 
-A Claude Code marketplace with 16 self-built skills (15 in marketplace + 1 internal). Third-party skills use `npx skills` (not /plugin install) for clean dialog UX.
+A Claude Code marketplace with 17 self-built skills (16 in marketplace + 1 internal). Third-party skills use `npx skills` (not /plugin install) for clean dialog UX.
 
-- **Self-built (in repo)**: ffeishu, freportstd, fpptx, fresearchframe, fresearchreport, fsearch, fdiagram, fdocx, fxlsx, flogme, fmoocrec, flibaudit, fsyncdoc, fskillcreat, fsysarchi, getnote
+- **Self-built (in repo)**: ffeishu, freportstd, fpptx, fresearchframe, fresearchreport, fsearch, fdiagram, fdocx, fxlsx, flogme, fmoocrec, flibaudit, fsyncdoc, fskillcreat, fsysarchi, getnote, fmashwork
 - **Feishu CLI (system level)**: install `@larksuite/cli` via npm — ffeishu orchestrates all `lark-cli` commands
 - **Utilities (user-installed via `npx skills`)**: mattpocock/skills sub-skills (caveman, diagnose, grill-me, ...)
+
+## 个人配置文件位置
+
+多数 `f-*` skill 需要真实值（飞书 token、wiki 节点、账号名等）才能跑——这些**不能进公开仓库**。
+
+`ccconfig` 用户的存放位置（**推荐**）：
+
+| 文件 | 作用 |
+|------|------|
+| `~/git/ccprivate/skill/<name>.yaml` | skill `<name>` 的真实配置（symlink 到 `~/.claude/skills/<name>/config.yaml`） |
+
+示例：`~/git/ccprivate/skill/ffeishu.yaml`、`flogme.yaml`、`fmoocrec.yaml`、`fmashwork.yaml`。
+
+`init-skill.sh sync` 自动建立 symlink；改 ccprivate 立即生效。
+
+独立用户：每个 skill 自带 `config.yaml.example`，复制为 `config.yaml` 填入你的真实值即可。
+
+**已有配置**：`ffeishu` / `flogme` / `fmoocrec` / `fmashwork` 都需要个人配置才能工作。
