@@ -38,18 +38,19 @@ allowed-tools: Read, Write, Bash, Glob, Grep,
 
 ## 首次安装（一次）
 
+**无需手动装依赖** —— skill 首次调用时自动检测并安装（隔离 venv + pip，幂等）。直接跑：
+
 ```bash
-# 1. 建隔离 venv + 装依赖（幂等，重复跑安全）
-bash ~/.claude/skills/fmashwork/scripts/setup.sh
-
-# 2. 若提示缺 python3.x-venv，先装一次（只要一次 sudo）再重跑上一条
-#    sudo apt-get install python3.14-venv
-
-# 3. 校验
-~/.fmashwork-venv/bin/python scripts/fmashwork.py check-env   # → 或直接跑 python3 scripts/fmashwork.py check-env
+python3 ~/.fmashwork-venv/bin/python scripts/fmashwork.py check-env
+# 或简写：python3 scripts/fmashwork.py check-env  （会自动切到 venv + 自动装依赖）
 ```
 
-> 为什么 venv：新版 Ubuntu/Debian 的 pip 有 PEP-668 保护，`pip install` 系统级会报 `externally-managed-environment`。skill 用隔离 venv，不污染系统 Python。`fmashwork.py` 会**自动优先用 `~/.fmashwork-venv`**（不存在则用系统 python3 并提示装）。
+- 缺依赖 → 自动执行 `scripts/setup.sh` 建 venv + 装 trimesh/pymeshfix/pygltflib/pyyaml
+- **唯一可能的手动步骤**：若系统缺 `python3.x-venv`（PEP-668 需要），需一次性执行：
+  `sudo apt-get install python3.14-venv`，之后重跑即可全自动
+- `set -euo pipefail` + 幂等：重复运行只补装缺失，安全
+
+> 为什么 venv：新版 Ubuntu/Debian 的 pip 有 PEP-668 保护，`pip install` 系统级报 `externally-managed-environment`。skill 用隔离 venv（`~/.fmashwork-venv）不污染系统 Python。`fmashwork.py` 自动优先用 venv 运行；venv 不存在则用系统 python3 并触发自动安装。
 
 ## 配置
 
