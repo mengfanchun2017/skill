@@ -34,14 +34,17 @@ SKILL_DIR = Path(__file__).resolve().parent.parent
 CONFIG_PATH = SKILL_DIR / "config.yaml"
 
 # 自动切换到项目 venv（若已用 setup.sh 建好）：保证依赖隔离，且不污染系统 Python
+# 判据用 sys.prefix != sys.base_prefix（venv 内运行），不能用 realpath 比较——
+# venv 的 bin/python 是指向系统 python 的 symlink，realpath 永远相同。
 _FMEASHWORK_VENV = os.environ.get(
     "FMEASHWORK_VENV", f"{Path.home()}/.fmashwork-venv/bin/python"
 )
 if (
-    os.path.exists(_FMEASHWORK_VENV)
-    and os.path.realpath(sys.executable) != os.path.realpath(_FMEASHWORK_VENV)
+    not hasattr(sys, "base_prefix")
+    or sys.prefix == sys.base_prefix
 ):
-    os.execv(_FMEASHWORK_VENV, [_FMEASHWORK_VENV, *sys.argv])  # noqa: S606
+    if os.path.exists(_FMEASHWORK_VENV):
+        os.execv(_FMEASHWORK_VENV, [_FMEASHWORK_VENV, *sys.argv])  # noqa: S606
 
 
 def load_config():
