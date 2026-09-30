@@ -97,12 +97,19 @@ def cmd_check_env(args):
             ok = False
 
     if missing:
-        print("\n  安装依赖（推荐 venv，多数发行版 PEP-668 禁系统级 pip）:")
-        print("    python3 -m venv ~/venvs/meshwork")
-        print(f"    ~/venvs/meshwork/bin/pip install {' '.join(missing)}")
-        print("  之后用 `~/venvs/meshwork/bin/python3 scripts/fmashwork.py` 运行本脚本。")
-        print("  若 venv 报缺 python3-venv：`sudo apt-get install python3.x-venv`")
-        print("  ⚠️  `--break-system-packages` 可绕过但会污染系统 Python，不推荐给他人环境。")
+        # 缺依赖 → 自动跑 setup.sh 装（幂等）。唯一人工步骤是 ensurepip 缺失时那条 sudo。
+        print(f"  ⚠️ 缺 {'/'.join(missing)}，自动执行 scripts/setup.sh 安装...\n")
+        setup = SKILL_DIR / "scripts" / "setup.sh"
+        rc = os.system(f"bash {shlex.quote(str(setup))}")
+        if rc == 0:
+            print("\n  ✅ 依赖已装，重跑 check-env 确认。")
+            # 重新 exec 到 venv（若 setup 建了 venv），重跑本命令
+            os.execv(sys.executable, [sys.executable, *sys.argv])
+        else:
+            print("\n  ❌ setup.sh 未能自动完成。若提示缺 python3.x-venv，请先执行：")
+            print("     sudo apt-get install python3.xx-venv")
+            print("  然后重跑本命令。")
+        sys.exit(1 if rc else 0)
 
     # 配置
     cfg = load_config()
