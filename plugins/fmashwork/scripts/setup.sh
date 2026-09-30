@@ -40,7 +40,7 @@ PY="$VENV_DIR/bin/python"
 
 # ---------- 3. venv 内装依赖（幂等） ----------
 # 循环逐个装而非一句话，缺失才装，减少重复检查/网络
-for pkg in trimesh pymeshfix pygltflib; do
+for pkg in trimesh pymeshfix pygltflib pyyaml; do
     if "$PY" -c "import ${pkg%%[<>=]*}" >/dev/null 2>&1; then
         echo "  ✓ $pkg 已装"
     else
