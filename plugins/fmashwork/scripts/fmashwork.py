@@ -104,8 +104,10 @@ def cmd_check_env(args):
         rc = os.system(f"bash {shlex.quote(str(setup))}")
         if rc == 0:
             print("\n  ✅ 依赖已装，重跑 check-env 确认。")
-            # 重新 exec 到 venv（若 setup 建了 venv），重跑本命令
-            os.execv(sys.executable, [sys.executable, *sys.argv])
+            # 已在 venv 且仍缺 = setup.sh 漏了库，不再循环
+            _in_venv = hasattr(sys, "base_prefix") and sys.prefix != sys.base_prefix
+            if not _in_venv:
+                os.execv(sys.executable, [sys.executable, *sys.argv])
         else:
             print("\n  ❌ setup.sh 未能自动完成。若提示缺 python3.x-venv，请先执行：")
             print("     sudo apt-get install python3.xx-venv")
