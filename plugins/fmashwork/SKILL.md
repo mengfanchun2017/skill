@@ -50,7 +50,7 @@ python3 ~/.fmashwork-venv/bin/python scripts/fmashwork.py check-env
   `sudo apt-get install python3.14-venv`，之后重跑即可全自动
 - `set -euo pipefail` + 幂等：重复运行只补装缺失，安全
 
-> 为什么 venv：新版 Ubuntu/Debian 的 pip 有 PEP-668 保护，`pip install` 系统级报 `externally-managed-environment`。skill 用隔离 venv（`~/.fmashwork-venv）不污染系统 Python。`fmashwork.py` 自动优先用 venv 运行；venv 不存在则用系统 python3 并触发自动安装。
+> 为什么 venv：新版 Ubuntu/Debian 的 pip 有 PEP-668 保护，`pip install` 系统级报 `externally-managed-environment`。skill 用隔离 venv（`~/.fmashwork-venv`）不污染系统 Python。`fmashwork.py` 自动优先用 venv 运行；venv 不存在则用系统 python3 并触发自动安装。
 
 ## 配置
 
@@ -69,7 +69,7 @@ python3 ~/.fmashwork-venv/bin/python scripts/fmashwork.py check-env
 python3 scripts/fmashwork.py check-env
 ```
 
-输出 WSL Python 版本、trimesh/pymeshfix/pygltflib 是否安装、`shared_dir` 是否可达。**任何失败先修再继续**。
+输出 WSL Python 版本、trimesh/pymeshfix/pygltflib 是否安装、`shared_dir` 是否可达。**缺依赖会自动装**（见「首次安装」）；失败项先修再继续。
 
 ### Phase 2: 生成（Playwright MCP）
 
