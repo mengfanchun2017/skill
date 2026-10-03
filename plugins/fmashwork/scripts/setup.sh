@@ -13,10 +13,10 @@
 
 set -euo pipefail
 
-VENV_DIR="${FMEASHWORK_VENV:-$HOME/.fmashwork-venv}"
+VENV_DIR="${FMASHWORK_VENV:-$HOME/.fmashwork-venv}"
 PY_PREFIX="python3"
 
-# ---------- 1. 探测 venv 组件（ensurepip） ----------
+# ensurepip 缺失是 PEP-668 前唯一硬边界：Ubuntu 精简 Python 不带，需 sudo 一次
 if ! "$PY_PREFIX" -c "import ensurepip" >/dev/null 2>&1; then
     minor="$("$PY_PREFIX" -c 'import sys; print(sys.version_info.minor)')"
     echo "❌ 缺 venv 组件（多数 Ubuntu 精简装 Python 时不带）。先装一次（只需一次）:"
@@ -27,7 +27,7 @@ if ! "$PY_PREFIX" -c "import ensurepip" >/dev/null 2>&1; then
     exit 1
 fi
 
-# ---------- 2. 幂等建 venv ----------
+# 幂等建 venv
 if [ ! -x "$VENV_DIR/bin/python" ]; then
     echo "→ 创建 venv: $VENV_DIR"
     "$PY_PREFIX" -m venv "$VENV_DIR"
@@ -38,9 +38,9 @@ fi
 PIP="$VENV_DIR/bin/pip"
 PY="$VENV_DIR/bin/python"
 
-# ---------- 3. venv 内装依赖（幂等） ----------
+# 幂等逐装
 # 循环逐个装而非一句话，缺失才装，减少重复检查/网络
-for pkg in trimesh pymeshfix pygltflib pyyaml; do
+for pkg in trimesh pymeshfix numpy pyyaml; do
     if "$PY" -c "import ${pkg%%[<>=]*}" >/dev/null 2>&1; then
         echo "  ✓ $pkg 已装"
     else
@@ -49,7 +49,7 @@ for pkg in trimesh pymeshfix pygltflib pyyaml; do
     fi
 done
 
-# ---------- 4. 完成提示 ----------
+# 完成提示
 echo
 echo "✅ 依赖就绪。用 venv 的 Python 运行工具："
 echo
