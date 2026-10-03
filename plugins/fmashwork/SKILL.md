@@ -39,7 +39,10 @@ allowed-tools: Read, Write, Bash, Glob, Grep,
 
 ## 首次安装（一次）
 
-**无需手动装依赖** —— skill 首次调用时自动检测并安装（隔离 venv + pip，幂等）。直接跑：
+**无需手动装依赖**，两条路都自动：
+
+1. **ccconfig 同步时**（推荐）：`init-skill.sh sync` 读 `deps.txt` 的 pip 依赖 → 自动调本 skill 的 `scripts/setup.sh` 建 `~/.fmashwork-venv` + 装 4 个包（幂等，已装则跳过）。别的终端 `maintain.sh self all` 拉一次即就绪。
+2. **skill 首次调用时**（兜底）：直接跑下面命令，自动切 venv + 自动安装。
 
 ```bash
 python3 ~/.fmashwork-venv/bin/python scripts/fmashwork.py check-env
