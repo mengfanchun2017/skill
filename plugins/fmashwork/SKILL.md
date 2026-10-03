@@ -7,7 +7,8 @@ description: |
   用法：用户说 "meshwork" / "fmashwork" / "跑图生3D" / "3D 打印工作流" / "校验模型" 触发
 allowed-tools: Read, Write, Bash, Glob, Grep,
   mcp__playwright__browser_navigate, mcp__playwright__browser_click, mcp__playwright__browser_snapshot,
-  mcp__playwright__browser_fill, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_wait_for
+  mcp__playwright__browser_fill, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_wait_for,
+  mcp__playwright__browser_file_upload, mcp__playwright__browser_new_page, mcp__playwright__browser_resize
 ---
 
 # fmashwork — AI 图生 3D → 拓竹打印自动化
@@ -45,9 +46,12 @@ python3 ~/.fmashwork-venv/bin/python scripts/fmashwork.py check-env
 # 或简写：python3 scripts/fmashwork.py check-env  （会自动切到 venv + 自动装依赖）
 ```
 
-- 缺依赖 → 自动执行 `scripts/setup.sh` 建 venv + 装 trimesh/pymeshfix/pygltflib/pyyaml
+- 缺依赖 → 自动执行 `scripts/setup.sh` 建 venv + 装 trimesh/pymeshfix/numpy/pyyaml
 - **唯一可能的手动步骤**：若系统缺 `python3.x-venv`（PEP-668 需要），需一次性执行：
   `sudo apt-get install python3.14-venv`，之后重跑即可全自动
+- 浏览器通道（Phase 2 图生3D）额外需要 Playwright MCP：
+  `bash ~/git/ccconfig/option-playwright/init.sh --status` 查状态，`--install` 装。
+  **其中 `sudo npx playwright install-deps chromium` 需在终端手动跑一次**（apt 装 ~20 个 .so，后台无法输 sudo 密码），跑过一次即永久可用。
 - `set -euo pipefail` + 幂等：重复运行只补装缺失，安全
 
 > 为什么 venv：新版 Ubuntu/Debian 的 pip 有 PEP-668 保护，`pip install` 系统级报 `externally-managed-environment`。skill 用隔离 venv（`~/.fmashwork-venv`）不污染系统 Python。`fmashwork.py` 自动优先用 venv 运行；venv 不存在则用系统 python3 并触发自动安装。
