@@ -73,11 +73,13 @@ python3 ~/.fmashwork-venv/bin/python scripts/fmashwork.py check-env
 python3 scripts/fmashwork.py check-env
 ```
 
-输出 WSL Python 版本、trimesh/pymeshfix/pygltflib 是否安装、`shared_dir` 是否可达。**缺依赖会自动装**（见「首次安装」）；失败项先修再继续。
+输出 WSL Python 版本、trimesh/pymeshfix/numpy 是否安装、`shared_dir` 是否可达。**缺依赖会自动装**（见「首次安装」）；失败项先修再继续。
 
 ### Phase 2: 生成（Playwright MCP）
 
 打开厂商网页版 → 输入提示词/上传参考图 → 等待生成 → 下载到 `shared_dir`。
+
+> 前置：Playwright MCP 已装。`bash ~/git/ccconfig/option-playwright/init.sh --status` 查。`✘ playwright` = chromium 没装，跑 `--install`（首次需手动跑一次 `sudo npx playwright install-deps chromium`）。
 
 **网页免费 ≠ 免费 API**：MCP 通道（Meshy 官方/混元3D 社区版）都需要付费 API key，本 skill 默认走 Playwright 吃网页免费额度。
 
