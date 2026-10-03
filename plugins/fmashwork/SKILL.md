@@ -51,7 +51,7 @@ python3 ~/.fmashwork-venv/bin/python scripts/fmashwork.py check-env
   `sudo apt-get install python3.14-venv`，之后重跑即可全自动
 - 浏览器通道（Phase 2 图生3D）额外需要 Playwright MCP：
   `bash ~/git/ccconfig/option-playwright/init.sh --status` 查状态，`--install` 装。
-  **其中 `sudo npx playwright install-deps chromium` 需在终端手动跑一次**（apt 装 ~20 个 .so，后台无法输 sudo 密码），跑过一次即永久可用。
+  **其中 `sudo env "PATH=$PATH" npx --yes playwright install-deps chromium` 需在终端手动跑一次**（apt 装 ~20 个 .so，后台无法输 sudo 密码）。npx 在 user-local 路径，sudo 默认 PATH 找不到，必须显式传 PATH 或用绝对路径 `/home/francis/.local/bin/npx`。跑过一次即永久可用。
 - `set -euo pipefail` + 幂等：重复运行只补装缺失，安全
 
 > 为什么 venv：新版 Ubuntu/Debian 的 pip 有 PEP-668 保护，`pip install` 系统级报 `externally-managed-environment`。skill 用隔离 venv（`~/.fmashwork-venv`）不污染系统 Python。`fmashwork.py` 自动优先用 venv 运行；venv 不存在则用系统 python3 并触发自动安装。
