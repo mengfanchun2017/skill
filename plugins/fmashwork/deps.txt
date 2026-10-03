@@ -4,6 +4,5 @@
 
 trimesh  pip:latest  fmashwork
 pymeshfix  pip:latest  fmashwork
-pygltflib  pip:latest  fmashwork
 numpy  pip:latest  fmashwork
 pyyaml  pip:latest  fmashwork

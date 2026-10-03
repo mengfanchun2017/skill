@@ -2,7 +2,7 @@
 """fmashwork — AI 图生 3D → 拓竹打印 工具脚本
 
 子命令:
-  check-env        检查 Python / trimesh / pymeshfix / pygltflib / shared_dir / config
+  check-env        检查 Python / trimesh / pymeshfix / numpy / shared_dir / config
   validate <file>  校验水密 / 体积 / 面数 / 流形
   repair <in> <out>  pymeshfix 修孔洞
   convert <in> <out> [--format fmt]  格式互转 glb/stl/obj/3mf
@@ -10,7 +10,7 @@
   pipeline <in>    validate + (repair 如需) + convert 一次性串完
 
 设计原则:
-  - 单文件 + argparse,无外部依赖除 trimesh/pymeshfix/pygltflib
+  - 单文件 + argparse,无外部依赖除 trimesh/pymeshfix/numpy
   - 所有路径支持 WSL (/mnt/c/...) 和 Linux 原生
   - 输出 JSON 友好（方便 Claude 解析）
 
@@ -34,18 +34,20 @@ from pathlib import Path
 SKILL_DIR = Path(__file__).resolve().parent.parent
 CONFIG_PATH = SKILL_DIR / "config.yaml"
 
-# 自动切换到项目 venv（若已用 setup.sh 建好）：保证依赖隔离，且不污染系统 Python
-# 判据用 sys.prefix != sys.base_prefix（venv 内运行），不能用 realpath 比较——
-# venv 的 bin/python 是指向系统 python 的 symlink，realpath 永远相同。
-_FMEASHWORK_VENV = os.environ.get(
-    "FMEASHWORK_VENV", f"{Path.home()}/.fmashwork-venv/bin/python"
+# 自动切入 venv（if 已由 setup.sh 建好）：隔离依赖不污染系统 python。
+# 判据用 sys.prefix != sys.base_prefix——venv 的 bin/python 是指向系统 python 的 symlink，realpath 相同判不出。
+_FMASHWORK_VENV = os.environ.get(
+    "FMASHWORK_VENV", f"{Path.home()}/.fmashwork-venv/bin/python"
 )
-if (
-    not hasattr(sys, "base_prefix")
-    or sys.prefix == sys.base_prefix
-):
-    if os.path.exists(_FMEASHWORK_VENV):
-        os.execv(_FMEASHWORK_VENV, [_FMEASHWORK_VENV, *sys.argv])  # noqa: S606
+
+
+def _switch_to_venv() -> bool:
+    """非 venv 且 venv 已建 → exec 进去，返回是否已切换；避免重复切换递归。"""
+    if hasattr(sys, "base_prefix") and sys.prefix != sys.base_prefix:
+        return False
+    if os.path.exists(_FMASHWORK_VENV):
+        os.execv(_FMASHWORK_VENV, [_FMASHWORK_VENV, *sys.argv])  # noqa: S606
+    return False
 
 
 def load_config():
@@ -69,6 +71,7 @@ def load_config():
 
 
 # -------- Phase 1: 环境检查 --------
+_switch_to_venv()
 
 
 def cmd_check_env(args):
@@ -85,7 +88,7 @@ def cmd_check_env(args):
     ok = ok and py_ok
 
     # 关键库
-    libs = ["trimesh", "pymeshfix", "pygltflib", "numpy"]
+    libs = ["trimesh", "pymeshfix", "numpy"]
     missing = []
     for label in libs:
         try:
@@ -102,17 +105,15 @@ def cmd_check_env(args):
         print(f"  ⚠️ 缺 {'/'.join(missing)}，自动执行 scripts/setup.sh 安装...\n")
         setup = SKILL_DIR / "scripts" / "setup.sh"
         rc = os.system(f"bash {shlex.quote(str(setup))}")
-        if rc == 0:
-            print("\n  ✅ 依赖已装，重跑 check-env 确认。")
-            # 已在 venv 且仍缺 = setup.sh 漏了库，不再循环
-            _in_venv = hasattr(sys, "base_prefix") and sys.prefix != sys.base_prefix
-            if not _in_venv:
-                os.execv(sys.executable, [sys.executable, *sys.argv])
-        else:
-            print("\n  ❌ setup.sh 未能自动完成。若提示缺 python3.x-venv，请先执行：")
-            print("     sudo apt-get install python3.xx-venv")
+        if rc != 0:
+            minor = sys.version_info.minor
+            print(f"\n  ❌ setup.sh 未能自动完成。若提示缺 python3.{minor}-venv，请先执行：")
+            print(f"     sudo apt-get install python3.{minor}-venv")
             print("  然后重跑本命令。")
-        sys.exit(1 if rc else 0)
+            sys.exit(1)
+        # 装完：切 venv 重跑一次 check-env 做真校验（setup 可能只装了系统 python，或装漏）
+        _switch_to_venv()
+        os.execv(sys.executable, [sys.executable, *sys.argv])
 
     # 配置
     cfg = load_config()
