@@ -36,18 +36,17 @@ CONFIG_PATH = SKILL_DIR / "config.yaml"
 
 # 自动切入 venv（if 已由 setup.sh 建好）：隔离依赖不污染系统 python。
 # 判据用 sys.prefix != sys.base_prefix——venv 的 bin/python 是指向系统 python 的 symlink，realpath 相同判不出。
-_FMASHWORK_VENV = os.environ.get(
-    "FMASHWORK_VENV", f"{Path.home()}/.fmashwork-venv/bin/python"
-)
+# FMASHWORK_VENV 语义 = venv 目录（与 setup.sh 一致）；python 入口固定 <dir>/bin/python。
+_FMASHWORK_VENV = os.environ.get("FMASHWORK_VENV", f"{Path.home()}/.fmashwork-venv")
+_FMASHWORK_PY = f"{_FMASHWORK_VENV}/bin/python"
 
 
-def _switch_to_venv() -> bool:
-    """非 venv 且 venv 已建 → exec 进去，返回是否已切换；避免重复切换递归。"""
+def _switch_to_venv() -> None:
+    """非 venv 且 venv 已建 → exec 进去。系统 python 启动时触发。</br>返回 None；exec 后不返回。"""
     if hasattr(sys, "base_prefix") and sys.prefix != sys.base_prefix:
-        return False
-    if os.path.exists(_FMASHWORK_VENV):
-        os.execv(_FMASHWORK_VENV, [_FMASHWORK_VENV, *sys.argv])  # noqa: S606
-    return False
+        return
+    if os.path.exists(_FMASHWORK_PY):
+        os.execv(_FMASHWORK_PY, [_FMASHWORK_PY, *sys.argv])  # noqa: S606
 
 
 def load_config():
@@ -111,9 +110,8 @@ def cmd_check_env(args):
             print(f"     sudo apt-get install python3.{minor}-venv")
             print("  然后重跑本命令。")
             sys.exit(1)
-        # 装完：切 venv 重跑一次 check-env 做真校验（setup 可能只装了系统 python，或装漏）
-        _switch_to_venv()
-        os.execv(sys.executable, [sys.executable, *sys.argv])
+        # 装完：exec 到 venv 重跑一次 check-env 做真校验（setup 只建 venv，系统 python 依旧没依赖）
+        os.execv(_FMASHWORK_PY, [_FMASHWORK_PY, *sys.argv])
 
     # 配置
     cfg = load_config()
