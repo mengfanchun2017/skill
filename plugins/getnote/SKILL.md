@@ -5,24 +5,34 @@ description: |
   得到大脑(Get笔记) 集成 — MCP 工具驱动。笔记 CRUD、语义搜索、知识库管理、图片上传、博主内容、直播。
   Use when 用户说"记笔记"/"保存到得到"/"搜笔记"/"搜知识库"/"我的笔记"/"知识库"/"博主"/"直播"/"上传图片到得到"。
 allowed-tools: Bash, Read, Write,
-  mcp__getnote__list_notes, mcp__getnote__get_note, mcp__getnote__save_note,
-  mcp__getnote__update_note, mcp__getnote__get_note_task_progress,
-  mcp__getnote__delete_note, mcp__getnote__add_note_tags,
-  mcp__getnote__delete_note_tag, mcp__getnote__recall,
-  mcp__getnote__recall_knowledge, mcp__getnote__list_topics,
-  mcp__getnote__create_topic, mcp__getnote__list_topic_notes,
-  mcp__getnote__batch_add_notes_to_topic, mcp__getnote__remove_note_from_topic,
-  mcp__getnote__get_upload_config, mcp__getnote__get_upload_token,
-  mcp__getnote__upload_image, mcp__getnote__list_topic_bloggers,
-  mcp__getnote__list_topic_blogger_contents, mcp__getnote__get_blogger_content_detail,
-  mcp__getnote__list_topic_lives, mcp__getnote__get_live_detail,
-  mcp__getnote__get_quota, mcp__getnote__share_note,
-  mcp__getnote__follow_topic_live, mcp__getnote__list_subscribe_topics
+  mcp__getnote__add_note_tags, mcp__getnote__batch_add_notes_to_topic,
+  mcp__getnote__create_topic, mcp__getnote__create_topic_directory,
+  mcp__getnote__delete_note, mcp__getnote__delete_note_tag,
+  mcp__getnote__delete_topic_directory, mcp__getnote__follow_topic_blogger,
+  mcp__getnote__follow_topic_live, mcp__getnote__get_blogger_content_detail,
+  mcp__getnote__get_knowledge_file_capabilities, mcp__getnote__get_knowledge_file_upload_token,
+  mcp__getnote__get_live_detail, mcp__getnote__get_note,
+  mcp__getnote__get_note_attachments, mcp__getnote__get_note_chapters,
+  mcp__getnote__get_note_marks, mcp__getnote__get_note_original,
+  mcp__getnote__get_note_quick_note, mcp__getnote__get_note_task_progress,
+  mcp__getnote__get_note_timeline, mcp__getnote__get_note_todos,
+  mcp__getnote__get_note_transcript, mcp__getnote__get_quota,
+  mcp__getnote__get_sprout, mcp__getnote__get_upload_config,
+  mcp__getnote__get_upload_token, mcp__getnote__list_notes,
+  mcp__getnote__list_sprouts, mcp__getnote__list_subscribe_topics,
+  mcp__getnote__list_topic_blogger_contents, mcp__getnote__list_topic_bloggers,
+  mcp__getnote__list_topic_directories, mcp__getnote__list_topic_lives,
+  mcp__getnote__list_topic_notes, mcp__getnote__list_topics,
+  mcp__getnote__recall, mcp__getnote__recall_knowledge,
+  mcp__getnote__remove_note_from_topic, mcp__getnote__save_note,
+  mcp__getnote__share_note, mcp__getnote__update_note,
+  mcp__getnote__update_topic_directory, mcp__getnote__upload_image,
+  mcp__getnote__upload_knowledge_file
 ---
 
 # getnote — 得到大脑 MCP 集成
 
-27 个 MCP tools 覆盖得到大脑全部功能。所有操作通过 MCP tool call 直接执行，不走 Bash CLI。
+45 个 MCP tools 覆盖得到大脑全部功能。所有操作通过 MCP tool call 直接执行，不走 Bash CLI。
 
 ## 配置
 
@@ -63,6 +73,21 @@ allowed-tools: Bash, Read, Write,
 | "分享笔记" | `share_note` |
 | "笔记进度"/"处理状态" | `get_note_task_progress` |
 
+### 笔记原文直读（v1.8 新增）
+
+按 note_type 直接取原文字段，不读 AI 摘要。链接→网页原文，录音→转写，文字→正文。
+
+| 用户说 | Tool |
+|--------|------|
+| "读原文"/"看原文" | `get_note_original` |
+| "转写文本"/"录音原文" | `get_note_transcript` |
+| "时间线"/"结构化时间线" | `get_note_timeline` |
+| "章节"/"章节时间线" | `get_note_chapters` |
+| "标记"/"笔记标记" | `get_note_marks` |
+| "待办"/"从会议提取待办" | `get_note_todos` |
+| "快捷笔记" | `get_note_quick_note` |
+| "附件"/"笔记里的图片音频" | `get_note_attachments` |
+
 ### 标签
 
 | 用户说 | Tool |
@@ -86,6 +111,10 @@ allowed-tools: Bash, Read, Write,
 | "知识库里有什么"/"查看知识库笔记" | `list_topic_notes` |
 | "加入知识库"/"添加到知识库" | `batch_add_notes_to_topic` |
 | "移出知识库" | `remove_note_from_topic` |
+| "知识库目录"/"文件夹结构" | `list_topic_directories` |
+| "创建文件夹" | `create_topic_directory` |
+| "重命名文件夹"/"移动文件夹" | `update_topic_directory` |
+| "删除文件夹"（破坏性，须用户确认） | `delete_topic_directory` |
 
 ### 博主内容
 
@@ -94,6 +123,7 @@ allowed-tools: Bash, Read, Write,
 | "博主列表"/"关注了哪些博主" | `list_topic_bloggers` |
 | "博主发了什么"/"博主内容" | `list_topic_blogger_contents` |
 | "查看博主内容详情" | `get_blogger_content_detail` |
+| "订阅博主"/"关注抖音博主到知识库" | `follow_topic_blogger` |
 
 ### 直播
 
@@ -102,6 +132,19 @@ allowed-tools: Bash, Read, Write,
 | "直播列表"/"有什么直播" | `list_topic_lives` |
 | "直播详情" | `get_live_detail` |
 | "预约直播"/"关注直播" | `follow_topic_live` |
+
+### 知识库文件上传（v1.8 新增）
+
+| 用户说 | Tool |
+|--------|------|
+| "上传文件到知识库"/"传 PDF 到知识库" | `get_knowledge_file_capabilities` → `get_knowledge_file_upload_token` → `upload_knowledge_file` |
+
+### 发芽报告
+
+| 用户说 | Tool |
+|--------|------|
+| "发芽报告"/"每月发芽" | `list_sprouts` |
+| "发芽原文"/"读发芽报告" | `get_sprout` |
 
 ### 图片上传
 
