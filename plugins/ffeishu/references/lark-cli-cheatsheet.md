@@ -79,7 +79,8 @@ lark-cli docs +update --api-version v2 --doc <doc_token> --as user --command app
 
 - `--command append`（v2，不再是 `--mode`）
 - `<source token=...>` 复用已上传的 Drive 文件；`name=` 可任意改名
-- 删除 Drive 文件：`lark-cli api DELETE /open-apis/drive/v1/files/{token}`
+- 删除 Drive 文件（**必须带 `--params '{"type":"file"}'`**，否则 99992402 validation failed）：
+  `lark-cli api DELETE /open-apis/drive/v1/files/{token} --params '{"type":"file"}'`
 
 ## 关键约束
 
