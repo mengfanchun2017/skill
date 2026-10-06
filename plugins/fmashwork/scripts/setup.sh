@@ -16,15 +16,17 @@ set -euo pipefail
 VENV_DIR="${FMASHWORK_VENV:-$HOME/.fmashwork-venv}"
 PY_PREFIX="python3"
 
-# ensurepip 缺失是 PEP-668 前唯一硬边界：Ubuntu 精简 Python 不带，需 sudo 一次
+# ensurepip 缺失（PEP-668 精简 Python 不带）：自动 apt 装，省掉手动一步
 if ! "$PY_PREFIX" -c "import ensurepip" >/dev/null 2>&1; then
     minor="$("$PY_PREFIX" -c 'import sys; print(sys.version_info.minor)')"
-    echo "❌ 缺 venv 组件（多数 Ubuntu 精简装 Python 时不带）。先装一次（只需一次）:"
-    echo
-    echo "    sudo apt-get install python3.${minor}-venv"
-    echo
-    echo "装完重新运行本脚本即可。"
-    exit 1
+    echo "→ 缺 venv 组件，自动安装 python3.${minor}-venv ..."
+    sudo apt-get install -y "python3.${minor}-venv" || {
+        echo "❌ 自动安装失败，需手动执行:"
+        echo "    sudo apt-get install python3.${minor}-venv"
+        echo "装完重新运行本脚本即可。"
+        exit 1
+    }
+    echo "→ venv 组件已装"
 fi
 
 # 幂等建 venv
