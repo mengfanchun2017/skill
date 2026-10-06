@@ -45,6 +45,42 @@ lark-cli drive +search --query test --page-size 1 --as user 2>&1 | sed '/^\[lark
 | `drive +export-download` | `--file-token --file-name` | 必须相对路径 |
 | `wiki +node-get` | `--token "URL"` 或 `--node-token` + `--obj-type` | 支持 URL |
 
+## 文件上传 / 下载（实测 2026-10-06）
+
+### 下载两通道（附件 vs Drive 文件）
+
+| 文件来源 | 命令 | 结果 |
+|----------|------|------|
+| **Drive 里的文件**（`+upload` 上传的） | `drive +download --file-token <token> --output ./x` | ✅ 直接可用 |
+| **doc 内嵌附件**（`<figure><source token=.../>`） | `drive +download --file-token <token>` | ❌ HTTP 403 `token lookup failed` |
+| **doc 内嵌附件**（正确通道） | `drive +preview --file-token <token> --type source_file --output ./x` | ✅ 拿到原始文件 |
+
+**结论**：凡 URL/文档里引到的文件（附件块），一律走 `+preview --type source_file`；普通 Drive 文件才用 `+download`。
+
+### 上传大小限制：严格 20MB
+
+- 实测 19MB → ✅ ok；21MB → ❌ `1061043 file size beyond limit`
+- **边界 = 20MB**（`drive/v1/files/upload_all` 上限）
+- lark-cli help 声称 `>20MB 自动 multipart`，**实测不生效**——超过 20MB 直接报 1061043
+- 官方大文件通道是 `multipart-upload-file` 预上传，但 lark-cli 未暴露对应子命令
+- **结论**：>20MB 的文件 lark-cli 传不了，需换通道（压缩/直接给路径/换同步盘）
+
+### zip 等二进制文件
+
+- 上传/下载全通道可用，`+download` 下载后字节完整（zipfile.testzip 通过）
+- 文件类型无限制，zip/docx/图片同待遇
+
+### 追加附件块到文档底部
+
+```bash
+lark-cli docs +update --api-version v2 --doc <doc_token> --as user --command append --doc-format xml \
+  --content '<figure view-type="Preview"><source token="<file_token>" name="<显示名>"/></figure>'
+```
+
+- `--command append`（v2，不再是 `--mode`）
+- `<source token=...>` 复用已上传的 Drive 文件；`name=` 可任意改名
+- 删除 Drive 文件：`lark-cli api DELETE /open-apis/drive/v1/files/{token}`
+
 ## 关键约束
 
 - **含嵌入资源（白板/图片/电子表格）禁止 overwrite** — 只能用 str_replace / block_insert_after / block_delete
