@@ -42,8 +42,10 @@ PY="$VENV_DIR/bin/python"
 
 # 幂等逐装
 # 循环逐个装而非一句话，缺失才装，减少重复检查/网络
+# import 名 ≠ pip 名：pyyaml 导入是 yaml，需显式映射
 for pkg in trimesh pymeshfix numpy pyyaml; do
-    if "$PY" -c "import ${pkg%%[<>=]*}" >/dev/null 2>&1; then
+    case "$pkg" in pyyaml) mod=yaml ;; *) mod="$pkg" ;; esac
+    if "$PY" -c "import $mod" >/dev/null 2>&1; then
         echo "  ✓ $pkg 已装"
     else
         echo "→ 安装 $pkg"
