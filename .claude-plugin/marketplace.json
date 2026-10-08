@@ -134,17 +134,6 @@
       "description": "源码文档同步 + 可选 aiagt 产品页同步。两阶段流水线，可被其他 agent 调用。 用法：代码变更后同步文档，有对应产品页则顺带更新。"
     },
     {
-      "name": "getnote",
-      "source": "./plugins/getnote",
-      "description": "得到大脑(Get笔记) 集成 — MCP 工具驱动。笔记 CRUD、语义搜索、知识库管理、图片上传、博主内容、直播。 Use when 用户说\"记笔记\"/\"保存到得到\"/\"搜笔记\"/\"搜知识库\"/\"我的笔记\"/\"知识库\"/\"博主\"/\"直播\"/\"上传图片到得到\"。",
-      "keywords": [
-        "getnote",
-        "dedao",
-        "notes",
-        "knowledge"
-      ]
-    },
-    {
       "name": "fskillcreat",
       "source": "./plugins/fskillcreat",
       "description": "创建新 Skill，问公开/私有，生成骨架，注册 symlink",
@@ -152,5 +141,5 @@
         "f"
       ]
     }
-]
+  ]
 }
