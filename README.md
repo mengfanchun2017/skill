@@ -29,7 +29,6 @@
 | 个人 OKR/日志 | `/plugin install flogme@mengfanchun2017-skills` |
 | 慕课推荐 | `/plugin install fmoocrec@mengfanchun2017-skills` |
 | 系统架构师备考 | `/plugin install fsysarchi@mengfanchun2017-skills` |
-| 得到笔记 | `/plugin install getnote@mengfanchun2017-skills` |
 | 源码文档同步 | `/plugin install fsyncdoc@mengfanchun2017-skills` |
 | 库审计 | `/plugin install flibaudit@mengfanchun2017-skills` |
 | 报告写作规范 | `/plugin install freportstd@mengfanchun2017-skills` |
@@ -92,7 +91,6 @@ cconfig 用户：`bash ccconfig/lib/init-skill.sh sync` 自动从 `conf/third-pa
 | `fsyncdoc` | 源码文档同步 + 产品页同步（aiagt） |
 | `fskillcreat` | Skill 开发脚手架 — 快速创建新 skill 骨架 |
 | `fsysarchi` | 系统分析师备考 — 暗号 `archi` 触发，随工边做边学 |
-| `getnote` | 得到大脑集成 — MCP 驱动，笔记 CRUD/搜索/知识库/直播 |
 
 ## 外部 skill — 三方上游 + 系统层 lark-cli（不通过本仓装）
 
@@ -155,7 +153,6 @@ claude-skills/                          ← 单聚合 marketplace 仓
 │   ├── fsyncdoc/SKILL.md
 │   ├── fskillcreat/SKILL.md
 │   ├── fsysarchi/SKILL.md
-│   ├── getnote/SKILL.md
 ├── README.md
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
@@ -183,9 +180,9 @@ MIT — 见 [LICENSE](LICENSE)
 
 ## English Summary
 
-A Claude Code marketplace with 17 self-built skills (16 in marketplace + 1 internal). Third-party skills use `npx skills` (not /plugin install) for clean dialog UX.
+A Claude Code marketplace with 16 self-built skills (all in marketplace). Third-party skills use `npx skills` (not /plugin install) for clean dialog UX.
 
-- **Self-built (in repo)**: ffeishu, freportstd, fpptx, fresearchframe, fresearchreport, fsearch, fdiagram, fdocx, fxlsx, flogme, fmoocrec, flibaudit, fsyncdoc, fskillcreat, fsysarchi, getnote, fmashwork
+- **Self-built (in repo)**: ffeishu, freportstd, fpptx, fresearchframe, fresearchreport, fsearch, fdiagram, fdocx, fxlsx, flogme, fmoocrec, flibaudit, fsyncdoc, fskillcreat, fsysarchi, fmashwork
 - **Feishu CLI (system level)**: install `@larksuite/cli` via npm — ffeishu orchestrates all `lark-cli` commands
 - **Utilities (user-installed via `npx skills`)**: mattpocock/skills sub-skills (caveman, diagnose, grill-me, ...)
 
