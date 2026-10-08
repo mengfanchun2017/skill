@@ -136,8 +136,8 @@ lark-cli auth login
 ```
 claude-skills/                          ← 单聚合 marketplace 仓
 ├── .claude-plugin/
-│   └── marketplace.json                # 15 plugin 入口（14 本地 + 1 getnote）
-├── plugins/                            ← 16 个自建 plugin（15 marketplace + 1 内部）
+│   └── marketplace.json                # 16 plugin 入口（全本地）
+├── plugins/                            ← 16 个自建 plugin（全 marketplace）
 │   ├── ffeishu/SKILL.md
 │   ├── freportstd/SKILL.md
 │   ├── fpptx/SKILL.md
