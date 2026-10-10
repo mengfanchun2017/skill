@@ -36,7 +36,7 @@ allowed-tools: Read, Glob, Grep
 
 - **飞书格式**：全部走 `fstd-core`（H1-H3、无手动编号、`<lark-table>` XML colgroup 之和 822）
 - **父文档**：所有子文档挂课程父文档（`root_doc_url`）下，禁止套用默认 wiki 节点
-- **案例引用**（可选）：注入格式 `> [案例引用: <title>](<url>#<id>)`，调用协议见 `forchcourse/references/case-protocol.md`；无命中不阻断主流程
+- **案例引用**（可选）：注入格式 `> [案例引用: <title>](<url>#<id>)`，调用协议见 forchcourse 的 `references/case-protocol.md`；无命中不阻断主流程
 - **标题**：文档标题 = 产物名（如《商业分析入门-课程体系》），正文主节 H1，不重复文档名作标题
 - **逐模块确认**：体系/教案/练习按模块或按章展示 → 用户改 → 确认 → 下一单元
 
