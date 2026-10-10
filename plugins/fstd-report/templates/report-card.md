@@ -1,6 +1,6 @@
 # 报告卡片（Report Card）
 
-> 正式写报告前的确认清单。fresearchreport Step 0 调用。
+> 正式写报告前的确认清单。orchreport Step 0 调用。
 
 ## 确认项
 

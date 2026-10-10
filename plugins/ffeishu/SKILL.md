@@ -255,7 +255,7 @@ fetch 源文档 → 分析H1/H2边界 → 拆分方案 → 用户审批 → 创�
 ## 工作流 G: 图子文档生成（数据/分析图）
 
 > 架构/流程图委托 fdiagram。本工作流用于**数据/分析图**（matplotlib/plotly）：每个图建独立子文档。
-> 内容规范见 `../freportstd/SKILL.md`，触发见 `../fresearchreport/SKILL.md` 工作流 G。
+> 内容规范见 `../fstd-report/SKILL.md`，触发见 `../orchreport/SKILL.md` 工作流 G。
 
 ### 完整流程
 
