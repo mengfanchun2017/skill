@@ -20,16 +20,16 @@
       ]
     },
     {
-      "name": "fstd-report",
+      "name": "fwstd-report",
       "description": "报告写作横向规范 — 内容结构、数据呈现、论证逻辑、图表约定。 4 套模板（研究/分析/对比/方案）+ 通用规则。 Use when 用户说\"写报告\"/\"出报告\"/\"分析报告\"/\"对比报告\"/\"方案报告\"， 或任何需要产出\"长篇正式文档\"的场景。",
-      "source": "./plugins/fstd-report",
+      "source": "./plugins/fwstd-report",
       "keywords": [
         "f"
       ]
     },
     {
       "name": "fpptx",
-      "description": "PPT/X 总控 — 从 md/wiki/材料到 PPTX 或飞书 Slides。 OfficeCLI 引擎（原生 OpenXML），也支持 lark-cli 生成飞书在线幻灯片。 内置 6 套设计主题，图表委托 fdiagram，内容规范委托 fstd-report。",
+      "description": "PPT/X 总控 — 从 md/wiki/材料到 PPTX 或飞书 Slides。 OfficeCLI 引擎（原生 OpenXML），也支持 lark-cli 生成飞书在线幻灯片。 内置 6 套设计主题，图表委托 fdiagram，内容规范委托 fwstd-report。",
       "source": "./plugins/fpptx",
       "keywords": [
         "f"
@@ -45,7 +45,7 @@
     },
     {
       "name": "fworch-report",
-      "description": "报告生成 — 读 JSON / 大纲 / 自由素材 → 结构化 markdown 报告。 3 种输入模式，按用户场景自动选择。内容规范委派 fstd-report。 飞书输出委派 ffeishu（图子文档工作流 G）。 用法：用户说\"写报告\"/\"出报告\"/\"分析报告\"/\"对比报告\"/\"方案报告\"触发",
+      "description": "报告生成 — 读 JSON / 大纲 / 自由素材 → 结构化 markdown 报告。 3 种输入模式，按用户场景自动选择。内容规范委派 fwstd-report。 飞书输出委派 ffeishu（图子文档工作流 G）。 用法：用户说\"写报告\"/\"出报告\"/\"分析报告\"/\"对比报告\"/\"方案报告\"触发",
       "source": "./plugins/fworch-report",
       "keywords": [
         "f"
@@ -142,17 +142,17 @@
       ]
     },
     {
-      "name": "fstd-course",
+      "name": "fwstd-course",
       "description": "课程文档内容规范 — 系列课程各产物（调研报告/课程体系/教案/练习/总结）的 内容架构、骨架与写作要求。飞书格式见 ffeishu，编排与执行见 fworch-course。 用法：被 fworch-course 及其子 skill 引用，一般不直接触发",
-      "source": "./plugins/fstd-course",
+      "source": "./plugins/fwstd-course",
       "keywords": [
         "f"
       ]
     },
     {
-      "name": "fstd-case",
+      "name": "fwstd-case",
       "description": "案例库内容规范 — Base 字段 schema、案例起名规则、正文模版与写作要求。 飞书格式见 ffeishu；案例编排/检索/建库执行见 fworch-case。 用法：被 fworch-case 引用，一般不直接触发",
-      "source": "./plugins/fstd-case",
+      "source": "./plugins/fwstd-case",
       "keywords": [
         "f"
       ]
