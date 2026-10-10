@@ -2,7 +2,7 @@
 name: fstd-course
 description: |
   课程文档内容规范 — 系列课程各产物（调研报告/课程体系/教案/练习/总结）的
-  内容架构、骨架与写作要求。飞书格式硬约束见 fstd-core，编排与执行见 forchcourse。
+  内容架构、骨架与写作要求。飞书格式见 ffeishu，编排与执行见 forchcourse。
   用法：被 forchcourse 及其子 skill 引用，一般不直接触发
 user-invocable: false
 allowed-tools: Read, Glob, Grep
@@ -10,13 +10,13 @@ allowed-tools: Read, Glob, Grep
 
 # fstd-course — 课程内容规范（L2）
 
-横向规范层，定义「一份好的课程文档长什么样」。**不绑定执行**（编排/委派走 `forchcourse`），**不重复平台格式**（飞书格式硬约束走 `fstd-core`）。
+横向规范层，定义「一份好的课程文档长什么样」。**不绑定执行**（编排/委派走 `forchcourse`），**不重复平台格式**（飞书格式走 `ffeishu`）。
 
 ## 职责边界
 
 | 本 skill 负责 | 不负责（委派） |
 |--------------|--------------|
-| 课程各产物的内容架构/骨架 | 飞书格式（lark-table 822 等）→ `fstd-core` |
+| 课程各产物的内容架构/骨架 | 飞书格式（lark-table 822 等）→ `ffeishu` |
 | 各产物模板（templates） | 编排/进度/委派 → `forchcourse` |
 | 案例注入的内容约定 | 案例检索 → `forchcase` |
 | 课程级写作要求 | 搜索素材 → `fsearch`/`fresearchframe` |
@@ -34,7 +34,7 @@ allowed-tools: Read, Glob, Grep
 
 ## 课程级写作要求
 
-- **飞书格式**：全部走 `fstd-core`（H1-H3、无手动编号、`<lark-table>` XML colgroup 之和 822）
+- **飞书格式**：全部走 `ffeishu`（write-checklist §2 为真相源）
 - **父文档**：所有子文档挂课程父文档（`root_doc_url`）下，禁止套用默认 wiki 节点
 - **案例引用**（可选）：注入格式 `> [案例引用: <title>](<url>#<id>)`，调用协议见 forchcourse 的 `references/case-protocol.md`；无命中不阻断主流程
 - **标题**：文档标题 = 产物名（如《商业分析入门-课程体系》），正文主节 H1，不重复文档名作标题
@@ -42,7 +42,7 @@ allowed-tools: Read, Glob, Grep
 
 ## 关联
 
-- `fstd-core` — 飞书格式硬约束（唯一真相源）
+- `ffeishu` — 飞书格式（write-checklist §2 为真相源）
 - `forchcourse` — 课程编排（orchestrator）
 - `forchcase` — 案例检索与注入协议
 - `fsearch` / `fresearchframe` — 素材搜索
