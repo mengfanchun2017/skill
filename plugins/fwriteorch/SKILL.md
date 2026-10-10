@@ -61,10 +61,10 @@ cat "${CCPRIVATE_HOME:-$HOME/git/ccprivate}/conf/writing/<genre>.yaml"
 
 - **飞书在线 = 唯一真相源**，本地 yaml 仅镜像（见注册表 `defaults.online_source_of_truth`）
 - **真实 token/父目录只在 `ccprivate/conf/writing/`**，公开仓库零真实值
-- 格式硬约束统一走 `fstd-core`，执行走 `ffeishu`
+- 格式规则统一走 `ffeishu`（`references/write-checklist.md` 为真相源）
 
 ## 关联
 
 - `forchcourse` / `forchreport` / `forchcase` — 编排层
-- `fstd-core` / `fstd-course` / `fstd-report` / `fstd-case` — 规范层
+- `fstd-course` / `fstd-report` / `fstd-case` — 体裁规范层
 - `ffeishu` / `fdiagram` / `fpptx` — 机械层

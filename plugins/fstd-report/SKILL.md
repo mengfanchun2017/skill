@@ -11,7 +11,7 @@ allowed-tools: Read, Write, Glob, Grep, Bash
 
 # fstd-report — 报告写作规范
 
-横向能力，定义"什么是好的报告"。**不绑定任何输出平台**（飞书/Word/Notion 都适用），具体飞书格式委派 `ffeishu`（格式硬约束唯一真相源 = `fstd-core`）。
+横向能力，定义"什么是好的报告"。**不绑定任何输出平台**（飞书/Word/Notion 都适用），具体飞书格式委派 `ffeishu`。
 
 ## 职责边界
 

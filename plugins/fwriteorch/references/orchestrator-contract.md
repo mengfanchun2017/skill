@@ -46,6 +46,6 @@ notes:                                    # 给 orchestrator 的提示
 
 ## 关联
 
-- `fstd-core` — 格式硬约束
+- `ffeishu` — 格式硬约束（write-checklist §2 为真相源）
 - `ffeishu` — 飞书机械层
 - `ccconfig/docs/adr/0043-writing-system-architecture.md` — 架构决策
