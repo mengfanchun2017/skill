@@ -75,6 +75,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 
 ## 文档格式规范（所有创建/编辑遵循）
 
+> **格式硬约束唯一真相源 → `../fstd-core/SKILL.md`**。本节为实现摘要，规则变更以 fstd-core 为准。
 > 完整检查清单（含执行步骤+验证）→ `references/write-checklist.md`。此处为摘要，写操作前 MUST 通读清单。
 
 ### 标题
