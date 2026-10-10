@@ -1,5 +1,5 @@
 ---
-name: orchreport
+name: forchreport
 user-invocable: true
 description: |
   报告生成 — 读 JSON / 大纲 / 自由素材 → 结构化 markdown 报告。
@@ -8,7 +8,7 @@ description: |
 allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 ---
 
-# orchreport — 报告生成
+# forchreport — 报告生成
 
 报告生成模块，将研究结果/大纲/自由素材转换为可读报告。
 
@@ -24,7 +24,7 @@ allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 |----|-------|------|
 | 机械层 | ffeishu | 怎么调 API（fetch / str_replace / block_insert_after / 验证） |
 | 规范层 | fstd-report | 内容写成什么样（模板骨架、论证三要素、数据呈现约定） |
-| 工作流层 | orchreport（本 skill） | 内容怎么产出/迭代（3 种输入模式、分轮评审、搜索补素材） |
+| 工作流层 | forchreport（本 skill） | 内容怎么产出/迭代（3 种输入模式、分轮评审、搜索补素材） |
 
 **更新已有报告时**：ffeishu 工作流 A 执行机械操作，本 skill 提供内容迭代流程（v1→v2），fstd-report 提供内容标准。三层各司其职。
 

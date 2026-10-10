@@ -3,7 +3,7 @@ name: fwriteorch
 user-invocable: true
 description: |
   撰写系统统一入口（路由层）。读体裁注册表判断需求属于哪种体裁（课程/报告/案例），
-  派发到对应 orchestrator（orchcourse/orchreport/orchcase）。用户只描述需求，无需记内部 skill 名。
+  派发到对应 orchestrator（forchcourse/forchreport/forchcase）。用户只描述需求，无需记内部 skill 名。
   用法：用户说"做课程"/"写报告"/"新增案例"等撰写需求时触发
 allowed-tools: Read, Bash, Glob, Grep
 ---
@@ -17,9 +17,9 @@ allowed-tools: Read, Bash, Glob, Grep
 ```
 用户需求（自由描述）
   └─ fwriteorch 读注册表 → 判体裁 → 派发
-       ├─ course  → orchcourse   （系列课程）
-       ├─ report  → orchreport   （报告）
-       └─ case    → orchcase     （案例库）
+       ├─ course  → forchcourse   （系列课程）
+       ├─ report  → forchreport   （报告）
+       └─ case    → forchcase     （案例库）
 ```
 
 四层：`fwriteorch`(L4 路由) → `orch*`(L3 编排) → `fstd-*`(L2 规范) → `ffeishu`+工具(L0 机械)。
@@ -51,11 +51,11 @@ cat "${CCPRIVATE_HOME:-$HOME/git/ccprivate}/conf/writing/<genre>.yaml"
 
 | 体裁 | 编排器 | 规范 |
 |------|--------|------|
-| course | `orchcourse` | `fstd-course` |
-| report | `orchreport` | `fstd-report` |
-| case | `orchcase` | `fstd-case` |
+| course | `forchcourse` | `fstd-course` |
+| report | `forchreport` | `fstd-report` |
+| case | `forchcase` | `fstd-case` |
 
-**降级（注册表缺失时）**：按触发词直接映射——"课程"→orchcourse / "报告"→orchreport / "案例"→orchcase，父目录用各 skill 内置默认（`ffeishu` 默认 wiki 节点）。不阻断。
+**降级（注册表缺失时）**：按触发词直接映射——"课程"→forchcourse / "报告"→forchreport / "案例"→forchcase，父目录用各 skill 内置默认（`ffeishu` 默认 wiki 节点）。不阻断。
 
 ## 约定
 
@@ -65,6 +65,6 @@ cat "${CCPRIVATE_HOME:-$HOME/git/ccprivate}/conf/writing/<genre>.yaml"
 
 ## 关联
 
-- `orchcourse` / `orchreport` / `orchcase` — 编排层
+- `forchcourse` / `forchreport` / `forchcase` — 编排层
 - `fstd-core` / `fstd-course` / `fstd-report` / `fstd-case` — 规范层
 - `ffeishu` / `fdiagram` / `fpptx` — 机械层
