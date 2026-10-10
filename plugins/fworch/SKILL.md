@@ -22,7 +22,7 @@ allowed-tools: Read, Bash, Glob, Grep
        └─ case    → fworch-case     （案例库）
 ```
 
-四层：`fworch`(L4 路由) → `orch*`(L3 编排) → `fstd-*`(L2 规范) → `ffeishu`+工具(L0 机械)。
+四层：`fworch`(L4 路由) → `orch*`(L3 编排) → `fwstd-*`(L2 规范) → `ffeishu`+工具(L0 机械)。
 架构决策见 `ccconfig/docs/adr/0043-writing-system-architecture.md`。
 
 ## 步骤
@@ -51,9 +51,9 @@ cat "${CCPRIVATE_HOME:-$HOME/git/ccprivate}/conf/writing/<genre>.yaml"
 
 | 体裁 | 编排器 | 规范 |
 |------|--------|------|
-| course | `fworch-course` | `fstd-course` |
-| report | `fworch-report` | `fstd-report` |
-| case | `fworch-case` | `fstd-case` |
+| course | `fworch-course` | `fwstd-course` |
+| report | `fworch-report` | `fwstd-report` |
+| case | `fworch-case` | `fwstd-case` |
 
 **降级（注册表缺失时）**：按触发词直接映射——"课程"→fworch-course / "报告"→fworch-report / "案例"→fworch-case，父目录用各 skill 内置默认（`ffeishu` 默认 wiki 节点）。不阻断。
 
@@ -66,5 +66,5 @@ cat "${CCPRIVATE_HOME:-$HOME/git/ccprivate}/conf/writing/<genre>.yaml"
 ## 关联
 
 - `fworch-course` / `fworch-report` / `fworch-case` — 编排层
-- `fstd-course` / `fstd-report` / `fstd-case` — 体裁规范层
+- `fwstd-course` / `fwstd-report` / `fwstd-case` — 体裁规范层
 - `ffeishu` / `fdiagram` / `fpptx` — 机械层
