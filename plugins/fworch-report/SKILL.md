@@ -5,6 +5,7 @@ description: |
   报告生成 — 读 JSON / 大纲 / 自由素材 → 结构化 markdown 报告。
   3 种输入模式，按用户场景自动选择。内容规范委派 fstd-report。
   飞书输出委派 ffeishu（图子文档工作流 G）。
+  用法：用户说"写报告"/"出报告"/"分析报告"/"对比报告"/"方案报告"触发
 allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 ---
 
