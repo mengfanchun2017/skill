@@ -30,7 +30,7 @@ allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 
 ## Step 0: 报告卡片（前置产物）
 
-任何模式开始前，先出 1 页报告卡片让用户确认。卡片模板 → `../fstd-report/templates/report-card.md`。
+任何模式开始前，先出 1 页报告卡片让用户确认。卡片模板 → `../fstd-report/references/report-card.md`。
 
 | 字段 | 内容 | 示例 |
 |------|------|------|
@@ -69,7 +69,7 @@ allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 - `comparison` — 对比/选型
 - `proposal` — 方案/规划
 
-模板在 `../fstd-report/templates/`。
+模板在 `../fstd-report/references/`。
 
 ## 工作流（按模式）
 
@@ -112,7 +112,7 @@ allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 - "技术调研：背景/现状/趋势/建议"
 
 #### Step 大纲.2: 选模板
-按大纲结构匹配 `fstd-report/templates/`：
+按大纲结构匹配 `fstd-report/references/`：
 - 现状+原因+建议 → `analysis.md`
 - 候选对比 → `comparison.md`
 - 背景+现状+趋势 → `research.md`
