@@ -1,5 +1,5 @@
 ---
-name: fstd-case
+name: fwstd-case
 description: |
   案例库内容规范 — Base 字段 schema、案例起名规则、正文模版与写作要求。
   飞书格式见 ffeishu；案例编排/检索/建库执行见 fworch-case。
@@ -8,7 +8,7 @@ user-invocable: false
 allowed-tools: Read, Glob, Grep
 ---
 
-# fstd-case — 案例库内容规范（L2）
+# fwstd-case — 案例库内容规范（L2）
 
 横向规范层，定义「一条好的案例长什么样」。**不绑定执行**（编排/检索/建库走 `fworch-case`），**不重复平台格式**（飞书格式走 `ffeishu`）。
 

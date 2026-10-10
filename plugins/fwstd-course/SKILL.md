@@ -1,5 +1,5 @@
 ---
-name: fstd-course
+name: fwstd-course
 description: |
   课程文档内容规范 — 系列课程各产物（调研报告/课程体系/教案/练习/总结）的
   内容架构、骨架与写作要求。飞书格式见 ffeishu，编排与执行见 fworch-course。
@@ -8,7 +8,7 @@ user-invocable: false
 allowed-tools: Read, Glob, Grep
 ---
 
-# fstd-course — 课程内容规范（L2）
+# fwstd-course — 课程内容规范（L2）
 
 横向规范层，定义「一份好的课程文档长什么样」。**不绑定执行**（编排/委派走 `fworch-course`），**不重复平台格式**（飞书格式走 `ffeishu`）。
 

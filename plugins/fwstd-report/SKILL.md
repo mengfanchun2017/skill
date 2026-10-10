@@ -1,5 +1,5 @@
 ---
-name: fstd-report
+name: fwstd-report
 user-invocable: true
 description: |
   报告写作横向规范 — 内容结构、数据呈现、论证逻辑、图表约定。
@@ -9,7 +9,7 @@ description: |
 allowed-tools: Read, Write, Glob, Grep, Bash
 ---
 
-# fstd-report — 报告写作规范
+# fwstd-report — 报告写作规范
 
 横向能力，定义"什么是好的报告"。**不绑定任何输出平台**（飞书/Word/Notion 都适用），具体飞书格式委派 `ffeishu`。
 
@@ -79,7 +79,7 @@ allowed-tools: Read, Write, Glob, Grep, Bash
 
 ```
 用户："写一份 X 报告"
-  └─→ fstd-report（选模板 + 规范）
+  └─→ fwstd-report（选模板 + 规范）
        ├─→ fresearchframe（搜索调研）         [可选]
        ├─→ fworch-report（出报告）     [执行]
        │     └─→ ffeishu（飞书格式 + 图子文档）
@@ -104,4 +104,4 @@ cat "$SKILL_DIR/config.yaml"
 
 ## 线上文档索引
 
-> fstd-report 直接创建的文档。通常通过 f-research-report/flogme 创建，不直接索引。
+> fwstd-report 直接创建的文档。通常通过 f-research-report/flogme 创建，不直接索引。
