@@ -15,7 +15,7 @@ allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 > 体裁注册表：`ccprivate/conf/writing/registry.yaml`（report 条目）+ 真值 `conf/writing/report.yaml`
 > 通信契约 → `references/comm-contract.md`；通用契约 → `fworch/references/orchestrator-contract.md`
 
-> **格式硬约束** → `../fstd-report/SKILL.md`（全局加载）
+> **格式硬约束** → `../ffeishu/references/write-checklist.md` §2
 > **飞书格式** → `../ffeishu/SKILL.md`（工作流 G 处理图子文档）
 
 ### 三层分工
