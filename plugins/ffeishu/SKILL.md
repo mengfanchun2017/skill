@@ -429,6 +429,7 @@ cat "$SKILL_DIR/config.yaml"
 
 | 标题 | 链接 | 日期 | 说明 |
 |------|------|------|------|
+| [Agent 输入格式](https://rcnejwuhyp41.feishu.cn/docx/S5GadIEB1oq8eRxuXUFc3iHvnCg) | 2026-11-02 | AI Agent 输入格式指南（列表/换行/缩进/XML 对理解的影响 + 研究证据 + 实操建议，2× table 822） |
 | [项目概览](https://rcnejwuhyp41.feishu.cn/docx/Fb8NdyldjoiQ5kxAb4lcCuminid) | 2026-11-02 | meshwork 孵化项目概览（rewrite：短标题 + lark-table 822） |
 | [厂商对比](https://rcnejwuhyp41.feishu.cn/docx/PA97dL2gKoXjtdxUhOucDK2pn1g) | 2026-11-02 | meshwork 官方站点/厂商对比（rewrite：短标题 + lark-table 822） |
 | [工作流介绍](https://rcnejwuhyp41.feishu.cn/docx/BmVxdnvgRoySu1x8PC7c7gSsnzs) | 2026-11-02 | meshwork 工具链+自动化通道+端到端流程（rewrite：短标题 + 3× lark-table 822） |
