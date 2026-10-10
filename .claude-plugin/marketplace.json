@@ -142,14 +142,6 @@
       ]
     },
     {
-      "name": "fstd-core",
-      "description": "飞书文档格式硬约束唯一真相源 — 标题层级、表格 XML、图表、缩写、引用等所有 飞书文档创建的强制规则。ffeishu / fstd-report / fstd-case / fstd-course 均引用本文件， 不再各自复制格式规则。 用法：被其他 skill 引用，一般不直接触发",
-      "source": "./plugins/fstd-core",
-      "keywords": [
-        "f"
-      ]
-    },
-    {
       "name": "fstd-course",
       "description": "课程文档内容规范 — 系列课程各产物（调研报告/课程体系/教案/练习/总结）的 内容架构、骨架与写作要求。飞书格式硬约束见 fstd-core，编排与执行见 forchcourse。 用法：被 forchcourse 及其子 skill 引用，一般不直接触发",
       "source": "./plugins/fstd-course",
