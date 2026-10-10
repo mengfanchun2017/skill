@@ -1,6 +1,6 @@
 # Orchestrator 通信契约（通用，L3/L1 规范）
 
-> 全部编排器（`forchcourse` / `forchreport` / `forchcase`）及其子 skill 遵循本契约。
+> 全部编排器（`fworch-course` / `fworch-report` / `fworch-case`）及其子 skill 遵循本契约。
 > 各编排器可加体裁专属补充，但**返回格式与真相源约定统一**。
 
 ## 子 skill 输出格式（统一返回块）

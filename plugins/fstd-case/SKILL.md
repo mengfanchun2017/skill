@@ -2,23 +2,23 @@
 name: fstd-case
 description: |
   案例库内容规范 — Base 字段 schema、案例起名规则、正文模版与写作要求。
-  飞书格式见 ffeishu；案例编排/检索/建库执行见 forchcase。
-  用法：被 forchcase 引用，一般不直接触发
+  飞书格式见 ffeishu；案例编排/检索/建库执行见 fworch-case。
+  用法：被 fworch-case 引用，一般不直接触发
 user-invocable: false
 allowed-tools: Read, Glob, Grep
 ---
 
 # fstd-case — 案例库内容规范（L2）
 
-横向规范层，定义「一条好的案例长什么样」。**不绑定执行**（编排/检索/建库走 `forchcase`），**不重复平台格式**（飞书格式走 `ffeishu`）。
+横向规范层，定义「一条好的案例长什么样」。**不绑定执行**（编排/检索/建库走 `fworch-case`），**不重复平台格式**（飞书格式走 `ffeishu`）。
 
 ## 职责边界
 
 | 本 skill 负责 | 不负责（委派） |
 |--------------|--------------|
 | Base 字段 schema | 飞书格式 → `ffeishu` |
-| 案例起名规则 | 编排/检索/建 wiki 执行 → `forchcase` |
-| 摘要格式 | 材料解析 → `forchcase` + MinerU |
+| 案例起名规则 | 编排/检索/建 wiki 执行 → `fworch-case` |
+| 摘要格式 | 材料解析 → `fworch-case` + MinerU |
 | 正文模版 + 写作要求 | 搜索扩展 → `fsearch` |
 
 ---
@@ -141,6 +141,6 @@ allowed-tools: Read, Glob, Grep
 ## 关联
 
 - `ffeishu` — 飞书格式
-- `forchcase` — 案例编排/检索/建库
-- `forchcourse` — 课程线（案例作为可选素材注入）
+- `fworch-case` — 案例编排/检索/建库
+- `fworch-course` — 课程线（案例作为可选素材注入）
 - `fsearch` — 搜索扩展
