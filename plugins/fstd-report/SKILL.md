@@ -27,10 +27,10 @@ allowed-tools: Read, Write, Glob, Grep, Bash
 
 | 模板 | 用途 | 章节骨架 |
 |------|------|----------|
-| `templates/research.md` | 调研/研究报告 | 摘要 → 背景 → 现状分析 → 调研发现 → 关键洞察 → 建议 |
-| `templates/analysis.md` | 分析/复盘报告 | 摘要 → 起因 → 过程 → 根因 → 影响 → 改进 |
-| `templates/comparison.md` | 对比/选型报告 | 摘要 → 目标 → 候选方案 → 多维对比 → 推荐 |
-| `templates/proposal.md` | 方案/规划报告 | 摘要 → 背景 → 目标 → 方案 → 实施路径 → 风险 |
+| `references/research.md` | 调研/研究报告 | 摘要 → 背景 → 现状分析 → 调研发现 → 关键洞察 → 建议 |
+| `references/analysis.md` | 分析/复盘报告 | 摘要 → 起因 → 过程 → 根因 → 影响 → 改进 |
+| `references/comparison.md` | 对比/选型报告 | 摘要 → 目标 → 候选方案 → 多维对比 → 推荐 |
+| `references/proposal.md` | 方案/规划报告 | 摘要 → 背景 → 目标 → 方案 → 实施路径 → 风险 |
 
 > 调用方式：用户说"写 X 报告"→ 复制对应模板 → 按用户大纲填充
 
