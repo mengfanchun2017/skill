@@ -1,18 +1,18 @@
 ---
-name: fresearchreport
+name: orchreport
 user-invocable: true
 description: |
   报告生成 — 读 JSON / 大纲 / 自由素材 → 结构化 markdown 报告。
-  3 种输入模式，按用户场景自动选择。内容规范委派 freportstd。
+  3 种输入模式，按用户场景自动选择。内容规范委派 fstd-report。
   飞书输出委派 ffeishu（图子文档工作流 G）。
 allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 ---
 
-# fresearchreport — 报告生成
+# orchreport — 报告生成
 
 报告生成模块，将研究结果/大纲/自由素材转换为可读报告。
 
-> **格式硬约束** → `../freportstd/rules.d/freportstd.md`（全局加载）
+> **格式硬约束** → `../fstd-report/SKILL.md`（全局加载）
 > **飞书格式** → `../ffeishu/SKILL.md`（工作流 G 处理图子文档）
 
 ### 三层分工
@@ -20,19 +20,19 @@ allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 | 层 | skill | 职责 |
 |----|-------|------|
 | 机械层 | ffeishu | 怎么调 API（fetch / str_replace / block_insert_after / 验证） |
-| 规范层 | freportstd | 内容写成什么样（模板骨架、论证三要素、数据呈现约定） |
-| 工作流层 | fresearchreport（本 skill） | 内容怎么产出/迭代（3 种输入模式、分轮评审、搜索补素材） |
+| 规范层 | fstd-report | 内容写成什么样（模板骨架、论证三要素、数据呈现约定） |
+| 工作流层 | orchreport（本 skill） | 内容怎么产出/迭代（3 种输入模式、分轮评审、搜索补素材） |
 
-**更新已有报告时**：ffeishu 工作流 A 执行机械操作，本 skill 提供内容迭代流程（v1→v2），freportstd 提供内容标准。三层各司其职。
+**更新已有报告时**：ffeishu 工作流 A 执行机械操作，本 skill 提供内容迭代流程（v1→v2），fstd-report 提供内容标准。三层各司其职。
 
 ## Step 0: 报告卡片（前置产物）
 
-任何模式开始前，先出 1 页报告卡片让用户确认。卡片模板 → `../freportstd/templates/report-card.md`。
+任何模式开始前，先出 1 页报告卡片让用户确认。卡片模板 → `../fstd-report/templates/report-card.md`。
 
 | 字段 | 内容 | 示例 |
 |------|------|------|
 | 目标读者 | 谁会读、用在哪 | 内部决策 / 客户提案 / 公开分享 |
-| 模板 | 选 freportstd 4 套之一 | research / analysis / comparison / proposal |
+| 模板 | 选 fstd-report 4 套之一 | research / analysis / comparison / proposal |
 | 字数 | 预期长度（影响深度） | < 2K 简版 / 2-5K 标准 / > 5K 详版 |
 | 章节大纲 | 4-7 个 H1 | 背景 → 现状 → 调研 → 洞察 → 建议 |
 | 数据源 | 已知/待搜（按 fsearch 三源） | minimax 中 / tavily 英 / 内部文档 |
@@ -55,18 +55,18 @@ allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
   ├─ 先出报告卡片 → 用户确认
   ├─ 检查当前目录：有 outline.yaml + results/*.json → JSON 模式
   ├─ 检查用户输入：含章节大纲（如"分析现状/根因/建议"） → 大纲模式
-  └─ 其他 → 自由模式（调 freportstd 选模板 + fsearch 搜索）
+  └─ 其他 → 自由模式（调 fstd-report 选模板 + fsearch 搜索）
 ```
 
 ## 模板委派
 
-任何模式都委派 `freportstd` 选模板：
+任何模式都委派 `fstd-report` 选模板：
 - `research` — 调研/研究
 - `analysis` — 分析/复盘
 - `comparison` — 对比/选型
 - `proposal` — 方案/规划
 
-模板在 `../freportstd/templates/`。
+模板在 `../fstd-report/templates/`。
 
 ## 工作流（按模式）
 
@@ -109,7 +109,7 @@ allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 - "技术调研：背景/现状/趋势/建议"
 
 #### Step 大纲.2: 选模板
-按大纲结构匹配 `freportstd/templates/`：
+按大纲结构匹配 `fstd-report/templates/`：
 - 现状+原因+建议 → `analysis.md`
 - 候选对比 → `comparison.md`
 - 背景+现状+趋势 → `research.md`
@@ -219,7 +219,7 @@ v2（Claude 改）
 见 `../ffeishu/SKILL.md` 工作流 G（含 lark-cli 完整命令）。
 
 ## 关联 Skills
-- `freportstd` — 内容规范、模板（必读）
+- `fstd-report` — 内容规范、模板（必读）
 - `fresearchframe` — 领域方法论 (4 领域)
 - `fresearchframe（Batch Mode）` — 批量研究
 - `ffeishu` — 飞书格式 + 图子文档 lark-cli 命令

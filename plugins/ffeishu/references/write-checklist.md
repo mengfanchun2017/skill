@@ -89,6 +89,6 @@
 
 ---
 
-> **研究类报告额外约束** → `skills/fresearchreport/rules.d/fresearchreport.md`（全局加载）
+> **研究类报告额外约束** → `../orchreport/SKILL.md`（全局加载）
 > **lark-cli 命令完整速查** → `rules/feishu-cli-cheatsheet.md`
 > **增量更新详细工作流** → `references/update-workflow.md`

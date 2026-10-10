@@ -1,5 +1,5 @@
 ---
-name: freportstd
+name: fstd-report
 user-invocable: true
 description: |
   报告写作横向规范 — 内容结构、数据呈现、论证逻辑、图表约定。
@@ -9,7 +9,7 @@ description: |
 allowed-tools: Read, Write, Glob, Grep, Bash
 ---
 
-# freportstd — 报告写作规范
+# fstd-report — 报告写作规范
 
 横向能力，定义"什么是好的报告"。**不绑定任何输出平台**（飞书/Word/Notion 都适用），具体飞书格式委派 `ffeishu`。
 
@@ -20,7 +20,7 @@ allowed-tools: Read, Write, Glob, Grep, Bash
 | 内容结构（H1/章节顺序/概括） | 飞书格式（lark-table 822 等）→ ffeishu |
 | 论证规范（数据+因果+不确定） | 搜索/数据收集 → fresearchframe |
 | 数据呈现原则（对比用表/数值量级） | 图表生成（python/mermaid）→ ffeishu 工作流 G |
-| 模板（4 套） | 报告工作流执行 → fresearchreport |
+| 模板（4 套） | 报告工作流执行 → orchreport |
 | 引用规范（国标/通用性） | 文档索引维护 → ffeishu |
 
 ## 4 套模板
@@ -64,8 +64,8 @@ allowed-tools: Read, Write, Glob, Grep, Bash
 
 | 步骤 | 责任方 | 工具 |
 |------|--------|------|
-| 1. 写 python 脚本（图） | fresearchreport | matplotlib/seaborn/plotly |
-| 2. 跑脚本 → /tmp/figs/*.png | fresearchreport | python3 |
+| 1. 写 python 脚本（图） | orchreport | matplotlib/seaborn/plotly |
+| 2. 跑脚本 → /tmp/figs/*.png | orchreport | python3 |
 | 3. 建子文档（图 + 解读 + 代码 3 段） | ffeishu | lark-cli docs +create |
 | 4. 父文档 block_insert_after 嵌入 | ffeishu | lark-cli docs +update |
 | 5. 父文档加"详见《<子文档名>》" | ffeishu | lark-cli |
@@ -79,9 +79,9 @@ allowed-tools: Read, Write, Glob, Grep, Bash
 
 ```
 用户："写一份 X 报告"
-  └─→ freportstd（选模板 + 规范）
+  └─→ fstd-report（选模板 + 规范）
        ├─→ fresearchframe（搜索调研）         [可选]
-       ├─→ fresearchreport（出报告）     [执行]
+       ├─→ orchreport（出报告）     [执行]
        │     └─→ ffeishu（飞书格式 + 图子文档）
        └─→ 完成
 ```
@@ -99,9 +99,9 @@ cat "$SKILL_DIR/config.yaml"
 ## 关联 Skills
 - `ffeishu` — 飞书格式 + 图子文档工作流 G
 - `fresearchframe` — 搜索调研
-- `fresearchreport` — 报告生成执行
+- `orchreport` — 报告生成执行
 - `flogme` — OKR/SUM 总结可参考本框架
 
 ## 线上文档索引
 
-> freportstd 直接创建的文档。通常通过 f-research-report/flogme 创建，不直接索引。
+> fstd-report 直接创建的文档。通常通过 f-research-report/flogme 创建，不直接索引。
