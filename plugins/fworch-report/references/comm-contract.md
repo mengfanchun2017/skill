@@ -1,6 +1,6 @@
-# forchreport 通信契约
+# fworch-report 通信契约
 
-> 通用编排器契约 → `fwriteorch/references/orchestrator-contract.md`（统一返回格式 / 真相源 / 进度）。
+> 通用编排器契约 → `fworch/references/orchestrator-contract.md`（统一返回格式 / 真相源 / 进度）。
 > 本文件只列报告线专属补充。
 
 ## 报告线进度
