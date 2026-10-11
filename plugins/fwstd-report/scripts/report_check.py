@@ -48,9 +48,6 @@ MANUAL_NUM = re.compile(r"^(?:[一二三四五六七八九十]+[、.]|\d+(?:\.\d
 SOURCE_ROW = re.compile(r"资料来源[：:]")
 REF_HEADING = re.compile(r"^#{1,6}\s*参考文献\s*$", re.MULTILINE)
 
-# 引用位置：句末（数据点后、句号/分号/换行前）——允许引用后紧跟句末标点
-SENTENCE_END = "。！？；\n"
-
 # 飞书禁用：旧写入链路残留
 OLD_PIPELINE = re.compile(r"docs\s+\+(?:create|update|fetch)|block_insert_after", re.IGNORECASE)
 
