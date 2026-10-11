@@ -1,7 +1,7 @@
 # 行业/市场分析镜头（Market Analysis）
 
 > fresearchframe `market` 领域的分析方法论。把收集到的事实**转成判断**，而不是罗列资料。
-> 来源：移植自 Doubao 行业研究方法论，已去平台绑定，适配 fsearch 双源取证。
+> 来源：移植自成熟行业研究方法论，适配 fsearch 双源取证。
 
 ## 何时用
 
