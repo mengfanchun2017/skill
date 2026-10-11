@@ -111,7 +111,7 @@ def check_report(
     info["heading_count"] = len(headings)
     max_level = max((lvl for lvl, _ in headings), default=0)
     if max_level > 3:
-        problems.append(f"存在 H{max_level} 标题（`####`+）；飞书仅支持 H1-H3）
+        problems.append(f"存在 H{max_level} 标题（`####`+）；飞书仅支持 H1-H3")
     if not any(lvl == 1 for lvl, _ in headings):
         warnings.append("无 H1 主标题（若整篇由父文档承载可忽略）")
 
@@ -129,7 +129,7 @@ def check_report(
     info["source_row_count"] = source_rows
     if table_count and source_rows < table_count:
         warnings.append(
-            f"{table_count} 张表但仅 {source_rows} 处"资料来源："行（建议每张表正下方标注来源）"
+            f"{table_count} 张表但仅 {source_rows} 处「资料来源：」行（建议每张表正下方标注来源）"
         )
 
     # --- 引用 ---
