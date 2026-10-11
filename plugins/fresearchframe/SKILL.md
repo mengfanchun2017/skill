@@ -77,11 +77,11 @@ allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 
 ### market 领域
 
-- market_overview: market_name, market_size, growth_rate
-- tam_sam_som: tam, sam, som
-- competitive_landscape: key_players, market_share
-- drivers: growth_drivers, market_trends
-- challenges: risks, constraints
+**字段**：market_overview（market_name/size/growth_rate）、tam_sam_som、competitive_landscape（key_players/market_share）、drivers、challenges。
+
+**分析方法论 → `references/market-analysis.md`**（行业/市场/赛道调研必读）：10 个分析镜头（主线压缩 / 规模与需求底线 / 利润池与价值迁移 / 竞争格局与终局 / 驱动—制约矩阵 / 周期定位与供需 / 政策传导 / 盈利质量与回报 / 预期差 / 证伪与终止条件）+ 4 类行业结构分支（产业链型 / 网络型 / 资产负债型 / 单店模型型，各带分析侧重与必做表）。
+
+要点：把事实**转成判断**而非罗列资料；链式行业必点"利润从哪个环节流向哪个环节"、点名"剪刀差"。数据分级与引用纪律见 `../fwstd-report/references/data-grading-and-citation.md`。
 
 ### technical 领域
 
