@@ -110,6 +110,17 @@ allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 - Sources
 - Uncertainty Register
 
+#### Step 4.5: 交付前校验（机械门禁）
+
+markdown 成稿后、交 ffeishu 前，跑 `../fwstd-report/scripts/report_check.py`：
+
+```bash
+python3 ../fwstd-report/scripts/report_check.py renumber report.md --in-place          # 引用编号首现顺序
+python3 ../fwstd-report/scripts/report_check.py check report.md --profile research      # 门禁
+```
+
+`check` 非 0 → 按报错修（编号问题用 `renumber --in-place`），通过后再输出。详见 `../fwstd-report/SKILL.md` § 交付前校验。
+
 #### Step 5: 输出
 根据 `RESEARCH_OUTPUT` 配置：feishu（默认）/ file / both
 输出到飞书时，委派 ffeishu skill（工作流 0 创建新文档）。

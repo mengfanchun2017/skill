@@ -48,6 +48,22 @@ allowed-tools: Read, Write, Glob, Grep, Bash
 - **凡数据必有句末引用**：正文每个具体数据点标 `[n]` 于句末、按首现顺序递增、同一来源全文复用；表格加"资料来源："行；文末参考文献与正文一一勾稽、≥15 条。
 - **结论强度不超证据档位**：一级可陈述事实、二级须显名限定、三级仅作线索不入展示；缺数据如实标缺口，绝不补造。
 
+## 交付前校验（机械门禁）
+
+写完报告 markdown 后、交 ffeishu 转飞书前，跑脚本把客观规则机械校验一遍（不靠人眼）：
+
+```bash
+S=~/.claude/skills/fwstd-report/scripts/report_check.py   # 或 plugins/fwstd-report/scripts/
+
+python3 "$S" outline report.md                              # 先看结构总览（章节/表格/引用/回扣主线）
+python3 "$S" renumber report.md --in-place                  # 引用编号按首现顺序重排 + 同步参考文献
+python3 "$S" check report.md --profile research --min-refs 15   # 交付门禁（0 通过 / 1 失败）
+```
+
+`check` 抓：配图/HTML/hr、H4+、标题手动编号、表格缺"资料来源"行、引用不连续/首现乱序、正文↔文末参考文献勾稽、参考文献未升序。`--json` 出机器可读结果，`--strict` 把警告也当失败。**编号问题一律用 `renumber --in-place` 修，不手工调。**
+
+> 校验对象是**markdown 源**（ffeishu 再转 lark-table XML）。脚本 `scripts/report_check.py`，通用不绑体系。
+
 ## 报告规范（核心）
 
 ### 结构
