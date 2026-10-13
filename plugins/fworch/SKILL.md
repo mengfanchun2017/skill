@@ -2,9 +2,9 @@
 name: fworch
 user-invocable: true
 description: |
-  撰写系统统一入口（路由层）。读体裁注册表判断需求属于哪种体裁（课程/报告/案例），
-  派发到对应 orchestrator（fworch-course/fworch-report/fworch-case）。用户只描述需求，无需记内部 skill 名。
-  用法：用户说"做课程"/"写报告"/"新增案例"等撰写需求时触发
+  撰写系统统一入口（路由层）。读体裁注册表判断需求属于哪种体裁（课程/报告/案例/面试准备），
+  派发到对应 orchestrator（fworch-course/fworch-report/fworch-case/fworch-interview）。用户只描述需求，无需记内部 skill 名。
+  用法：用户说"做课程"/"写报告"/"新增案例"/"准备面试"等撰写需求时触发
 allowed-tools: Read, Bash, Glob, Grep
 ---
 
@@ -17,9 +17,10 @@ allowed-tools: Read, Bash, Glob, Grep
 ```
 用户需求（自由描述）
   └─ fworch 读注册表 → 判体裁 → 派发
-       ├─ course  → fworch-course   （系列课程）
-       ├─ report  → fworch-report   （报告）
-       └─ case    → fworch-case     （案例库）
+       ├─ course    → fworch-course    （系列课程）
+       ├─ report    → fworch-report    （报告）
+       ├─ case      → fworch-case      （案例库）
+       └─ interview → fworch-interview （面试准备）
 ```
 
 四层：`fworch`(L4 路由) → `orch*`(L3 编排) → `fwstd-*`(L2 规范) → `ffeishu`+工具(L0 机械)。
@@ -37,7 +38,7 @@ cat "${CCPRIVATE_HOME:-$HOME/git/ccprivate}/conf/writing/registry.yaml"
 
 ### Step 2: 判体裁
 
-按用户输入匹配 `trigger`；不明确时用 AskUserQuestion 让用户选（course/report/case）。
+按用户输入匹配 `trigger`；不明确时用 AskUserQuestion 让用户选（course/report/case/interview）。
 
 判出体裁 → 读该体裁的 `config` 真值文件（父目录/根文档 token 等）：
 
