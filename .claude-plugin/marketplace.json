@@ -164,6 +164,14 @@
       "keywords": [
         "f"
       ]
+    },
+    {
+      "name": "fwstd-interview",
+      "description": "面试准备内容规范 — 岗位画像/组织行业/知识地图/能力模型/问题库/问答素材/未来工作思路/模拟清单/成稿包 的内容架构与写作要求。面向\"零经验应聘者\"的全链条准备。飞书格式见 ffeishu，编排与执行见 fworch-interview。 用法：被 fworch-interview 引用，或用户说\"准备面试\"/\"岗位面试\"触发",
+      "source": "./plugins/fwstd-interview",
+      "keywords": [
+        "f"
+      ]
     }
   ]
 }
