@@ -55,8 +55,9 @@ cat "${CCPRIVATE_HOME:-$HOME/git/ccprivate}/conf/writing/<genre>.yaml"
 | course | `fworch-course` | `fwstd-course` |
 | report | `fworch-report` | `fwstd-report` |
 | case | `fworch-case` | `fwstd-case` |
+| interview | `fworch-interview` | `fwstd-interview` |
 
-**降级（注册表缺失时）**：按触发词直接映射——"课程"→fworch-course / "报告"→fworch-report / "案例"→fworch-case，父目录用各 skill 内置默认（`ffeishu` 默认 wiki 节点）。不阻断。
+**降级（注册表缺失时）**：按触发词直接映射——"课程"→fworch-course / "报告"→fworch-report / "案例"→fworch-case / "面试"→fworch-interview，父目录用各 skill 内置默认（`ffeishu` 默认 wiki 节点）。不阻断。
 
 ## 约定
 
