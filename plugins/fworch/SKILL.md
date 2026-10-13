@@ -67,6 +67,6 @@ cat "${CCPRIVATE_HOME:-$HOME/git/ccprivate}/conf/writing/<genre>.yaml"
 
 ## 关联
 
-- `fworch-course` / `fworch-report` / `fworch-case` — 编排层
-- `fwstd-course` / `fwstd-report` / `fwstd-case` — 体裁规范层
+- `fworch-course` / `fworch-report` / `fworch-case` / `fworch-interview` — 编排层
+- `fwstd-course` / `fwstd-report` / `fwstd-case` / `fwstd-interview` — 体裁规范层
 - `ffeishu` / `fdiagram` / `fpptx` — 机械层
