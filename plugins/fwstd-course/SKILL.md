@@ -31,6 +31,9 @@ allowed-tools: Read, Glob, Grep
 | 教案（逐课） | `references/lesson-template.md` | 学习目标/导入/核心知识点/案例引用(可选)/实操/小结/练习提示 |
 | 练习与测验 | `references/exercise-template.md` | 每章 10 题(5知识+3理解+2实操) + 课程级项目(场景+任务+评分+参考答案) |
 | 完结总结 | `references/summary-template.md` | 知识图谱/易错点汇编/能力评估/后续路径/认证指引 |
+| 单元 memo（现有材料） | `references/memo-template.md` | 原始记录：官方多源合并 / 原文全文，忠实呈现不改写 |
+| 单元 update（现有材料） | 复用 `lesson-template.md` | 课程化精读（学习目标/导入/核心框架/小结/练习）+ 现代演进 |
+| 能力框架（capability→skill） | `references/framework-template.md` | 按 SFIA 三层：capability 能力域 → skill 可执行动作 → knowledge 入库外 |
 
 ## 课程级写作要求
 
