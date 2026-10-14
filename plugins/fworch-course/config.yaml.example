@@ -1,0 +1,28 @@
+# fworch-course 课程配置模板
+# 复制到 ccprivate/conf/fcourse/<slug>.yaml 使用
+#
+# ⚠️ 真相源在飞书在线（Base/docx），本 yaml 只是本地缓存镜像。
+#    在线改了需重新生成 yaml 或人工同步；详见 fworch-course SKILL.md § Phase A。
+
+slug: ""
+name: ""
+direction: ""  # 商业分析 / 数据分析 / AI 能力 / 知识管理
+status: "draft"  # draft / in_progress / completed
+
+feishu:
+  root_doc_url: ""           # 飞书父文档（所有子文档挂此，必填）
+  requirement_doc_url: ""    # 需求文档（你提供）
+  research_doc_url: ""
+  syllabus_doc_url: ""
+  overview_doc_url: ""
+  lesson_docs: []
+    # - chapter: 1
+    #   title: "导入"
+    #   url: ""
+  exercise_doc_url: ""
+  summary_doc_url: ""
+
+caselib_direction: []
+  # - "商业分析"
+
+current_step: 0  # 0-5
