@@ -33,3 +33,34 @@ lark_call() {
     printf '%s\n' "$out" | sed '/^\[lark-cli\]/d'
     return $rc
 }
+
+# 私有配置读取：真值存 ccprivate/conf/<file>，公开 skill 运行时读取。
+# 用 python 解析（不依赖 yq）；缺失文件/键 → 返回空串 + 非零码，调用方自行降级。
+# 用法: lark_conf_get writing/case.yaml base_token
+lark_conf_path() {
+    local rel="$1"
+    for base in "${CCPRIVATE_HOME:-}" "$HOME/git/ccprivate" "${CCPRIVATE_DIR:-}"; do
+        [[ -n "$base" && -f "$base/conf/$rel" ]] && { echo "$base/conf/$rel"; return 0; }
+    done
+    return 1
+}
+
+lark_conf_get() {
+    local rel="$1"; shift
+    local f
+    f="$(lark_conf_path "$rel")" || return 1
+    python3 - "$f" "$@" <<'PYEOF'
+import sys, yaml
+path, keys = sys.argv[1], sys.argv[2:]
+try:
+    node = yaml.safe_load(open(path)) or {}
+except Exception:
+    sys.exit(1)
+for k in keys:
+    if isinstance(node, dict) and k in node:
+        node = node[k]
+    else:
+        sys.exit(1)
+print(node if not isinstance(node, bool) else str(node).lower())
+PYEOF
+}
