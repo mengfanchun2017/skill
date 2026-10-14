@@ -40,10 +40,13 @@ allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 - 核心数据全文一致，与底稿对得上。
 
 数据分级、句末 `[n]` 引用、文末勾稽、交付前数字核验 → `../fwstd-report/references/data-grading-and-citation.md`。
+研究深度（机制/文献定位，避免只做汇编）→ `../fwstd-report/references/research-depth.md`；
+行文与"预先反驳自己" → `../fwstd-report/references/writing-craft.md`。
 
 ## Step 0: 报告卡片（前置产物）
 
 任何模式开始前，先出 1 页报告卡片让用户确认。卡片模板 → `../fwstd-report/references/report-card.md`。
+**选原型**（按读者用途：学术/deck/调查/研报/科普）→ `../fwstd-report/references/report-prototypes.md` —— 读者拿它干什么决定结构、篇幅、图题写法。写不出一句话判断（读者会复述给别人的那句）说明还没想清楚。
 
 | 字段 | 内容 | 示例 |
 |------|------|------|
@@ -222,6 +225,7 @@ v2（Claude 改）
 | 对比图 / 占比图 | **本工作流** 或 plotly 交互图 |
 
 ### Step G.1: 写 python 脚本
+- **先读图表选型与陷阱库** → `../fwstd-report/references/chart-guide.md`（图型速查 + 每图必带六项 + 三个改变结论的陷阱：负值画成零 / 选错图型 / Y 轴不从零）
 - 选型：常规图 matplotlib + seaborn；交互图 plotly
 - 存到 `/tmp/figs/<图名>.py`（脚本可追溯、可重跑）
 - 中文字体显式设置：`plt.rcParams['font.sans-serif']=['Noto Sans CJK SC']`
