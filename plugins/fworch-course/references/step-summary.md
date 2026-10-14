@@ -15,7 +15,7 @@
 
 按 `~/.claude/skills/fwstd-course/references/summary-template.md`：
 
-- 课程知识图谱（知识点关系图，调 fdiagram）
+- 课程知识图谱（知识点关系图，调 fdiagram 飞书画板，`<whiteboard type="mermaid">` 思维导图/流程图嵌入）
 - 常见误区和易错点汇编
 - 关键能力评估
 - 后续学习路径推荐
