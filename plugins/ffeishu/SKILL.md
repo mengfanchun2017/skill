@@ -423,20 +423,12 @@ cat "$SKILL_DIR/config.yaml"
 
 ---
 
-## 线上文档索引
+## 文档索引
 
-> ffeishu 创建/编辑的文档。每次操作后追加。格式：`[标题](url) | 日期 | 说明`
+> ffeishu 创建/编辑的文档。**文档索引统一存私有 `ccprivate/skill/ffeishu.yaml` 的 `doc_index`**（title/url/doc_token/parent_doc/description），不进公开仓库（避免暴露个人飞书链接）。
+> 本仓库只放占位模板。查询方式：`lark_conf` 读取 `ccprivate/skill/ffeishu.yaml` 的 `doc_index`，或 `lark-cli drive +search`。
 
-| 标题 | 链接 | 日期 | 说明 |
-|------|------|------|------|
-| [Agent 输入格式](https://REDACTED_TENANT.feishu.cn/docx/S5GadIEB1oq8eRxuXUFc3iHvnCg) | 2026-11-02 | AI Agent 输入格式指南（列表/换行/缩进/XML 对理解的影响 + 研究证据 + 实操建议，2× table 822） |
-| [项目概览](https://REDACTED_TENANT.feishu.cn/docx/Fb8NdyldjoiQ5kxAb4lcCuminid) | 2026-11-02 | meshwork 孵化项目概览（rewrite：短标题 + lark-table 822） |
-| [厂商对比](https://REDACTED_TENANT.feishu.cn/docx/PA97dL2gKoXjtdxUhOucDK2pn1g) | 2026-11-02 | meshwork 官方站点/厂商对比（rewrite：短标题 + lark-table 822） |
-| [工作流介绍](https://REDACTED_TENANT.feishu.cn/docx/BmVxdnvgRoySu1x8PC7c7gSsnzs) | 2026-11-02 | meshwork 工具链+自动化通道+端到端流程（rewrite：短标题 + 3× lark-table 822） |
-| [案例调研](https://REDACTED_TENANT.feishu.cn/docx/KsLPdQB9Jo71KCxPz3dcbwHznfg) | 2026-11-02 | meshwork 线上案例/开源工具调研（rewrite 修复标题泄漏） |
-| [通道选型](https://REDACTED_TENANT.feishu.cn/docx/T5aid9Z8oogYwyxhwquc1HktnMd) | 2026-11-01 | meshwork 子文档（AI 浏览器自动化选型，用户建，正文 H1 已改短标题） |
-
-### 常用 Wiki 节点
+### 常用 Wiki 节点（占位符，真实值在 ffeishu.yaml `wiki_nodes`）
 
 | 用途 | Token | URL |
 |------|-------|-----|
