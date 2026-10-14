@@ -64,3 +64,40 @@ for k in keys:
 print(node if not isinstance(node, bool) else str(node).lower())
 PYEOF
 }
+
+# 文档索引查询 — 私有索引统一存 ccprivate/skill/ffeishu.yaml 的 doc_index（唯一真相源）。
+# 查询: lark_doc_index [keyword]   # 空参 = 列全部；keyword 匹配 title/description/parent_doc
+# 追加: lark_doc_index --add title url doc_token parent_doc "description"   # 幂等（按 doc_token 去重）
+lark_doc_index() {
+    local f
+    f="$(lark_conf_path ../skill/ffeishu.yaml 2>/dev/null || echo "$HOME/git/ccprivate/skill/ffeishu.yaml")"
+    [[ -f "$f" ]] || { echo "[doc-index] 未找到 $f" >&2; return 1; }
+    if [[ "${1:-}" == "--add" ]]; then
+        local title="$2" url="$3" tok="$4" parent="$5" desc="${6:-}"
+        [[ -n "$title" && -n "$url" ]] || { echo "[doc-index] --add need title url [doc_token] [parent] [desc]" >&2; return 2; }
+        python3 - "$f" "$title" "$url" "$tok" "$parent" "$desc" <<'PYEOF'
+import sys, yaml
+path, title, url, tok, parent, desc = sys.argv[1:]
+d = yaml.safe_load(open(path)) or {}
+di = d.setdefault("doc_index", [])
+for e in di:
+    if e.get("url") == url:
+        print("[doc-index] 已存在，跳过: " + url); sys.exit(0)
+di.append({"title": title, "url": url, "doc_token": tok, "parent_doc": parent, "description": desc})
+yaml.dump(d, open(path, "w"), allow_unicode=True, sort_keys=False, default_flow_style=False)
+print("[doc-index] 已追加: " + title)
+PYEOF
+        return 0
+    fi
+    local kw="${1:-}"
+    python3 - "$f" "$kw" <<'PYEOF'
+import sys, yaml
+path, kw = sys.argv[1], sys.argv[2]
+d = yaml.safe_load(open(path)) or {}
+di = d.get("doc_index", [])
+kw = kw.lower() if kw else ""
+hits = [e for e in di if not kw or kw in (e.get("title","") + e.get("description","") + e.get("parent_doc","")).lower()]
+for e in sorted(hits, key=lambda x: x.get("created",""), reverse=True):
+    print(f"{e.get('title','')} | {e.get('url','')} | parent={e.get('parent_doc','')}")
+PYEOF
+}
