@@ -213,7 +213,7 @@ $E "$CFG" append feishu.lesson_docs chapter=1 title="导入" url="<url>"
 - fworch-case — 案例库（**可选**，按需调用，非强制依赖）
 - ffeishu — 飞书操作
 - fsearch / fresearchframe — 搜索
-- fdiagram — 图
+- fdiagram — 图（飞书画板入口，默认 `<whiteboard type="mermaid">` 嵌入课程文档）
 - fwstd-course — 内容规范 + 模板
 
 ---
