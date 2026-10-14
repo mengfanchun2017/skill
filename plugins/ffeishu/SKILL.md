@@ -35,7 +35,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 
 ## 文档父子层级规则
 
-**默认父目录**：`TWQbwwbuGiePWZkvlX7c9cQvnph`（Claude 工作 wiki）。
+**默认父目录**：`config.yaml → wiki_nodes.default`（真实值在私有 `ccprivate/skill/ffeishu.yaml`，本仓库只放占位）。
 
 **任务级父目录判断**：
 - 若用户明确给出父文档 URL → 以该 URL token 为 `--parent-token`
