@@ -20,9 +20,11 @@ query 规划（判语言选源）→ 主力搜索（额度耗尽切 Exa）→ ex
 
 ## 配置
 
-API key 全通过 Claude Code 的 MCP 配置管理：
-- **ccconfig 用户**：真实 key 放 `ccprivate/conf/claude.json`（symlink）
-- **独立用户**：`~/.claude/settings.json` 的 `mcpServers` 中配置 Tavily + Exa
+API key 配置：
+- **Tavily / Exa**：通过 Claude Code 的 MCP 配置管理
+  - **ccconfig 用户**：真实 key 放 `ccprivate/conf/claude.json`（symlink）
+  - **独立用户**：`~/.claude/settings.json` 的 `mcpServers` 中配置 Tavily + Exa
+- **MiniMax**：`ccprivate/conf/llm.json` 的 `llms.minimax31`（与 LLM 预设同一把 key，REST 直调，无需 MCP）
 
 ## 何时用
 
@@ -38,46 +40,66 @@ API key 全通过 Claude Code 的 MCP 配置管理：
 搜索分三层，调用方按需选择策略，**不是必跑所有层**：
 
 ```
-query 规划（生成中英文 query + 策略选择）
+query 规划（判断语言 + 策略选择）
     │
-    ├─ [快速 ~1s] Tavily Search (fast) → 单源快速探查
+    ├─ [快速 ~1s] 主力单源 fast 探查（英文→Tavily fast，中文→MiniMax）
     │
-    ├─ [标准 ~3s] Tavily Search + Exa Search（并行）→ 自动 extract URL
+    ├─ [标准 ~3s] 主力源搜索（按语言路由）→ 额度耗尽/报错 → Exa 兜底 → 自动 extract URL
     │       │
     │       └─ extract 不够？→ Exa fetch 补充全文
     │
-    └─ [深度 ~30-150s] 标准搜索完成 → 用户确认 → Tavily Research
+    └─ [深度 ~30-150s] 标准搜索完成 → 用户确认 → Tavily Research（依赖 Tavily 额度）
 ```
 
 ### 搜索策略预设
 
 | 策略 | 耗时 | 调用的源 | 适用场景 |
 |------|------|---------|---------|
-| `fsearch:fast` | ~1s | Tavily Search (fast) | 快速事实确认、简单查询 |
-| `fsearch:standard` | ~3s | Tavily Search (advanced) + Exa Search | **默认**，大多数场景 |
+| `fsearch:fast` | ~1s | 主力源 fast/单源快速探查 | 快速事实确认、简单查询 |
+| `fsearch:standard` | ~3s | 按语言路由的主力源（额度耗尽→Exa） | **默认**，大多数场景 |
 | `fsearch:deep` | ~30-150s | standard → Tavily Research | 深度调研、报告型需求 |
-| `fsearch:code` | ~3s | Tavily Search (advanced, 特定域名) + Exa | 技术选型、代码库搜索 |
-| `fsearch:news` | ~3s | Tavily Search (topic=news, time_range=week) + Exa | 近期动态追踪 |
+| `fsearch:code` | ~3s | Tavily Search (advanced, 特定域名) → 耗尽切 Exa | 技术选型、代码库搜索 |
+| `fsearch:news` | ~3s | Tavily Search (topic=news, time_range=week) → 耗尽切 Exa | 近期动态追踪 |
 
-## 双源并行（标准搜索核心）
+## 分语言路由（标准搜索核心）
 
-标准搜索**必须同时执行**以下两个搜索源：
+标准搜索**按 query 语言选主力源，主力无额度时切 Exa 兜底**，不默认双源并行：
 
-1. **Tavily Search** — 英文主力，速度快、内容丰富度好
-2. **Exa Search** — 中英文混合主力，独家覆盖中文评测/社区/企业源
+| query 语言 | 主力源 | 主力失败（额度耗尽/报错） |
+|-----------|--------|--------------------------|
+| 英文 | **Tavily Search** | → Exa Search |
+| 中文 | **MiniMax 搜索**（REST） | → Exa Search |
 
-> 执行后必须逐条标注来源标签：`[tavily]`、`[exa]`、`[tavily-research]`。
+- 判断依据是 query 主体语言；中英混合 query 优先按中文路由（MiniMax 中文强），拿不准可两源都跑
+- **Tavily 超限特征**：`exceeds your plan's set usage limit` → 本次及后续直接切 Exa
+- **MiniMax 失败特征**：HTTP 非 200 / `base_resp.status_code != 0`（额度/鉴权）→ 切 Exa
+- 执行后必须逐条标注来源标签：`[tavily]`、`[minimax]`、`[exa]`、`[tavily-research]`。
 
-### 对比
+### MiniMax 搜索调用（中文主力）
 
-| | Tavily Search | Exa Search |
-|--|--------------|------------|
-| 速度 | ~2-3s | ~3-4s |
-| 内容 | snippet 丰富，可直接判断 | highlights 摘要 |
-| 中文 | 能覆盖，但不如 Exa 深 | **强项**，中文社区/论坛/测评站多 |
-| 英文前沿 | **强项**，arXiv/博客/新闻好 | 也可但不如 Tavily |
-| 独家源 | — | DataLearnerAI / 有道 / 302.AI 等 |
-| 内容提取 | Tavily extract（主力） | Exa fetch（补充） |
+REST 端点，key 与 LLM 预设同一把（`ccprivate/conf/llm.json` 的 `llms.minimax31`）：
+
+```bash
+KEY=$(python3 -c "import json;print(json.load(open('$HOME/git/ccprivate/conf/llm.json'))['llms']['minimax31'])")
+curl -s -X POST 'https://api.minimaxi.com/v1/coding_plan/search' \
+  -H "Authorization: Bearer $KEY" -H 'Content-Type: application/json' \
+  -d '{"q":"查询词"}'
+```
+
+- 返回：`{organic:[{title,link,snippet,date}], related_searches, base_resp}`
+- 走 coding_plan 搜索额度，非 Tavily 额度
+- 注意：`q` 只接受一个查询词；多 query 分多次请求
+
+### 三源对比
+
+| | MiniMax Search | Tavily Search | Exa Search |
+|--|---------------|--------------|------------|
+| 定位 | **中文主力** | **英文主力** | 兜底 + 中英补充 |
+| 速度 | ~1-2s | ~2-3s | ~3-4s |
+| 中文 | **强项**，本土站点覆盖好 | 能覆盖，但不如本土深 | 较强，社区/测评站多 |
+| 英文前沿 | 一般 | **强项**，arXiv/博客/新闻好 | 也可但不如 Tavily |
+| 失败切换 | → Exa | → Exa | 末位，无兜底 |
+| 内容提取 | snippet 为主 | Tavily extract（主力） | Exa fetch（补充） |
 
 ### 提取全文流程
 
@@ -91,13 +113,11 @@ Tavily extract（主力）→ 拿到内容 → 直接用
 - **Exa fetch** 适合 Exa 搜索结果的页面内容提取
 - 注意：Tavily extract 走 MCP Task 机制可能超时，超时后自动切 Exa fetch
 
-### WebSearch（中国不可用）
+### WebSearch（已禁用，勿调用）
 
-`WebSearch` 是 Claude Code **内置搜索工具**（走 LLM vendor 侧搜索后端），非 MCP 配置。
+`WebSearch` 是 Claude Code **内置搜索工具**，在 `settings.json` `permissions.deny` 中被禁用（中国区域 US-only 不可用 + bridge 路由事故后恢复禁用）。
 
-⚠️ **中国区域不可用**：WebSearch 文档标注 US-only，在中国调用返回空结果。
-
-fsearch **默认不调用 WebSearch**。仅在 Tavily + Exa 同时无结果时做尝试性 fallback，并标注 `[websearch（US-only）]`。
+fsearch **禁止调用 WebSearch**。搜索只走本 skill 的路由源（Tavily / MiniMax / Exa）。
 
 ## Tavily Research（深度综合）
 
@@ -161,11 +181,11 @@ fsearch **默认不调用 WebSearch**。仅在 Tavily + Exa 同时无结果时�
 对需要全局覆盖的主题，同时执行中英文 query：
 
 ```
-中文 query  → Exa Search（主力）
-英文 query  → Tavily Search（主力）
+中文 query  → MiniMax 搜索（主力），耗尽 → Exa
+英文 query  → Tavily Search（主力），耗尽 → Exa
 ```
 
-聚合、去重后标注 `[tavily]` / `[exa]`。
+聚合、去重后标注 `[minimax]` / `[tavily]` / `[exa]`。
 
 ## 聚合去重
 
@@ -185,7 +205,7 @@ def deduplicate_by_url(results):
 
 - 同一 query 在 **15 分钟内**不重复执行搜索（依赖 Tavily MCP 自带缓存）
 - 当前无 skill 层缓存实现，调用方自行管理
-- 搜索质量保底：结果数 < 3 → 自动改写 query 重搜一次；仍 < 3 → 改用 `fsearch:deep` 策略
+- 搜索质量保底：结果数 < 3 → 自动改写 query 重搜一次；仍 < 3 → 换源重搜（主力↔Exa 互换）或改用 `fsearch:deep`（需 Tavily 额度可用）
 
 ## 搜索清单（必须输出到调用方）
 
@@ -196,25 +216,30 @@ def deduplicate_by_url(results):
 
 > 非正文
 
+### MiniMax（中文）
+1. [标题](url) `[minimax]`
+2. [标题](url) `[minimax]`
+
 ### Tavily（英文）
 1. [标题](url) `[tavily]`
 2. [标题](url) `[tavily]`
 
-### Exa（中英文混合）
+### Exa（兜底/补充）
 1. [标题](url) `[exa]`
 2. [标题](url) `[exa]`
 
 ### 核心引用
 | 来源 | 标题 | 用途 |
 |------|------|------|
+| [minimax] | ... | 数据 |
 | [tavily] | ... | 数据 |
 | [exa] | ... | 案例 |
 ```
 
 **规则**：
-- 每源 ≤5 条，每条标注 `[tavily]` / `[exa]` / `[tavily-research]`
+- 每源 ≤5 条，每条标注 `[minimax]` / `[tavily]` / `[exa]` / `[tavily-research]`
 - 核心引用表选前 3 条，用途列填：定义 / 案例 / 数据 / 对比
-- 统一用 `[tavily]` `[exa]` `[tavily-research]`，不用 `[tv]` `[web]` 等变体
+- 统一用 `[minimax]` `[tavily]` `[exa]` `[tavily-research]`，不用 `[tv]` `[web]` `[mm]` 等变体
 - 调用方决定是否附加到最终输出文档
 
 ## 关联 Skills

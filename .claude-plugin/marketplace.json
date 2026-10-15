@@ -69,7 +69,7 @@
     },
     {
       "name": "fsearch",
-      "description": "搜索活动统一原语 — 双源并行搜索（Tavily+Exa）、自动 extract、按需 research、 聚合去重、来源标注、搜索清单输出。被 fresearchframe / flogme / ffeishu 等需要外部调研的 skill 委托调用。 不含领域方法论（领域解读由 fresearchframe 负责）。",
+      "description": "搜索活动统一原语 — 分语言路由搜索（中文→MiniMax、英文→Tavily，额度耗尽切 Exa）、 自动 extract、按需 research、聚合去重、来源标注、搜索清单输出。 被 fresearchframe / flogme / ffeishu 等需要外部调研的 skill 委托调用。 不含领域方法论（领域解读由 fresearchframe 负责）。",
       "source": "./plugins/fsearch",
       "keywords": [
         "f"
