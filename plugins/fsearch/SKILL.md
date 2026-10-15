@@ -2,8 +2,9 @@
 name: fsearch
 user-invocable: true
 description: |
-  搜索活动统一原语 — 双源并行搜索（Tavily+Exa）、自动 extract、按需 research、
-  聚合去重、来源标注、搜索清单输出。被 fresearchframe / flogme / ffeishu 等需要外部调研的 skill 委托调用。
+  搜索活动统一原语 — 分语言路由搜索（中文→MiniMax、英文→Tavily，额度耗尽切 Exa）、
+  自动 extract、按需 research、聚合去重、来源标注、搜索清单输出。
+  被 fresearchframe / flogme / ffeishu 等需要外部调研的 skill 委托调用。
   不含领域方法论（领域解读由 fresearchframe 负责）。
 allowed-tools: Read, Write, Bash,
   mcp__tavily__tavily_search, mcp__tavily__tavily_research,
@@ -13,7 +14,7 @@ allowed-tools: Read, Write, Bash,
 
 # fsearch — 搜索活动统一原语
 
-query 规划 → 双源并行搜索 → extract 全文 → 聚合去重 → 来源标注 → 搜索清单输出
+query 规划（判语言选源）→ 主力搜索（额度耗尽切 Exa）→ extract 全文 → 聚合去重 → 来源标注 → 搜索清单输出
 
 **不含领域方法论**。领域方法论由 `fresearchframe` 负责。
 
