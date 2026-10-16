@@ -3,15 +3,14 @@
 ## 仓结构
 
 ```
-claude-skills/
+skill/
 ├── .claude-plugin/marketplace.json    # 仓根入口，**手动维护**
 ├── plugins/<skill>/                   # 自建 plugin（实体）
 │   ├── SKILL.md                       # skill 描述（必须 frontmatter）
 │   ├── references/                    # 可选：长文档
 │   ├── scripts/                       # 可选：脚本
 │   └── ...
-├── plugins/skill-template/            # 脚手架（开发用）
-└── option-<name>/                     # 配套安装器（随 plugin 走）
+└── www/                               # 静态展示页（部署到 skill.aiagt.dev）
 ```
 
 ## 新增自建 skill

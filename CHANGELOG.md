@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.12.0] — 2026-10-16
+
+### Added
+- marketplace.json: 注册 fworch 撰写系统全套缺失条目 — **fworch**（统一入口）+ **fworch-course** + **fworch-case** + **fworch-interview**，及 **fllmpack**（LLM 预设导出/导入）。marketplace 从 20 → 24 个 plugin，与 `plugins/` 目录数一致
+
+### Changed
+- marketplace.json 版本 0.9.0 → 0.12.0（此前用旧版号，与 CHANGELOG 漂移）
+- **README.md 全面重写**：修正仓名 `claude-skills` → `skill`；marketplace add 命令修正；自建 skill 表从 16 条刷新为 24 条（补 fworch/fwstd-* 撰写系统 8 个 + fllmpack + fmashwork）；移除不存在的 `freportstd` / `fresearchreport` 旧名（实为 `fwstd-report` / `fworch-report`）
+- **CLAUDE.md 重写**：plugin 数 15→24、目录结构、插件清单、配置注入路径（`ccprivate/skill-config/` → `ccprivate/skill/`）
+- **CONTRIBUTING.md**：仓名修正；移除不存在的 `plugins/skill-template/` 与 `option-<name>/` 结构条目
+
+### Fixed
+- README / CLAUDE.md / CONTRIBUTING.md 中所有 `github.com/mengfanchun2017/claude-skills` 死链 → `github.com/mengfanchun2017/skill`
+- **www/index.html 展示页刷新**：SKILLS 数组 15 → 24 张卡片（修正 3 个不存在的 skill 名 `fresearchreport`/`freportstd`/`getnote` → `fworch-report`/`fwstd-report`/撰写系统全套）；技能数文案 16 → 24；GitHub 链接与 marketplace add 命令修正；补充 i18n fllmpack 卡片
+
 ## [0.11.0] — 2026-08-23
 
 ### Added
