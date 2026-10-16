@@ -4,15 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ccskills — Claude Code 技能市场</title>
-<meta name="description" content="16 个精选 Claude Code 技能。飞书文档、PPT、Excel、PDF、图表、调研、OKR 管理 — 按需安装，独立使用。ccconfig 一键装好底层工具 + 自动 clone 本仓库。">
+<meta name="description" content="24 个精选 Claude Code 技能。飞书文档、PPT、Excel、图表、调研、撰写系统、OKR 管理 — 按需安装，独立使用。ccconfig 一键装好底层工具 + 自动 clone 本仓库。">
 <meta name="color-scheme" content="dark">
 <meta property="og:title" content="ccskills — Claude Code 技能市场">
-<meta property="og:description" content="16 个精选 Claude Code 技能，与 ccconfig 环境配置配套使用。按需安装，独立使用。">
+<meta property="og:description" content="24 个精选 Claude Code 技能，与 ccconfig 环境配置配套使用。按需安装，独立使用。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://skill.aiagt.dev">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="ccskills — Claude Code 技能市场">
-<meta name="twitter:description" content="16 个精选 Claude Code 技能，与 ccconfig 环境配置配套使用。">
+<meta name="twitter:description" content="24 个精选 Claude Code 技能，与 ccconfig 环境配置配套使用。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230a0a0f'/><text x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-size='18' font-weight='bold' fill='%23a78bfa'>S</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -151,8 +151,8 @@ footer a:hover{color:#a1a1aa}
       <a href="#skills" data-i18n="nav_skills">技能</a>
       <a href="#how" data-i18n="nav_how">怎么用</a>
       <a href="#ecosystem" data-i18n="nav_eco">生态</a>
-      <a href="https://github.com/mengfanchun2017/claude-skills" target="_blank" rel="noopener" data-i18n="nav_gh">GitHub</a>
-      <span class="badge">v0.9.0</span>
+      <a href="https://github.com/mengfanchun2017/skill" target="_blank" rel="noopener" data-i18n="nav_gh">GitHub</a>
+      <span class="badge">v0.12.0</span>
       <button class="lang-btn" onclick="toggleLang()" data-i18n="lang_switch">EN</button>
     </div>
   </div>
@@ -160,24 +160,24 @@ footer a:hover{color:#a1a1aa}
 
 <section class="hero">
   <div class="container">
-    <h1 data-i18n="hero_title">16 个技能，<br>一个<span>市场</span>。</h1>
-    <p class="sub" data-i18n="hero_sub">Claude Code 技能集合。飞书文档、PPT、Excel、图表、调研、OKR 管理 — 按需安装，独立使用。ccconfig 一条命令装好底层工具 + 自动 clone 本仓库。</p>
+    <h1 data-i18n="hero_title">24 个技能，<br>一个<span>市场</span>。</h1>
+    <p class="sub" data-i18n="hero_sub">Claude Code 技能集合。飞书文档、PPT、Excel、图表、调研、撰写系统、OKR 管理 — 按需安装，独立使用。ccconfig 一条命令装好底层工具 + 自动 clone 本仓库。</p>
     <div class="hero-cta">
-      <a href="https://github.com/mengfanchun2017/claude-skills" class="primary" target="_blank" rel="noopener" data-i18n="hero_cta">查看 GitHub →</a>
+      <a href="https://github.com/mengfanchun2017/skill" class="primary" target="_blank" rel="noopener" data-i18n="hero_cta">查看 GitHub →</a>
       <a href="https://config.aiagt.dev" class="secondary" target="_blank" rel="noopener" data-i18n="hero_ccconfig">⚙️ ccconfig 环境配置</a>
     </div>
     <div class="install-bar">
       <div class="bar-header" data-i18n="marketplace_add">① 添加市场（一次性）</div>
       <div class="bar-body">
-        <code>/plugin marketplace add mengfanchun2017/claude-skills</code>
-        <button class="cpy-btn" onclick="copyText(this,'/plugin marketplace add mengfanchun2017/claude-skills')" data-i18n="copy">复制</button>
+        <code>/plugin marketplace add mengfanchun2017/skill</code>
+        <button class="cpy-btn" onclick="copyText(this,'/plugin marketplace add mengfanchun2017/skill')" data-i18n="copy">复制</button>
       </div>
     </div>
     <div class="install-bar">
       <div class="bar-header" data-i18n="skill_install">② 安装技能（挑你需要的）</div>
       <div class="bar-body">
         <code>/plugin install &lt;name&gt;@mengfanchun2017-skills</code>
-        <button class="cpy-btn" onclick="copyText(this,'/plugin install @mengfanchun2017-skills')" data-i18n="copy">复制</button>
+        <button class="cpy-btn" onclick="copyText(this,'/plugin install <name>@mengfanchun2017-skills')" data-i18n="copy">复制</button>
       </div>
     </div>
   </div>
@@ -201,6 +201,7 @@ footer a:hover{color:#a1a1aa}
       <button class="cat-btn active" onclick="filterSkills('all',this)" data-i18n="cat_all">🔮 全部</button>
       <button class="cat-btn" onclick="filterSkills('docs',this)" data-i18n="cat_docs">📄 文档办公</button>
       <button class="cat-btn" onclick="filterSkills('research',this)" data-i18n="cat_research">🔍 调研分析</button>
+      <button class="cat-btn" onclick="filterSkills('writing',this)" data-i18n="cat_writing">✍️ 写作编排</button>
       <button class="cat-btn" onclick="filterSkills('productivity',this)" data-i18n="cat_productivity">⚡ 效率工具</button>
     </div>
     <div class="skill-grid" id="skillGrid"></div>
@@ -253,7 +254,7 @@ footer a:hover{color:#a1a1aa}
           <div class="eco-desc" data-i18n="eco_ccconfig">装工具：一条命令配好 Claude Code 环境</div>
         </div>
       </a>
-      <a href="https://github.com/mengfanchun2017/claude-skills" class="eco-link" target="_blank" rel="noopener">
+      <a href="https://github.com/mengfanchun2017/skill" class="eco-link" target="_blank" rel="noopener">
         <div class="eco-icon">📦</div>
         <div class="eco-info">
           <div class="eco-name">GitHub</div>
@@ -266,7 +267,7 @@ footer a:hover{color:#a1a1aa}
 
 <footer>
   <div class="container">
-    <p><a href="https://github.com/mengfanchun2017/claude-skills" target="_blank" rel="noopener">GitHub</a> &middot; <a href="https://config.aiagt.dev" target="_blank" rel="noopener">ccconfig</a> &middot; MIT License</p>
+    <p><a href="https://github.com/mengfanchun2017/skill" target="_blank" rel="noopener">GitHub</a> &middot; <a href="https://config.aiagt.dev" target="_blank" rel="noopener">ccconfig</a> &middot; MIT License</p>
   </div>
 </footer>
 
@@ -399,11 +400,29 @@ const SKILLS = [
     deps: ["fsearch"]
   },
   {
-    id: "fresearchreport", name: "fresearchreport", icon: "📋", cat: "research", needs_ccconfig: false,
-    ccconfig_zh: "纯技能，依赖 freportstd + fresearchframe + ffeishu",
-    ccconfig_en: "Pure skill, depends on freportstd + fresearchframe + ffeishu",
-    desc_zh: "研究报告生成器。三种输入模式（JSON/大纲/自由），v1 → 审查 → v2 迭代流程，委托 freportstd 质量标准，输出到 ffeishu。",
-    desc_en: "Report generator. 3 input modes (JSON/outline/free), v1 → review → v2 iteration, delegates to freportstd for standards, outputs to ffeishu.",
+    id: "fworch", name: "fworch", icon: "🧩", cat: "writing", needs_ccconfig: false,
+    ccconfig_zh: "纯技能，撰写系统路由层",
+    ccconfig_en: "Pure skill, writing-system router",
+    desc_zh: "撰写系统统一入口（路由层）。读体裁注册表判断需求属于哪种体裁（课程/报告/案例/面试准备），派发到对应 orchestrator，用户只描述需求、无需记内部 skill 名。",
+    desc_en: "Writing-system unified entry (router). Reads the genre registry, dispatches to the right orchestrator (course/report/case/interview) — you just describe the need.",
+    scenarios_zh: [
+      {trigger: '"做一门课"', result: "→ 识别为课程体裁，派发 fworch-course"},
+      {trigger: '"写一份分析报告"', result: "→ 识别为报告体裁，派发 fworch-report"},
+      {trigger: '"准备一下这个岗位的面试"', result: "→ 识别为面试体裁，派发 fworch-interview"}
+    ],
+    scenarios_en: [
+      {trigger: '"Build me a course"', result: "→ Detected as course, dispatches fworch-course"},
+      {trigger: '"Write an analysis report"', result: "→ Detected as report, dispatches fworch-report"},
+      {trigger: '"Prepare me for this job interview"', result: "→ Detected as interview, dispatches fworch-interview"}
+    ],
+    deps: ["fworch-report", "fworch-course", "fworch-case", "fworch-interview"]
+  },
+  {
+    id: "fworch-report", name: "fworch-report", icon: "📋", cat: "writing", needs_ccconfig: false,
+    ccconfig_zh: "纯技能，依赖 fwstd-report + fresearchframe + ffeishu",
+    ccconfig_en: "Pure skill, depends on fwstd-report + fresearchframe + ffeishu",
+    desc_zh: "报告生成 orchestrator。三种输入模式（JSON/大纲/自由素材）→ 结构化 Markdown 报告，内容规范委托 fwstd-report，飞书输出委托 ffeishu。",
+    desc_en: "Report generation orchestrator. 3 input modes (JSON/outline/free material) → structured Markdown, delegates standards to fwstd-report, Feishu output to ffeishu.",
     scenarios_zh: [
       {trigger: '"根据这份调研数据写报告"', result: "→ JSON 输入模式，结构化生成"},
       {trigger: '"写一份 X vs Y 竞品分析"', result: "→ 自动搜索 + 对比框架 + 结论"},
@@ -414,23 +433,125 @@ const SKILLS = [
       {trigger: '"Write an X vs Y competitive analysis"', result: "→ Auto search + comparison + conclusions"},
       {trigger: '"Deep research on quantum computing industry"', result: "→ outline.yaml batch, per-chapter write"}
     ],
-    deps: ["freportstd", "fresearchframe", "ffeishu"]
+    deps: ["fwstd-report", "fresearchframe", "ffeishu"]
   },
   {
-    id: "freportstd", name: "freportstd", icon: "📏", cat: "research", needs_ccconfig: false,
+    id: "fworch-course", name: "fworch-course", icon: "📚", cat: "writing", needs_ccconfig: true,
+    ccconfig_zh: "依赖飞书文档（ffeishu）+ 私有课程配置",
+    ccconfig_en: "Depends on Feishu docs (ffeishu) + private course config",
+    desc_zh: "系列课程创作 orchestrator。两种模式：从零创作（调研→体系→教案→练习→总结）/ 现有材料课程化。每步产出存飞书子文档，读配置判断进度。",
+    desc_en: "Series-course creation orchestrator. Two modes: from-scratch (research→structure→lesson→exercise→summary) / material-to-course. Each step outputs a Feishu sub-doc.",
+    scenarios_zh: [
+      {trigger: '"做一门 AI 入门的系列课"', result: "→ 从零创作模式，逐步产出课程体系+教案"},
+      {trigger: '"把这批 PDF 课件整理成课程"', result: "→ 现有材料课程化模式，抽取为 memo+update"},
+      {trigger: '"继续上次那门课"', result: "→ 读配置判断进度，从下一步继续"}
+    ],
+    scenarios_en: [
+      {trigger: '"Build an intro-to-AI course series"', result: "→ From-scratch mode, stepwise structure + lessons"},
+      {trigger: '"Turn these PDF slides into a course"', result: "→ Material-to-course mode, extract to memo+update"},
+      {trigger: '"Continue the course from last time"', result: "→ Reads config, resumes at the next step"}
+    ],
+    deps: ["ffeishu", "fwstd-course"]
+  },
+  {
+    id: "fworch-case", name: "fworch-case", icon: "🗂️", cat: "writing", needs_ccconfig: true,
+    ccconfig_zh: "依赖飞书 wiki 案例库 + Base 元数据",
+    ccconfig_en: "Depends on Feishu wiki case library + Base metadata",
+    desc_zh: "案例库编排器。维护飞书 wiki 三层案例库 + Base 元数据，按关键词/专业领域检索案例，新增/更新案例时搜索整理生成正文。",
+    desc_en: "Case-library orchestrator. Maintains a Feishu wiki 3-tier case library + Base metadata, retrieves cases by keyword/domain, generates body text on add/update.",
+    scenarios_zh: [
+      {trigger: '"案例库里有没有关于供应链的案例"', result: "→ 按关键词/领域检索，返回匹配案例"},
+      {trigger: '"新增一个案例"', result: "→ 搜索整理素材 → 生成正文 → 写入案例库"},
+      {trigger: '"给课程补充一个案例"', result: "→ 检索 + fetch 案例正文注入课程上下文"}
+    ],
+    scenarios_en: [
+      {trigger: '"Any supply-chain cases in the library?"', result: "→ Keyword/domain search, returns matches"},
+      {trigger: '"Add a new case"', result: "→ Research → generate body → write to library"},
+      {trigger: '"Add a case to the course"', result: "→ Retrieve + fetch case body into course context"}
+    ],
+    deps: ["ffeishu", "fwstd-case"]
+  },
+  {
+    id: "fworch-interview", name: "fworch-interview", icon: "🎯", cat: "writing", needs_ccconfig: true,
+    ccconfig_zh: "依赖飞书文档（ffeishu）+ 私有面试配置",
+    ccconfig_en: "Depends on Feishu docs (ffeishu) + private interview config",
+    desc_zh: "面试准备 orchestrator。面向零经验应聘者，从岗位认知、行业组织、专业能力到未来工作思路的全链条准备，每步产出存飞书子文档。",
+    desc_en: "Interview-prep orchestrator. Full-chain prep for first-time candidates — role awareness, industry/org, professional skill, future work plan — each step a Feishu sub-doc.",
+    scenarios_zh: [
+      {trigger: '"准备这个岗位的面试"', result: "→ 建面试准备配置，逐步产出材料"},
+      {trigger: '"帮我整理岗位画像和知识地图"', result: "→ 岗位/组织/能力模型分步产出"},
+      {trigger: '"生成面试模拟清单"', result: "→ 问题库 + 问答素材 + 模拟清单成稿"}
+    ],
+    scenarios_en: [
+      {trigger: '"Prepare me for this role\'s interview"', result: "→ Creates prep config, stepwise material"},
+      {trigger: '"Draft the role profile and knowledge map"', result: "→ Role/org/competency model, step by step"},
+      {trigger: '"Generate a mock interview checklist"', result: "→ Question bank + answer material + mock list"}
+    ],
+    deps: ["ffeishu", "fwstd-interview"]
+  },
+  {
+    id: "fwstd-report", name: "fwstd-report", icon: "📏", cat: "writing", needs_ccconfig: false,
     ccconfig_zh: "纯技能，零外部依赖，装了就能用",
     ccconfig_en: "Pure skill, zero external deps, works immediately",
-    desc_zh: "报告写作横向规范。4 套模板（研究/分析/对比/方案），结构规则（H1-H3 仅）、数据呈现（对比用表不用列表）、论证规则、引注规范。",
-    desc_en: "Report writing standards. 4 templates (research/analysis/comparison/proposal), structure rules, data presentation, argumentation, citation standards.",
+    desc_zh: "报告写作横向规范。4 套模板（研究/分析/对比/方案），结构规则、数据分级与引用纪律、判断主线、论证逻辑、图表约定。",
+    desc_en: "Report writing standards. 4 templates (research/analysis/comparison/proposal), structure rules, data grading & citation discipline, argumentation, chart conventions.",
     scenarios_zh: [
-      {trigger: "任何报告生成场景", result: "→ 被 fresearchreport 和 flogme 自动调用"},
+      {trigger: "任何报告生成场景", result: "→ 被 fworch-report 和 flogme 自动调用"},
       {trigger: '"确保报告符合规范"', result: "→ 结构检查、数据呈现验证、引注审核"},
       {trigger: '"我需要一份对比报告的模板"', result: "→ 4 套模板按场景选用"}
     ],
     scenarios_en: [
-      {trigger: "Any report generation scenario", result: "→ Auto-invoked by fresearchreport and flogme"},
+      {trigger: "Any report generation scenario", result: "→ Auto-invoked by fworch-report and flogme"},
       {trigger: '"Ensure report meets standards"', result: "→ Structure check, data presentation, citation audit"},
       {trigger: '"I need a comparison report template"', result: "→ 4 templates, chosen by scenario"}
+    ],
+    deps: []
+  },
+  {
+    id: "fwstd-course", name: "fwstd-course", icon: "📐", cat: "writing", needs_ccconfig: false,
+    ccconfig_zh: "纯技能，内容规范层",
+    ccconfig_en: "Pure skill, content-standards layer",
+    desc_zh: "课程文档内容规范 — 系列课程各产物（调研报告/课程体系/教案/练习/总结）的内容架构、骨架与写作要求。被 fworch-course 引用。",
+    desc_en: "Course document standards — content architecture, skeletons and writing requirements for each course artifact. Referenced by fworch-course.",
+    scenarios_zh: [
+      {trigger: "fworch-course 产出课程产物时", result: "→ 自动按本规范约束内容结构"},
+      {trigger: '"课程体系应该包含什么"', result: "→ 返回课程体系骨架与写作要求"}
+    ],
+    scenarios_en: [
+      {trigger: "When fworch-course produces artifacts", result: "→ Auto-constrains content structure"},
+      {trigger: '"What should a course structure contain?"', result: "→ Returns skeleton + writing requirements"}
+    ],
+    deps: []
+  },
+  {
+    id: "fwstd-case", name: "fwstd-case", icon: "📐", cat: "writing", needs_ccconfig: false,
+    ccconfig_zh: "纯技能，内容规范层",
+    ccconfig_en: "Pure skill, content-standards layer",
+    desc_zh: "案例库内容规范 — Base 字段 schema、案例起名规则、正文模版与写作要求。被 fworch-case 引用。",
+    desc_en: "Case-library standards — Base field schema, naming rules, body template and writing requirements. Referenced by fworch-case.",
+    scenarios_zh: [
+      {trigger: "fworch-case 建库/写案例时", result: "→ 按 schema 与起名规则约束"},
+      {trigger: '"案例正文怎么组织"', result: "→ 返回正文模版与写作要求"}
+    ],
+    scenarios_en: [
+      {trigger: "When fworch-case builds/writes cases", result: "→ Constrained by schema + naming rules"},
+      {trigger: '"How to structure a case body?"', result: "→ Returns body template + writing requirements"}
+    ],
+    deps: []
+  },
+  {
+    id: "fwstd-interview", name: "fwstd-interview", icon: "📐", cat: "writing", needs_ccconfig: false,
+    ccconfig_zh: "纯技能，内容规范层",
+    ccconfig_en: "Pure skill, content-standards layer",
+    desc_zh: "面试准备内容规范 — 岗位画像/组织行业/知识地图/能力模型/问题库/问答素材/未来工作思路/模拟清单/成稿包的内容架构与写作要求。",
+    desc_en: "Interview-prep standards — content architecture & writing requirements for role profile, org/industry, knowledge map, competency model, question bank, mock list, final pack.",
+    scenarios_zh: [
+      {trigger: "fworch-interview 产出材料时", result: "→ 按本规范约束各产物结构"},
+      {trigger: '"面试准备应该有哪几块"', result: "→ 返回全链条准备清单与骨架"}
+    ],
+    scenarios_en: [
+      {trigger: "When fworch-interview produces material", result: "→ Constrains each artifact's structure"},
+      {trigger: '"What goes into interview prep?"', result: "→ Returns the full-chain checklist + skeletons"}
     ],
     deps: []
   },
@@ -489,22 +610,20 @@ const SKILLS = [
     deps: ["fsearch", "ffeishu", "flogme"]
   },
   {
-    id: "getnote", name: "getnote", icon: "🧠", cat: "productivity", needs_ccconfig: true,
-    ccconfig_zh: "ccconfig 已装：GetNote MCP 服务器",
-    ccconfig_en: "ccconfig installs: GetNote MCP server",
-    desc_zh: "得到笔记集成。27 个 MCP 工具，笔记增删改查、语义搜索、知识库管理、图片上传、博主内容浏览、直播回看。",
-    desc_en: "DeDao (Get Note) integration. 27 MCP tools, note CRUD, semantic search, knowledge base management, image upload, blogger content, livestreams.",
+    id: "fllmpack", name: "fllmpack", icon: "📦", cat: "productivity", needs_ccconfig: false,
+    ccconfig_zh: "纯技能，仅需 Python",
+    ccconfig_en: "Pure skill, only needs Python",
+    desc_zh: "LLM 预设配置导出/导入。把本机 LLM 预设（内置+自定义）打包成不含任何 API key 的配置包，发给同事导入后各自填 key。导出物自包含。",
+    desc_en: "LLM preset export/import. Packs local LLM presets (built-in + custom) into an API-key-free bundle; recipients import and fill in their own keys. Self-contained export.",
     scenarios_zh: [
-      {trigger: '"记一条关于 RAG 架构的笔记"', result: "→ 创建笔记 + 自动标签 + 语义索引"},
-      {trigger: '"在我的知识库里搜索微服务"', result: "→ 语义搜索，跨笔记关联"},
-      {trigger: '"把我关注的博主最新文章列出来"', result: "→ 订阅博主内容聚合"}
+      {trigger: '"把我的 LLM 配置导出给同事"', result: "→ 打包预设（不含 key），输出到 C:\\claudepack"},
+      {trigger: '"导入同事给的 LLM 预设包"', result: "→ 导入预设定义，提示填入自己的 key"}
     ],
     scenarios_en: [
-      {trigger: '"Take a note about RAG architecture"', result: "→ Create note + auto-tag + semantic index"},
-      {trigger: '"Search my knowledge base for microservices"', result: "→ Semantic search, cross-note linking"},
-      {trigger: '"List latest posts from bloggers I follow"', result: "→ Subscribed blogger content aggregation"}
+      {trigger: '"Export my LLM config for a colleague"', result: "→ Packs presets (no keys), outputs to C:\\claudepack"},
+      {trigger: '"Import the LLM preset pack"', result: "→ Imports preset definitions, prompts for your own keys"}
     ],
-    deps: ["GetNote MCP"]
+    deps: ["python3"]
   },
   {
     id: "flibaudit", name: "flibaudit", icon: "🛡️", cat: "research", needs_ccconfig: false,
@@ -539,6 +658,40 @@ const SKILLS = [
       {trigger: '"Update aiagt product page"', result: "→ Sync code changes to product page"}
     ],
     deps: []
+  },
+  {
+    id: "fmashwork", name: "fmashwork", icon: "🧊", cat: "productivity", needs_ccconfig: true,
+    ccconfig_zh: "ccconfig 已装：Playwright MCP、Python 3D 库",
+    ccconfig_en: "ccconfig installs: Playwright MCP, Python 3D libs",
+    desc_zh: "AI 图生 3D → 拓竹打印自动化工作流。网页免费生成（混元3D/Meshy）→ 本地校验（trimesh 水密/流形）→ pymeshfix 修复 → 导出 STL/3MF → Bambu Studio 确认打印。",
+    desc_en: "AI image-to-3D → Bambu print automation. Free web generation (Hunyuan3D/Meshy) → local validation (trimesh watertight/manifold) → pymeshfix repair → export STL/3MF → Bambu Studio confirm.",
+    scenarios_zh: [
+      {trigger: '"跑图生3D工作流"', result: "→ 生成 → 校验 → 修复 → 导出可打印文件"},
+      {trigger: '"校验这个 3D 模型能不能打印"', result: "→ trimesh 检查水密性/流形/体积"},
+      {trigger: '"meshwork 一个小摆件"', result: "→ 端到端管线，交付 STL/3MF"}
+    ],
+    scenarios_en: [
+      {trigger: '"Run the image-to-3D workflow"', result: "→ Generate → validate → repair → export printable file"},
+      {trigger: '"Check if this 3D model is printable"', result: "→ trimesh watertight/manifold/volume check"},
+      {trigger: '"meshwork a small figurine"', result: "→ End-to-end pipeline, delivers STL/3MF"}
+    ],
+    deps: ["Playwright MCP", "trimesh", "pymeshfix"]
+  },
+  {
+    id: "fskillcreat", name: "fskillcreat", icon: "🛠️", cat: "productivity", needs_ccconfig: false,
+    ccconfig_zh: "纯技能，零外部依赖",
+    ccconfig_en: "Pure skill, zero external deps",
+    desc_zh: "Skill 开发脚手架。交互式询问公开/私有归属，生成新 skill 骨架并注册 symlink 到 ~/.claude/skills/。",
+    desc_en: "Skill scaffolding. Interactively asks public/private, generates a new skill skeleton and registers a symlink into ~/.claude/skills/.",
+    scenarios_zh: [
+      {trigger: '"创建一个新 skill"', result: "→ 问公开/私有 → 生成骨架 → 注册 symlink"},
+      {trigger: '"做一个新插件"', result: "→ 生成 SKILL.md frontmatter + 目录结构"}
+    ],
+    scenarios_en: [
+      {trigger: '"Create a new skill"', result: "→ Ask public/private → skeleton → register symlink"},
+      {trigger: '"Make a new plugin"', result: "→ Generates SKILL.md frontmatter + directory structure"}
+    ],
+    deps: []
   }
 ];
 
@@ -549,8 +702,8 @@ const I18N = {
     nav_eco: "生态",
     nav_gh: "GitHub",
     lang_switch: "EN",
-    hero_title: '16 个技能，<br>一个<span>市场</span>。',
-    hero_sub: "Claude Code 技能集合。飞书文档、PPT、Excel、图表、调研、OKR 管理 — 按需安装，独立使用。底层工具由 ccconfig 一键装好。",
+    hero_title: '24 个技能，<br>一个<span>市场</span>。',
+    hero_sub: "Claude Code 技能集合。飞书文档、PPT、Excel、图表、调研、撰写系统、OKR 管理 — 按需安装，独立使用。底层工具由 ccconfig 一键装好。",
     hero_cta: "查看 GitHub →",
     hero_ccconfig: "⚙️ ccconfig 环境配置",
     marketplace_add: "① 添加市场（一次性）",
@@ -562,6 +715,7 @@ const I18N = {
     cat_all: "🔮 全部",
     cat_docs: "📄 文档办公",
     cat_research: "🔍 调研分析",
+    cat_writing: "✍️ 写作编排",
     cat_productivity: "⚡ 效率工具",
     scenarios_label: "使用场景",
     badge_cc: "需 ccconfig",
@@ -582,8 +736,8 @@ const I18N = {
     nav_eco: "Ecosystem",
     nav_gh: "GitHub",
     lang_switch: "中文",
-    hero_title: '16 Skills,<br>One <span>Marketplace</span>.',
-    hero_sub: "Claude Code skill collection. Feishu docs, PPT, Excel, diagrams, research, OKR — install individually. Underlying tools installed by ccconfig in one command.",
+    hero_title: '24 Skills,<br>One <span>Marketplace</span>.',
+    hero_sub: "Claude Code skill collection. Feishu docs, PPT, Excel, diagrams, research, writing system, OKR — install individually. Underlying tools installed by ccconfig in one command.",
     hero_cta: "View on GitHub →",
     hero_ccconfig: "⚙️ ccconfig Environment",
     marketplace_add: "① Add marketplace (one-time)",
@@ -595,6 +749,7 @@ const I18N = {
     cat_all: "🔮 All",
     cat_docs: "📄 Document & Office",
     cat_research: "🔍 Research & Analysis",
+    cat_writing: "✍️ Writing System",
     cat_productivity: "⚡ Productivity",
     scenarios_label: "Scenarios",
     badge_cc: "needs ccconfig",
@@ -679,7 +834,7 @@ function renderSkills() {
         </div>
       </div>
       <div class="skill-desc">${lang === 'zh' ? s.desc_zh : s.desc_en}</div>
-      ${s.deps.length ? `<div class="skill-deps">${s.deps.map(d => `<span class="dep${needsCC && ['lark-cli','officecli','whiteboard-cli','PyMuPDF','GetNote MCP','Supabase'].some(t => d.includes(t)) ? ' cc-dep' : ''}">${d}</span>`).join('')}</div>` : ''}
+      ${s.deps.length ? `<div class="skill-deps">${s.deps.map(d => `<span class="dep${needsCC && ['lark-cli','officecli','whiteboard-cli','PyMuPDF','Supabase','Playwright MCP'].some(t => d.includes(t)) ? ' cc-dep' : ''}">${d}</span>`).join('')}</div>` : ''}
       <div class="skill-scenarios">
         <div class="sc-label">${I18N[lang].scenarios_label}</div>
         ${(lang === 'zh' ? s.scenarios_zh : s.scenarios_en).map(sc => `

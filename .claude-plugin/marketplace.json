@@ -7,7 +7,7 @@
   },
   "metadata": {
     "description": "Claude Code skill 集合 — 自建 + 飞书 CLI + 辅助工具",
-    "version": "0.9.0",
+    "version": "0.12.0",
     "homepage": "https://github.com/mengfanchun2017/skill"
   },
   "plugins": [
@@ -172,6 +172,38 @@
       "keywords": [
         "f"
       ]
+    },
+    {
+      "name": "fworch-course",
+      "source": "./plugins/fworch-course",
+      "keywords": [
+        "f"
+      ],
+      "description": "系列课程创作 orchestrator。读 ccprivate/conf/fcourse/<slug>.yaml 配置 -> 判断当前课程进度 -> 读取对应 step 细则执行 -> 更新配置。 所有产物存飞书父文档下的子文档。fworch-case 案例库**可选**调用（按需、用户触发）。 两种模式：Mode A 从零创作（调研→体系→教案）；Mode B 现有材料课程化（已有课件/PDF 抽取为 memo+update）。 用法：用户说\"做课程\"/\"创作课程\"/\"设计课程\"/\"继续课程\"/\"课程材料课程化\"/\"已有课程抽取\"触发"
+    },
+    {
+      "name": "fworch-case",
+      "source": "./plugins/fworch-case",
+      "keywords": [
+        "f"
+      ],
+      "description": "案例库编排器。维护飞书 wiki 三层案例库 + Base 元数据，按关键词/专业领域检索案例， 新增/更新案例时搜索整理生成正文，fetch 案例主文档内容注入课程上下文。 内容规范（schema/起名/正文模版）见 fwstd-case。 用法：用户说\"案例库\"/\"案例\"/\"补充案例\"/\"推荐案例\"/\"新增案例\"触发"
+    },
+    {
+      "name": "fworch-interview",
+      "source": "./plugins/fworch-interview",
+      "keywords": [
+        "f"
+      ],
+      "description": "面试准备 orchestrator。读 ccprivate/conf/finterview/<slug>.yaml 配置 -> 判断准备进度 -> 读取对应 step 细则执行 -> 更新配置。所有产物存飞书父文档下的子文档。 面向\"零经验应聘者\"从岗位认知、行业组织、专业能力到未来工作思路的全链条准备。 用法：用户说\"准备面试\"/\"岗位面试\"/\"应聘准备\"/\"面试材料\"触发"
+    },
+    {
+      "name": "fllmpack",
+      "source": "./plugins/fllmpack",
+      "keywords": [
+        "f"
+      ],
+      "description": "LLM 预设配置导出/导入 — 把本机 LLM 预设（内置+自定义）打包成不含任何 API key 的 配置包，发给同事导入后各自填 key。导出物自包含（附脚本副本），收件方无需装本 skill 即可导入。默认输出 C:\\claudepack（WSL /mnt/c/claudepack）。 用法：用户说\"导出 LLM 配置\"/\"打包 LLM\"/\"把模型配置给同事\"/\"导入 LLM 配置\"/\"导入预设包\"触发。"
     }
   ]
 }

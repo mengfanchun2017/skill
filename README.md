@@ -1,14 +1,14 @@
-# claude-skills — Claude Code skill 集合
+# skill — Claude Code skill 集合
 
-> Claude Code 技能聚合仓。**17 个自建**（16 marketplace + 1 内部 fskillcreat）+ **第三方 skill 由用户用 npx skills 自管**（不通过 marketplace）。
-> 飞书 / 调研 / 文档 / PPT / Excel / 图表 / 3D 打印 一站式。
+> Claude Code 技能聚合仓。**24 个自建 plugin**（全部在 marketplace 注册）+ **第三方 skill 由用户用 npx skills 自管**（不通过 marketplace）。
+> 飞书 / 调研 / 撰写系统 / 文档 / PPT / Excel / 图表 / 3D 打印 一站式。
 
 ## 快速开始
 
 在 Claude Code 里添加 marketplace（一次性）：
 
 ```
-/plugin marketplace add mengfanchun2017/claude-skills
+/plugin marketplace add mengfanchun2017/skill
 ```
 
 然后按需安装（挑你需要的，`<name>` 替换为下表中的名称）：
@@ -25,14 +25,15 @@
 | Excel 表格 | `/plugin install fxlsx@mengfanchun2017-skills` |
 | 画架构图/流程图 | `/plugin install fdiagram@mengfanchun2017-skills` |
 | 搜索/调研 | `/plugin install fsearch@mengfanchun2017-skills` |
-| 研究报告 | `/plugin install fresearchreport@mengfanchun2017-skills` |
+| 研究方法论框架 | `/plugin install fresearchframe@mengfanchun2017-skills` |
+| 报告生成 | `/plugin install fworch-report@mengfanchun2017-skills` |
+| 报告写作规范 | `/plugin install fwstd-report@mengfanchun2017-skills` |
+| 撰写系统统一入口 | `/plugin install fworch@mengfanchun2017-skills` |
 | 个人 OKR/日志 | `/plugin install flogme@mengfanchun2017-skills` |
 | 慕课推荐 | `/plugin install fmoocrec@mengfanchun2017-skills` |
 | 系统架构师备考 | `/plugin install fsysarchi@mengfanchun2017-skills` |
 | 源码文档同步 | `/plugin install fsyncdoc@mengfanchun2017-skills` |
 | 库审计 | `/plugin install flibaudit@mengfanchun2017-skills` |
-| 报告写作规范 | `/plugin install freportstd@mengfanchun2017-skills` |
-| 研究方法论框架 | `/plugin install fresearchframe@mengfanchun2017-skills` |
 | AI 图生 3D → 拓竹打印 | `/plugin install fmashwork@mengfanchun2017-skills` |
 
 可以一次装多个：
@@ -72,25 +73,34 @@ cconfig 用户：`bash ccconfig/lib/init-skill.sh sync` 自动从 `conf/third-pa
 
 克隆 [ccconfig](https://github.com/mengfanchun2017/ccconfig) 后，`bash lib/init-skill.sh sync` 自动完成：symlink 自建 skill、注册 marketplace、安装第三方 skill、注入私有配置。详见 ccconfig 文档。
 
-## 自建 skill（16 个，仓内）
+## 自建 plugin（24 个，全部 marketplace 注册）
 
-| Skill | 说明 |
+| Plugin | 说明 |
 |-------|------|
 | `ffeishu` | 飞书文档编排层（wiki/表格/白板、报告整合/拆分/转换/对比） |
-| `freportstd` | 报告写作横向规范（4 套模板：研究/分析/对比/方案） |
-| `fpptx` | PPTX 总控（OfficeCLI 引擎：批量 JSON、模板合并、autofit） |
-| `fresearchframe` | 4 领域研究方法论 + 批量深度研究（customer/generic/market/technical） |
-| `fresearchreport` | 报告生成（JSON/大纲/素材 → 结构化 Markdown） |
-| `fsearch` | 多源搜索编排原语（四源并行：Tavily + Exa + WebSearch + Tavily Research） |
-| `fdiagram` | 代码驱动图表生成（Mermaid 架构/流程/时序/ER/类图、白板） |
+| `fpptx` | PPT/X 总控（PPTX 或飞书 Slides，6 套设计主题） |
 | `fdocx` | Word .docx 总控（OfficeCLI 引擎：模板/样式/表格/图片/目录） |
 | `fxlsx` | Excel .xlsx 总控（OfficeCLI 引擎：公式/图表/条件格式/透视表） |
+| `fdiagram` | 飞书画板统一入口（Mermaid/PlantUML：架构/流程/时序/ER/类/甘特/思维导图） |
+| `fsearch` | 搜索活动统一原语（分语言路由：中文→MiniMax、英文→Tavily，耗尽切 Exa） |
+| `fresearchframe` | 4 领域研究方法论（customer/generic/market/technical） |
+| `fworch` | 撰写系统统一入口（按体裁路由到 course/report/case/interview） |
+| `fworch-report` | 报告生成 orchestrator（JSON/大纲/素材 → 结构化 Markdown） |
+| `fworch-course` | 系列课程创作 orchestrator（从零创作 / 现有材料课程化） |
+| `fworch-case` | 案例库编排器（飞书 wiki 三层案例库 + Base 元数据） |
+| `fworch-interview` | 面试准备 orchestrator（岗位认知 → 专业能力 → 未来工作思路） |
+| `fwstd-report` | 报告写作横向规范（4 套模板：研究/分析/对比/方案） |
+| `fwstd-course` | 课程文档内容规范（被 fworch-course 引用） |
+| `fwstd-case` | 案例库内容规范（被 fworch-case 引用） |
+| `fwstd-interview` | 面试准备内容规范（被 fworch-interview 引用） |
 | `flogme` | 个人管理系统（OKR/Worklog/Reflect/SUM，飞书 Base） |
-| `fmoocrec` | 慕课推荐（QS 课程 + 学习路径，飞书 Base + Supabase） |
-| `flibaudit` | 库审计 — 依赖分析 + 安全漏洞 + 版本兼容性 |
-| `fsyncdoc` | 源码文档同步 + 产品页同步（aiagt） |
-| `fskillcreat` | Skill 开发脚手架 — 快速创建新 skill 骨架 |
+| `fmoocrec` | MOOC 课程推荐（QS 课程 + 学习路径，飞书 Base + Supabase） |
 | `fsysarchi` | 系统分析师备考 — 暗号 `archi` 触发，随工边做边学 |
+| `flibaudit` | 仓库全面审计 — 架构/代码/文件卫生/测试/文档/发布就绪 |
+| `fsyncdoc` | 源码文档同步 + 产品页同步（aiagt） |
+| `fmashwork` | AI 图生 3D → 拓竹打印自动化工作流 |
+| `fllmpack` | LLM 预设配置导出/导入（不含 API key，发给同事各自填 key） |
+| `fskillcreat` | Skill 开发脚手架 — 快速创建新 skill 骨架 |
 
 ## 外部 skill — 三方上游 + 系统层 lark-cli（不通过本仓装）
 
@@ -134,25 +144,34 @@ lark-cli auth login
 ## 架构
 
 ```
-claude-skills/                          ← 单聚合 marketplace 仓
+skill/                                  ← 单聚合 marketplace 仓
 ├── .claude-plugin/
-│   └── marketplace.json                # 16 plugin 入口（全本地）
-├── plugins/                            ← 16 个自建 plugin（全 marketplace）
+│   └── marketplace.json                # plugin 入口（全本地）
+├── plugins/                            ← 24 个自建 plugin（全 marketplace）
 │   ├── ffeishu/SKILL.md
-│   ├── freportstd/SKILL.md
 │   ├── fpptx/SKILL.md
-│   ├── fresearchframe/SKILL.md
-│   ├── fresearchreport/SKILL.md
-│   ├── fsearch/SKILL.md
-│   ├── fdiagram/SKILL.md
 │   ├── fdocx/SKILL.md
 │   ├── fxlsx/SKILL.md
+│   ├── fdiagram/SKILL.md
+│   ├── fsearch/SKILL.md
+│   ├── fresearchframe/SKILL.md
+│   ├── fworch/SKILL.md
+│   ├── fworch-report/SKILL.md
+│   ├── fworch-course/SKILL.md
+│   ├── fworch-case/SKILL.md
+│   ├── fworch-interview/SKILL.md
+│   ├── fwstd-report/SKILL.md
+│   ├── fwstd-course/SKILL.md
+│   ├── fwstd-case/SKILL.md
+│   ├── fwstd-interview/SKILL.md
 │   ├── flogme/SKILL.md
 │   ├── fmoocrec/SKILL.md
+│   ├── fsysarchi/SKILL.md
 │   ├── flibaudit/SKILL.md
 │   ├── fsyncdoc/SKILL.md
-│   ├── fskillcreat/SKILL.md
-│   ├── fsysarchi/SKILL.md
+│   ├── fmashwork/SKILL.md
+│   ├── fllmpack/SKILL.md
+│   └── fskillcreat/SKILL.md
 ├── README.md
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
@@ -180,9 +199,9 @@ MIT — 见 [LICENSE](LICENSE)
 
 ## English Summary
 
-A Claude Code marketplace with 16 self-built skills (all in marketplace). Third-party skills use `npx skills` (not /plugin install) for clean dialog UX.
+A Claude Code marketplace with 24 self-built plugins (all registered in marketplace). Third-party skills use `npx skills` (not /plugin install) for clean dialog UX.
 
-- **Self-built (in repo)**: ffeishu, freportstd, fpptx, fresearchframe, fresearchreport, fsearch, fdiagram, fdocx, fxlsx, flogme, fmoocrec, flibaudit, fsyncdoc, fskillcreat, fsysarchi, fmashwork
+- **Self-built (in repo)**: ffeishu, fpptx, fdocx, fxlsx, fdiagram, fsearch, fresearchframe, fworch, fworch-report, fworch-course, fworch-case, fworch-interview, fwstd-report, fwstd-course, fwstd-case, fwstd-interview, flogme, fmoocrec, fsysarchi, flibaudit, fsyncdoc, fmashwork, fllmpack, fskillcreat
 - **Feishu CLI (system level)**: install `@larksuite/cli` via npm — ffeishu orchestrates all `lark-cli` commands
 - **Utilities (user-installed via `npx skills`)**: mattpocock/skills sub-skills (caveman, diagnose, grill-me, ...)
 
