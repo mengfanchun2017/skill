@@ -19,12 +19,29 @@
 """
 import sys, os, json, argparse, tempfile
 
-CONF = os.path.expanduser("~/git/ccprivate/conf/mineru.json")
+# 配置查找顺序：$MINERU_CONF > $CCPRIVATE_HOME/conf > $CCPRIVATE_DIR/conf > ~/git/ccprivate/conf
+def _conf_path():
+    env = os.environ.get("MINERU_CONF")
+    if env:
+        return os.path.expanduser(env)
+    priv = os.environ.get("CCPRIVATE_HOME") or os.environ.get("CCPRIVATE_DIR")
+    if priv:
+        p = os.path.join(priv, "conf", "mineru.json")
+        if os.path.isfile(p):
+            return p
+    return os.path.expanduser("~/git/ccprivate/conf/mineru.json")
+
+
+CONF = _conf_path()
 
 
 def load_conf():
-    with open(CONF) as f:
-        return json.load(f)
+    try:
+        with open(CONF) as f:
+            return json.load(f)
+    except Exception:
+        # 无 conf → 降级纯 Flash（免费档），不中断
+        return {}
 
 
 def pdf_pages(path):
@@ -84,6 +101,11 @@ def main():
         if not os.path.exists(args.source):
             print(f"ERROR: file not found: {args.source}", file=sys.stderr)
             sys.exit(2)
+
+    if not use_flash and not token:
+        print("ERROR: 该材料需 Precision 档（>20页/网页/强制），但未配置 MinerU token。"
+              f"\n  配置: bash ccconfig/init-option.sh mineru key  （conf: {CONF}）", file=sys.stderr)
+        sys.exit(3)
 
     from mineru import MinerU
     client = MinerU(token) if (token and not use_flash) else MinerU()
