@@ -6,7 +6,7 @@ description: |
   新增/更新案例时搜索整理生成正文，fetch 案例主文档内容注入课程上下文。
   内容规范（schema/起名/正文模版）见 fwstd-case。
   用法：用户说"案例库"/"案例"/"补充案例"/"推荐案例"/"新增案例"触发
-allowed-tools: Read, Bash, Glob, Grep
+allowed-tools: Read, Bash, Glob, Grep, mcp__mineru__parse_documents
 ---
 
 # fworch-case — 案例库编排器（L3）
@@ -103,8 +103,8 @@ chunks:
 **正文结构与写作要求**：严格按 `fwstd-case` 的「案例正文模版」。
 
 0. **材料预处理**：原始材料（本地 PDF/Word/PPT 或 URL）先转 markdown：
-   - **本地文件 / PDF URL** → MinerU 解析（`references/mineru_parse.py`）
-   - **网页 URL** → Tavily extract / Exa fetch 优先；MinerU `crawl` 补充（国内可达、需结构保留时）
+   - **本地文件 / PDF URL** → MinerU 解析：MCP `mcp__mineru__parse_documents`（交互快）或 `references/mineru_parse.py`（脚本可复现，`uv run` 自管依赖）
+   - **网页 URL** → Tavily extract / Exa fetch 优先；MinerU `mcp__mineru__parse_documents` 补充（国内可达、需结构保留时）
    - **纯文字描述** → 直接进 `fsearch`
 1. **搜索扩展**：`fsearch` 补充背景/数据/图表源，扩展内容作主文档单独一节。
 2. **命名**：按 `fwstd-case` 起名规则算标题。

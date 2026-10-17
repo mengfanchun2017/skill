@@ -9,7 +9,8 @@ description: |
 allowed-tools: Read, Write, Bash,
   mcp__tavily__tavily_search, mcp__tavily__tavily_research,
   mcp__tavily__tavily_extract, mcp__tavily__tavily_crawl, mcp__tavily__tavily_map,
-  mcp__exa__web_search_exa, mcp__exa__web_fetch_exa
+  mcp__exa__web_search_exa, mcp__exa__web_fetch_exa,
+  mcp__mineru__parse_documents
 ---
 
 # fsearch — 搜索活动统一原语
@@ -106,12 +107,24 @@ curl -s -X POST 'https://api.minimaxi.com/v1/coding_plan/search' \
 ```
 Tavily extract（主力）→ 拿到内容 → 直接用
                       → Exa fetch（补充）→ 直接用
-                      → 空壳/被拦截/需登录 → 跳过，备注即可
+                      → 需保留结构（标题层级/表格/公式/图）且国内可达 → MinerU crawl
+                      → 空壳/被拦截/需登录/SPA → Playwright（见 rules/search.md）
+                      → 均失败 → 跳过，备注即可
 ```
 
 - **Tavily extract** 速度快、可并行，适合公开静态页面
 - **Exa fetch** 适合 Exa 搜索结果的页面内容提取
+- **MinerU crawl**（`mcp__mineru__parse_documents`）：国内可达 + 需结构保留时用，正文提取保留 `#` 标题层级/表格/公式/图片 URL，适合把网页正文嵌进文档。**限制**：服务器在中国区，github/aws/wikipedia 等境外站超时或被区域限制；目标站反爬（如飞书官网）会失败 → 回落 Tavily/Exa
 - 注意：Tavily extract 走 MCP Task 机制可能超时，超时后自动切 Exa fetch
+
+**网页源选型速查**：
+
+| 场景 | 首选 |
+|------|------|
+| 常规国内/外静态页 | Tavily extract |
+| Exa 搜索结果页 | Exa fetch |
+| 国内页 + 要保留结构嵌文档 | **MinerU crawl** |
+| 登录墙 / SPA / 反爬 | Playwright |
 
 ### WebSearch（已禁用，勿调用）
 
