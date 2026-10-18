@@ -126,17 +126,19 @@ def main():
     md = result.markdown or ""
     print(md)
 
-    # 图片资源
+    # 图片资源：SDK 返回 Image dataclass（.data/.name/.path），老版本可能是裸 bytes
     images = getattr(result, "images", None) or []
     if images and args.outdir:
         os.makedirs(args.outdir, exist_ok=True)
         for i, img in enumerate(images):
-            ext = "png"
-            try:
-                with open(os.path.join(args.outdir, f"img_{i:03d}.{ext}"), "wb") as f:
-                    f.write(img)
-            except Exception:
-                pass
+            name = getattr(img, "path", None) or getattr(img, "name", None)
+            ext = os.path.splitext(name)[1].lstrip(".") if name else "png"
+            data = getattr(img, "data", img)
+            if not isinstance(data, (bytes, bytearray)):
+                print(f"WARN: 跳过未知图片格式 {type(img)}", file=sys.stderr)
+                continue
+            with open(os.path.join(args.outdir, f"img_{i:03d}.{ext}"), "wb") as f:
+                f.write(data)
 
     # debug 信息到 stderr
     print(f"[mineru] mode={'flash' if use_flash else 'precision'} "
