@@ -126,7 +126,7 @@ def render_flow(content_list, images_dir, translate=None):
     return "\n".join(x for x in out if x)
 
 
-def render_grid_columns(content_list, images_dir, layout):
+def render_grid_columns(content_list, images_dir, layout, translate=None):
     """按 bbox 把每页条目分左右栏，用 <grid> 输出。仅适合短内容对照。"""
     out = []
     cols_per_page = {int(k): v for k, v in (layout.get("columns_per_page") or {}).items()}
@@ -177,13 +177,12 @@ def main():
 
     title = args.title or tmap.get("__title__") or args.slug
     if args.columns == "grid":
-        body = render_grid_columns(cl, pkg["images_dir"], pkg["layout"])
+        body = render_grid_columns(cl, pkg["images_dir"], pkg["layout"], translate)
     else:
-        body = render_flow(cl, pkg["images_dir"], translate=None)
-        body = body.replace(f"<title>{esc('__title__')}</title>", f"<title>{esc(title)}</title>", 1)
-        if not tmap:
-            body = re.sub(r"<title>.*?</title>", f"<title>{esc(title)}</title>", body, count=1)
+        body = render_flow(cl, pkg["images_dir"], translate=translate)
 
+    # 标题：flow/grid 统一替换 <title> 占位（render_flow 里 __title__ 会被 translate 映射）
+    body = re.sub(r"<title>.*?</title>", f"<title>{esc(title)}</title>", body, count=1)
     xml = body if "<title>" in body else f"<title>{esc(title)}</title>\n{body}"
     if args.out:
         Path(args.out).write_text(xml, encoding="utf-8")
