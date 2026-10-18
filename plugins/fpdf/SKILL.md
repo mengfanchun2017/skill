@@ -3,9 +3,10 @@ name: fpdf
 user-invocable: true
 description: |
   PDF 精排 — 把 PDF 精确拆解后重排为飞书文档（复杂版式：全宽表格、分栏、引用、高亮块），
-  可选导出 Word、可选生成译文版。
+  可选导出 Word、可选生成译文版，可安装/检查运行依赖。
   用法：用户说"PDF 排版"/"PDF 转飞书"/"处理这个 PDF"/"/fpdf <路径>"、
-  或给出 PDF 路径要求"放到飞书上"/"导出 Word"/"翻译 PDF"。
+  给出 PDF 路径要求"放到飞书上"/"导出 Word"/"翻译 PDF"，
+  或说"安装依赖"/"检查依赖"（= /fpdf deps）。
   依赖 MinerU（解析）+ lark-cli（飞书）+ uv（运行器）。
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, mcp__mineru__parse_documents
 ---
@@ -15,15 +16,35 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, mcp__mineru__parse_documents
 把 PDF 当成「结构化数据」而非「一段文字」：先精确拆出内容与版式（表格/图片/公式/标题层级/分栏），
 再用飞书文档的排版能力重建，而不是把 PDF 当图片贴上去。
 
-## 三个入口（唯一真相源是本文件；脚本只做确定性机械步骤）
+## 四个入口（唯一真相源是本文件；脚本只做确定性机械步骤）
 
 | 用户说法 | 行为 |
 |---------|------|
 | `/fpdf <路径>` | 解析 → 飞书文档（**默认落飞书**） |
 | `/fpdf word <路径>` | 解析 → 飞书文档 → **再导出 Word 到源文件同目录** |
 | `/fpdf trans <路径>` | 解析 → 飞书**原文文档 + 译文文档**（默认译成中文） |
+| `/fpdf deps`（或"安装依赖"/"检查依赖"） | **只装/查依赖**，不处理任何 PDF |
 
 路径支持 Windows 格式（`C:\...` / `C:/...`）和 WSL 格式（`/mnt/c/...`），脚本内部自动转换。
+
+### `/fpdf deps` — 依赖安装
+
+识别词："安装依赖"/"装依赖"/"检查依赖"/"deps"/"环境检查"。**不带 PDF 路径**。
+
+```bash
+bash ~/.claude/skills/fpdf/scripts/setup.sh          # 检查 + 缺啥装啥
+bash ~/.claude/skills/fpdf/scripts/setup.sh --check  # 只检查不安装
+```
+
+执行后**逐项报告**每个依赖的状态（✓/✗），并明确区分两类：
+
+- **需你本人动手的**：`poppler-utils` 要 `sudo apt-get install -y poppler-utils`。
+  自动会话里 sudo 常因无 TTY 不可用 → 此时**必须把命令原样给用户**让其自行执行。
+  建议提示用户用 `! sudo apt-get install -y poppler-utils` 形式在本会话内跑，输出能回到对话。
+- **我能自动搞定的**：`uv`、`lark-cli` 可自动装；MinerU token / 飞书授权需引导用户走扫码或填 key。
+
+> 其他三个入口（处理 PDF 时）`run.sh` 也会**自动**调 setup.sh 补齐依赖，
+> 所以 `deps` 主要用于**提前安装**或**排查环境问题**。
 
 ## 执行流程（4 步，全部走 `scripts/run.sh`）
 
