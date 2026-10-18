@@ -8,8 +8,10 @@
   - `scripts/render.py`：结构包 → 飞书 DocxXML（表格列宽 822、`<grid>` 分栏、`<callout>` 强调、图片 caption）
   - `scripts/translate.py`：逐段翻译（复用 Claude 当前模型，走 Anthropic Messages）
   - `scripts/run.sh`：编排器（解析 → 渲染 → 上传飞书 → 可选 Word 导出）
-  - `scripts/setup.sh`：依赖预检（uv / lark-cli / 飞书授权 / MinerU token）
-- fpdf: `config.yaml.example` + `deps.txt` + `.gitignore`
+  - `scripts/setup.sh`：依赖预检 + 自动安装（uv / **poppler-utils** / lark-cli / 飞书授权 / MinerU token），支持 `--check` 只检查
+  - `run.sh` 启动时**自动调 setup.sh 补齐依赖**，用户无需手动预检
+- fpdf: `deps.txt` 声明 `poppler-utils apt:latest`（init-skill.sh sync 一并处理）
+- fpdf: `config.yaml.example` + `.gitignore`
 
 ### Fixed
 - **表格 XML 语法更正（重要）**：`<lark-table rows= cols= column-widths=>` 经实测**无效** —— 列宽被丢弃（全变 120）、第二个 `<lark-tr>` 被吞。正确写法是标准 HTML `<table><colgroup><thead><tr><th>`（实测列宽 411 保留、多行完整）。ffeishu SKILL.md + write-checklist.md 已更正，fworch-interview / fwstd-course / fwstd-report / fwstd-interview 的残留引用一并清理，`report_check.py` 的标签白名单同步更新
