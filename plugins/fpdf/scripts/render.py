@@ -26,25 +26,39 @@ from pathlib import Path
 COLWIDTH_TOTAL = 822   # 飞书文档正文可用宽度（实测）
 
 
-def esc(t):
-    """转义文本，但保留 <sup>/<sub> 为飞书上标语法。
+_SUP_OR_SUB = re.compile(r"<(sup|sub)>(.*?)</\1>", re.S | re.I)
 
-    MinerU 对论文的角标会输出 <sup>1,2</sup>（作者单位）和 <sub>…</sub>（化学式）。
-    直接 html.escape 会把它变成可见的 &lt;sup&gt; 字面量（用户实测"大量 <sup>1,2</sup>
-    裸露"）。飞书 DocxXML 没有 sup/sub 标签，上标走 <latex>^{...}</latex> ——
-    实测 lark-cli 收到 <sup>1</sup> 也会自动转成 <latex>{}^{1}</latex>，但
-    经 esc 转义后就没有这个转换机会了，故在这里先还原成 latex。
+
+def _is_script_content(x):
+    """判断 sup/sub 的内容是不是真角标。
+
+    MinerU 有两类 sup：真角标（作者单位 "1,2"、"a"、"†"）和误判 —— 图注整段
+    被逐词包成上标（实测 <sup>Figure</sup> <sup>1.</sup> <sup>Suppression</sup>
+    <sup>of</sup> …）。后者按 latex 渲染会整行缩小，必须还原成普通文本。
+    判据：短（≤8 字符）且不含空格、不是纯英文单词。
+    """
+    x = x.strip()
+    if not x or len(x) > 8 or " " in x:
+        return False
+    return not re.fullmatch(r"[A-Za-z]{3,}", x)
+
+
+def esc(t):
+    """转义文本，但把真角标 <sup>/<sub> 还原为飞书上标语法。
+
+    飞书 DocxXML 没有 sup/sub 标签，上标走 <latex>^{...}</latex>（实测 lark-cli
+    收到 <sup>1</sup> 也会自动转成 <latex>{}^{1}</latex>）。原先直接 html.escape
+    会把它变成可见的 &lt;sup&gt;1&lt;/sup&gt; 字面量（用户实测"大量 sup 裸露"）。
     """
     s = str(t)
-    # <sup>x</sup> → <latex>^{x}</latex>；<sub>x</sub> → <latex>_{x}</latex>
-    s = re.sub(r"<sup>(.*?)</sup>", r"<latex>^{\1}</latex>", s, flags=re.S | re.I)
-    s = re.sub(r"<sub>(.*?)</sub>", r"<latex>_{\1}</latex>", s, flags=re.S | re.I)
-    # 只转义剩余文本：先占位已生成的 <latex> 段，避免它的尖括号被转义
+    s = _SUP_OR_SUB.sub(
+        lambda m: (f"<latex>^{{{m.group(2)}}}</latex>" if m.group(1).lower() == "sup"
+                   else f"<latex>_{{{m.group(2)}}}</latex>")
+        if _is_script_content(m.group(2)) else m.group(2),
+        s)
+    # 只转义剩余文本：占位已生成的 <latex> 段，避免它的尖括号被转义
     parts = re.split(r"(<latex>.*?</latex>)", s, flags=re.S)
-    out = []
-    for i, p in enumerate(parts):
-        out.append(p if i % 2 else html.escape(p, quote=False))
-    return "".join(out)
+    return "".join(p if i % 2 else html.escape(p, quote=False) for i, p in enumerate(parts))
 
 
 def read_pkg(workdir, slug):
