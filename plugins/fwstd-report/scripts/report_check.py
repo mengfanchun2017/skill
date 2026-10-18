@@ -99,9 +99,11 @@ def check_report(
         problems.append("含旧写入链路残留（docs +create/update、block_insert_after 等）")
     if HR.search(text):
         problems.append("含分割线 `<hr>`（--- / *** / ___）")
-    # 只检查明显的 HTML 标签（跳过 lark-table 允许的？——飞书源用 XML 不写 markdown，这里抓漏网）
+    # 只检查明显的 HTML 标签（跳过 <table>/<colgroup> 等飞书表格 XML —— 源是
+    # markdown，这里抓的是漏网的手写标签；lark-table 旧语法已废弃不再放行）
     for tag in set(HTML_TAG.findall(text)):
-        if "lark-table" not in tag and not tag.startswith("</"):
+        if tag not in ("table", "colgroup", "col", "thead", "tbody", "tr", "th", "td", "p") \
+                and not tag.startswith("</"):
             warnings.append(f"含 HTML/XML 标签 {tag}（确认非误用）")
 
     headings = [(len(lvl), name.strip()) for lvl, name in HEADING.findall(text)]
