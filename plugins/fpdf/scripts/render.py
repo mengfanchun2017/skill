@@ -136,14 +136,14 @@ def render_grid_columns(content_list, images_dir, layout, translate=None):
     for pg in sorted(pages):
         items = pages[pg]
         if cols_per_page.get(pg, 1) < 2:
-            out.append(render_flow(items, images_dir).replace("<title>__title__</title>", ""))
+            out.append(render_flow(items, images_dir, translate=translate).replace("<title>__title__</title>", ""))
             continue
         mid = sum(e["bbox"][0] + e["bbox"][2] for e in items
                   if e.get("bbox")) / max(1, len([e for e in items if e.get("bbox")]))
         left = [e for e in items if e.get("bbox") and e["bbox"][0] < mid]
         right = [e for e in items if e.get("bbox") and e["bbox"][0] >= mid]
-        lx = render_flow(left, images_dir).replace("<title>__title__</title>", "")
-        rx = render_flow(right, images_dir).replace("<title>__title__</title>", "")
+        lx = render_flow(left, images_dir, translate=translate).replace("<title>__title__</title>", "")
+        rx = render_flow(right, images_dir, translate=translate).replace("<title>__title__</title>", "")
         out.append(f'<grid><column width-ratio="0.5">{lx}</column>'
                    f'<column width-ratio="0.5">{rx}</column></grid>')
     return "\n".join(out)
