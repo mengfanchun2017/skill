@@ -27,7 +27,24 @@ COLWIDTH_TOTAL = 822   # 飞书文档正文可用宽度（实测）
 
 
 def esc(t):
-    return html.escape(str(t), quote=False)
+    """转义文本，但保留 <sup>/<sub> 为飞书上标语法。
+
+    MinerU 对论文的角标会输出 <sup>1,2</sup>（作者单位）和 <sub>…</sub>（化学式）。
+    直接 html.escape 会把它变成可见的 &lt;sup&gt; 字面量（用户实测"大量 <sup>1,2</sup>
+    裸露"）。飞书 DocxXML 没有 sup/sub 标签，上标走 <latex>^{...}</latex> ——
+    实测 lark-cli 收到 <sup>1</sup> 也会自动转成 <latex>{}^{1}</latex>，但
+    经 esc 转义后就没有这个转换机会了，故在这里先还原成 latex。
+    """
+    s = str(t)
+    # <sup>x</sup> → <latex>^{x}</latex>；<sub>x</sub> → <latex>_{x}</latex>
+    s = re.sub(r"<sup>(.*?)</sup>", r"<latex>^{\1}</latex>", s, flags=re.S | re.I)
+    s = re.sub(r"<sub>(.*?)</sub>", r"<latex>_{\1}</latex>", s, flags=re.S | re.I)
+    # 只转义剩余文本：先占位已生成的 <latex> 段，避免它的尖括号被转义
+    parts = re.split(r"(<latex>.*?</latex>)", s, flags=re.S)
+    out = []
+    for i, p in enumerate(parts):
+        out.append(p if i % 2 else html.escape(p, quote=False))
+    return "".join(out)
 
 
 def read_pkg(workdir, slug):
