@@ -75,6 +75,11 @@ def detect_columns(content_list, page_w):
     body = [e for e in content_list
             if e.get("type") in ("text", "table", "image", "chart", "equation")
             and isinstance(e.get("bbox"), (list, tuple)) and len(e["bbox"]) == 4]
+    if not body:
+        return {}
+    # bbox 坐标系与 PDF 点不一致（实测 MinerU 用更宽的内部坐标，x 可超出页面点宽）
+    # → 页面有效宽度取 bbox 自身的右边界，不拿 pymupdf 的页面宽度去比。
+    page_w = max(e["bbox"][2] for e in body) or page_w
     cols = {}
     for e in body:
         pg = e.get("page_idx", 0)
