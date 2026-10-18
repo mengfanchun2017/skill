@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.13.0] — 2026-10-18
+
+### Added
+- **fpdf**（PDF 精排）：把 PDF 精确拆解后重排为飞书文档，可选导出 Word、可选生成译文版。三个入口 `/fpdf <路径>` / `/fpdf word <路径>` / `/fpdf trans <路径>`。marketplace 24 → 25 个 plugin
+  - `scripts/parse.py`：MinerU Precision 解析 → 结构包（markdown + `content_list` 带 bbox + 图片 + 版式推断）
+  - `scripts/render.py`：结构包 → 飞书 DocxXML（表格列宽 822、`<grid>` 分栏、`<callout>` 强调、图片 caption）
+  - `scripts/translate.py`：逐段翻译（复用 Claude 当前模型，走 Anthropic Messages）
+  - `scripts/run.sh`：编排器（解析 → 渲染 → 上传飞书 → 可选 Word 导出）
+  - `scripts/setup.sh`：依赖预检（uv / lark-cli / 飞书授权 / MinerU token）
+- fpdf: `config.yaml.example` + `deps.txt` + `.gitignore`
+
+### Fixed
+- **表格 XML 语法更正（重要）**：`<lark-table rows= cols= column-widths=>` 经实测**无效** —— 列宽被丢弃（全变 120）、第二个 `<lark-tr>` 被吞。正确写法是标准 HTML `<table><colgroup><thead><tr><th>`（实测列宽 411 保留、多行完整）。ffeishu SKILL.md + write-checklist.md 已更正，fworch-interview / fwstd-course / fwstd-report / fwstd-interview 的残留引用一并清理，`report_check.py` 的标签白名单同步更新
+
+### Changed
+- **ffeishu**: PDF 处理改为**委托 fpdf**（新增「PDF 处理 → 委托 fpdf skill」路由节），不再自己用 MCP/外部工具临时对付；移除低效的 `— | 用 MCP/外部工具` 占位
+
 ## [0.12.0] — 2026-10-16
 
 ### Added
