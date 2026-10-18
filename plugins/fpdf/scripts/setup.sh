@@ -45,6 +45,20 @@ _sudo_ok() {
     return 0
 }
 
+# 需用户手动装时，给可**原样复制**的命令（提示勿手打：实测手输易混入中文顿号、
+# 全角字符，apt 会报 "Unable to locate package poppler-utils、"，白跑一趟）
+_poppler_manual_hint() {
+    printf '\n' >&2
+    printf '  \033[33m>>> 需要你自己执行这行（请整行复制，勿手打）\033[0m\n' >&2
+    printf '\n      sudo apt-get install -y poppler-utils\n\n' >&2
+    printf '  在本会话里可直接输入（! 前缀 = 直接跑，输出回到对话）：\n' >&2
+    printf '      ! sudo apt-get install -y poppler-utils\n' >&2
+    printf '\n  \033[36m注意\033[0m：包名是 poppler-utils，结尾不要带任何标点；\n' >&2
+    printf '       若报 "Unable to locate package poppler-utils、"，\n' >&2
+    printf '       多半是粘进了中文顿号「、」——删掉重跑即可。\n' >&2
+    printf '\n  （不装也能跑：解析/渲染主路径走 pymupdf，不依赖 poppler）\n' >&2
+}
+
 # --- uv ---
 if command -v uv >/dev/null 2>&1; then
     ok "uv $(uv --version 2>/dev/null | awk '{print $2}')"
@@ -69,13 +83,13 @@ elif _sudo_ok; then
         ok "poppler-utils 已安装"
     else
         bad "poppler-utils 安装失败"
-        info "手动装:  sudo apt-get install -y poppler-utils"
+        _poppler_manual_hint
         MISSING=$((MISSING+1))
     fi
 else
-    bad "poppler-utils 缺:$pop_missing（需 sudo 但当前不可用）"
-    info "手动装:  sudo apt-get install -y poppler-utils"
-    info "（不装也能跑 —— pymupdf 已覆盖全部解析/渲染；只是少了命令行工具这一档）"
+    # 需用户自己装 —— 提示必须可直接复制粘贴，别让人手打（易混入中文标点/全角字符）
+    bad "poppler-utils 缺:$pop_missing（需 sudo 但当前环境不可用）"
+    _poppler_manual_hint
     MISSING=$((MISSING+1))
 fi
 
