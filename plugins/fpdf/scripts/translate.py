@@ -19,24 +19,34 @@ LLM 后端复用 ~/.claude/llm-current（与 Claude 当前模型一致，零配�
 import sys, os, json, argparse, urllib.request, urllib.error, re
 from pathlib import Path
 
-LLM_CONF = os.path.expanduser("~/git/ccprivate/conf/llm.json")
+LLM_MERGED = os.path.expanduser("~/.cache/llm-merged.json")
 LLM_CURRENT = os.path.expanduser("~/.claude/llm-current")
+BRIDGE = "http://127.0.0.1:8898"
 
 
 def load_preset(name):
-    """从 ccprivate/conf/llm.json 取 preset 的 url/key/model。嵌套结构要兼容。"""
+    """取 preset 的 base_url/key/model。
+
+    真相源是 init-llm.sh 产出的合并快照 ~/.cache/llm-merged.json —— 它已把三层
+    （llm.json 的 key / llmprivate.json 的 base_url+model / 自定义）合好。
+    直接读 ccprivate/conf/llm.json 只有 key，拿不到 base_url/model。
+    """
     try:
-        d = json.load(open(LLM_CONF))
+        d = json.load(open(LLM_MERGED))
     except Exception:
         return None
-    llms = d.get("llms") or d
+    llms = d.get("llms") or {}
+    if not name:
+        name = d.get("current") or ""
     p = llms.get(name)
     if not isinstance(p, dict):
         return None
     key = p.get("key")
     if isinstance(key, dict):
         key = key.get("key") or next((v for v in key.values() if isinstance(v, str)), "")
-    return {"url": p.get("url") or p.get("base_url"), "key": key, "model": p.get("model")}
+    return {"base_url": p.get("base_url") or p.get("url"), "key": key,
+            "model": p.get("model"), "use_bridge": p.get("use_bridge", False),
+            "name": name}
 
 
 def current_preset_name():
@@ -47,21 +57,28 @@ def current_preset_name():
 
 
 def call_llm(cfg, prompt, max_tokens=8000):
-    """OpenAI 兼容 chat completions。返回文本。"""
-    url = cfg["url"].rstrip("/")
-    if not url.endswith("/chat/completions"):
-        url += "/chat/completions"
+    """OpenAI 兼容 chat completions。
+
+    use_bridge=True 的 preset 上游是内网 OpenAI-only 端点，本机 bridge(8898) 已按
+    当前 preset 配好 upstream（claude 自己也走它）→ 直接打 bridge 即可，无需自己
+    拼内网鉴权/host_header。
+    """
+    if cfg.get("use_bridge"):
+        url = f"{BRIDGE}/v1/chat/completions"
+        hdrs = {"Content-Type": "application/json"}
+    else:
+        url = cfg["base_url"].rstrip("/")
+        if not url.endswith("/chat/completions"):
+            url += "/chat/completions"
+        hdrs = {"Content-Type": "application/json",
+                "Authorization": f"Bearer {cfg['key']}"}
     body = json.dumps({
         "model": cfg["model"],
         "messages": [{"role": "user", "content": prompt}],
         "max_tokens": max_tokens,
         "temperature": 0.2,
     }).encode()
-    req = urllib.request.Request(url, data=body, headers={
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {cfg['key']}",
-        "anthropic-version": "2023-06-01",
-    })
+    req = urllib.request.Request(url, data=body, headers=hdrs)
     with urllib.request.urlopen(req, timeout=180) as r:
         d = json.loads(r.read())
     return d["choices"][0]["message"]["content"]
@@ -99,7 +116,7 @@ def main():
     preset = args.preset or current_preset_name()
     cfg = load_preset(preset) if preset else None
     if not cfg or not cfg.get("url"):
-        print(f"ERROR: 取不到 LLM 配置（preset={preset!r}, conf={LLM_CONF}）。"
+        print(f"ERROR: 取不到 LLM 配置（preset={preset!r}, conf={LLM_MERGED}）。"
               f"指定 --preset 或检查 llm.json。", file=sys.stderr)
         sys.exit(3)
 
