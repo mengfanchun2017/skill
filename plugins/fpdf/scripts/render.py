@@ -181,7 +181,11 @@ def render_flow(content_list, images_dir, translate=None, keep_refs=False):
             if caps:
                 out.append(f'<p align="center">{esc(" ".join(caps))}</p>')
         elif t == "ref_text":
-            continue   # 参考文献归入正文时保留，见 --keep-refs
+            if not keep_refs:
+                continue
+            txt = (translate(e.get("text", "")) if translate else e.get("text", ""))
+            if txt.strip():
+                out.append(f"<p>{esc(txt)}</p>")
     return "\n".join(x for x in out if x)
 
 
@@ -217,6 +221,8 @@ def main():
                     help="flow=顺序流(默认,推荐) / grid=按原版式左右分栏")
     ap.add_argument("--translate-map", default=None,
                     help="JSON 文件: {原文段落: 译文}；命中则替换")
+    ap.add_argument("--keep-refs", action="store_true",
+                    help="保留参考文献段（默认丢弃，避免长文献表淹没正文）")
     ap.add_argument("--out", default=None, help="输出 XML 路径（默认 stdout）")
     args = ap.parse_args()
 
@@ -238,7 +244,8 @@ def main():
     if args.columns == "grid":
         body = render_grid_columns(cl, pkg["images_dir"], pkg["layout"], translate)
     else:
-        body = render_flow(cl, pkg["images_dir"], translate=translate)
+        body = render_flow(cl, pkg["images_dir"], translate=translate,
+                           keep_refs=args.keep_refs)
 
     # 标题：flow/grid 统一替换 <title> 占位（render_flow 里 __title__ 会被 translate 映射）
     body = re.sub(r"<title>.*?</title>", f"<title>{esc(title)}</title>", body, count=1)
