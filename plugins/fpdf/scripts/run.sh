@@ -72,7 +72,7 @@ if [ "$ITEMS" = "0" ]; then
 fi
 ok "解析完成：$ITEMS 条结构条目"
 
-# --- 2. 渲染 XML ---
+# --- 2. 渲染 XML（先原文；若 --trans 再产译文 XML）---
 info "[2/4] 渲染 DocxXML..."
 PAGE_TITLE="${TITLE:-$SLUG}"
 ( cd "$WORKDIR" && python3 "$HERE/render.py" "$SLUG" --workdir . --title "$PAGE_TITLE" \
@@ -80,17 +80,32 @@ PAGE_TITLE="${TITLE:-$SLUG}"
 [ -s "$WORKDIR/$SLUG.xml" ] || { bad "渲染失败"; exit 1; }
 ok "渲染完成：$(wc -c <"$WORKDIR/$SLUG.xml") 字符"
 
+TRANS_XML=""
+if [ "$TRANS" = "1" ]; then
+    info "[2b] 翻译 + 渲染译文版..."
+    if uv run --quiet "$HERE/translate.py" "$SLUG" --workdir "$WORKDIR" \
+        --target "${FPDF_TRANS_TARGET:-zh}" >"$WORKDIR/.trans.out" 2>"$WORKDIR/.trans.err"; then
+        TRANS_MAP="$(tail -1 "$WORKDIR/.trans.out" | python3 -c "import json,sys; print(json.load(sys.stdin).get('trans_map',''))" 2>/dev/null)"
+        ( cd "$WORKDIR" && python3 "$HERE/render.py" "$SLUG" --workdir . \
+            --title "$PAGE_TITLE（译文）" --translate-map "$TRANS_MAP" \
+            --columns "$COLUMNS" --out "$WORKDIR/$SLUG.zh.xml" ) 2>&1 | grep -v '^$' >&2 || true
+        [ -s "$WORKDIR/$SLUG.zh.xml" ] && { TRANS_XML="$WORKDIR/$SLUG.zh.xml"; ok "译文版渲染完成"; } \
+            || bad "译文版渲染失败"
+    else
+        bad "翻译失败：$(tail -3 "$WORKDIR/.trans.err" | tr '\n' ' ')"
+    fi
+fi
+
 # --- 3. 上传飞书 ---
 info "[3/4] 上传飞书..."
 export LARKSUITE_CLI_CONFIG_DIR="$(grep '^configDir=' "$HOME/.lark-cli-account" | cut -d= -f2)"
 export PATH="$HOME/.local/bin:$PATH"
-CREATE_ARGS=(--api-version v2 --as user --doc-format xml --content "@./$SLUG.xml" --title "$PAGE_TITLE")
-if [ -n "$PARENT" ]; then
-    CREATE_ARGS+=(--parent-token "$PARENT")
-else
-    # wiki_nodes.default 两种形态都要吃：fpdf.yaml 用自己的（可能直接是 token 串
-    # 或 {token:}），回落 ffeishu.yaml 时是 {token: ...} 嵌套 dict。
-    DEF_NODE="$(python3 -c "
+DOC_ID=""; DOC_URL=""; TRANS_ID=""; TRANS_URL=""
+
+# 父节点：--parent 显式给 > fpdf.yaml > ffeishu.yaml 的 wiki_nodes.default
+# （fpdf.yaml 自己的可能是裸 token 串，ffeishu.yaml 是 {token:} 嵌套 dict，都要吃）
+if [ -z "$PARENT" ]; then
+    PARENT="$(python3 -c "
 import yaml,os
 for p in [os.path.expanduser('~/git/ccprivate/skill/fpdf.yaml'), os.path.expanduser('~/git/ccprivate/skill/ffeishu.yaml')]:
     if os.path.isfile(p):
@@ -99,33 +114,61 @@ for p in [os.path.expanduser('~/git/ccprivate/skill/fpdf.yaml'), os.path.expandu
         if isinstance(n, dict): n=n.get('token')
         if n: print(n); break
 " 2>/dev/null)"
-    [ -n "$DEF_NODE" ] && CREATE_ARGS+=(--parent-token "$DEF_NODE")
 fi
-CREATE_OUT="$( cd "$WORKDIR" && lark-cli docs +create "${CREATE_ARGS[@]}" 2>&1 | sed '/^\[lark-cli\]/d' )"
-DOC_ID="$(printf '%s' "$CREATE_OUT" | grep -oP '"document_id":\s*"\K[^"]+' | head -1)"
-DOC_URL="$(printf '%s' "$CREATE_OUT" | grep -oP '"url":\s*"\K[^"]+' | head -1)"
-[ -n "$DOC_ID" ] || { bad "上传失败："; printf '%s\n' "$CREATE_OUT" >&2; exit 1; }
-ok "飞书文档：$DOC_URL"
 
-# --- 4. 可选 Word 导出 ---
-WORD_PATH=""
+upload_doc() {   # $1=xml文件名(相对WORKDIR) $2=标题  → 设 DOC_ID/DOC_URL
+    local xmlf="$1" title="$2"
+    local args=(--api-version v2 --as user --doc-format xml --content "@./$xmlf" --title "$title")
+    [ -n "$PARENT" ] && args+=(--parent-token "$PARENT")
+    local out
+    out="$( cd "$WORKDIR" && lark-cli docs +create "${args[@]}" 2>&1 | sed '/^\[lark-cli\]/d' )"
+    DOC_ID="$(printf '%s' "$out" | grep -oP '"document_id":\s*"\K[^"]+' | head -1)"
+    DOC_URL="$(printf '%s' "$out" | grep -oP '"url":\s*"\K[^"]+' | head -1)"
+    [ -n "$DOC_ID" ] || { bad "上传失败："; printf '%s\n' "$out" >&2; return 1; }
+    return 0
+}
+
+info "[3/4] 上传飞书..."
+upload_doc "$SLUG.xml" "$PAGE_TITLE" || exit 1
+ok "原文文档：$DOC_URL"
+
+if [ -n "$TRANS_XML" ]; then
+    ORIG_ID="$DOC_ID"; ORIG_URL="$DOC_URL"
+    upload_doc "$SLUG.zh.xml" "$PAGE_TITLE（译文）" || true
+    if [ -n "$DOC_ID" ]; then
+        TRANS_ID="$DOC_ID"; TRANS_URL="$DOC_URL"; ok "译文文档：$TRANS_URL"
+    fi
+    DOC_ID="$ORIG_ID"; DOC_URL="$ORIG_URL"
+fi
+
+# --- 4. 可选 Word 导出（原文 + 译文各导一份）---
+WORD_PATH=""; WORD_ZH=""
+export_word() {   # $1=doc_id $2=附加后缀  → echo 落盘路径
+    local id="$1" suffix="${2:-}" out tmpw exp_dir
+    exp_dir="${FPDF_WORD_DIR:-$(dirname "$SRC")}"
+    # lark-cli 导出有路径沙箱：只能落 cwd / /tmp / ~/files。先导到 /tmp 再 move。
+    local tmpd; tmpd="$(mktemp -d /tmp/fpdf-exp.XXXXXX)"
+    out="$( lark-cli drive +export --doc-type docx --token "$id" \
+        --file-extension docx --output-dir "$tmpd" --overwrite 2>&1 | sed '/^\[lark-cli\]/d' )"
+    tmpw="$(printf '%s' "$out" | grep -oP '"saved_path":\s*"\K[^"]+' | head -1)"
+    if [ -n "$tmpw" ] && [ -f "$tmpw" ]; then
+        mkdir -p "$exp_dir"
+        local dest="$exp_dir/$(basename "${tmpw%.docx}")${suffix}.docx"
+        mv -f "$tmpw" "$dest" && echo "$dest"
+    else
+        bad "Word 导出失败：$(printf '%s' "$out" | grep -oP '"message":\s*"\K[^"]+' | head -1)" >&2
+    fi
+    rm -rf "$tmpd"
+}
+
 if [ "$WORD" = "1" ]; then
     info "[4/4] 导出 Word..."
-    EXP_DIR="${FPDF_WORD_DIR:-$(dirname "$SRC")}"
-    # lark-cli 的导出有路径沙箱：只能落 cwd / /tmp / ~/files，目标目录在别处
-    # 会被拒（unsafe output path）。先导到 /tmp 再 move 到用户要的位置。
-    TMP_EXP="$(mktemp -d /tmp/fpdf-exp.XXXXXX)"
-    export_out="$( lark-cli drive +export --doc-type docx --token "$DOC_ID" \
-        --file-extension docx --output-dir "$TMP_EXP" --overwrite 2>&1 | sed '/^\[lark-cli\]/d' )"
-    TMP_WORD="$(printf '%s' "$export_out" | grep -oP '"saved_path":\s*"\K[^"]+' | head -1)"
-    if [ -n "$TMP_WORD" ] && [ -f "$TMP_WORD" ]; then
-        mkdir -p "$EXP_DIR"
-        WORD_PATH="$EXP_DIR/$(basename "$TMP_WORD")"
-        mv -f "$TMP_WORD" "$WORD_PATH" && ok "Word：$WORD_PATH" || { bad "Word 移动失败"; WORD_PATH=""; }
-    else
-        bad "Word 导出失败：$(printf '%s' "$export_out" | grep -oP '"message":\s*"\K[^"]+' | head -1)"
+    WORD_PATH="$(export_word "$DOC_ID" "")"
+    [ -n "$WORD_PATH" ] && ok "Word(原文)：$WORD_PATH"
+    if [ -n "$TRANS_ID" ]; then
+        WORD_ZH="$(export_word "$TRANS_ID" ".译文")"
+        [ -n "$WORD_ZH" ] && ok "Word(译文)：$WORD_ZH"
     fi
-    rm -rf "$TMP_EXP"
 else
     info "[4/4] 跳过 Word 导出"
 fi
