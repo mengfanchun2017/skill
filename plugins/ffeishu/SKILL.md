@@ -67,9 +67,25 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep
   ├─ "导出Word/PPT"/"转Office"            → 工作流 D: 飞书→Office
   ├─ "导入飞书"                           → 工作流 D: Office→飞书
   ├─ "对比"/"diff"                        → 工作流 E: 文档对比
-  ├─ "翻译PDF"                            → PDF 提取 + 翻译
+  ├─ 输入是 PDF（排版/转飞书/翻译/导出）   → **委托 fpdf skill**（见下方「PDF 处理」）
   └─ "找文档"/"有哪些关于X的文档"         → Step S: 文档发现
 ```
+
+---
+
+## PDF 处理 → 委托 fpdf skill
+
+**任何以 PDF 为输入的操作都走 fpdf，不要在本 skill 里临时用 MCP/外部工具对付。**
+fpdf 负责「精确拆解版式 → 飞书精排」，包括复杂表格/分栏/图片/公式，是本仓 PDF 能力的唯一入口。
+
+| 用户说法 | 委托命令 |
+|---------|---------|
+| "PDF 转飞书"/"PDF 排版"/"处理这个 PDF" | `bash ~/.claude/skills/fpdf/scripts/run.sh "<路径>"` |
+| "PDF 转飞书并导出 Word" | 同上 `--word` |
+| "翻译 PDF" | 同上 `--trans` |
+
+fpdf 创建完成后，本 skill 只在其需要嵌入已有文档时参与（`block_insert_after`）。
+PDF 的完整执行流程、依赖预检、父文档配置 → 见 `../fpdf/SKILL.md`。
 
 ---
 
@@ -84,11 +100,20 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 - **文档标题用简单连贯的中文短名**（2-6 字），不带长前缀/后缀/副标题。同项目多文档可用统一短词风格：`项目概览` `厂商对比` `工作流介绍` `案例调研` `通道选型`
 - 禁止风格：`厂商盘点 — 国产图生3D 工具全景`、`类似案例调研 — 别人怎么做...` 这类「长主语 — 解释副标题」
 
-### 表格 → `<lark-table>` XML
-- **禁止 Markdown 表格**，全部用 `<lark-table>` XML
-- **colgroup 列宽之和 = 822**（`round(822/N)` 均分），写后 fetch `--detail full` 验证
-- 必设属性：`rows="N" cols="N" header-row="true" header-column="true" column-widths="W,W,W"`
-- 单元格内纯文本，不用 `#` 标题符号
+### 表格 → 标准 HTML `<table>` XML
+- **禁止 Markdown 表格**（列宽会被固定成 120，无法控制），全部用 `<table>` XML
+- **要控制列宽必须显式写 `<colgroup>`，宽度之和 = 822**（`round(822/N)` 均分）
+- 正确结构（**唯一保留列宽和多行的写法**）：
+  ```xml
+  <table><colgroup><col width="411"/><col width="411"/></colgroup>
+    <thead><tr><th background-color="light-gray"><p>表头</p></th></tr></thead>
+    <tbody><tr><td><p>值</p></td></tr></tbody></table>
+  ```
+- 单元格内容包在 `<p>` 里，不用 `#` 标题符号
+
+> ⚠ **旧写法 `<lark-table rows="N" cols="N" column-widths="...">` 已废弃**：2026-10-18 实测该标签
+> 被渲染器忽略 —— 列宽全变 120、第二个 `<lark-tr>` 被吞（只剩首行）。现存文档用标准 `<table>`，
+> 本文件此前教的 lark-table 语法与实态不符，已更正。
 
 ### 图表 → 委托 fdiagram skill
 - 架构图/流程图/时序图等由 fdiagram 生成，通过 `block_insert_after` 插入
@@ -401,7 +426,7 @@ lark-cli docs +fetch --api-version v2 --doc "$PARENT_TOKEN" --detail full | grep
 | 画图表 | fdiagram | 委托 fdiagram skill |
 | 数据图（图子文档） | ffeishu 本工作流 G | lark-cli + python |
 | 文件上传 | lark-drive | `lark-cli drive +upload` |
-| PDF 提取+翻译 | — | 用 MCP/外部工具 |
+| PDF 提取+翻译+排版 | fpdf | 委托 fpdf skill（`fpdf/scripts/run.sh`） |
 
 ---
 
