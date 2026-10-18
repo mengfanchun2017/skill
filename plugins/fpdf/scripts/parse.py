@@ -87,12 +87,18 @@ def detect_columns(content_list, page_w):
             continue
         xs = sorted(xs)
         gap = page_w * 0.25
-        clusters, cur = 1, xs[0]
-        for x in xs[1:]:
-            if x - cur > gap:
-                clusters += 1
-                cur = x
-        out[pg] = clusters
+        # 先按左边界切簇，再按簇内条目数过滤：居中标题/页眉这类孤立元素
+        # 会自成一簇，不过滤就虚报栏数（实测单栏标题页被切成 4 簇）。
+        sizes, cur_size = [], 1
+        for a, b in zip(xs, xs[1:]):
+            if b - a > gap:
+                sizes.append(cur_size)
+                cur_size = 1
+            else:
+                cur_size += 1
+        sizes.append(cur_size)
+        min_size = max(3, len(xs) * 0.15)
+        out[pg] = max(1, sum(1 for s in sizes if s >= min_size))
     return out
 
 
