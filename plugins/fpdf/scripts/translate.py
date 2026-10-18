@@ -56,12 +56,16 @@ def current_preset_name():
         return ""
 
 
-def call_llm(cfg, prompt, max_tokens=8000):
+def call_llm(cfg, prompt, max_tokens=32000):
     """走 Anthropic Messages 协议。
 
     实测本机 bridge(8898) 只暴露 /v1/messages（Anthropic 格式），POST
     /v1/chat/completions 返回 404 —— bridge 把内网 OpenAI 上游转成 Anthropic 给
     Claude 用，不反向暴露 OpenAI 面。所以这里也说 Anthropic 格式。
+
+    max_tokens 给足 32000：上游 DeepSeek 是推理模型，thinking 块先占预算，
+    8000 时整批 30 段全被 thinking 吃光、stop_reason=max_tokens、正文 0 字符
+    （实测 n=10 也如此）。thinking 开关经 bridge 传 {"type":"disabled"} 无效。
     """
     url = f"{BRIDGE}/v1/messages" if cfg.get("use_bridge") else \
         cfg["base_url"].rstrip("/") + "/v1/messages"
@@ -125,12 +129,10 @@ def main():
 
     lang = {"zh": "中文", "en": "English"}[args.target]
     result = {}
-    # 标题
-    title = wd.name
-    batches = [texts[i:i + args.batch_size] for i in range(0, len(texts), args.batch_size)]
-    for bi, batch in enumerate(batches):
+
+    def build_prompt(batch):
         numbered = "\n".join(f"<<<{j}>>>{t}" for j, t in enumerate(batch))
-        prompt = (
+        return (
             f"你是专业学术翻译。把下面用 <<<N>>> 编号的段落逐段翻译成{lang}。\n"
             f"要求：\n"
             f"1. 严格保持 <<<N>>> 编号和段落一一对应，输出格式与输入一致。\n"
@@ -138,12 +140,20 @@ def main():
             f"3. 保留原文的专有名词、缩写、公式、引用编号 [1] 等不译。\n"
             f"4. 只输出译文，不要任何解释或前后缀。\n\n{numbered}"
         )
+
+    def translate_batch(batch, depth=0):
+        """返回 {段落: 译文}。输出缺失过半视为被 max_tokens 截断 → 拆半递归。
+
+        上游是推理模型，thinking 块先占 max_tokens 预算；整批一次发时
+        thinking 可能吃满预算、正文 0 字符（实测 max_tokens=8000 时 30 段全空，
+        32000 时正常）。拆半是兜底：预算不足时缩小输入而非容忍空白译文。
+        """
+        pad = "  " * depth
         try:
-            resp = call_llm(cfg, prompt)
+            resp = call_llm(cfg, build_prompt(batch))
         except Exception as e:
-            print(f"ERROR: 批次 {bi} 调用失败: {type(e).__name__}: {str(e)[:300]}", file=sys.stderr)
+            print(f"ERROR: 翻译调用失败: {type(e).__name__}: {str(e)[:300]}", file=sys.stderr)
             sys.exit(1)
-        # 解析 <<<N>>>译文
         parts = re.split(r"<<<(\d+)>>>", resp)
         got = {}
         for k in range(1, len(parts), 2):
@@ -151,9 +161,19 @@ def main():
                 got[int(parts[k])] = parts[k + 1].strip()
             except (IndexError, ValueError):
                 pass
-        for j, orig in enumerate(batch):
-            result[orig] = got.get(j, "")
-        print(f"[fpdf] 批次 {bi+1}/{len(batches)} 完成 ({len(got)}/{len(batch)} 段)", file=sys.stderr)
+        print(f"{pad}[fpdf] {len(batch)} 段 → {len(got)} 段译文", file=sys.stderr)
+        if len(got) < len(batch) / 2 and len(batch) > 1:
+            print(f"{pad}[fpdf] 输出缺失过半，拆半重试", file=sys.stderr)
+            half = (len(batch) + 1) // 2
+            out = translate_batch(batch[:half], depth + 1)
+            out.update(translate_batch(batch[half:], depth + 1))
+            return out
+        return {orig: got.get(j, "") for j, orig in enumerate(batch)}
+
+    for bi, batch in enumerate(
+            [texts[i:i + args.batch_size] for i in range(0, len(texts), args.batch_size)]):
+        print(f"[fpdf] 批次 {bi+1}/{(len(texts)+args.batch_size-1)//args.batch_size}", file=sys.stderr)
+        result.update(translate_batch(batch))
 
     result["__title__"] = title
     out_path = args.out or str(wd / f"{args.slug}.trans.json")
