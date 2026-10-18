@@ -42,6 +42,17 @@ case "$SRC" in
 esac
 [ -f "$SRC" ] || { bad "文件不存在: $SRC"; exit 2; }
 
+# 前置依赖：跑 setup.sh 补缺（装 poppler 等）。硬阻断项（uv/lark-cli/授权）缺失则停；
+# 软缺项（如 poppler 无 sudo 装不上）只告警 —— 解析走 pymupdf，不依赖它。
+if ! bash "$HERE/setup.sh" --quiet >/dev/null 2>&1; then
+    info "依赖有缺项，尝试自动补齐..."
+    bash "$HERE/setup.sh" >&2 || true
+    # 复查硬依赖
+    for hard in uv lark-cli; do
+        command -v "$hard" >/dev/null 2>&1 || { bad "缺少必需依赖: $hard"; exit 1; }
+    done
+fi
+
 # 工作目录：仓库外（避免 auto-sync 把版权材料推进公开库）
 WORK_ROOT="${FPDF_WORK_ROOT:-$HOME/pdf-work}"
 # slug 用 python 生成：sed 的 [一-龥] 字符范围在 LANG=C.UTF-8 下报
