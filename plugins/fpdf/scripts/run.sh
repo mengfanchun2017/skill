@@ -112,10 +112,20 @@ WORD_PATH=""
 if [ "$WORD" = "1" ]; then
     info "[4/4] 导出 Word..."
     EXP_DIR="${FPDF_WORD_DIR:-$(dirname "$SRC")}"
+    # lark-cli 的导出有路径沙箱：只能落 cwd / /tmp / ~/files，目标目录在别处
+    # 会被拒（unsafe output path）。先导到 /tmp 再 move 到用户要的位置。
+    TMP_EXP="$(mktemp -d /tmp/fpdf-exp.XXXXXX)"
     export_out="$( lark-cli drive +export --doc-type docx --token "$DOC_ID" \
-        --file-extension docx --output-dir "$EXP_DIR" --overwrite 2>&1 | sed '/^\[lark-cli\]/d' )"
-    WORD_PATH="$(printf '%s' "$export_out" | grep -oP '"saved_path":\s*"\K[^"]+' | head -1)"
-    [ -n "$WORD_PATH" ] && ok "Word：$WORD_PATH" || bad "Word 导出失败"
+        --file-extension docx --output-dir "$TMP_EXP" --overwrite 2>&1 | sed '/^\[lark-cli\]/d' )"
+    TMP_WORD="$(printf '%s' "$export_out" | grep -oP '"saved_path":\s*"\K[^"]+' | head -1)"
+    if [ -n "$TMP_WORD" ] && [ -f "$TMP_WORD" ]; then
+        mkdir -p "$EXP_DIR"
+        WORD_PATH="$EXP_DIR/$(basename "$TMP_WORD")"
+        mv -f "$TMP_WORD" "$WORD_PATH" && ok "Word：$WORD_PATH" || { bad "Word 移动失败"; WORD_PATH=""; }
+    else
+        bad "Word 导出失败：$(printf '%s' "$export_out" | grep -oP '"message":\s*"\K[^"]+' | head -1)"
+    fi
+    rm -rf "$TMP_EXP"
 else
     info "[4/4] 跳过 Word 导出"
 fi
