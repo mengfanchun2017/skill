@@ -118,20 +118,18 @@ chunks:
    - 改名：`drive +update-title --token <node_token> --type wiki --title "<新标题>" --as user`
 6. **回填 Base 记录**：见下方 JSON（字段与选项见 `fwstd-case`，⚠️ 字段名 `案例名称`、编号 auto_number 不写）。
 
-### MinerU 解析（材料预处理标准工具）
+### 材料解析（委托 fpdf 解析层）
 
-> 官方 MinerU API（mineru.net），PDF/Word/PPT/图片/网页 → Markdown。≤20页/≤10MB 走免费 Flash，>20页走 Precision（token）。
-> 脚本依赖由 uv 自管（PEP 723），不依赖系统 python 的 mineru 包。
+> **PDF 解析统一走 fpdf**（`fpdf/scripts/parse.py`），本 skill 不再自带解析脚本 —— PDF 能力单点维护。
+> MinerU API（mineru.net）：Flash（≤20页/≤10MB，免费，仅文本） / Precision（token，带 bbox 结构 + 图片）。
 
 ```bash
-uv run ~/.claude/skills/fworch-case/references/mineru_parse.py "<本地路径>.pdf"
-uv run ~/.claude/skills/fworch-case/references/mineru_parse.py "https://example.com/article"
-uv run ~/.claude/skills/fworch-case/references/mineru_parse.py "<file>" --force-precision
-# 直接执行也行（shebang 走 uv）: ~/.claude/skills/fworch-case/references/mineru_parse.py <file>
+# 本地 PDF → 结构包（markdown + content_list + 图片）落仓库外目录
+uv run ~/.claude/skills/fpdf/scripts/parse.py "<本地路径>.pdf" --outdir "$HOME/pdf-work/<slug>"
+# 只要纯文本、省额度：加 --tier flash
+# 纯文本可直接读 <outdir>/<slug>.md；结构需求读 .content_list.json
 ```
-- 输出 markdown 到 stdout；`--outdir DIR` 存图；debug（mode/pages/chars）到 stderr
-- token 在 `ccprivate/conf/mineru.json`（脚本自动读，勿硬编码）
-- 需 uv（`bash ccconfig/lib/ensure-uv.sh` 一键装）
+- token 在 `ccprivate/conf/mineru.json`（脚本自动读，勿硬编码）；需 uv
 - 境外站（github/aws/wikipedia）超时→网页优先 Tavily/Exa
 - 表格 → 飞书原生表格；图/公式 → 第3层子文档
 
