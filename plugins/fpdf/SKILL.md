@@ -27,17 +27,28 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, mcp__mineru__parse_documents
 
 ## 执行流程（4 步，全部走 `scripts/run.sh`）
 
-### Step 0: 前置检查（必做，缺什么装什么）
+### Step 0: 前置检查（自动，缺什么装什么）
+
+**`run.sh` 会自动调 `setup.sh` 补齐**，通常不必手动跑。手动检查/安装时：
 
 ```bash
-bash ~/.claude/skills/fpdf/scripts/setup.sh
+bash ~/.claude/skills/fpdf/scripts/setup.sh          # 检查 + 缺啥装啥（需 sudo 时提示）
+bash ~/.claude/skills/fpdf/scripts/setup.sh --check  # 只检查不安装
 ```
 
-检查 4 项：`uv` / `lark-cli` / **飞书授权** / **MinerU token**。全部就绪退出码 0。
+检查 5 项：
 
-- 缺 `uv` → `curl -LsSf https://astral.sh/uv/install.sh | sh`
-- 缺 `lark-cli` 或**飞书未授权** → `bash ~/git/ccconfig/init-option.sh larkcli`（走扫码授权，一次性）
-- 缺 MinerU token → `bash ~/git/ccconfig/init-option.sh mineru key`
+| 依赖 | 缺失时 | 是否阻断 |
+|------|--------|---------|
+| `uv` | `curl -LsSf https://astral.sh/uv/install.sh \| sh` | **阻断** |
+| `lark-cli` | `bash ~/git/ccconfig/init-option.sh larkcli` | **阻断** |
+| 飞书授权 | 同上（走扫码，一次性） | **阻断** |
+| MinerU token | `bash ~/git/ccconfig/init-option.sh mineru key` | 不阻断（仅 flash 档可跑） |
+| `poppler-utils` | 自动 `sudo apt-get install -y poppler-utils`；无 sudo 权限时**只提示不阻断** | 不阻断 |
+
+**为什么 poppler 不阻断**：解析/渲染主路径走 pymupdf（`parse.py` 内用），poppler 只在需要
+`pdftotext`/`pdfimages`/`pdftoppm` 这类命令行快速抽取时用得上；装不上不影响主流程。
+无 TTY 的自动会话里 `sudo` 会挂，故 setup.sh 先判 `sudo -n` 再决定装还是提示。
 
 > **飞书授权口径**：唯一可信信号是 `lark-cli auth status` 的 `identities.user.available`。
 > `config.json` 里的 `users[]` 是「登录过」的记录，token 过期仍残留 → 拿它判断会假阳性。
