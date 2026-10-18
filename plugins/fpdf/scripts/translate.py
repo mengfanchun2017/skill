@@ -115,7 +115,7 @@ def main():
 
     preset = args.preset or current_preset_name()
     cfg = load_preset(preset) if preset else None
-    if not cfg or not cfg.get("url"):
+    if not cfg or not cfg.get("base_url"):
         print(f"ERROR: 取不到 LLM 配置（preset={preset!r}, conf={LLM_MERGED}）。"
               f"指定 --preset 或检查 llm.json。", file=sys.stderr)
         sys.exit(3)
