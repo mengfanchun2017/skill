@@ -16,7 +16,7 @@ allowed-tools: Read, Glob, Grep
 
 | 本 skill 负责 | 不负责（委派） |
 |--------------|--------------|
-| 各准备产物的内容架构/骨架 | 飞书格式（lark-table 822）→ `ffeishu` |
+| 各准备产物的内容架构/骨架 | 飞书格式（表格 XML 822）→ `ffeishu` |
 | 模板（`references/templates.md`） | 编排/进度 → `fworch-interview` |
 | 岗位画像/知识地图/能力模型/问答/工作思路 的写法 | 搜索素材 → `fsearch` / `fresearchframe` |
 

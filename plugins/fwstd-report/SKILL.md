@@ -17,7 +17,7 @@ allowed-tools: Read, Write, Glob, Grep, Bash
 
 | 本 skill 负责 | 不负责（委派其他 skill） |
 |--------------|---------------------|
-| 内容结构（H1/章节顺序/概括） | 飞书格式（lark-table 822 等）→ ffeishu |
+| 内容结构（H1/章节顺序/概括） | 飞书格式（表格 XML 822 等）→ ffeishu |
 | 论证规范（数据+因果+不确定） | 搜索/数据收集 → fresearchframe |
 | 数据呈现原则（对比用表/数值量级） | 图表生成（python/mermaid）→ ffeishu 工作流 G |
 | 模板（4 套） | 报告工作流执行 → fworch-report |
@@ -68,7 +68,7 @@ python3 "$S" check report.md --profile research --min-refs 15   # 交付门禁�
 
 `check` 抓：配图/HTML/hr、H4+、标题手动编号、表格缺"资料来源"行、引用不连续/首现乱序、正文↔文末参考文献勾稽、参考文献未升序。`--json` 出机器可读结果，`--strict` 把警告也当失败。**编号问题一律用 `renumber --in-place` 修，不手工调。**
 
-> 校验对象是**markdown 源**（ffeishu 再转 lark-table XML）。脚本 `scripts/report_check.py`，通用不绑体系。
+> 校验对象是**markdown 源**（ffeishu 再转表格 XML）。脚本 `scripts/report_check.py`，通用不绑体系。
 
 ## 报告规范（核心）
 

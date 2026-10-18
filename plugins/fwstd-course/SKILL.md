@@ -16,7 +16,7 @@ allowed-tools: Read, Glob, Grep
 
 | 本 skill 负责 | 不负责（委派） |
 |--------------|--------------|
-| 课程各产物的内容架构/骨架 | 飞书格式（lark-table 822 等）→ `ffeishu` |
+| 课程各产物的内容架构/骨架 | 飞书格式（表格 XML 822 等）→ `ffeishu` |
 | 各产物模板（templates） | 编排/进度/委派 → `fworch-course` |
 | 案例注入的内容约定 | 案例检索 → `fworch-case` |
 | 课程级写作要求 | 搜索素材 → `fsearch`/`fresearchframe` |

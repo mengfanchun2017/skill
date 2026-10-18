@@ -8,7 +8,7 @@
 
 设计原则：
   - 通用、不绑体系：不假设固定章节名、不要求 6 分片、不要求 ≥15 条（阈值可调）
-  - 只校验 markdown 源（ffeishu 再转 lark-table XML）
+  - 只校验 markdown 源（ffeishu 再转表格 XML）
   - 单文件 + argparse，只依赖标准库
   - 退出码：0 通过 / 1 校验失败 / 2 用法错误
 

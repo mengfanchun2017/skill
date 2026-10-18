@@ -1,6 +1,6 @@
 # 面试准备模板骨架
 
-> fwstd-interview 各产物骨架。飞书格式（lark-table 822 等）走 ffeishu。
+> fwstd-interview 各产物骨架。飞书格式（表格 XML 822 等）走 ffeishu。
 
 ## 岗位画像
 
@@ -36,7 +36,7 @@
 > 掌握程度：入门/熟悉/精通（对照 <级别>）
 
 | 能力域 capability | 技能 skill | 关键知识点 knowledge | 掌握程度 |
-|<lark-table 822>|
+|<table 822>|
 ```
 
 ## 能力素质模型
