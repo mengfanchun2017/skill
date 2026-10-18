@@ -1,0 +1,201 @@
+#!/usr/bin/env -S uv run --quiet --script
+# /// script
+# requires-python = ">=3.10"
+# dependencies = ["mineru-open-sdk", "pymupdf", "pyyaml"]
+# ///
+"""fpdf 解析层 — PDF → 结构包（markdown + content_list + 图片）。
+
+为什么独立于 fworch-case/references/mineru_parse.py：
+    那个脚本是「素材转 markdown」取向（stdout 出 md，用途=喂给课程化流水线）。
+    本脚本是「版式还原」取向：必须拿到 content_list 的 bbox 坐标，才能重建
+    分栏/表格结构 → 交给飞书 XML 排版。两者输出契约不同，故不复用。
+
+档位（实测差异，非猜测）：
+    Flash（免费，无 token）  → 只有 markdown 纯文本，content_list=None，无图片
+    Precision（token）       → markdown + content_list（带 bbox/table_body/caption）+ 图片
+    ⇒ 要结构必须 Precision。--tier flash 仅供「只要纯文本、省额度」时降级。
+
+产物布局（--outdir 下）：
+    <slug>.md                 正文 markdown
+    <slug>.content_list.json  结构化条目（type/bbox/page_idx/table_body/...）
+    <slug>.layout.json        版式推断结果（分栏列数 per page，供排版层读）
+    images/                   image/chart 类条目的图片文件
+    <slug>.meta.json          来源、档位、页数、解析时间
+
+用法：
+    parse.py <pdf路径> --outdir DIR [--tier precision|flash] [--slug NAME]
+    parse.py <pdf路径> --outdir DIR --dry-run    # 只打档位判定，不调 API
+"""
+import sys, os, json, time, argparse, re
+from pathlib import Path
+
+CONF_CANDIDATES = [
+    lambda: os.environ.get("MINERU_CONF"),
+    lambda: (os.environ.get("CCPRIVATE_HOME") or os.environ.get("CCPRIVATE_DIR") or "") and
+            os.path.join(os.environ.get("CCPRIVATE_HOME") or os.environ.get("CCPRIVATE_DIR"), "conf", "mineru.json"),
+    lambda: os.path.expanduser("~/git/ccprivate/conf/mineru.json"),
+]
+
+
+def load_token():
+    for cand in CONF_CANDIDATES:
+        p = cand()
+        if p and os.path.isfile(p):
+            try:
+                t = json.load(open(p)).get("token", "")
+                if t and not any(m in t for m in ("请填入", "请到", "your key", "placeholder", "<your-")):
+                    return t
+            except Exception:
+                pass
+    return ""
+
+
+def pdf_meta(path):
+    try:
+        import pymupdf
+        d = pymupdf.open(path)
+        n, w, h = d.page_count, [], []
+        for p in d:
+            r = p.rect
+            w.append(round(r.width)); h.append(round(r.height))
+        d.close()
+        return {"pages": n, "widths": w, "heights": h}
+    except Exception:
+        return {"pages": None, "widths": [], "heights": []}
+
+
+def detect_columns(content_list, page_w):
+    """按 bbox 左边界聚类推断分栏数。
+
+    判据：同一页里正文文本框的左边界若聚成 2+ 个明显分离的簇（间距 > 页面宽 25%），
+    视为多栏。header/footer/page_number 不参与（它们横跨全宽会污染判断）。
+    """
+    if not page_w:
+        return {}
+    body = [e for e in content_list
+            if e.get("type") in ("text", "table", "image", "chart", "equation")
+            and isinstance(e.get("bbox"), (list, tuple)) and len(e["bbox"]) == 4]
+    cols = {}
+    for e in body:
+        pg = e.get("page_idx", 0)
+        x0 = e["bbox"][0]
+        cols.setdefault(pg, []).append(x0)
+    out = {}
+    for pg, xs in cols.items():
+        if len(xs) < 3:
+            out[pg] = 1
+            continue
+        xs = sorted(xs)
+        gap = page_w * 0.25
+        clusters, cur = 1, xs[0]
+        for x in xs[1:]:
+            if x - cur > gap:
+                clusters += 1
+                cur = x
+        out[pg] = clusters
+    return out
+
+
+def slugify(path):
+    s = Path(path).stem
+    s = re.sub(r"[^\w一-鿿-]+", "-", s).strip("-")
+    return s or "document"
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("source", help="本地 PDF 路径")
+    ap.add_argument("--outdir", required=True, help="结构包输出目录")
+    ap.add_argument("--tier", default="precision", choices=["precision", "flash"],
+                    help="precision(默认,带结构) / flash(免费,仅文本)")
+    ap.add_argument("--slug", default=None, help="产物命名 slug（默认取文件名）")
+    ap.add_argument("--model", default="vlm", help="precision 模型 vlm/pipeline")
+    ap.add_argument("--dry-run", action="store_true", help="只打档位判定，不调 API")
+    args = ap.parse_args()
+
+    if not os.path.isfile(args.source):
+        print(f"ERROR: 文件不存在: {args.source}", file=sys.stderr); sys.exit(2)
+
+    slug = args.slug or slugify(args.source)
+    meta = pdf_meta(args.source)
+    token = load_token()
+    tier = args.tier
+    if tier == "precision" and not token:
+        print("ERROR: precision 档需要 MinerU token，未在 ccprivate/conf/mineru.json 找到。\n"
+              "  降级: --tier flash（仅文本无结构）；或先配置 token: bash ccconfig/init-option.sh mineru key",
+              file=sys.stderr)
+        sys.exit(3)
+
+    size_mb = os.path.getsize(args.source) / 1e6
+    print(f"[fpdf] tier={tier} pages={meta['pages']} size={size_mb:.1f}MB slug={slug}", file=sys.stderr)
+
+    if args.dry_run:
+        print(json.dumps({"tier": tier, "pages": meta["pages"], "size_mb": round(size_mb, 2),
+                          "has_token": bool(token), "slug": slug}, ensure_ascii=False))
+        return
+
+    from mineru import MinerU
+    client = MinerU(token) if tier == "precision" else MinerU()
+    t0 = time.time()
+    try:
+        if tier == "precision":
+            result = client.extract(args.source, model=args.model, timeout=600)
+        else:
+            result = client.flash_extract(args.source, timeout=300)
+    except Exception as e:
+        print(f"ERROR: {type(e).__name__}: {str(e)[:500]}", file=sys.stderr)
+        sys.exit(1)
+
+    if result.state != "done":
+        print(f"ERROR: 解析未完成 state={result.state} err={result.err_code} {result.error}", file=sys.stderr)
+        sys.exit(1)
+
+    outdir = Path(args.outdir)
+    (outdir / "images").mkdir(parents=True, exist_ok=True)
+    md = result.markdown or ""
+    (outdir / f"{slug}.md").write_text(md, encoding="utf-8")
+
+    cl = result.content_list or []
+    if cl:
+        (outdir / f"{slug}.content_list.json").write_text(
+            json.dumps(cl, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    # 图片：SDK Image dataclass（.data/.name），文件名取自其 path
+    saved = []
+    for i, img in enumerate(getattr(result, "images", None) or []):
+        data = getattr(img, "data", img)
+        if not isinstance(data, (bytes, bytearray)):
+            continue
+        name = Path(getattr(img, "path", None) or getattr(img, "name", f"img_{i:03d}.png")).name
+        (outdir / "images" / name).write_bytes(data)
+        saved.append(name)
+
+    # 版式推断：用页面宽度（取首页宽，pptx 式纵横向混排时以多数为准）
+    widths = meta["widths"] or [0]
+    page_w = max(set(widths), key=widths.count) if widths else 0
+    cols = detect_columns(cl, page_w) if cl else {}
+    (outdir / f"{slug}.layout.json").write_text(
+        json.dumps({"columns_per_page": cols, "page_width": page_w}, ensure_ascii=False, indent=2),
+        encoding="utf-8")
+
+    from collections import Counter
+    types = dict(Counter(e.get("type") for e in cl)) if cl else {}
+    (outdir / f"{slug}.meta.json").write_text(json.dumps({
+        "source": os.path.abspath(args.source), "slug": slug, "tier": tier,
+        "pages": meta["pages"], "size_mb": round(size_mb, 2),
+        "chars": len(md), "items": len(cl), "images": len(saved),
+        "item_types": types, "parse_seconds": round(time.time() - t0, 1),
+        "parsed_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+    }, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    print(f"[fpdf] done tier={tier} chars={len(md)} items={len(cl)} images={len(saved)} "
+          f"cols_pages={sum(1 for v in cols.values() if v > 1)}/{len(cols)} "
+          f"{time.time() - t0:.0f}s", file=sys.stderr)
+    print(json.dumps({"slug": slug, "outdir": str(outdir), "items": len(cl),
+                      "images": len(saved), "multi_col_pages":
+                      sorted(p for p, v in cols.items() if v > 1)},
+                     ensure_ascii=False))
+
+
+if __name__ == "__main__":
+    main()
