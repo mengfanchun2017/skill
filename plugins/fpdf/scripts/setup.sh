@@ -120,10 +120,14 @@ else
     info "配置:  bash ~/git/ccconfig/init-option.sh mineru key"
 fi
 
-echo "─────────────"
-if [ "$MISSING" -eq 0 ]; then
-    echo "全部就绪"
+if [ "$QUIET" = 1 ]; then
+    [ "$MISSING" -eq 0 ] && echo "deps-ok" || echo "deps-missing:$MISSING"
 else
-    echo "$MISSING 项待处理（见上方 → 提示）"
+    echo "─────────────"
+    if [ "$MISSING" -eq 0 ]; then
+        echo "全部就绪"
+    else
+        echo "$MISSING 项待处理（见上方 → 提示）"
+    fi
 fi
 exit "$MISSING"
