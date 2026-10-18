@@ -21,7 +21,10 @@
 
 ### Step 0: 抽取（本地）
 
-- PDF → 文本：`python3 -c "import fitz; ..."`（pymupdf），逐页 `get_text()`，写 `.txt`
+- PDF → 文本/**结构**：**委托 fpdf 解析层** `uv run ~/.claude/skills/fpdf/scripts/parse.py "<路径>" --outdir <仓库外目录>`
+  （统一走 fpdf，PDF 解析能力单点维护；产出 `<slug>.md` 纯文本 + `.content_list.json` 结构 + 图片）
+  - 只需讲义文字 → 加 `--tier flash`（免费、快）；要保留表格/图片结构 → 默认 Precision
+  - 旧法 `pymupdf get_text()` 仅在极简场景（纯文字讲义）下可直接用
 - Excel/PPT：另存或转 CSV
 - 录屏：字幕文件直接用
 - 产出物放仓库**外**目录（避免 auto-sync 把版权材料推进公开库）

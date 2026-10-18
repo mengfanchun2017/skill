@@ -221,7 +221,7 @@ lark-cli base +url-resolve --url "<record 分享链接>" --as user
 ## 依赖
 
 - `references/lark_env.sh` — 稳定工具层（auth 前缀/预检/输出净化/打分检索）
-- `references/mineru_parse.py` — 材料解析
+- `fpdf` — PDF 材料解析（`fpdf/scripts/parse.py`，本 skill 不再自带解析脚本）
 - `fwstd-case` — 内容规范（schema/起名/正文模版）
 - `ffeishu` — 飞书文档操作
 - `fsearch` — 新增案例搜索扩展
