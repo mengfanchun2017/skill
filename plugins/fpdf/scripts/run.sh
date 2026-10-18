@@ -44,7 +44,14 @@ esac
 
 # 工作目录：仓库外（避免 auto-sync 把版权材料推进公开库）
 WORK_ROOT="${FPDF_WORK_ROOT:-$HOME/pdf-work}"
-[ -n "$SLUG" ] || SLUG="$(basename "${SRC%.*}" | sed -E 's/[^[:alnum:]_一-龥-]+/-/g; s/^-|-$//g')"
+# slug 用 python 生成：sed 的 [一-龥] 字符范围在 LANG=C.UTF-8 下报
+# "Invalid collation character"（LC_COLLATE 不支持该范围），会静默产出空 slug。
+[ -n "$SLUG" ] || SLUG="$(python3 -c "
+import re,sys,os
+s=os.path.splitext(os.path.basename(sys.argv[1]))[0]
+s=re.sub(r'[^\w一-鿿-]+','-',s,flags=re.UNICODE).strip('-')
+print(s)
+" "$SRC" 2>/dev/null)"
 [ -n "$SLUG" ] || SLUG="document"
 WORKDIR="$WORK_ROOT/$SLUG"
 mkdir -p "$WORKDIR"
@@ -81,12 +88,15 @@ CREATE_ARGS=(--api-version v2 --as user --doc-format xml --content "@./$SLUG.xml
 if [ -n "$PARENT" ]; then
     CREATE_ARGS+=(--parent-token "$PARENT")
 else
+    # wiki_nodes.default 两种形态都要吃：fpdf.yaml 用自己的（可能直接是 token 串
+    # 或 {token:}），回落 ffeishu.yaml 时是 {token: ...} 嵌套 dict。
     DEF_NODE="$(python3 -c "
 import yaml,os
 for p in [os.path.expanduser('~/git/ccprivate/skill/fpdf.yaml'), os.path.expanduser('~/git/ccprivate/skill/ffeishu.yaml')]:
     if os.path.isfile(p):
         d=yaml.safe_load(open(p)) or {}
         n=(d.get('wiki_nodes') or {}).get('default')
+        if isinstance(n, dict): n=n.get('token')
         if n: print(n); break
 " 2>/dev/null)"
     [ -n "$DEF_NODE" ] && CREATE_ARGS+=(--parent-token "$DEF_NODE")
