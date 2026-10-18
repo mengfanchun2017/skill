@@ -126,20 +126,48 @@ def image_xml(item, images_dir, rel_prefix="images"):
     return f'<img path="@./{rel_prefix}/{Path(p).name}"{cap}/>'
 
 
-def render_flow(content_list, images_dir, translate=None):
-    """顺序流：按 content_list 顺序输出块，跳过 header/footer/page_number。"""
+def _heading_level(item, seen_levels):
+    """修正 MinerU 的标题层级。
+
+    MinerU 把论文里所有小标题都标成 text_level=2（实测 88 号 17 个 h2 里
+    "4.1. Microorganisms…" 这类子节应为 h3），且不跳级约束要求 h1 → h2 → h3
+    连续出现。用编号模式（"2.1." 是二级、"1." 是一级）和首次出现层级推断。
+    """
+    lvl = item.get("text_level")
+    if not lvl:
+        return None
+    txt = (item.get("text") or "").strip()
+    if lvl == 1:
+        seen_levels.add(1)
+        return 1
+    # 编号形态：X.Y.Z. / X.Y. / X. 决定相对深度
+    m = re.match(r"^(\d+(?:\.\d+)*)\.?\s", txt)
+    if m:
+        depth = m.group(1).count(".") + 1
+        return min(1 + depth, 4)
+    seen_levels.add(2)
+    return 2
+
+
+def render_flow(content_list, images_dir, translate=None, keep_refs=False):
+    """顺序流：按 content_list 顺序输出块，跳过 header/footer/page_number。
+
+    keep_refs=True 时保留 ref_text（参考文献）——默认关掉是为了不让长长的
+    文献表淹没正文；但用户要"原文结构完整"时它就是文档的一部分。
+    """
     out = [f"<title>{esc(translate('__title__') if translate else '__title__')}</title>"]
     skip = {"header", "footer", "page_number"}
+    seen_levels = set()
     for e in content_list:
         t = e.get("type")
         if t in skip:
             continue
         if t == "text":
-            lvl = e.get("text_level")
+            lvl = _heading_level(e, seen_levels)
             txt = (translate(e.get("text", "")) if translate else e.get("text", ""))
             if not txt.strip():
                 continue
-            if lvl and 1 <= lvl <= 3:
+            if lvl and 1 <= lvl <= 4:
                 out.append(f"<h{lvl}>{esc(txt)}</h{lvl}>")
             else:
                 out.append(f"<p>{esc(txt)}</p>")
