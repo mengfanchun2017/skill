@@ -57,31 +57,28 @@ def current_preset_name():
 
 
 def call_llm(cfg, prompt, max_tokens=8000):
-    """OpenAI 兼容 chat completions。
+    """走 Anthropic Messages 协议。
 
-    use_bridge=True 的 preset 上游是内网 OpenAI-only 端点，本机 bridge(8898) 已按
-    当前 preset 配好 upstream（claude 自己也走它）→ 直接打 bridge 即可，无需自己
-    拼内网鉴权/host_header。
+    实测本机 bridge(8898) 只暴露 /v1/messages（Anthropic 格式），POST
+    /v1/chat/completions 返回 404 —— bridge 把内网 OpenAI 上游转成 Anthropic 给
+    Claude 用，不反向暴露 OpenAI 面。所以这里也说 Anthropic 格式。
     """
-    if cfg.get("use_bridge"):
-        url = f"{BRIDGE}/v1/chat/completions"
-        hdrs = {"Content-Type": "application/json"}
-    else:
-        url = cfg["base_url"].rstrip("/")
-        if not url.endswith("/chat/completions"):
-            url += "/chat/completions"
-        hdrs = {"Content-Type": "application/json",
-                "Authorization": f"Bearer {cfg['key']}"}
+    url = f"{BRIDGE}/v1/messages" if cfg.get("use_bridge") else \
+        cfg["base_url"].rstrip("/") + "/v1/messages"
     body = json.dumps({
         "model": cfg["model"],
-        "messages": [{"role": "user", "content": prompt}],
         "max_tokens": max_tokens,
         "temperature": 0.2,
+        "messages": [{"role": "user", "content": prompt}],
     }).encode()
+    hdrs = {"Content-Type": "application/json", "anthropic-version": "2023-06-01"}
+    if not cfg.get("use_bridge"):
+        hdrs["x-api-key"] = cfg["key"]
     req = urllib.request.Request(url, data=body, headers=hdrs)
-    with urllib.request.urlopen(req, timeout=180) as r:
+    with urllib.request.urlopen(req, timeout=300) as r:
         d = json.loads(r.read())
-    return d["choices"][0]["message"]["content"]
+    parts = [b.get("text", "") for b in d.get("content", []) if b.get("type") == "text"]
+    return "".join(parts)
 
 
 def collect_texts(content_list):
