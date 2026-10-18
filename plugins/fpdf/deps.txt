@@ -1,3 +1,6 @@
-# fpdf 基础依赖（Python 包由 uv 按脚本头部 PEP723 自动管理，此处只列 CLI 工具）
+# fpdf 基础依赖
+# Python 包（mineru-open-sdk / pymupdf 等）由 uv 按脚本头部 PEP723 自动管理，不列在此。
+# 这里列 CLI 工具，init-skill.sh sync 与 scripts/setup.sh 都会检查并按缺失补装。
 
 @larksuite/cli  npm:latest  fpdf
+poppler-utils   apt:latest  fpdf
