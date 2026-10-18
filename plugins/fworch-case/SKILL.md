@@ -103,8 +103,10 @@ chunks:
 **正文结构与写作要求**：严格按 `fwstd-case` 的「案例正文模版」。
 
 0. **材料预处理**：原始材料（本地 PDF/Word/PPT 或 URL）先转 markdown：
-   - **本地文件 / PDF URL** → MinerU 解析：MCP `mcp__mineru__parse_documents`（交互快）或 `references/mineru_parse.py`（脚本可复现，`uv run` 自管依赖）
-   - **网页 URL** → Tavily extract / Exa fetch 优先；MinerU `mcp__mineru__parse_documents` 补充（国内可达、需结构保留时）
+   - **本地 PDF** → **委托 fpdf 解析层**：`uv run ~/.claude/skills/fpdf/scripts/parse.py "<路径>" --outdir <仓库外目录>`
+     （统一走 fpdf，PDF 解析能力单点维护；产出 markdown + content_list + 图片）。
+     只要纯文本、省额度时加 `--tier flash`。
+   - **PDF URL / 网页 URL** → Tavily extract / Exa fetch 优先；MinerU `mcp__mineru__parse_documents` 补充（国内可达、需结构保留时）
    - **纯文字描述** → 直接进 `fsearch`
 1. **搜索扩展**：`fsearch` 补充背景/数据/图表源，扩展内容作主文档单独一节。
 2. **命名**：按 `fwstd-case` 起名规则算标题。
