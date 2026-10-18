@@ -1,0 +1,3 @@
+# fpdf 基础依赖（Python 包由 uv 按脚本头部 PEP723 自动管理，此处只列 CLI 工具）
+
+@larksuite/cli  npm:latest  fpdf

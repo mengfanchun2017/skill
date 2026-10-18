@@ -173,23 +173,30 @@ else
     info "[4/4] 跳过 Word 导出"
 fi
 
-# 记录到索引
-python3 - "$PAGE_TITLE" "$DOC_URL" "$DOC_ID" "$SRC" <<'PYEOF' >&2 2>&1 || true
+# 记录到索引（原文 + 译文两条，各自按 doc_token 去重）
+python3 - "$PAGE_TITLE" "$DOC_URL" "$DOC_ID" "$SRC" "$TRANS_URL" "$TRANS_ID" <<'PYEOF' >&2 2>&1 || true
 import sys, os, yaml
-title, url, tok, src = sys.argv[1:5]
+title, url, tok, src, turl, ttok = sys.argv[1:7]
 f = os.path.expanduser("~/git/ccprivate/skill/fpdf.yaml")
 d = yaml.safe_load(open(f)) if os.path.isfile(f) else {}
 d = d or {}
 di = d.setdefault("doc_index", [])
-if not any(e.get("doc_token") == tok for e in di if isinstance(e, dict)):
-    di.append({"title": title, "url": url, "doc_token": tok, "source": src})
-    yaml.dump(d, open(f, "w"), allow_unicode=True, sort_keys=False)
+def add(t, u, k, note=""):
+    if k and not any(isinstance(e, dict) and e.get("doc_token") == k for e in di):
+        di.append({"title": t, "url": u, "doc_token": k, "source": src, "note": note})
+add(title, url, tok)
+if ttok:
+    add(title + "（译文）", turl, ttok, "translation")
+yaml.dump(d, open(f, "w"), allow_unicode=True, sort_keys=False)
 PYEOF
 
 # 机器可读结果
-python3 - "$SLUG" "$WORKDIR" "$DOC_ID" "$DOC_URL" "${WORD_PATH:-}" "$ITEMS" <<'PYEOF'
+python3 - "$SLUG" "$WORKDIR" "$DOC_ID" "$DOC_URL" "$TRANS_ID" "$TRANS_URL" "${WORD_PATH:-}" "${WORD_ZH:-}" "$ITEMS" <<'PYEOF'
 import json, sys
-slug, wd, did, url, word, items = sys.argv[1:7]
-print(json.dumps({"slug": slug, "workdir": wd, "doc_id": did, "doc_url": url,
-                  "word_path": word, "items": int(items or 0)}, ensure_ascii=False))
+slug, wd, did, url, tid, turl, word, word_zh, items = sys.argv[1:10]
+print(json.dumps({"slug": slug, "workdir": wd,
+                  "doc_id": did, "doc_url": url,
+                  "trans_doc_id": tid, "trans_doc_url": turl,
+                  "word_path": word, "word_trans_path": word_zh,
+                  "items": int(items or 0)}, ensure_ascii=False))
 PYEOF

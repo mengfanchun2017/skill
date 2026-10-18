@@ -1,0 +1,10 @@
+# fpdf 配置模板
+# ccconfig 用户：真实值放 ccprivate/skill/fpdf.yaml，apply-config.sh 自动 symlink 注入。
+# 独立用户：复制本文件为 config.yaml 填入真实值。
+
+# 所有输出文档的父 wiki 节点（从父文档 URL 的 /wiki/<token> 取）
+wiki_nodes:
+  default: ""
+
+# 文档索引（自动追加，勿手改）
+doc_index: []
