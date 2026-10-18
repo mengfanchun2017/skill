@@ -80,6 +80,13 @@ import sys, yaml
 path, title, url, tok, parent, desc = sys.argv[1:]
 d = yaml.safe_load(open(path)) or {}
 di = d.setdefault("doc_index", [])
+# 自愈：历史遗留的「扁平碎片」格式（`- title:` / `- url:` 各成独立 list item，
+# 来自逐行追加）会让 .get("url") 永远取不到 → 去重失效、每次 --add 重复插入。
+# 检测到碎片即告警并中止，提示先重组（勿静默继续，否则碎片越攒越多）。
+if any(isinstance(e, dict) and "title" not in e for e in di):
+    sys.stderr.write("[doc-index] ⚠️ 检测到扁平碎片格式条目（字段各成独立 list item）"
+                     "— 去重已失效。先重组 doc_index 为 dict 列表再 --add。\n")
+    sys.exit(3)
 for e in di:
     if e.get("url") == url:
         print("[doc-index] 已存在，跳过: " + url); sys.exit(0)
