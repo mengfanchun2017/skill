@@ -1,24 +1,49 @@
 #!/usr/bin/env bash
 # fpdf 依赖预检 + 安装 — 幂等，缺什么装什么。
 #
-# 依赖分三类（实测结论，非猜测）：
-#   uv           解析/渲染脚本的运行器（PEP723 自管 py 依赖，不碰系统 Python）
-#   lark-cli     飞书读写（docs +create/+fetch/+update、drive +export/+delete）
-#   MinerU token Precision 档鉴权（存在 ccprivate/conf/mineru.json；Flash 档不需要）
+# 依赖分五类（实测结论，非猜测）：
+#   uv            解析/渲染脚本的运行器（PEP723 自管 py 依赖，不碰系统 Python）
+#   poppler-utils PDF 命令行工具（pdftotext/pdfinfo/pdfimages/pdftoppm）— apt 装
+#   lark-cli      飞书读写（docs +create/+fetch/+update、drive +export/+delete）
+#   飞书授权       lark-cli auth（未授权任何飞书写操作都会失败）
+#   MinerU token  Precision 档鉴权（存在 ccprivate/conf/mineru.json；Flash 档不需要）
 #
 # pymupdf/pdf2docx 等 python 库由 uv 按脚本头部 # /// script 自动拉，本脚本不管。
+#
+# 用法：
+#   bash setup.sh            # 检查 + 缺啥装啥（装需 sudo 时提示）
+#   bash setup.sh --check    # 只检查不安装（CI/只想看状态时用）
+#   bash setup.sh --quiet    # 只输出结论行 + 退出码（供 run.sh 内嵌调用）
 
 set -uo pipefail
 
-ok()   { printf '  \033[32m✓\033[0m %s\n' "$*"; }
-bad()  { printf '  \033[31m✗\033[0m %s\n' "$*"; }
-info() { printf '  \033[36m→\033[0m %s\n' "$*"; }
-warn() { printf '  \033[33m!\033[0m %s\n' "$*"; }
+CHECK_ONLY=0; QUIET=0
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --check) CHECK_ONLY=1 ;;
+        --quiet) QUIET=1 ;;
+        -h|--help) sed -n '2,20p' "$0"; exit 0 ;;
+        *) echo "未知参数: $1" >&2; exit 2 ;;
+    esac
+    shift
+done
+
+ok()   { [ "$QUIET" = 1 ] || printf '  \033[32m✓\033[0m %s\n' "$*"; }
+bad()  { printf '  \033[31m✗\033[0m %s\n' "$*" >&2; }
+info() { [ "$QUIET" = 1 ] || printf '  \033[36m→\033[0m %s\n' "$*"; }
+warn() { printf '  \033[33m!\033[0m %s\n' "$*" >&2; }
 
 MISSING=0
 
-echo "fpdf 依赖检查"
-echo "─────────────"
+[ "$QUIET" = 1 ] || { echo "fpdf 依赖检查"; echo "─────────────"; }
+
+# 能否免密 sudo（无 TTY 时交互 sudo 会挂，须先判）
+_sudo_ok() {
+    command -v sudo >/dev/null 2>&1 || return 1
+    sudo -n true 2>/dev/null && return 0
+    [ -t 0 ] || return 1          # 无 TTY 且不免密 → 交互 sudo 必挂
+    return 0
+}
 
 # --- uv ---
 if command -v uv >/dev/null 2>&1; then
@@ -26,6 +51,31 @@ if command -v uv >/dev/null 2>&1; then
 else
     bad "uv 未安装"
     info "装 uv:  curl -LsSf https://astral.sh/uv/install.sh | sh"
+    MISSING=$((MISSING+1))
+fi
+
+# --- poppler-utils（PDF 命令行工具；非必需但有则更快更省，尤其大文件抽文本/拆图）---
+POPPLER_BINS="pdftotext pdfinfo pdfimages pdftoppm"
+pop_missing=""
+for b in $POPPLER_BINS; do command -v "$b" >/dev/null 2>&1 || pop_missing="$pop_missing $b"; done
+if [ -z "$pop_missing" ]; then
+    ok "poppler-utils（$POPPLER_BINS 齐备）"
+elif [ "$CHECK_ONLY" = 1 ]; then
+    warn "poppler-utils 缺:$pop_missing"
+    MISSING=$((MISSING+1))
+elif _sudo_ok; then
+    info "poppler-utils 缺失（$pop_missing）→ 安装中..."
+    if sudo apt-get install -y poppler-utils >/dev/null 2>&1; then
+        ok "poppler-utils 已安装"
+    else
+        bad "poppler-utils 安装失败"
+        info "手动装:  sudo apt-get install -y poppler-utils"
+        MISSING=$((MISSING+1))
+    fi
+else
+    bad "poppler-utils 缺:$pop_missing（需 sudo 但当前不可用）"
+    info "手动装:  sudo apt-get install -y poppler-utils"
+    info "（不装也能跑 —— pymupdf 已覆盖全部解析/渲染；只是少了命令行工具这一档）"
     MISSING=$((MISSING+1))
 fi
 
