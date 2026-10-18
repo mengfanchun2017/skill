@@ -175,10 +175,10 @@ def main():
         print(f"[fpdf] 批次 {bi+1}/{(len(texts)+args.batch_size-1)//args.batch_size}", file=sys.stderr)
         result.update(translate_batch(batch))
 
-    result["__title__"] = title
+    result["__title__"] = meta.get("title") or wd.name
     out_path = args.out or str(wd / f"{args.slug}.trans.json")
     Path(out_path).write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
-    miss = sum(1 for v in result.values() if not v)
+    miss = sum(1 for k, v in result.items() if k != "__title__" and not v)
     print(f"[fpdf] 译文 → {out_path}（{len(result)-1} 段，{miss} 段空）", file=sys.stderr)
     print(json.dumps({"trans_map": out_path, "segments": len(result) - 1, "empty": miss},
                      ensure_ascii=False))
