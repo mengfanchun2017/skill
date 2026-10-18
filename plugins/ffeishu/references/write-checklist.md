@@ -46,11 +46,12 @@
 - [ ] 章节间无 `<hr/>` 分割线
 - [ ] **标题为简单连贯中文短名**（2-6 字），不带「长主语 — 解释副标题」；同一项目的子文档用统一短词风格
 
-### 表格 → `<lark-table>` XML
-- [ ] **禁止 Markdown 表格**，全部用 `<lark-table>` XML
+### 表格 → 标准 HTML `<table>` XML
+- [ ] **禁止 Markdown 表格**（列宽被固定成 120），全部用 `<table>` XML
+- [ ] 结构：`<table><colgroup><col width="N"/>…</colgroup><thead><tr><th><p>…</p></th></tr></thead><tbody><tr><td><p>…</p></td></tr></tbody></table>`
 - [ ] **colgroup 列宽之和 = 822**（`round(822/N)` 均分：2列→411×2, 3列→274×3, 4列→205×2+206×2, 5列→164×4+166）
-- [ ] 必设属性：`rows="N" cols="N" header-row="true" header-column="true" column-widths="W,W,W"`
-- [ ] 单元格内纯文本，不用 `#` 标题符号
+- [ ] 单元格内容包 `<p>`；不用 `#` 标题符号
+- [ ] ⚠ **勿用 `<lark-table rows= cols= column-widths=>`**（旧写法，实测列宽丢失 + 多行被吞；2026-10-18 更正）
 
 ### 图表 → 委托 fdiagram skill
 - [ ] 架构图/流程图等由 fdiagram 生成，通过 `block_insert_after` 嵌入

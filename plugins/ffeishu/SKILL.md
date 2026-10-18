@@ -58,7 +58,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 ```
 用户意图
   ├─ "创建文档"/"写文档"/"生成报告"        → 工作流 0: 创建新文档
-  ├─ "创建表格"/"画表格"                   → 工作流 0 + lark-table
+  ├─ "创建表格"/"画表格"                   → 工作流 0 + 表格 XML
   ├─ "画架构图"/"流程图"/"时序图"          → 委托 fdiagram skill
   ├─ "生成PPT"/"做slides"                 → 委托 fpptx skill
   ├─ "更新文档"/"update report"           → 工作流 A: 增量更新
@@ -144,7 +144,7 @@ lark-cli drive +search --query "关键词" --space-ids "space_id_1,space_id_2"
 
 ### Step 0: 内容构造
 1. 标题：`# ## ###` 三级，检查无 `数字[.、]` 前缀
-2. 表格：`<lark-table>` XML，`column-widths` 之和 = 822
+2. 表格：`<table>` XML（含 `<colgroup>`，宽度之和 = 822）
 3. 图表：委托 fdiagram skill，通过 `block_insert_after` 嵌入
 
 ### Step 1: 创建
