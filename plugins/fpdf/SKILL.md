@@ -220,3 +220,4 @@ fpdf **不依赖** ffeishu 的运行时，只在两处复用其成果：
 | `unsafe output path` | lark-cli 导出路径沙箱 | 已内置：先导 /tmp 再 move（勿绕过） |
 | 图片 0 字节 | MinerU SDK 的 `images` 是 dataclass 非 bytes | 已修（取 `.data`）；见 memory `mineru-sdk-image-write-bug-20261018` |
 | 想重新排版 | 结构包已存在 | 直接调 `render.py`，不必重新解析 |
+| 依赖报缺想一次性装 | — | `/fpdf deps`（或"安装依赖"）跑 setup.sh；`poppler-utils` 需用户自己 sudo |
