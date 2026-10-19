@@ -213,6 +213,57 @@ def main():
         print(f"[fpdf] 警告：全量产物提取失败（{type(e).__name__}: {str(e)[:120]}），"
               f"回落到 v1 content_list", file=sys.stderr)
 
+    # 原始图：MinerU 会把一页里的一张 figure（含 A/B/C/D 子图）**切成多块**
+    # 低清截图（实测 55 号 pg4 一张 5185x5094 的图被切成 4 块 617x429 的 28KB 缩略图），
+    # 拼接关系丢失、分辨率掉 8 倍。PDF 里每张 figure 本身就是一张完整嵌入图，
+    # 直接抽原图并按版面 bbox 建立「图块 → 原图」映射，渲染时每张原图只出一次。
+    orig_map = {}          # 原图文件名 → 覆盖的 MinerU 图块数
+    orig_path = outdir / f"{slug}.figure_map.json"
+    try:
+        import pymupdf
+        doc = pymupdf.open(args.source)
+        # MinerU 版面树的 bbox 与 PDF 同坐标系（实测 page_size=[595,779] 与 PDF 一致），
+        # 但 content_list_v2 的 bbox 被放大过 —— 映射一律用版面树坐标。
+        blocks = json.loads(blocks_path.read_text(encoding="utf-8")).get("pdf_info") \
+            if blocks_path.exists() else []
+        figures = []       # {page, pdf_bbox, file, size, keys:[(v2 block 坐标)]}
+        for pgi, pg in enumerate(doc):
+            page_figs = []
+            for x in pg.get_images(full=True):
+                xr = x[0]
+                info = doc.extract_image(xr)
+                if info["width"] < 800:      # 小图标（Check for updates 等）跳过
+                    continue
+                rects = pg.get_image_rects(xr)
+                if not rects:
+                    continue
+                r = rects[0]
+                fn = f"fig_p{pgi}_{info['width']}x{info['height']}.{info['ext']}"
+                (outdir / "images" / fn).write_bytes(info["image"])
+                page_figs.append({"xref": xr, "file": fn,
+                                  "bbox": [round(r.x0), round(r.y0), round(r.x1), round(r.y1)],
+                                  "size": f"{info['width']}x{info['height']}"})
+            # 版面树该页的图块（用于确认覆盖关系）
+            if pgi < len(blocks):
+                mb = [b for b in (blocks[pgi].get("para_blocks") or [])
+                      if b.get("type") in ("image", "chart") and b.get("bbox")]
+                for f in page_figs:
+                    fb = f["bbox"]
+                    f["blocks"] = sum(
+                        1 for b in mb
+                        if (min(fb[2], b["bbox"][2]) - max(fb[0], b["bbox"][0])) > 0
+                        and (min(fb[3], b["bbox"][3]) - max(fb[1], b["bbox"][1])) > 0)
+            doc[pgi] = doc[pgi]
+            figures.extend(page_figs)
+        doc.close()
+        if figures:
+            orig_map = {f["file"]: f for f in figures}
+            orig_path.write_text(json.dumps(figures, ensure_ascii=False, indent=2),
+                                 encoding="utf-8")
+    except Exception as e:
+        print(f"[fpdf] 警告：原图提取失败（{type(e).__name__}: {str(e)[:120]}），"
+              f"用 MinerU 裁切图", file=sys.stderr)
+
     # 版式推断：用 MinerU 版面树的页宽（更贴合其 bbox 坐标系），回落 pymupdf
     widths = meta["widths"] or [0]
     page_w = max(set(widths), key=widths.count) if widths else 0
