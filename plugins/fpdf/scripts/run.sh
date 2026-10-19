@@ -16,7 +16,7 @@ ok()   { printf '\033[32m✓\033[0m %s\n' "$*" >&2; }
 bad()  { printf '\033[31m✗\033[0m %s\n' "$*" >&2; }
 info() { printf '\033[36m→\033[0m %s\n' "$*" >&2; }
 
-SRC=""; WORD=0; TRANS=0; TITLE=""; PARENT=""; SLUG=""; COLUMNS="flow"
+SRC=""; WORD=0; TRANS=0; TITLE=""; PARENT=""; SLUG=""; COLUMNS="flow"; KEEPREFS=0
 while [ $# -gt 0 ]; do
     case "$1" in
         --word)    WORD=1 ;;
@@ -25,6 +25,7 @@ while [ $# -gt 0 ]; do
         --parent)  PARENT="$2"; shift ;;
         --slug)    SLUG="$2"; shift ;;
         --columns) COLUMNS="$2"; shift ;;
+        --keep-refs) KEEPREFS=1 ;;
         -*)        bad "未知参数 $1"; exit 2 ;;
         *)         SRC="$1" ;;
     esac
@@ -86,8 +87,9 @@ ok "解析完成：$ITEMS 条结构条目"
 # --- 2. 渲染 XML（先原文；若 --trans 再产译文 XML）---
 info "[2/4] 渲染 DocxXML..."
 PAGE_TITLE="${TITLE:-$SLUG}"
+KEEP_ARG=(); [ "$KEEPREFS" = "1" ] && KEEP_ARG=(--keep-refs)
 ( cd "$WORKDIR" && python3 "$HERE/render.py" "$SLUG" --workdir . --title "$PAGE_TITLE" \
-    --columns "$COLUMNS" --out "$WORKDIR/$SLUG.xml" ) 2>&1 | grep -v '^$' >&2 || true
+    --columns "$COLUMNS" "${KEEP_ARG[@]}" --out "$WORKDIR/$SLUG.xml" ) 2>&1 | grep -v '^$' >&2 || true
 [ -s "$WORKDIR/$SLUG.xml" ] || { bad "渲染失败"; exit 1; }
 ok "渲染完成：$(wc -c <"$WORKDIR/$SLUG.xml") 字符"
 
@@ -99,7 +101,7 @@ if [ "$TRANS" = "1" ]; then
         TRANS_MAP="$(tail -1 "$WORKDIR/.trans.out" | python3 -c "import json,sys; print(json.load(sys.stdin).get('trans_map',''))" 2>/dev/null)"
         ( cd "$WORKDIR" && python3 "$HERE/render.py" "$SLUG" --workdir . \
             --title "$PAGE_TITLE（译文）" --translate-map "$TRANS_MAP" \
-            --columns "$COLUMNS" --out "$WORKDIR/$SLUG.zh.xml" ) 2>&1 | grep -v '^$' >&2 || true
+            --columns "$COLUMNS" "${KEEP_ARG[@]}" --out "$WORKDIR/$SLUG.zh.xml" ) 2>&1 | grep -v '^$' >&2 || true
         [ -s "$WORKDIR/$SLUG.zh.xml" ] && { TRANS_XML="$WORKDIR/$SLUG.zh.xml"; ok "译文版渲染完成"; } \
             || bad "译文版渲染失败"
     else
