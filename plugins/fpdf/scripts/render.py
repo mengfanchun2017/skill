@@ -316,7 +316,8 @@ def render_v2(pages, images_dir, translate=None, keep_refs=False, rel_prefix="im
     return "\n".join(x for x in out if x)
 
 
-def render_v2_grid(pages, images_dir, translate=None, keep_refs=False, rel_prefix="images"):
+def render_v2_grid(pages, images_dir, translate=None, keep_refs=False, rel_prefix="images",
+                   fig_resolve=None):
     """v2 + 按页左右分栏。只对**真双栏页**分栏，单栏页（标题页/跨栏图页）走顺序流。
 
     判据不是"有条目在中间"，而是看 x0 是否显著双峰：真双栏页的正文左边界聚成
@@ -324,10 +325,11 @@ def render_v2_grid(pages, images_dir, translate=None, keep_refs=False, rel_prefi
     至少 2 条，且簇间距 > 页宽 25%」判定，避免把单栏标题页误切两半。
     """
     out = []
-    for pg in pages:
+    for pgi, pg in enumerate(pages):
         body = [e for e in pg if e.get("type") in
                 ("paragraph", "title", "table", "image", "chart", "list") and e.get("bbox")]
-        flat = lambda p: render_v2([p], images_dir, translate, keep_refs, rel_prefix) \
+        flat = lambda p: render_v2([p], images_dir, translate, keep_refs, rel_prefix,
+                                   fig_resolve) \
             .replace("<title>__title__</title>", "")
         if len(body) < 4:
             out.append(flat(pg))
