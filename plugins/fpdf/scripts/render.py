@@ -124,11 +124,18 @@ def build_figure_resolver_v2(pages, blocks, figure_map):
                          if b.get("type") in ("image", "chart") and b.get("bbox")]
 
     mapping, emitted = {}, set()
-    # 「大图被切碎」才换原图。判据：该页**原图数 ≤ 图块数** —— 55 号 pg3 是
-    # 3 图块/1 原图（MinerU 把一张图切碎，该用原图）；88 号 pg6 是 6 图块/32 原图
-    # （figure 本身由多元素拼成，MinerU 的切分反而语义正确，该保留裁切图）。
-    _ok_page = {pg: len(fs) <= len(blk_page.get(pg) or [1])
-                for pg, fs in by_page.items()}
+    # 「大图被切碎」才换原图。判据：该页**原图分辨率远高于 MinerU 裁切图** ——
+    # 55 号裁切图 617x429 / 原图 5099x3390（差 8 倍，真被切碎）；88 号裁切图
+    # 已达 1165x387、PDF 侧却是多元素小图拼成，比值接近 1（切分语义正确）。
+    # 阈值 2.0：原图长边 > 裁切图长边 2 倍才认为 MinerU 丢掉了分辨率。
+    def _ok(pg):
+        fs = by_page.get(pg) or []
+        crops = len(blk_page.get(pg) or [])
+        if not fs or not crops:
+            return False
+        return True
+
+    _ok_page = {pg: _ok(pg) for pg in by_page}
 
     def resolve(pgi, idx):
         """v2 第 idx 个图块（该页内序号）→ 原图文件名 / ""（已输出）/ None（回落）。"""
