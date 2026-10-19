@@ -434,7 +434,9 @@ def render_v2(pages, images_dir, translate=None, keep_refs=False, rel_prefix="im
                 src = (c.get("image_source") or {}).get("path")
             if not src:
                 return ""
-            local = Path(images_dir).parent / src
+            # MinerU 的 src 形如 "images/x.jpg"（含目录），原图文件名是裸名 —— 两者
+            # 都落在 images_dir 下，故统一取 basename 再拼 images_dir
+            local = Path(images_dir) / Path(src).name
             if not local.exists():
                 return ""
             caps = [x.get("content", "") for x in (c.get("image_caption")
