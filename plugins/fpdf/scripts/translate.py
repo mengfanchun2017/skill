@@ -56,30 +56,36 @@ def current_preset_name():
         return ""
 
 
-def call_llm(cfg, prompt, max_tokens=32000):
+def call_llm(cfg, prompt, max_tokens=None):
     """走 Anthropic Messages 协议。
 
     实测本机 bridge(8898) 只暴露 /v1/messages（Anthropic 格式），POST
     /v1/chat/completions 返回 404 —— bridge 把内网 OpenAI 上游转成 Anthropic 给
     Claude 用，不反向暴露 OpenAI 面。所以这里也说 Anthropic 格式。
 
-    max_tokens 给足 32000：上游 DeepSeek 是推理模型，thinking 块先占预算，
-    8000 时整批 30 段全被 thinking 吃光、stop_reason=max_tokens、正文 0 字符
-    （实测 n=10 也如此）。thinking 开关经 bridge 传 {"type":"disabled"} 无效。
+    思考预算：上游 DeepSeek 是推理模型，thinking 先占 max_tokens 预算，
+    8000 时整批 30 段全被 thinking 吃光、stop_reason=max_tokens、正文 0 字符。
+    与 transliter 对齐（translate-config.sh: MAX_TOKENS=100000 + LLM_THINKING=disabled）：
+    预算给到 100000 + 显式传 thinking.disabled。注意本机 bridge 只对
+    enabled/adaptive 做转发（openai_bridge.py 的 thinking 分支），disabled 落到
+    bridge 里被忽略、不会传给上游网关 —— 所以真正兜底是「换非推理模型 + 拆批重试」。
     """
+    if max_tokens is None:
+        max_tokens = int(os.environ.get("FPDF_MAX_TOKENS", "100000"))
     url = f"{BRIDGE}/v1/messages" if cfg.get("use_bridge") else \
         cfg["base_url"].rstrip("/") + "/v1/messages"
     body = json.dumps({
         "model": cfg["model"],
         "max_tokens": max_tokens,
         "temperature": 0.2,
+        "thinking": {"type": "disabled"},
         "messages": [{"role": "user", "content": prompt}],
     }).encode()
     hdrs = {"Content-Type": "application/json", "anthropic-version": "2023-06-01"}
     if not cfg.get("use_bridge"):
         hdrs["x-api-key"] = cfg["key"]
     req = urllib.request.Request(url, data=body, headers=hdrs)
-    with urllib.request.urlopen(req, timeout=300) as r:
+    with urllib.request.urlopen(req, timeout=600) as r:
         d = json.loads(r.read())
     parts = [b.get("text", "") for b in d.get("content", []) if b.get("type") == "text"]
     return "".join(parts)
@@ -129,6 +135,19 @@ def main():
 
     lang = {"zh": "中文", "en": "English"}[args.target]
     result = {}
+    # 模型兜底链：当前 preset（可能是推理模型，思考会吃满预算）失效时切到非推理模型。
+    # 实测 officeds41flash(deepseek-v4.1-flash) 30 段整批 thinking 吃光 8000 预算、
+    # 正文 0 字符；而 deepseek-v4-flash 是同一网关的非推理版（reasoning_tokens=0），
+    # 同样 30 段 mt=8000 稳定出 29-30 段。默认链 = 当前 preset → 非推理副本。
+    candidates = [cfg]
+    for alt in (os.environ.get("FPDF_FALLBACK_PRESETS", "officedsflash,homedsflash,deepseek41flash")
+                .split(",")):
+        alt = alt.strip()
+        if alt and alt != preset:
+            c = load_preset(alt)
+            if c and c.get("base_url"):
+                candidates.append(c)
+    cur = {"cfg": cfg}
 
     def build_prompt(batch):
         numbered = "\n".join(f"<<<{j}>>>{t}" for j, t in enumerate(batch))
@@ -141,19 +160,7 @@ def main():
             f"4. 只输出译文，不要任何解释或前后缀。\n\n{numbered}"
         )
 
-    def translate_batch(batch, depth=0):
-        """返回 {段落: 译文}。输出缺失过半视为被 max_tokens 截断 → 拆半递归。
-
-        上游是推理模型，thinking 块先占 max_tokens 预算；整批一次发时
-        thinking 可能吃满预算、正文 0 字符（实测 max_tokens=8000 时 30 段全空，
-        32000 时正常）。拆半是兜底：预算不足时缩小输入而非容忍空白译文。
-        """
-        pad = "  " * depth
-        try:
-            resp = call_llm(cfg, build_prompt(batch))
-        except Exception as e:
-            print(f"ERROR: 翻译调用失败: {type(e).__name__}: {str(e)[:300]}", file=sys.stderr)
-            sys.exit(1)
+    def _parse(resp):
         parts = re.split(r"<<<(\d+)>>>", resp)
         got = {}
         for k in range(1, len(parts), 2):
@@ -161,14 +168,42 @@ def main():
                 got[int(parts[k])] = parts[k + 1].strip()
             except (IndexError, ValueError):
                 pass
-        print(f"{pad}[fpdf] {len(batch)} 段 → {len(got)} 段译文", file=sys.stderr)
-        if len(got) < len(batch) / 2 and len(batch) > 1:
-            print(f"{pad}[fpdf] 输出缺失过半，拆半重试", file=sys.stderr)
+        return got
+
+    def translate_batch(batch, depth=0):
+        """返回 {段落: 译文}。输出缺失过半视为预算被 thinking 吃光 → 拆半递归；
+        仍全空则整条链换下一个模型重试该批。
+
+        实测 max_tokens 给到 32k 时推理模型能出全 30 段，但耗时和 token 都翻倍，
+        且模型档位会变 —— 所以拆半 + 换非推理模型比单纯加大预算更省。
+        """
+        pad = "  " * depth
+        last = {}
+        for idx, c in enumerate(candidates):
+            try:
+                resp = call_llm(c, build_prompt(batch))
+            except Exception as e:
+                print(f"{pad}[fpdf] {c['name']} 调用失败: {type(e).__name__}: {str(e)[:160]}",
+                      file=sys.stderr)
+                continue
+            got = _parse(resp)
+            if len(got) > len(last):
+                last = got
+            print(f"{pad}[fpdf] {c['name']}: {len(batch)} 段 → {len(got)} 段译文", file=sys.stderr)
+            if len(got) >= len(batch) / 2:
+                cur["cfg"] = c
+                return {orig: got.get(j, "") for j, orig in enumerate(batch)}
+            if idx + 1 < len(candidates):
+                print(f"{pad}[fpdf] 输出缺失过半（疑 thinking 吃光预算），换下一个模型",
+                      file=sys.stderr)
+        # 全链都没拿到一半：拆半继续（batch==1 时接受最后一次的产出）
+        if len(batch) > 1:
+            print(f"{pad}[fpdf] 所有模型均缺失，拆半重试", file=sys.stderr)
             half = (len(batch) + 1) // 2
             out = translate_batch(batch[:half], depth + 1)
             out.update(translate_batch(batch[half:], depth + 1))
             return out
-        return {orig: got.get(j, "") for j, orig in enumerate(batch)}
+        return {orig: last.get(0, "") for orig in batch}
 
     for bi, batch in enumerate(
             [texts[i:i + args.batch_size] for i in range(0, len(texts), args.batch_size)]):

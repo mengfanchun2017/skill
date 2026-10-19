@@ -34,13 +34,27 @@ def _is_script_content(x):
 
     MinerU 有两类 sup：真角标（作者单位 "1,2"、"a"、"†"）和误判 —— 图注整段
     被逐词包成上标（实测 <sup>Figure</sup> <sup>1.</sup> <sup>Suppression</sup>
-    <sup>of</sup> …）。后者按 latex 渲染会整行缩小，必须还原成普通文本。
-    判据：短（≤8 字符）且不含空格、不是纯英文单词。
+    <sup>of</sup> …）。后者按 latex 渲染会让整行缩成上标，必须还原成普通文本。
+    判据：短（≤8 字符）、不含空格、且不是英文单词（真角标是数字/符号/单字母）。
     """
     x = x.strip()
     if not x or len(x) > 8 or " " in x:
         return False
-    return not re.fullmatch(r"[A-Za-z]{3,}", x)
+    return not re.fullmatch(r"[A-Za-z]{2,}\.?", x)
+
+
+def _false_positive_run(text):
+    """整段被逐词包成 sup 的情况（图注误判）→ 返回 True。
+
+    单看一个 <sup>of</sup> 和真角标难分；但 MinerU 的误判是**连成一串**的
+    （图注每个词一个 sup，实测 88 号有 226 个）。一段里出现 ≥3 个 sup 且多数
+    内容是英文单词，就是整段误判 —— 此时全部还原成普通文本，一个都不当角标。
+    """
+    found = _SUP_OR_SUB.findall(text)
+    if len(found) < 3:
+        return False
+    words = sum(1 for _, c in found if re.fullmatch(r"[A-Za-z]{2,}\.?", c.strip()))
+    return words >= len(found) * 0.5
 
 
 def esc(t):
@@ -51,10 +65,11 @@ def esc(t):
     会把它变成可见的 &lt;sup&gt;1&lt;/sup&gt; 字面量（用户实测"大量 sup 裸露"）。
     """
     s = str(t)
+    bad_run = _false_positive_run(s)
     s = _SUP_OR_SUB.sub(
         lambda m: (f"<latex>^{{{m.group(2)}}}</latex>" if m.group(1).lower() == "sup"
                    else f"<latex>_{{{m.group(2)}}}</latex>")
-        if _is_script_content(m.group(2)) else m.group(2),
+        if not bad_run and _is_script_content(m.group(2)) else m.group(2),
         s)
     # 只转义剩余文本：占位已生成的 <latex> 段，避免它的尖括号被转义
     parts = re.split(r"(<latex>.*?</latex>)", s, flags=re.S)
