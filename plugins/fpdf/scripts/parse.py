@@ -187,16 +187,13 @@ def main():
     # 行内公式只能以 $...$ 裸文留在正文里（实测 55 号 4 处、88 号 54 处）。
     v2_path = outdir / f"{slug}.content_list_v2.json"
     html_path = outdir / f"{slug}.html"
-    units_path = outdir / f"{slug}.layout.json"
+    blocks_path = outdir / f"{slug}.blocks.json"
     n_v2 = 0
     try:
         if getattr(result, "_zip_bytes", None):
-            raw = outdir / f"{slug}.zip"
-            raw.write_bytes(result._zip_bytes)
             import zipfile, io as _io
             with zipfile.ZipFile(_io.BytesIO(result._zip_bytes)) as zf:
-                names = zf.namelist()
-                for n in names:
+                for n in zf.namelist():
                     base = Path(n).name
                     if base.endswith("_content_list_v2.json") and n_v2 == 0:
                         data = json.loads(zf.read(n))
@@ -204,7 +201,7 @@ def main():
                                            encoding="utf-8")
                         n_v2 = sum(len(pg) for pg in data) if isinstance(data, list) else 0
                     elif base == "layout.json":
-                        units_path.write_text(zf.read(n).decode("utf-8"), encoding="utf-8")
+                        blocks_path.write_text(zf.read(n).decode("utf-8"), encoding="utf-8")
                     elif base.endswith(".html"):
                         html_path.write_text(zf.read(n).decode("utf-8"), encoding="utf-8")
             if not n_v2:
@@ -213,9 +210,17 @@ def main():
         print(f"[fpdf] 警告：全量产物提取失败（{type(e).__name__}: {str(e)[:120]}），"
               f"回落到 v1 content_list", file=sys.stderr)
 
-    # 版式推断：优先用 MinerU 版面树的 page_size，回落 pymupdf
+    # 版式推断：用 MinerU 版面树的页宽（更贴合其 bbox 坐标系），回落 pymupdf
     widths = meta["widths"] or [0]
     page_w = max(set(widths), key=widths.count) if widths else 0
+    if blocks_path.exists():
+        try:
+            pi = json.loads(blocks_path.read_text(encoding="utf-8")).get("pdf_info") or []
+            sizes = [p.get("page_size", [0, 0])[0] for p in pi if p.get("page_size")]
+            if sizes:
+                page_w = max(set(sizes), key=sizes.count)
+        except Exception:
+            pass
     cols = detect_columns(cl, page_w) if cl else {}
 
     from collections import Counter
@@ -226,12 +231,14 @@ def main():
         "chars": len(md), "items": len(cl), "images": len(saved),
         "item_types": types, "parse_seconds": round(time.time() - t0, 1),
         "parsed_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+        "has_v2": bool(n_v2), "v2_items": n_v2,
+        "has_html": html_path.exists(), "has_blocks": blocks_path.exists(),
     }, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    print(f"[fpdf] done tier={tier} chars={len(md)} items={len(cl)} images={len(saved)} "
-          f"cols_pages={sum(1 for v in cols.values() if v > 1)}/{len(cols)} "
+    print(f"[fpdf] done tier={tier} chars={len(md)} items={len(cl)} v2={n_v2} "
+          f"images={len(saved)} cols_pages={sum(1 for v in cols.values() if v > 1)}/{len(cols)} "
           f"{time.time() - t0:.0f}s", file=sys.stderr)
-    print(json.dumps({"slug": slug, "outdir": str(outdir), "items": len(cl),
+    print(json.dumps({"slug": slug, "outdir": str(outdir), "items": len(cl), "v2_items": n_v2,
                       "images": len(saved), "multi_col_pages":
                       sorted(p for p, v in cols.items() if v > 1)},
                      ensure_ascii=False))
