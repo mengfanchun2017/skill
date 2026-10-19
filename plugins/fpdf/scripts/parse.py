@@ -253,7 +253,6 @@ def main():
                         1 for b in mb
                         if (min(fb[2], b["bbox"][2]) - max(fb[0], b["bbox"][0])) > 0
                         and (min(fb[3], b["bbox"][3]) - max(fb[1], b["bbox"][1])) > 0)
-            doc[pgi] = doc[pgi]
             figures.extend(page_figs)
         doc.close()
         if figures:
