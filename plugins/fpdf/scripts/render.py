@@ -124,12 +124,17 @@ def build_figure_resolver_v2(pages, blocks, figure_map):
                          if b.get("type") in ("image", "chart") and b.get("bbox")]
 
     mapping, emitted = {}, set()
+    # 「大图被切碎」才换原图。判据：该页原图数 ≥ 图块数的一半 —— 55 号 pg3 是
+    # 3 图块/1 原图（真碎片），88 号 pg6 是 6 图块/32 原图（figure 本身由多元素
+    # 拼成，MinerU 的切分反而语义正确），后者一律回落裁切图。
+    _ok_page = {pg: (len(fs) >= max(1, len(blk_page.get(pg) or [1])) / 2)
+                for pg, fs in by_page.items()}
 
     def resolve(pgi, idx):
         """v2 第 idx 个图块（该页内序号）→ 原图文件名 / ""（已输出）/ None（回落）。"""
         figs = by_page.get(pgi) or []
         bl = blk_page.get(pgi) or []
-        if not figs or idx >= len(bl):
+        if not figs or idx >= len(bl) or not _ok_page.get(pgi):
             return None
         bbox = bl[idx]
         best, best_ov = None, 0.0
