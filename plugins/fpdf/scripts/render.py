@@ -302,10 +302,10 @@ def _bold_labels(html, labels=_FRONT_LABELS):
         if lab in ("OPEN ACCESS", "开放获取"):
             # 篇幅短、独立成段，整段加粗
             html = re.sub(r"<p>\s*(OPEN\s*ACCESS|开放获取)\s*</p>", r"<p><b>\1</b></p>", html)
-        elif lab.startswith("*"):
-            html = html.replace(lab, f"<b>{lab}</b>")
         else:
-            html = html.replace(lab, f"<b>{lab}</b>")
+            # 只加粗**段首**出现的标签（元信息段都是 "<p>标签: 值</p>"），
+            # 避免 "引用：" 这类词在正文中段被误加粗
+            html = re.sub(r"<p>(\s*)" + re.escape(lab), r"<p>\1<b>" + lab + "</b>", html)
     return html
 
 
