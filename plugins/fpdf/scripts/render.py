@@ -141,6 +141,130 @@ def image_xml(item, images_dir, rel_prefix="images"):
     return f'<img path="@./{rel_prefix}/{Path(p).name}"{cap}/>'
 
 
+def _inline_v2(fragments, translate=None):
+    """把 v2 的内联片段数组渲染成飞书行内 XML。
+
+    v2 的段落是 fragment 列表：text / equation_inline / 其它。行内公式必须
+    转成 <latex>，否则会以 "$2 5 ^ { \\circ } \\mathrm { C }$" 裸文出现
+    （v1 content_list 完全没有 equation 条目 —— 实测 55 号 4 处、88 号 54 处）。
+    """
+    out = []
+    for f in fragments or []:
+        if not isinstance(f, dict):
+            continue
+        ft = f.get("type")
+        c = f.get("content", "")
+        if ft == "equation_inline":
+            body = c.strip()
+            if body.startswith("$") and body.endswith("$"):
+                body = body[1:-1].strip()
+            out.append(f"<latex>{body}</latex>")
+        else:
+            txt = translate(c) if translate else c
+            out.append(esc(txt))
+    return "".join(out)
+
+
+_V2_TEXT_KEYS = {
+    "paragraph": "paragraph_content", "title": "title_content",
+    "page_header": "page_header_content", "page_footer": "page_footer_content",
+    "page_number": "page_number_content", "aside_text": "aside_text_content",
+}
+
+
+def render_v2(pages, images_dir, translate=None, keep_refs=False, rel_prefix="images"):
+    """用 content_list_v2 渲染（含行内公式、list、图片/表格）。
+
+    v2 按页组织成块列表，天然带版面顺序；公式作为 equation_inline 片段保留，
+    参考文献是 list(reference_list) 而不是散落的 ref_text。
+    """
+    out = [f"<title>{esc(translate('__title__') if translate else '__title__')}</title>"]
+    seen_levels = set()
+
+    def block_xml(e, in_grid=False):
+        t = e.get("type")
+        c = e.get("content") or {}
+        if t in ("page_header", "page_footer", "page_number"):
+            return ""
+        if t in _V2_TEXT_KEYS:
+            frags = c.get(_V2_TEXT_KEYS[t]) or []
+            html = _inline_v2(frags, translate)
+            if not html.strip():
+                return ""
+            if t == "title":
+                lvl = c.get("level") or 2
+                txt_plain = re.sub(r"<[^>]+>", "", html)
+                lvl = _heading_level({"text_level": lvl, "text": txt_plain}, seen_levels) or 2
+                return f"<h{lvl}>{html}</h{lvl}>"
+            return f"<p>{html}</p>"
+        if t == "list":
+            items = c.get("list_items") or []
+            is_ref = c.get("list_type") == "reference_list"
+            if is_ref and not keep_refs:
+                return ""
+            lis = []
+            for it in items:
+                inner = _inline_v2(it.get("item_content") or [], translate)
+                if inner.strip():
+                    lis.append(f"<li>{inner}</li>")
+            if not lis:
+                return ""
+            return "<ol>" + "".join(lis) + "</ol>" if is_ref else "<ul>" + "".join(lis) + "</ul>"
+        if t == "table":
+            caps = [x.get("content", "") for x in (c.get("table_caption") or [])]
+            body = table_xml(c.get("html"), caps)
+            return body
+        if t in ("image", "chart"):
+            src = (c.get("image_source") or {}).get("path")
+            if not src:
+                return ""
+            local = Path(images_dir).parent / src
+            if not local.exists():
+                return ""
+            caps = [x.get("content", "") for x in (c.get("image_caption")
+                                                   or c.get("chart_caption") or [])]
+            cap = f' caption="{esc(" ".join(caps))}"' if caps else ""
+            img = f'<img path="@./{rel_prefix}/{Path(src).name}"{cap}/>'
+            return img
+        return ""
+
+    for pg in pages:
+        body_blocks = [e for e in pg if e.get("type") not in
+                       ("page_header", "page_footer", "page_number")]
+        for e in body_blocks:
+            x = block_xml(e)
+            if x:
+                out.append(x)
+    return "\n".join(x for x in out if x)
+
+
+def render_v2_grid(pages, images_dir, translate=None, keep_refs=False, rel_prefix="images"):
+    """v2 + 按页左右分栏（用 bbox 左边界中位数分界）。"""
+    out = []
+    for pg in pages:
+        body = [e for e in pg if e.get("type") in
+                ("paragraph", "title", "table", "image", "chart", "list") and e.get("bbox")]
+        if len(body) < 3:
+            out.append(render_v2([pg], images_dir, translate, keep_refs, rel_prefix)
+                       .replace("<title>__title__</title>", ""))
+            continue
+        x0s = sorted(e["bbox"][0] for e in body)
+        mid = x0s[len(x0s) // 2]
+        left = [e for e in pg if not e.get("bbox") or e["bbox"][0] < mid]
+        right = [e for e in pg if e.get("bbox") and e["bbox"][0] >= mid]
+        if not left or not right:
+            out.append(render_v2([pg], images_dir, translate, keep_refs, rel_prefix)
+                       .replace("<title>__title__</title>", ""))
+            continue
+        lx = render_v2([left], images_dir, translate, keep_refs, rel_prefix) \
+            .replace("<title>__title__</title>", "")
+        rx = render_v2([right], images_dir, translate, keep_refs, rel_prefix) \
+            .replace("<title>__title__</title>", "")
+        out.append(f'<grid><column width-ratio="0.5">{lx}</column>'
+                   f'<column width-ratio="0.5">{rx}</column></grid>')
+    return "\n".join(x for x in out if x)
+
+
 def _heading_level(item, seen_levels):
     """修正 MinerU 的标题层级。
 
