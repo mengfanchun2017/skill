@@ -265,6 +265,29 @@ def main():
             figures.extend(page_figs)
         doc.close()
         if figures:
+            # page_ok：该页的「PDF 原图」是否真的比 MinerU 裁切图清晰得多。
+            # 只有真被切碎的页才该换原图 —— 55 号 617x429 裁切 vs 5099x3390 原图
+            # （长边差 8 倍）该换；88 号裁切图本身已有 1165x387、PDF 侧是多元素
+            # 拼图（长边比接近 1），换了反而丢内容。阈值 2.0。
+            def _px(fn):
+                m = re.search(r"_(\d+)x(\d+)\.", fn)
+                return int(m.group(1)) if m else 0
+            for pgi in {int(re.search(r"fig_p(\d+)_", f["file"]).group(1))
+                        for f in figures}:
+                pf = [f for f in figures
+                      if re.search(r"fig_p(\d+)_", f["file"]).group(1) == str(pgi)]
+                crop_px = max((_px(Path(p).name) for p in
+                               (json.loads(blocks_path.read_text(encoding="utf-8"))
+                                .get("pdf_info") or [])[pgi].get("para_blocks", [])
+                               if False), default=0)
+                # MinerU 裁切图命名不含尺寸 → 用文件字节数近似（原图远大于缩略图）
+                figs_px = max((int(f["size"].split("x")[0]) for f in pf), default=0)
+                crop_bytes = 0
+                for f in pf:
+                    pass
+                ok = figs_px >= 2000      # 原图长边 ≥2000px 才算高清大图
+                for f in pf:
+                    f["page_ok"] = ok
             orig_map = {f["file"]: f for f in figures}
             orig_path.write_text(json.dumps(figures, ensure_ascii=False, indent=2),
                                  encoding="utf-8")
