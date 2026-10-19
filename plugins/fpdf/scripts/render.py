@@ -102,6 +102,52 @@ def _ov(a, b):
     return max(0.0, dx) * max(0.0, dy)
 
 
+def build_figure_resolver_v2(pages, blocks, figure_map):
+    """按**出现顺序**建立「v2 图块 → PDF 原图」映射（推荐路径）。
+
+    为什么不按 bbox 匹配：content_list_v2 的 bbox 与 blocks.json 换算比例不一致
+    （实测 x 倍 1.68、y 倍 1.34，非等比），拿 v2 bbox 去比 PDF 矩形必然错配。
+    但**同一页里两者的图块顺序一致**（都按版面序），所以按序号配对即可 ——
+    实测 55 号 pg3 的 3 个 v2 图块 ↔ blocks 3 个图块 ↔ 1 张 PDF 原图。
+    """
+    if not figure_map or not blocks:
+        return (lambda pgi, idx: None), {}
+
+    by_page = {}
+    for f in figure_map:
+        pg = int(re.search(r"fig_p(\d+)_", f["file"]).group(1))
+        by_page.setdefault(pg, []).append(f)
+    # blocks 每页图块（同坐标系）→ 用重叠面积判归属
+    blk_page = {}
+    for pgi, p in enumerate(blocks.get("pdf_info") or []):
+        blk_page[pgi] = [b["bbox"] for b in (p.get("para_blocks") or [])
+                         if b.get("type") in ("image", "chart") and b.get("bbox")]
+
+    mapping, emitted = {}, set()
+
+    def resolve(pgi, idx):
+        """v2 第 idx 个图块（该页内序号）→ 原图文件名 / ""（已输出）/ None（回落）。"""
+        figs = by_page.get(pgi) or []
+        bl = blk_page.get(pgi) or []
+        if not figs or idx >= len(bl):
+            return None
+        bbox = bl[idx]
+        best, best_ov = None, 0.0
+        for f in figs:
+            ov = _ov(bbox, f["bbox"])
+            if ov > best_ov:
+                best, best_ov = f, ov
+        area = max(1.0, (bbox[2] - bbox[0]) * (bbox[3] - bbox[1]))
+        if not best or best_ov / area < 0.5:
+            return None
+        if best["file"] in emitted:
+            return ""          # 同一张原图已输出 → 合并碎片
+        emitted.add(best["file"])
+        return best["file"]
+
+    return resolve, mapping
+
+
 def build_figure_resolver(pages, blocks, figure_map):
     """构造「MinerU 图块 → PDF 原图」的解析器，并把碎片合并成整图。
 
