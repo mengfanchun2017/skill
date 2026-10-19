@@ -424,8 +424,9 @@ def render_v2(pages, images_dir, translate=None, keep_refs=False, rel_prefix="im
             return body
         if t in ("image", "chart"):
             src = None
-            if fig_resolve and e.get("bbox"):
-                r = fig_resolve(pgi, e["bbox"])
+            if fig_resolve:
+                r = fig_resolve(pgi, figidx[0])
+                figidx[0] += 1
                 if r == "":
                     return ""          # 同张原图已输出过（碎片合并）
                 src = r
