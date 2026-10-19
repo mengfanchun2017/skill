@@ -650,7 +650,7 @@ def main():
 
     title = args.title or tmap.get("__title__") or args.slug
     # 原图解析器：把一页里被 MinerU 切碎的多个图块合并回 PDF 的那张完整大图
-    fig_resolve, _ = build_figure_resolver(v2, pkg["blocks"], pkg["figure_map"])
+    fig_resolve, _ = build_figure_resolver_v2(v2, pkg["blocks"], pkg["figure_map"])
     if use_v2:
         fn = render_v2_grid if args.columns == "grid" else render_v2
         body = fn(v2, pkg["images_dir"], translate=translate, keep_refs=args.keep_refs,
