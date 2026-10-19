@@ -228,21 +228,27 @@ def main():
             if blocks_path.exists() else []
         figures = []       # {page, pdf_bbox, file, size, keys:[(v2 block 坐标)]}
         for pgi, pg in enumerate(doc):
-            page_figs = []
+            page_figs, seen_xref = [], set()
             for x in pg.get_images(full=True):
                 xr = x[0]
+                if xr in seen_xref:          # 同一 xref 在一页可被重复引用
+                    continue
+                seen_xref.add(xr)
                 info = doc.extract_image(xr)
-                if info["width"] < 800:      # 小图标（Check for updates 等）跳过
+                w, h = info["width"], info["height"]
+                # 过滤装饰件：小图标（<800 宽）和极扁横条（标题下划线、表格框线，
+                # 实测 88 号 pg6 有 1456x30 这种）都不是 figure
+                if w < 800 or h < 200 or w / max(1, h) > 12:
                     continue
                 rects = pg.get_image_rects(xr)
                 if not rects:
                     continue
                 r = rects[0]
-                fn = f"fig_p{pgi}_{info['width']}x{info['height']}.{info['ext']}"
+                fn = f"fig_p{pgi}_x{xr}_{w}x{h}.{info['ext']}"
                 (outdir / "images" / fn).write_bytes(info["image"])
                 page_figs.append({"xref": xr, "file": fn,
                                   "bbox": [round(r.x0), round(r.y0), round(r.x1), round(r.y1)],
-                                  "size": f"{info['width']}x{info['height']}"})
+                                  "size": f"{w}x{h}"})
             # 版面树该页的图块（用于确认覆盖关系）
             if pgi < len(blocks):
                 mb = [b for b in (blocks[pgi].get("para_blocks") or [])
