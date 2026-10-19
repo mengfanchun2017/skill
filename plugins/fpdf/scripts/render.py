@@ -115,7 +115,7 @@ def build_figure_resolver(pages, blocks, figure_map):
     state 记录每个图块是否已被 emit（避免同图重复输出）。
     """
     if not figure_map or not blocks:
-        return (lambda blk: None), {"emitted": set()}
+        return (lambda pgi, bbox: None), {"emitted": set()}
     # 版面树按页收集图块 bbox（与 PDF 同坐标系）
     per_page = {}
     for pgi, p in enumerate(blocks.get("pdf_info") or []):
