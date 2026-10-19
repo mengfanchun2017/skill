@@ -230,6 +230,29 @@ _V2_TEXT_KEYS = {
 }
 
 
+# 论文首页的元信息标签（PDF 里用 Bold/BdIt 字体排的）→ 渲染时补 <b>
+_FRONT_LABELS = ("OPEN ACCESS", "Edited by:", "Reviewed by:", "*Correspondence:",
+                 "Specialty section:", "Received:", "Accepted:", "Published:",
+                 "Citation:", "Keywords:")
+
+
+def _bold_labels(html, labels=_FRONT_LABELS):
+    """给正文里的元信息标签加粗。
+
+    PDF 用 HelveticaNeue-Bd/BdIt 把 "Edited by:"、"Received:" 这类标签排成粗体，
+    MinerU 的 content_list 丢掉了字体信息 → 渲染出来全是细体。这里按标签名补
+    <b>。先处理长标签避免 "Received:" 与 "Accepted:" 的前缀互相干扰。
+    """
+    for lab in sorted(labels, key=len, reverse=True):
+        if lab == "OPEN ACCESS":
+            html = re.sub(r"(?<![\w>])(OPEN\s+ACCESS)(?![\w<])", r"<b>\1</b>", html)
+        elif lab.startswith("*Correspondence"):
+            html = html.replace("*Correspondence:", "<b>*Correspondence:</b>")
+        else:
+            html = html.replace(lab, f"<b>{lab}</b>")
+    return html
+
+
 def render_v2(pages, images_dir, translate=None, keep_refs=False, rel_prefix="images",
               fig_resolve=None, front_matter=True):
     """用 content_list_v2 渲染（含行内公式、list、图片/表格）。
@@ -239,10 +262,21 @@ def render_v2(pages, images_dir, translate=None, keep_refs=False, rel_prefix="im
 
     fig_resolve(page_idx, bbox) 由 build_figure_resolver 提供：返回 PDF 原图文件名
     （碎片合并后每张只出一次）、""（同图已出过）或 None（用 MinerU 裁切图）。
+    front_matter=True 时把首页「论文信息区」渲染成引用块，并在正文（INTRODUCTION）
+    前插一条分隔线 —— 用户要求：作者/OPEN ACCESS 等信息做引用，正文前加横线区分。
     """
     out = [f"<title>{esc(translate('__title__') if translate else '__title__')}</title>"]
     seen_levels = set()
-    declared_ref = {"seen": False}     # 参考文献编号起始（见下）
+    fm = {"in_front": bool(front_matter), "closed": not front_matter}
+
+    def _is_body_start(e):
+        """正文起点：首页第一个 level<=2 的 title（INTRODUCTION / 1. Introduction）。"""
+        if e.get("type") != "title":
+            return False
+        c = e.get("content") or {}
+        t = "".join(x.get("content", "") for x in (c.get("title_content") or [])
+                    if isinstance(x, dict)).strip()
+        return bool(re.match(r"^(?:\d+\.?\s*)?(INTRODUCTION|Introduction)\b", t))
 
     def block_xml(e, pgi):
         t = e.get("type")
