@@ -124,18 +124,15 @@ def build_figure_resolver_v2(pages, blocks, figure_map):
                          if b.get("type") in ("image", "chart") and b.get("bbox")]
 
     mapping, emitted = {}, set()
-    # 「大图被切碎」才换原图。判据：该页**原图分辨率远高于 MinerU 裁切图** ——
-    # 55 号裁切图 617x429 / 原图 5099x3390（差 8 倍，真被切碎）；88 号裁切图
-    # 已达 1165x387、PDF 侧却是多元素小图拼成，比值接近 1（切分语义正确）。
-    # 阈值 2.0：原图长边 > 裁切图长边 2 倍才认为 MinerU 丢掉了分辨率。
-    def _ok(pg):
-        fs = by_page.get(pg) or []
-        crops = len(blk_page.get(pg) or [])
-        if not fs or not crops:
-            return False
-        return True
-
-    _ok_page = {pg: _ok(pg) for pg in by_page}
+    # 「大图被切碎」才换原图 —— 判据由 parse.py 预先算好并写进 figure_map 的
+    # page_ok 字段（比较原图与 MinerU 裁切图的分辨率）。这里只读结果。
+    _ok_page = {}
+    for f in figure_map:
+        if "page_ok" in f:
+            pg = int(re.search(r"fig_p(\d+)_", f["file"]).group(1))
+            _ok_page[pg] = bool(f["page_ok"])
+    if not _ok_page:      # 老解析包没有该字段 → 全部按可用处理
+        _ok_page = {pg: True for pg in by_page}
 
     def resolve(pgi, idx):
         """v2 第 idx 个图块（该页内序号）→ 原图文件名 / ""（已输出）/ None（回落）。"""
