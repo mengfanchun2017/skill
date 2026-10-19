@@ -343,6 +343,10 @@ def render_v2(pages, images_dir, translate=None, keep_refs=False, rel_prefix="im
     for pgi, pg in enumerate(pages):
         body_blocks = [e for e in pg if e.get("type") not in
                        ("page_header", "page_footer", "page_number")]
+        # 参考文献的 list 块是「每条一段」切碎的（实测 55 号 69 条 = 69 个 list 块），
+        # 而且双栏页里左右栏的条目在数组里交错 —— 直接逐块输出会散成 69 个列表。
+        # 合并策略：同一个引用块（相邻 ≤2 块的间隙 + 同一栏 x0）的 list 归成一组。
+        groups = _group_lists(body_blocks)
         for e in body_blocks:
             # 正文起点：关掉引用块、插分隔线（论文信息区 → 正文 的分界）
             if fm["in_front"] and _is_body_start(e) and not fm["closed"]:
@@ -350,7 +354,11 @@ def render_v2(pages, images_dir, translate=None, keep_refs=False, rel_prefix="im
                 fm["in_front"] = False
                 out.append("</blockquote>")
                 out.append("<hr/>")
-            x = block_xml(e, pgi)
+            if e.get("type") == "list" and id(e) in groups:
+                g = groups.pop(id(e))
+                x = _list_block_xml(g, translate, keep_refs)
+            else:
+                x = block_xml(e, pgi)
             if not x:
                 continue
             if fm["in_front"] and e.get("type") == "paragraph":
