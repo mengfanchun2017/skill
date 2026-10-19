@@ -467,11 +467,6 @@ def render_v2(pages, images_dir, translate=None, keep_refs=False, rel_prefix="im
                 g = groups.pop(id(e), [e])
                 consumed.update(id(x) for x in g)
                 x = _list_block_xml(g, translate, keep_refs)
-                # 参考文献整篇是一个列表：本组若是引用区且下一页还有 list 块，
-                # 累积到 ref_buf，等引用区结束再一次性输出（避免 6 个断开的 ul）
-                if g and (g[0].get("content") or {}).get("list_type") == "reference_list":
-                    if id(e) == id(g[0]) or not ref_state["open"]:
-                        pass
             else:
                 x = block_xml(e, pgi, figidx)
             if not x:
