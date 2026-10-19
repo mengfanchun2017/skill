@@ -120,13 +120,35 @@ doc_index: []                  # 自动追加，勿手改
 
 ## 解析档位（决定能不能排版）
 
+走 **MinerU 云端 API**（`mineru.net/api/v4`，非本地包），Precision 档 `model=vlm`。
+
 | 档位 | 返回 | 用途 |
 |------|------|------|
 | **Flash**（免费，无 token） | 只有 markdown 纯文本，**无坐标无图片** | 只要文字时降级用 |
-| **Precision**（token） | markdown + `content_list`（每条带 bbox 坐标 + 表格 HTML + 图片） + 图片 | **默认**，排版必需 |
+| **Precision**（token） | markdown + `content_list` + `content_list_v2` + 图片 + 版面树 | **默认**，排版必需 |
 
 `/fpdf` 默认走 Precision —— 没有 bbox 就无法还原分栏、表格结构。
 Flash 档解析出的包 `content_list` 为空，render 会直接报错拒绝排版。
+
+### 两个 content_list：v1 与 v2（render 默认用 v2）
+
+MinerU 的结果 zip 里同时有 v1 和 v2 两份，**结构不同**：
+
+| | v1 `content_list.json` | v2 `content_list_v2.json` |
+|---|---|---|
+| 组织 | 全文档扁平数组 | **按页数组**（天然版面顺序） |
+| 行内公式 | ❌ 没有（以 `$...$` 混在正文里） | ✅ `equation_inline` 片段 |
+| 参考文献 | 散落 `ref_text` | `list` + `list_type: reference_list` |
+| 标题层级 | `text_level` | `title` + `level` |
+| 表格 | `table_body`（html 串） | `html` + `table_caption` + footnote |
+
+`render.py` 默认 `--source auto`：有 v2 用 v2，否则回落 v1。
+**v2 是解决行内公式裸露（`$25^{\circ}C$`）的关键** —— 实测 55 号 4 处、88 号 54 处
+公式在 v1 里是纯文本，v2 才还原成公式片段 → 渲染为 `<latex>`。
+
+解析同时落 `*.blocks.json`（MinerU 版面树，行级 span + 置信度）与 `*.html`（MathML），
+供后续更细的版式还原取用。这些都从结果 zip 里取 —— SDK 的 `ExtractResult`
+只暴露 v1 markdown/content_list/图片三样，不 `save_all` 就永远拿不到。
 
 ## 排版能力映射（PDF 结构 → 飞书块）
 
@@ -157,12 +179,19 @@ Flash 档解析出的包 `content_list` 为空，render 会直接报错拒绝排
 
 `render.py` 已把 MinerU 的 `table_body`（`<table><tr><td>`）规范化为上述结构并自动均分 822 列宽。
 
-## 分栏策略（默认不还原左右并排）
+## 分栏策略（`--columns`）
 
-论文类双栏 PDF 的「左右两栏」是**印刷版式**，在移动端优先的飞书文档里左右并排会挤成一团。
-因此 `render.py` **默认 `--columns flow`**：按原阅读顺序展开为单栏流，保留全部内容与层级。
+论文类双栏 PDF 的「左右两栏」是**印刷版式**。两种呈现各有取舍：
 
-确需左右对照时加 `--columns grid`：按 bbox 把每页条目分左右栏输出 `<grid>`。
+- `--columns flow`（**默认**）：按原阅读顺序展开为单栏流。移动端好读，但看不出原分栏。
+- `--columns grid`：按 bbox 把每页分左右栏输出 `<grid>`，还原 PDF 观感。**只对真双栏页生效** ——
+  单栏页（标题页/跨栏图页）仍走顺序流，判据是 x0 左边界双峰且两簇间距 > 页宽 25%
+  （只判"有条目在中间"会把单栏标题页误切两半）。
+
+## 参考文献（`--keep-refs`）
+
+`ref_text` / `reference_list` 默认**丢弃**（长文献表会淹没正文）。要完整结构加 `--keep-refs`，
+参考文献会渲染成有序列表（自动去掉条目自带的 `1.` 前缀，避免 `<ol>` 双重编号）。
 
 ## 翻译（--trans）
 
