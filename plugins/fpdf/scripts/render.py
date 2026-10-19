@@ -281,10 +281,14 @@ _V2_TEXT_KEYS = {
 }
 
 
-# 论文首页的元信息标签（PDF 里用 Bold/BdIt 字体排的）→ 渲染时补 <b>
+# 论文首页的元信息标签（PDF 里用 Bold/BdIt 字体排的）→ 渲染时补 <b>。
+# 译文版里这些标签被译成中文，故中英标签都要列 —— 否则译文版全部丢粗体
+# （实测译文 "编辑："/"关键词：" 匹配不上英文表，b=0）。
 _FRONT_LABELS = ("OPEN ACCESS", "Edited by:", "Reviewed by:", "*Correspondence:",
                  "Specialty section:", "Received:", "Accepted:", "Published:",
-                 "Citation:", "Keywords:")
+                 "Citation:", "Keywords:",
+                 "开放获取", "编辑：", "审稿人：", "*通讯作者：", "专业版块：",
+                 "收稿日期：", "接受日期：", "发表日期：", "引用：", "关键词：")
 
 
 def _bold_labels(html, labels=_FRONT_LABELS):
@@ -295,13 +299,11 @@ def _bold_labels(html, labels=_FRONT_LABELS):
     <b>。先处理长标签避免 "Received:" 与 "Accepted:" 的前缀互相干扰。
     """
     for lab in sorted(labels, key=len, reverse=True):
-        if lab == "OPEN ACCESS":
-            # 篇幅短、独立成段，直接整段加粗
-            html = re.sub(r"<p>\s*(OPEN\s*ACCESS)\s*</p>", r"<p><b>\1</b></p>", html)
-            html = re.sub(r"(?<![\w><])(OPEN\s+ACCESS)(?![\w<])",
-                          r"<b>\1</b>", html) if "<b>OPEN" not in html else html
-        elif lab.startswith("*Correspondence"):
-            html = html.replace("*Correspondence:", "<b>*Correspondence:</b>")
+        if lab in ("OPEN ACCESS", "开放获取"):
+            # 篇幅短、独立成段，整段加粗
+            html = re.sub(r"<p>\s*(OPEN\s*ACCESS|开放获取)\s*</p>", r"<p><b>\1</b></p>", html)
+        elif lab.startswith("*"):
+            html = html.replace(lab, f"<b>{lab}</b>")
         else:
             html = html.replace(lab, f"<b>{lab}</b>")
     return html
