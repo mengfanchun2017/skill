@@ -230,16 +230,21 @@ _V2_TEXT_KEYS = {
 }
 
 
-def render_v2(pages, images_dir, translate=None, keep_refs=False, rel_prefix="images"):
+def render_v2(pages, images_dir, translate=None, keep_refs=False, rel_prefix="images",
+              fig_resolve=None, front_matter=True):
     """用 content_list_v2 渲染（含行内公式、list、图片/表格）。
 
     v2 按页组织成块列表，天然带版面顺序；公式作为 equation_inline 片段保留，
     参考文献是 list(reference_list) 而不是散落的 ref_text。
+
+    fig_resolve(page_idx, bbox) 由 build_figure_resolver 提供：返回 PDF 原图文件名
+    （碎片合并后每张只出一次）、""（同图已出过）或 None（用 MinerU 裁切图）。
     """
     out = [f"<title>{esc(translate('__title__') if translate else '__title__')}</title>"]
     seen_levels = set()
+    declared_ref = {"seen": False}     # 参考文献编号起始（见下）
 
-    def block_xml(e, in_grid=False):
+    def block_xml(e, pgi):
         t = e.get("type")
         c = e.get("content") or {}
         if t in ("page_header", "page_footer", "page_number"):
@@ -260,23 +265,36 @@ def render_v2(pages, images_dir, translate=None, keep_refs=False, rel_prefix="im
             is_ref = c.get("list_type") == "reference_list"
             if is_ref and not keep_refs:
                 return ""
+            numbered = any(re.match(r"^\s*\d+[.)]\s", _inline_v2(
+                it.get("item_content") or [], None)) for it in items)
             lis = []
             for it in items:
                 inner = _inline_v2(it.get("item_content") or [], translate)
-                # 条目文本自带编号（"1. Jiang..."）→ 去掉，否则 <ol> 会自动再加
-                # 一层序号，渲染成 "1. 1. Jiang..."（实测飞书 seq-marker + 自带前缀）
-                inner = re.sub(r"^\s*\d+[.)]\s+", "", inner)
+                # 条目自带编号（"1. Jiang..."）时交给 <ol> 统一编号，去掉原文前缀
+                # 以免 "1. 1. Jiang"；源自带编号则保留（不加 <ol>，见下）
+                if numbered:
+                    inner = re.sub(r"^\s*\d+[.)]\s+", "", inner)
                 if inner.strip():
                     lis.append(f"<li>{inner}</li>")
             if not lis:
                 return ""
-            return "<ol>" + "".join(lis) + "</ol>" if is_ref else "<ul>" + "".join(lis) + "</ul>"
+            # 原文本来就带编号的（88 号 style）用 <ol> 自动编号；55 号式无编号文献
+            # 用 <ul> 保留悬挂缩进观感 —— 否则飞书会给原本无编号的文献强加 "1."
+            tag = "ol" if numbered else "ul"
+            return f"<{tag}>" + "".join(lis) + f"</{tag}>"
         if t == "table":
             caps = [x.get("content", "") for x in (c.get("table_caption") or [])]
             body = table_xml(c.get("html"), caps)
             return body
         if t in ("image", "chart"):
-            src = (c.get("image_source") or {}).get("path")
+            src = None
+            if fig_resolve and e.get("bbox"):
+                r = fig_resolve(pgi, e["bbox"])
+                if r == "":
+                    return ""          # 同张原图已输出过（碎片合并）
+                src = r
+            if not src:
+                src = (c.get("image_source") or {}).get("path")
             if not src:
                 return ""
             local = Path(images_dir).parent / src
@@ -285,15 +303,14 @@ def render_v2(pages, images_dir, translate=None, keep_refs=False, rel_prefix="im
             caps = [x.get("content", "") for x in (c.get("image_caption")
                                                    or c.get("chart_caption") or [])]
             cap = f' caption="{esc(" ".join(caps))}"' if caps else ""
-            img = f'<img path="@./{rel_prefix}/{Path(src).name}"{cap}/>'
-            return img
+            return f'<img path="@./{rel_prefix}/{Path(src).name}"{cap}/>'
         return ""
 
-    for pg in pages:
+    for pgi, pg in enumerate(pages):
         body_blocks = [e for e in pg if e.get("type") not in
                        ("page_header", "page_footer", "page_number")]
         for e in body_blocks:
-            x = block_xml(e)
+            x = block_xml(e, pgi)
             if x:
                 out.append(x)
     return "\n".join(x for x in out if x)
