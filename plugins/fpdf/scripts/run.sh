@@ -2,7 +2,7 @@
 # fpdf 编排器 — 一个 PDF 走完全链路，产出飞书文档（可选 Word 导出、译文版）。
 #
 # 用法（通常由 SKILL.md 的 AI 流程调用，不必手敲）：
-#   run.sh <pdf路径> [--word] [--trans] [--title T] [--parent TOKEN] [--slug S] [--columns flow|grid]
+#   run.sh <pdf路径> [--word] [--trans] [--title T] [--parent TOKEN] [--slug S] [--columns flow|grid] [--keep-refs]
 #
 # 设计：本脚本只做「确定性机械步骤」，判断类决策（标题、父文档、翻译）留在 SKILL.md。
 # 每一步打印可读进度到 stderr；最后一行 stdout 是 JSON 结果（机器可读）。
