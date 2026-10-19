@@ -380,7 +380,7 @@ def render_v2(pages, images_dir, translate=None, keep_refs=False, rel_prefix="im
                     if isinstance(x, dict)).strip()
         return bool(re.match(r"^(?:\d+\.?\s*)?(INTRODUCTION|Introduction)\b", t))
 
-    def block_xml(e, pgi):
+    def block_xml(e, pgi, figidx):
         t = e.get("type")
         c = e.get("content") or {}
         if t in ("page_header", "page_footer", "page_number"):
