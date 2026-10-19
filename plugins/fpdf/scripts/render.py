@@ -83,15 +83,69 @@ def read_pkg(workdir, slug):
     cl2 = (wd / f"{slug}.content_list_v2.json")
     ly = (wd / f"{slug}.layout.json")
     blk = (wd / f"{slug}.blocks.json")
+    fm = (wd / f"{slug}.figure_map.json")
     data = {
         "markdown": md.read_text(encoding="utf-8") if md.exists() else "",
         "content_list": json.loads(cl.read_text(encoding="utf-8")) if cl.exists() else [],
         "content_list_v2": json.loads(cl2.read_text(encoding="utf-8")) if cl2.exists() else [],
         "layout": json.loads(ly.read_text(encoding="utf-8")) if ly.exists() else {},
         "blocks": json.loads(blk.read_text(encoding="utf-8")) if blk.exists() else {},
+        "figure_map": json.loads(fm.read_text(encoding="utf-8")) if fm.exists() else [],
         "images_dir": wd / "images",
     }
     return data
+
+
+def _ov(a, b):
+    dx = min(a[2], b[2]) - max(a[0], b[0])
+    dy = min(a[3], b[3]) - max(a[1], b[1])
+    return max(0.0, dx) * max(0.0, dy)
+
+
+def build_figure_resolver(pages, blocks, figure_map):
+    """构造「MinerU 图块 → PDF 原图」的解析器，并把碎片合并成整图。
+
+    MinerU 会把一页里的一张 figure（含 A/B/C/D 子图）切成多块低清截图 ——
+    实测 55 号 pg3 的 5099x3390 大图被切成 3 块 617x429 缩略图，拼接关系丢失。
+    做法：用**重叠面积占比**把每个图块归到覆盖它最多的原图（不依赖坐标系换算，
+    因为 content_list_v2 与 blocks.json 的 bbox 比例不一致）；同一张原图下的多个
+    块只输出一次（位置取覆盖它的块的第一个出现处）。
+
+    返回 (resolver, state)：resolver(block) → 原图文件名或 None；
+    state 记录每个图块是否已被 emit（避免同图重复输出）。
+    """
+    if not figure_map or not blocks:
+        return (lambda blk: None), {"emitted": set()}
+    # 版面树按页收集图块 bbox（与 PDF 同坐标系）
+    per_page = {}
+    for pgi, p in enumerate(blocks.get("pdf_info") or []):
+        per_page[pgi] = [b["bbox"] for b in (p.get("para_blocks") or [])
+                         if b.get("type") in ("image", "chart") and b.get("bbox")]
+    by_page = {}
+    for f in figure_map:
+        pg = int(re.search(r"fig_p(\d+)_", f["file"]).group(1))
+        by_page.setdefault(pg, []).append(f)
+
+    emitted = set()
+
+    def resolve(pgi, bbox):
+        cands = by_page.get(pgi) or []
+        best, best_ov = None, 0.0
+        for f in cands:
+            ov = _ov(bbox, f["bbox"])
+            if ov > best_ov:
+                best, best_ov = f, ov
+        if not best:
+            return None
+        area = max(1.0, (bbox[2] - bbox[0]) * (bbox[3] - bbox[1]))
+        if best_ov / area < 0.5:      # 覆盖不足一半 → 不是这张图
+            return None
+        if best["file"] in emitted:    # 同图已出过 → 跳过（合并碎片）
+            return ""
+        emitted.add(best["file"])
+        return best["file"]
+
+    return resolve, {"emitted": emitted}
 
 
 def widths_for(n):
