@@ -228,12 +228,9 @@ def main():
             if blocks_path.exists() else []
         figures = []       # {page, pdf_bbox, file, size, keys:[(v2 block 坐标)]}
         for pgi, pg in enumerate(doc):
-            page_figs, seen_xref = [], set()
+            page_figs, seen_hash = [], {}
             for x in pg.get_images(full=True):
                 xr = x[0]
-                if xr in seen_xref:          # 同一 xref 在一页可被重复引用
-                    continue
-                seen_xref.add(xr)
                 info = doc.extract_image(xr)
                 w, h = info["width"], info["height"]
                 # 过滤装饰件：小图标（<800 宽）和极扁横条（标题下划线、表格框线，
@@ -243,9 +240,15 @@ def main():
                 rects = pg.get_image_rects(xr)
                 if not rects:
                     continue
+                # 同图多 xref（PDF 里重复嵌入，实测 88 号 pg2 内容完全相同的两张
+                # 1358x286 各有 2 个 xref）→ 按内容哈希去重，只留第一个
+                key = (w, h, hashlib.md5(info["image"]).hexdigest())
+                if key in seen_hash:
+                    continue
                 r = rects[0]
                 fn = f"fig_p{pgi}_x{xr}_{w}x{h}.{info['ext']}"
                 (outdir / "images" / fn).write_bytes(info["image"])
+                seen_hash[key] = fn
                 page_figs.append({"xref": xr, "file": fn,
                                   "bbox": [round(r.x0), round(r.y0), round(r.x1), round(r.y1)],
                                   "size": f"{w}x{h}"})
