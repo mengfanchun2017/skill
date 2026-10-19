@@ -253,6 +253,62 @@ def _bold_labels(html, labels=_FRONT_LABELS):
     return html
 
 
+def _group_lists(blocks):
+    """把切碎的 list 块按「同一栏 + 相邻」归组，返回 {id(首块): [块...]}。
+
+    参考文献在 v2 里是逐条一个 list 块（55 号 69 条 = 69 块）。双栏页里左右栏
+    条目在数组里交错（实测 pg8 左栏 A–D 在前、右栏 D–F 在后，被正文块隔开），
+    因此分组键是 (栏, 邻接)：同栏且中间只隔 0–2 个非 list 块视为同一引用区。
+    """
+    groups, order = {}, []
+    cur, cur_key = [], None
+    gap = 0
+    for e in blocks:
+        if e.get("type") == "list":
+            b = e.get("bbox") or [0, 0, 0, 0]
+            # 栏判定：一栏半页宽为界；没有 bbox 时归同一组
+            key = None if not e.get("bbox") else (0 if b[0] < 300 else 1)
+            if cur and (gap <= 2 and (key is None or cur_key is None or key == cur_key)):
+                cur.append(e)
+            else:
+                if cur:
+                    groups[id(cur[0])] = cur
+                    order.append(id(cur[0]))
+                cur, cur_key = [e], key
+            gap = 0
+        else:
+            gap += 1
+    if cur:
+        groups[id(cur[0])] = cur
+    return groups
+
+
+def _list_block_xml(blocks, translate=None, keep_refs=False):
+    """把一组 list 块合成一个 <ol>/<ul>。"""
+    items, numbered = [], False
+    for e in blocks:
+        c = e.get("content") or {}
+        if c.get("list_type") == "reference_list" and not keep_refs:
+            return ""
+        for it in (c.get("list_items") or []):
+            inner = _inline_v2(it.get("item_content") or [], translate)
+            if re.match(r"^\s*\d+[.)]\s", inner):
+                numbered = True
+            items.append(inner)
+    if not items:
+        return ""
+    lis = []
+    for inner in items:
+        t = re.sub(r"^\s*\d+[.)]\s+", "", inner) if numbered else inner
+        if t.strip():
+            lis.append(f"<li>{t}</li>")
+    if not lis:
+        return ""
+    # 来源自带编号（88 号式）→ <ol> 自动编号；无编号（55 号式）→ <ul> 保留悬挂缩进
+    tag = "ol" if numbered else "ul"
+    return f"<{tag}>" + "".join(lis) + f"</{tag}>"
+
+
 def render_v2(pages, images_dir, translate=None, keep_refs=False, rel_prefix="images",
               fig_resolve=None, front_matter=True):
     """用 content_list_v2 渲染（含行内公式、list、图片/表格）。
