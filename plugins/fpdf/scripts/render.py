@@ -209,6 +209,9 @@ def render_v2(pages, images_dir, translate=None, keep_refs=False, rel_prefix="im
             lis = []
             for it in items:
                 inner = _inline_v2(it.get("item_content") or [], translate)
+                # 条目文本自带编号（"1. Jiang..."）→ 去掉，否则 <ol> 会自动再加
+                # 一层序号，渲染成 "1. 1. Jiang..."（实测飞书 seq-marker + 自带前缀）
+                inner = re.sub(r"^\s*\d+[.)]\s+", "", inner)
                 if inner.strip():
                     lis.append(f"<li>{inner}</li>")
             if not lis:
