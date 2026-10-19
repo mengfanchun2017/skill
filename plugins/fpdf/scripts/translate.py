@@ -99,6 +99,41 @@ def collect_texts(content_list):
     return out
 
 
+def collect_texts_v2(pages):
+    """从 content_list_v2 收集待译文本。
+
+    v2 的文本藏在 fragment 数组里（paragraph_content / title_content / list_items），
+    行内公式是支持 equation_inline 片段 —— 翻译只取 text 片段的 content，公式原样保留
+    （render 时按同一 fragment 顺序重拼，译文 map 的 key 就是这些 text 片段）。
+    """
+    keys = ("paragraph_content", "title_content", "list_items",
+            "page_header_content", "page_footer_content")
+    out = []
+
+    def walk(frags):
+        for f in frags or []:
+            if isinstance(f, dict) and f.get("type") == "text":
+                c = (f.get("content") or "").strip()
+                if c:
+                    out.append(f["content"])
+
+    for pg in pages:
+        for e in pg:
+            c = e.get("content") or {}
+            for k in keys:
+                v = c.get(k)
+                if k == "list_items" and isinstance(v, list):
+                    for it in v:
+                        walk(it.get("item_content"))
+                elif isinstance(v, list):
+                    walk(v)
+            for capk in ("image_caption", "chart_caption", "table_caption", "table_footnote"):
+                for x in (c.get(capk) or []):
+                    if isinstance(x, dict) and x.get("type") == "text" and (x.get("content") or "").strip():
+                        out.append(x["content"])
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("slug")
@@ -106,17 +141,22 @@ def main():
     ap.add_argument("--target", default="zh", choices=["zh", "en"])
     ap.add_argument("--preset", default=None, help="llm.json preset 名（默认用当前生效模型）")
     ap.add_argument("--batch-size", type=int, default=30)
+    ap.add_argument("--source", default="auto", choices=["auto", "v1", "v2"])
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--out", default=None)
     args = ap.parse_args()
 
     wd = Path(args.workdir)
     cl_path = wd / f"{args.slug}.content_list.json"
-    if not cl_path.exists():
-        print("ERROR: 无 content_list.json，无法翻译（flash 档不含结构）", file=sys.stderr)
+    v2_path = wd / f"{args.slug}.content_list_v2.json"
+    v2 = json.loads(v2_path.read_text(encoding="utf-8")) if v2_path.exists() else []
+    v1 = json.loads(cl_path.read_text(encoding="utf-8")) if cl_path.exists() else []
+    use_v2 = args.source == "v2" or (args.source == "auto" and v2)
+    if not v1 and not v2:
+        print("ERROR: 无 content_list(.json/_v2.json)，无法翻译（flash 档不含结构）", file=sys.stderr)
         sys.exit(2)
-    cl = json.loads(cl_path.read_text(encoding="utf-8"))
-    texts = collect_texts(cl)
+    texts = collect_texts_v2(v2) if use_v2 else collect_texts(v1)
+    print(f"[fpdf] 译文源={'v2' if use_v2 else 'v1'} 待译片段={len(texts)}", file=sys.stderr)
     meta = json.loads((wd / f"{args.slug}.meta.json").read_text(encoding="utf-8")) \
         if (wd / f"{args.slug}.meta.json").exists() else {}
 

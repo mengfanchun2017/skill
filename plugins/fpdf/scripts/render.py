@@ -246,29 +246,33 @@ def render_v2(pages, images_dir, translate=None, keep_refs=False, rel_prefix="im
 
 
 def render_v2_grid(pages, images_dir, translate=None, keep_refs=False, rel_prefix="images"):
-    """v2 + 按页左右分栏（用 bbox 左边界中位数分界）。"""
+    """v2 + 按页左右分栏。只对**真双栏页**分栏，单栏页（标题页/跨栏图页）走顺序流。
+
+    判据不是"有条目在中间"，而是看 x0 是否显著双峰：真双栏页的正文左边界聚成
+    两簇（实测 ~68 与 ~502），单栏页（首页/末页）x0 连续铺满。用「左右两簇各自
+    至少 2 条，且簇间距 > 页宽 25%」判定，避免把单栏标题页误切两半。
+    """
     out = []
     for pg in pages:
         body = [e for e in pg if e.get("type") in
                 ("paragraph", "title", "table", "image", "chart", "list") and e.get("bbox")]
-        if len(body) < 3:
-            out.append(render_v2([pg], images_dir, translate, keep_refs, rel_prefix)
-                       .replace("<title>__title__</title>", ""))
+        flat = lambda p: render_v2([p], images_dir, translate, keep_refs, rel_prefix) \
+            .replace("<title>__title__</title>", "")
+        if len(body) < 4:
+            out.append(flat(pg))
             continue
         x0s = sorted(e["bbox"][0] for e in body)
+        page_w = max((e["bbox"][2] for e in body), default=0)
         mid = x0s[len(x0s) // 2]
         left = [e for e in pg if not e.get("bbox") or e["bbox"][0] < mid]
         right = [e for e in pg if e.get("bbox") and e["bbox"][0] >= mid]
-        if not left or not right:
-            out.append(render_v2([pg], images_dir, translate, keep_refs, rel_prefix)
-                       .replace("<title>__title__</title>", ""))
+        # 双栏须两簇都够厚且分离明显
+        if len(left) < 2 or len(right) < 2 or (right[0]["bbox"][0] - max(
+                e["bbox"][0] for e in left if e.get("bbox"))) < page_w * 0.25:
+            out.append(flat(pg))
             continue
-        lx = render_v2([left], images_dir, translate, keep_refs, rel_prefix) \
-            .replace("<title>__title__</title>", "")
-        rx = render_v2([right], images_dir, translate, keep_refs, rel_prefix) \
-            .replace("<title>__title__</title>", "")
-        out.append(f'<grid><column width-ratio="0.5">{lx}</column>'
-                   f'<column width-ratio="0.5">{rx}</column></grid>')
+        out.append(f'<grid><column width-ratio="0.5">{flat(left)}</column>'
+                   f'<column width-ratio="0.5">{flat(right)}</column></grid>')
     return "\n".join(x for x in out if x)
 
 
