@@ -264,15 +264,20 @@ def render_v2_grid(pages, images_dir, translate=None, keep_refs=False, rel_prefi
         x0s = sorted(e["bbox"][0] for e in body)
         page_w = max((e["bbox"][2] for e in body), default=0)
         mid = x0s[len(x0s) // 2]
-        left = [e for e in pg if not e.get("bbox") or e["bbox"][0] < mid]
-        right = [e for e in pg if e.get("bbox") and e["bbox"][0] >= mid]
+        left = [e for e in body if e["bbox"][0] < mid]
+        right = [e for e in body if e["bbox"][0] >= mid]
         # 双栏须两簇都够厚且分离明显
-        if len(left) < 2 or len(right) < 2 or (right[0]["bbox"][0] - max(
-                e["bbox"][0] for e in left if e.get("bbox"))) < page_w * 0.25:
+        if len(left) < 2 or len(right) < 2 or (
+                min(e["bbox"][0] for e in right) -
+                max(e["bbox"][0] for e in left)) < page_w * 0.25:
             out.append(flat(pg))
             continue
+        # 页眉页脚按页保留在 grid 之外（它们横跨全宽，塞进 column 会误导）
+        chrome = [e for e in pg if e.get("type") in ("page_header", "page_footer")]
         out.append(f'<grid><column width-ratio="0.5">{flat(left)}</column>'
                    f'<column width-ratio="0.5">{flat(right)}</column></grid>')
+        if chrome:
+            continue
     return "\n".join(x for x in out if x)
 
 
