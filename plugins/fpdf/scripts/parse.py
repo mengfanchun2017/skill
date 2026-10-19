@@ -265,16 +265,22 @@ def main():
             figures.extend(page_figs)
         doc.close()
         if figures:
-            # page_ok：该页的「PDF 原图」是否真的比 MinerU 裁切图清晰得多。
-            # 只有真被切碎的页才该换原图 —— 55 号裁切图 617x429 vs 原图 5099x3390
-            # （长边差 8 倍）该换；88 号裁切图本身已有 1165x387、PDF 侧是多元素
-            # 拼图，换了反而丢内容。判据：原图长边 ≥ 2000px（55 号全部满足；
-            # 88 号的原图多为 1358x286 这类小块，不满足）。
+            # page_ok：该页是否该换成 PDF 原图。判据 = MinerU 图块数 > 原图数
+            # —— 说明 MinerU 把一整张 figure 切成了多块低清截图。
+            # 55 号 pg3：3 图块 / 1 原图 → 切碎，用原图；
+            # 88 号 pg6：6 图块 / 6 原图 → 1:1，MinerU 没切，保留裁切图。
+            from collections import defaultdict
+            _blk_n, _fig_n = defaultdict(int), defaultdict(int)
             for f in figures:
-                try:
-                    f["page_ok"] = int(f["size"].split("x")[0]) >= 2000
-                except Exception:
-                    f["page_ok"] = False
+                _fig_n[int(re.search(r"fig_p(\d+)_", f["file"]).group(1))] += 1
+            if blocks_path.exists():
+                for pgi, p in enumerate(json.loads(
+                        blocks_path.read_text(encoding="utf-8")).get("pdf_info") or []):
+                    _blk_n[pgi] = sum(1 for b in (p.get("para_blocks") or [])
+                                      if b.get("type") in ("image", "chart"))
+            for f in figures:
+                pgi = int(re.search(r"fig_p(\d+)_", f["file"]).group(1))
+                f["page_ok"] = _blk_n.get(pgi, 0) > _fig_n.get(pgi, 0)
             orig_map = {f["file"]: f for f in figures}
             orig_path.write_text(json.dumps(figures, ensure_ascii=False, indent=2),
                                  encoding="utf-8")
