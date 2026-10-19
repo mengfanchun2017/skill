@@ -80,11 +80,15 @@ def read_pkg(workdir, slug):
     wd = Path(workdir)
     md = (wd / f"{slug}.md")
     cl = (wd / f"{slug}.content_list.json")
+    cl2 = (wd / f"{slug}.content_list_v2.json")
     ly = (wd / f"{slug}.layout.json")
+    blk = (wd / f"{slug}.blocks.json")
     data = {
         "markdown": md.read_text(encoding="utf-8") if md.exists() else "",
         "content_list": json.loads(cl.read_text(encoding="utf-8")) if cl.exists() else [],
+        "content_list_v2": json.loads(cl2.read_text(encoding="utf-8")) if cl2.exists() else [],
         "layout": json.loads(ly.read_text(encoding="utf-8")) if ly.exists() else {},
+        "blocks": json.loads(blk.read_text(encoding="utf-8")) if blk.exists() else {},
         "images_dir": wd / "images",
     }
     return data
@@ -375,6 +379,8 @@ def main():
                     help="JSON 文件: {原文段落: 译文}；命中则替换")
     ap.add_argument("--keep-refs", action="store_true",
                     help="保留参考文献段（默认丢弃，避免长文献表淹没正文）")
+    ap.add_argument("--source", default="auto", choices=["auto", "v1", "v2"],
+                    help="结构来源：auto=有 v2 用 v2（含行内公式）否则 v1")
     ap.add_argument("--out", default=None, help="输出 XML 路径（默认 stdout）")
     args = ap.parse_args()
 
@@ -387,14 +393,20 @@ def main():
         return tmap.get(s, s)
 
     cl = pkg["content_list"]
-    if not cl:
-        print("ERROR: 无 content_list.json（该文档用了 flash 档，不带结构）。"
+    v2 = pkg["content_list_v2"]
+    use_v2 = args.source == "v2" or (args.source == "auto" and v2)
+    if not cl and not v2:
+        print("ERROR: 无 content_list(.json/_v2.json)（该文档用了 flash 档，不带结构）。"
               "要排版请用 precision 档重新解析。", file=sys.stderr)
         sys.exit(2)
 
     title = args.title or tmap.get("__title__") or args.slug
-    if args.columns == "grid":
-        body = render_grid_columns(cl, pkg["images_dir"], pkg["layout"], translate)
+    if use_v2:
+        fn = render_v2_grid if args.columns == "grid" else render_v2
+        body = fn(v2, pkg["images_dir"], translate=translate, keep_refs=args.keep_refs)
+    elif args.columns == "grid":
+        body = render_grid_columns(cl, pkg["images_dir"], pkg["layout"], translate,
+                                   keep_refs=args.keep_refs)
     else:
         body = render_flow(cl, pkg["images_dir"], translate=translate,
                            keep_refs=args.keep_refs)
