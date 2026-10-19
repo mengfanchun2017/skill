@@ -150,7 +150,10 @@ def main():
     t0 = time.time()
     try:
         if tier == "precision":
-            result = client.extract(args.source, model=args.model, timeout=600)
+            # table/formula 显式开启：实测 vlm 默认已带表格与公式识别，但显式传
+            # 保证行为确定（options 只在显式设置时才发给服务端）。
+            result = client.extract(args.source, model=args.model, timeout=600,
+                                    formula=True, table=True)
         else:
             result = client.flash_extract(args.source, timeout=300)
     except Exception as e:
