@@ -344,8 +344,19 @@ def render_v2(pages, images_dir, translate=None, keep_refs=False, rel_prefix="im
         body_blocks = [e for e in pg if e.get("type") not in
                        ("page_header", "page_footer", "page_number")]
         for e in body_blocks:
+            # 正文起点：关掉引用块、插分隔线（论文信息区 → 正文 的分界）
+            if fm["in_front"] and _is_body_start(e) and not fm["closed"]:
+                fm["closed"] = True
+                fm["in_front"] = False
+                out.append("</blockquote>")
+                out.append("<hr/>")
             x = block_xml(e, pgi)
-            if x:
+            if not x:
+                continue
+            if fm["in_front"] and e.get("type") == "paragraph":
+                # 首页信息区各段 → 引用块内逐段；标签加粗
+                out.append(_bold_labels(x) if x.startswith("<p>") else x)
+            else:
                 out.append(x)
     return "\n".join(x for x in out if x)
 
