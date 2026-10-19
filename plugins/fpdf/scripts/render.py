@@ -453,6 +453,7 @@ def render_v2(pages, images_dir, translate=None, keep_refs=False, rel_prefix="im
         # 合并策略：同一个引用块（相邻 ≤2 块的间隙 + 同一栏 x0）的 list 归成一组。
         groups = _group_lists(body_blocks)
         figidx = [0]        # 本页图块序号（resolver 用序号对应 blocks.json 的图块）
+        consumed = set()    # 已被合并输出过的组内块 id（避免组内其余块再单独成列）
         for e in body_blocks:
             # 正文起点：关掉引用块、插分隔线（论文信息区 → 正文 的分界）
             if fm["in_front"] and _is_body_start(e) and not fm["closed"]:
@@ -460,8 +461,11 @@ def render_v2(pages, images_dir, translate=None, keep_refs=False, rel_prefix="im
                 fm["in_front"] = False
                 out.append("</blockquote>")
                 out.append("<hr/>")
-            if e.get("type") == "list" and id(e) in groups:
-                g = groups.pop(id(e))
+            if e.get("type") == "list":
+                if id(e) in consumed:
+                    continue
+                g = groups.pop(id(e), [e])
+                consumed.update(id(x) for x in g)
                 x = _list_block_xml(g, translate, keep_refs)
             else:
                 x = block_xml(e, pgi, figidx)
