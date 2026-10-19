@@ -291,7 +291,10 @@ def _bold_labels(html, labels=_FRONT_LABELS):
     """
     for lab in sorted(labels, key=len, reverse=True):
         if lab == "OPEN ACCESS":
-            html = re.sub(r"(?<![\w>])(OPEN\s+ACCESS)(?![\w<])", r"<b>\1</b>", html)
+            # 篇幅短、独立成段，直接整段加粗
+            html = re.sub(r"<p>\s*(OPEN\s*ACCESS)\s*</p>", r"<p><b>\1</b></p>", html)
+            html = re.sub(r"(?<![\w><])(OPEN\s+ACCESS)(?![\w<])",
+                          r"<b>\1</b>", html) if "<b>OPEN" not in html else html
         elif lab.startswith("*Correspondence"):
             html = html.replace("*Correspondence:", "<b>*Correspondence:</b>")
         else:
