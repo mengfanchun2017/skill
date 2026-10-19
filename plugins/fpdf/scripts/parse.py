@@ -26,7 +26,7 @@
     parse.py <pdf路径> --outdir DIR [--tier precision|flash] [--slug NAME]
     parse.py <pdf路径> --outdir DIR --dry-run    # 只打档位判定，不调 API
 """
-import sys, os, json, time, argparse, re
+import sys, os, json, time, argparse, re, hashlib
 from pathlib import Path
 
 CONF_CANDIDATES = [
