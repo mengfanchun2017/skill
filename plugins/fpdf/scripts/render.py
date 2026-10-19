@@ -355,9 +355,15 @@ def render_v2(pages, images_dir, translate=None, keep_refs=False, rel_prefix="im
                 continue
             if fm["in_front"] and e.get("type") == "paragraph":
                 # 首页信息区各段 → 引用块内逐段；标签加粗
+                if not fm.get("opened"):
+                    out.append("<blockquote>")
+                    fm["opened"] = True
                 out.append(_bold_labels(x) if x.startswith("<p>") else x)
             else:
                 out.append(x)
+    # 文档无 INTRODUCTION 标题时，别留未闭合的引用块
+    if fm["in_front"] and fm.get("opened"):
+        out.append("</blockquote>")
     return "\n".join(x for x in out if x)
 
 
