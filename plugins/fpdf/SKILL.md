@@ -2,12 +2,13 @@
 name: fpdf
 user-invocable: true
 description: |
-  PDF 精排 — 把 PDF 精确拆解后重排为飞书文档（复杂版式：全宽表格、分栏、引用、高亮块），
-  可选导出 Word、可选生成译文版，可安装/检查运行依赖。
+  PDF 精排 — 把 PDF 精确拆解后重排为飞书文档：还原表格列宽、行内公式、高清原图、
+  参考文献、论文首页信息区，可选导出 Word、可选生成译文版，可安装/检查运行依赖。
   用法：用户说"PDF 排版"/"PDF 转飞书"/"处理这个 PDF"/"/fpdf <路径>"、
-  给出 PDF 路径要求"放到飞书上"/"导出 Word"/"翻译 PDF"，
+  给出 PDF 路径要求"放到飞书上"/"导出 Word"/"翻译 PDF"、
+  说"排版不对"/"图不清楚"/"公式没渲染"/"文献编号不对"（返工重排）、
   或说"安装依赖"/"检查依赖"（= /fpdf deps）。
-  依赖 MinerU（解析）+ lark-cli（飞书）+ uv（运行器）。
+  依赖 MinerU 云端 API（解析）+ lark-cli（飞书）+ uv（运行器）。
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, mcp__mineru__parse_documents
 ---
 
@@ -157,11 +158,12 @@ MinerU 的结果 zip 里同时有 v1 和 v2 两份，**结构不同**：
 | PDF 内容 | 飞书 XML | 说明 |
 |---------|---------|------|
 | 表格 | `<table><colgroup><col width="N"/></colgroup><thead><tr><th>` | **列宽之和 = 822**；见下方警告 |
-| 分栏 | `<grid><column width-ratio="0.5">…</column>…</grid>` | 各列 ratio 之和 = 1 |
+| 行内公式 / 上下标 | `<latex>E = mc^2</latex>` / `<latex>^{1,2}</latex>` | **飞书无 `<sup>`/`<sub>`**，上标一律 latex |
+| 分栏 | `<grid><column width-ratio="0.5">…</column>…</grid>` | 各列 ratio 之和 = 1（默认不用，见下） |
 | 强调块 | `<callout emoji="💡" background-color="light-blue">` | 子块仅 `p/ol/ul/checkbox` + 行内标签 |
-| 引用 | `<blockquote><p>…</p></blockquote>` | |
+| 引用 | `<blockquote><p>…</p></blockquote>` | 首页信息区用它包住元信息 |
+| 分隔线 | `<hr/>` | 论文信息区与正文之间 |
 | 图片 | `<img path="@./images/xxx.jpg" caption="…"/>` | 路径**相对 CLI 工作目录** |
-| 公式 | `<p align="center"><code>LaTeX</code></p>` | 飞书无原生公式块，降级为代码 |
 
 ### ⚠ 表格语法警告（重要）
 
