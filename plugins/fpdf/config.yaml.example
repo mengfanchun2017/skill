@@ -1,10 +1,23 @@
 # fpdf 配置模板
-# ccconfig 用户：真实值放 ccprivate/skill/fpdf.yaml，apply-config.sh 自动 symlink 注入。
-# 独立用户：复制本文件为 config.yaml 填入真实值。
+#
+# 独立用户（从公开仓库装 skill 的人）：
+#   复制本文件为 config.yaml 放同目录，填入下面两项真实值即可，无需 ccprivate。
+#   ⚠️ config.yaml 已在 .gitignore 里，不会被提交；请勿改本 template 文件本身。
+#
+# ccconfig 用户：
+#   真实值放 ccprivate/skill/fpdf.yaml，apply-config.sh 自动把它 symlink 成
+#   <skill目录>/config.yaml —— 两条路径是同一个文件，改哪边都行。
 
-# 所有输出文档的父 wiki 节点（从父文档 URL 的 /wiki/<token> 取）
+# 所有输出文档的父 wiki 节点 token（从父文档 URL 的 /wiki/<token> 取）
+# 留空则创建的文档落在飞书云空间根目录，且不便于统一归档。
 wiki_nodes:
   default: ""
+
+# MinerU token（默认 precision 档必需；不填只能跑 flash 档，无结构、不能排版）
+# 获取：https://mineru.net → API 管理 → 建 token
+# 也可放在独立文件里（优先级：$MINERU_CONF > 本文件 > ccprivate/conf/mineru.json）
+mineru:
+  token: ""
 
 # 文档索引（自动追加，勿手改）
 doc_index: []

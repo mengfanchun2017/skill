@@ -33,7 +33,8 @@ bad()  { printf '  \033[31m✗\033[0m %s\n' "$*" >&2; }
 info() { [ "$QUIET" = 1 ] || printf '  \033[36m→\033[0m %s\n' "$*"; }
 warn() { printf '  \033[33m!\033[0m %s\n' "$*" >&2; }
 
-MISSING=0
+MISSING=0   # 阻断项（缺了 run.sh 直接停）
+SOFT=0      # 软缺项（不影响主路径，仅告警）
 
 [ "$QUIET" = 1 ] || { echo "fpdf 依赖检查"; echo "─────────────"; }
 
@@ -113,22 +114,22 @@ for b in $POPPLER_BINS; do command -v "$b" >/dev/null 2>&1 || pop_missing="$pop_
 if [ -z "$pop_missing" ]; then
     ok "poppler-utils（$POPPLER_BINS 齐备）"
 elif [ "$CHECK_ONLY" = 1 ]; then
-    warn "poppler-utils 缺:$pop_missing"
-    MISSING=$((MISSING+1))
+    warn "poppler-utils 缺:$pop_missing（软依赖，不阻断）"
+    SOFT=$((SOFT+1))
 elif _sudo_ok; then
     info "poppler-utils 缺失（$pop_missing）→ 安装中..."
     if sudo apt-get install -y poppler-utils >/dev/null 2>&1; then
         ok "poppler-utils 已安装"
     else
-        bad "poppler-utils 安装失败"
+        bad "poppler-utils 安装失败（软依赖，不阻断）"
         _poppler_manual_hint
-        MISSING=$((MISSING+1))
+        SOFT=$((SOFT+1))
     fi
 else
     # 需用户自己装 —— 提示必须可直接复制粘贴，别让人手打（易混入中文标点/全角字符）
-    bad "poppler-utils 缺:$pop_missing（需 sudo 但当前环境不可用）"
+    warn "poppler-utils 缺:$pop_missing（需 sudo 但当前环境不可用；软依赖，不阻断）"
     _poppler_manual_hint
-    MISSING=$((MISSING+1))
+    SOFT=$((SOFT+1))
 fi
 
 # --- lark-cli ---
@@ -175,13 +176,15 @@ else
 fi
 
 if [ "$QUIET" = 1 ]; then
+    # quiet 只表达阻断项：run.sh 据此判 gate；软缺不阻断
     [ "$MISSING" -eq 0 ] && echo "deps-ok" || echo "deps-missing:$MISSING"
 else
     echo "─────────────"
     if [ "$MISSING" -eq 0 ]; then
-        echo "全部就绪"
+        [ "$SOFT" -eq 0 ] && echo "全部就绪" || echo "阻断项就绪（$SOFT 项软依赖缺失，不影响主路径）"
     else
-        echo "$MISSING 项待处理（见上方 → 提示）"
+        echo "$MISSING 项阻断待处理（见上方 → 提示）"
+        [ "$SOFT" -gt 0 ] && echo "另有 $SOFT 项软依赖缺失（不阻断）"
     fi
 fi
 exit "$MISSING"
