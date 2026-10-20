@@ -199,8 +199,9 @@ MinerU 会把一页里的一张 figure（含 A/B/C/D 子图）**切成多块低�
 `<slug>.figure_map.json` 记录「原图 ↔ 页面 bbox」；`render.py` 按**页内出现顺序**把多个
 MinerU 图块归到同一张原图、只输出一次（合并碎片）。
 
-- 只对**真被切碎**的页生效：判据是该页原图数 ≥ 图块数的一半。88 号那种 figure
-  本身由多元素拼成（6 图块/32 原图）时回落 MinerU 裁切图 —— 此时切分反而语义正确。
+- 只对**真被切碎**的页生效：判据是 **MinerU 图块数 > 该页 PDF 原图数**（写进
+  `figure_map` 的 `page_ok`）。55 号 `3 图块 / 1 原图` → 换原图；88 号 `1 图块 / 1 原图`
+  → 不换（那种 figure 本身由多元素拼成，MinerU 切分反而语义正确）。
 - 同内容多 xref（PDF 重复嵌入）按 md5 去重；小图标（<800 宽）和极扁装饰条
   （`1456x30` 这类）不算 figure。
 
@@ -240,12 +241,16 @@ PDF 里这些标签用 Bold/BdIt 字体排（MinerU 丢掉了字体信息），`
 固定在仓库外 `~/pdf-work/<slug>/`（可用 `FPDF_WORK_ROOT` 改）：
 
 ```
-<slug>.md                正文 markdown
-<slug>.content_list.json 结构化条目（bbox/表格 HTML/caption）
-<slug>.layout.json       版式推断（每页栏数）
-<slug>.xml               渲染好的 DocxXML
-<slug>.trans.json        译文映射（--trans 时）
-images/                  提取的图片
+<slug>.md                  正文 markdown
+<slug>.content_list.json   v1 结构条目（平铺数组）
+<slug>.content_list_v2.json v2 结构条目（按页，含 equation_inline）★ render 默认用
+<slug>.blocks.json         MinerU 版面树（行级 span + 置信度）
+<slug>.html                full.html（MathML 公式），备用
+<slug>.figure_map.json     「PDF 原图 ↔ 页面 bbox + page_ok」映射
+<slug>.layout.json         版式推断（每页栏数）
+<slug>.xml / .zh.xml       渲染好的 DocxXML（原文 / 译文）
+<slug>.trans.json          译文映射（--trans 时）
+images/                    图片（MinerU 裁切图 + fig_* 原图）
 ```
 
 **必须在仓库外** —— 落在 git 仓库内会被 auto-sync 秒推进公开库（版权材料泄漏）。
