@@ -39,9 +39,9 @@ bash ~/.claude/skills/fpdf/scripts/setup.sh --check  # 只检查不安装
 
 执行后**逐项报告**每个依赖的状态（✓/✗），并明确区分两类：
 
-- **需你本人动手的**：`poppler-utils` 要 `sudo apt-get install -y poppler-utils`。
-  自动会话里 sudo 常因无 TTY 不可用 → 此时**必须把命令原样给用户**让其自行执行。
-  建议提示用户用 `! sudo apt-get install -y poppler-utils` 形式在本会话内跑，输出能回到对话。
+- **需你本人动手的**：`poppler-utils` 若自动装失败，setup.sh 会**按平台**给出可复制的
+  安装命令（apt / brew / dnf / pacman / apk），必须把该行**原样**给用户自行执行。
+  自动会话里 sudo 常因无 TTY 不可用 → 提示用户用 `! <该行命令>` 在本会话内跑，输出回到对话。
 - **我能自动搞定的**：`uv`、`lark-cli` 可自动装；MinerU token / 飞书授权需引导用户走扫码或填 key。
 
 > 其他三个入口（处理 PDF 时）`run.sh` 也会**自动**调 setup.sh 补齐依赖，
@@ -60,13 +60,21 @@ bash ~/.claude/skills/fpdf/scripts/setup.sh --check  # 只检查不安装
 
 检查 5 项：
 
-| 依赖 | 缺失时 | 是否阻断 |
-|------|--------|---------|
+| 依赖 | 缺失时怎么装 | 是否阻断 |
+|------|-------------|---------|
 | `uv` | `curl -LsSf https://astral.sh/uv/install.sh \| sh` | **阻断** |
-| `lark-cli` | `bash ~/git/ccconfig/init-option.sh larkcli` | **阻断** |
-| 飞书授权 | 同上（走扫码，一次性） | **阻断** |
-| MinerU token | `bash ~/git/ccconfig/init-option.sh mineru key` | 不阻断（仅 flash 档可跑） |
-| `poppler-utils` | 自动 `sudo apt-get install -y poppler-utils`；无 sudo 权限时**只提示不阻断** | 不阻断 |
+| `lark-cli` | `npm i -g @larksuite/cli`，装入 PATH（或落 `~/.local/bin`） | **阻断** |
+| 飞书授权 | `lark-cli auth login`（走扫码，一次性） | **阻断** |
+| MinerU token | https://mineru.net → API 管理 → 建 token，填进 config.yaml 的 `mineru.token` | **阻断**（默认 precision 档） |
+| `poppler-utils` | 自动按平台装（apt / brew / dnf / pacman / apk）；装不上**只提示不阻断** | 不阻断 |
+
+> **token 口径**：`run.sh` 默认走 precision 档（排版必需），缺 token 时 `parse.py` 直接
+> `exit 3`。所以 MinerU token 标为**阻断**——不是"能跑 flash 档"就算过。
+> 真要跑纯文本降级版，得显式 `--tier flash`。
+>
+> **cccconfig 用户**：上面两条（lark-cli / MinerU token）在 ccconfig 环境里有一键命令
+> `bash ~/git/ccconfig/init-option.sh larkcli` 和 `... mineru key`，可用可不用；
+> 独立用户直接用 `npm i -g` / 网页建 token 即可，不依赖 ccconfig。
 
 **为什么 poppler 不阻断**：解析/渲染主路径走 pymupdf（`parse.py` 内用），poppler 只在需要
 `pdftotext`/`pdfimages`/`pdftoppm` 这类命令行快速抽取时用得上；装不上不影响主流程。
@@ -107,9 +115,21 @@ Word 导出路径、译文文档链接一并给出。多链接用列表。
 
 ## 父文档（所有输出落在此处）
 
-父文档链接存在**私有配置** `ccprivate/skill/fpdf.yaml` 的 `wiki_nodes.default`
-（未配置时回落 ffeishu.yaml 的 default）。用户说"保存父文档链接"或"配置 fpdf"时：
-用 AskUserQuestion 问父文档 URL/token → 写入该 yaml：
+父文档 token 存在**配置文件**的 `wiki_nodes.default`。配置文件按以下顺序查找
+（`run.sh` 的 `_cfg_path`）：
+
+```
+1. $FPDF_CONFIG                （环境变量显式指定）
+2. <skill目录>/config.yaml      （独立用户默认；复制 config.yaml.example 填值）
+3. $CCPRIVATE_HOME/skill/fpdf.yaml
+4. ~/git/ccprivate/skill/fpdf.yaml   （ccc私用户；apply-config.sh 已 symlink 成第 2 条）
+```
+
+未在 fpdf 配置中找到时，回落 ffeishu 配置的 default。文档索引 `doc_index` 写回
+**同一个命中的配置文件**——独立用户写自己的 config.yaml，不碰 ccprivate。
+
+用户说"保存父文档链接"或"配置 fpdf"时：
+用 AskUserQuestion 问父文档 URL/token → 写入**命中文件**（同上第 1 顺位命中项）：
 
 ```yaml
 wiki_nodes:
@@ -310,4 +330,4 @@ fpdf **不依赖** ffeishu 的运行时，只在两处复用其成果：
 | **文献被强加 "1."** | 一律用 `<ol>` | 已修：源无编号的用 `<ul>`（见「参考文献」节） |
 | **文档出现重名副本** | 用了 `docs +create` 而非 `+update` | 改文档一律 `docs +update --command overwrite`；副本用 `drive +delete` 清 |
 | 想重新排版 | 结构包已存在 | 直接调 `render.py`，不必重新解析 |
-| 依赖报缺想一次性装 | — | `/fpdf deps`（或"安装依赖"）跑 setup.sh；`poppler-utils` 需用户自己 sudo |
+| 依赖报缺想一次性装 | — | `/fpdf deps`（或"安装依赖"）跑 setup.sh；`poppler-utils` 若装不上按平台提示用户自行执行 |
