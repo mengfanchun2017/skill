@@ -85,17 +85,34 @@ sys.exit(1)
 " 2>/dev/null
 }
 
+# 各平台 poppler 包名/装法（跨平台，别写死 apt）
+_poppler_install_cmd() {
+    if   command -v apt-get >/dev/null 2>&1; then echo "sudo apt-get install -y poppler-utils"
+    elif command -v brew    >/dev/null 2>&1; then echo "brew install poppler"
+    elif command -v dnf     >/dev/null 2>&1; then echo "sudo dnf install -y poppler-utils"
+    elif command -v pacman  >/dev/null 2>&1; then echo "sudo pacman -S poppler"
+    elif command -v apk     >/dev/null 2>&1; then echo "sudo apk add poppler-utils"
+    else echo ""
+    fi
+}
+
 # 需用户手动装时，给可**原样复制**的命令（提示勿手打：实测手输易混入中文顿号、
 # 全角字符，apt 会报 "Unable to locate package poppler-utils、"，白跑一趟）
 _poppler_manual_hint() {
+    local cmd; cmd="$(_poppler_install_cmd)"
     printf '\n' >&2
-    printf '  \033[33m>>> 需要你自己执行这行（请整行复制，勿手打）\033[0m\n' >&2
-    printf '\n      sudo apt-get install -y poppler-utils\n\n' >&2
-    printf '  在本会话里可直接输入（! 前缀 = 直接跑，输出回到对话）：\n' >&2
-    printf '      ! sudo apt-get install -y poppler-utils\n' >&2
-    printf '\n  \033[36m注意\033[0m：包名是 poppler-utils，结尾不要带任何标点；\n' >&2
-    printf '       若报 "Unable to locate package poppler-utils、"，\n' >&2
-    printf '       多半是粘进了中文顿号「、」——删掉重跑即可。\n' >&2
+    if [ -n "$cmd" ]; then
+        printf '  \033[33m>>> 需要你自己执行这行（请整行复制，勿手打）\033[0m\n' >&2
+        printf '\n      %s\n\n' "$cmd" >&2
+        printf '  在本会话里可直接输入（! 前缀 = 直接跑，输出回到对话）：\n' >&2
+        printf '      ! %s\n' "$cmd" >&2
+        printf '\n  \033[36m注意\033[0m：包名结尾不要带任何标点；若报\n' >&2
+        printf '       "Unable to locate package poppler-utils、"，多半是粘进了\n' >&2
+        printf '       中文顿号「、」——删掉重跑即可。\n' >&2
+    else
+        printf '  \033[33m>>> 未识别包管理器，请手动装 poppler（提供 pdftotext/pdfinfo/pdfimages/pdftoppm）\033[0m\n' >&2
+        printf '      macOS(brew): brew install poppler ｜ Debian/Ubuntu: apt-get install poppler-utils\n' >&2
+    fi
     printf '\n  （不装也能跑：解析/渲染主路径走 pymupdf，不依赖 poppler）\n' >&2
 }
 
@@ -117,21 +134,28 @@ if [ -z "$pop_missing" ]; then
 elif [ "$CHECK_ONLY" = 1 ]; then
     warn "poppler-utils 缺:$pop_missing（软依赖，不阻断）"
     SOFT=$((SOFT+1))
-elif _sudo_ok; then
-    info "poppler-utils 缺失（$pop_missing）→ 安装中..."
-    if sudo apt-get install -y poppler-utils >/dev/null 2>&1; then
-        ok "poppler-utils 已安装"
+else
+    _cmd="$(_poppler_install_cmd)"
+    # sudo 类需要 _sudo_ok；brew 不需要 sudo
+    case "$_cmd" in
+        sudo*) _sudo_ok || _cmd="" ;;
+    esac
+    if [ -n "$_cmd" ]; then
+        info "poppler-utils 缺失（$pop_missing）→ 安装中..."
+        if bash -c "$_cmd" >/dev/null 2>&1; then
+            ok "poppler-utils 已安装"
+        else
+            bad "poppler-utils 安装失败（软依赖，不阻断）"
+            _poppler_manual_hint
+            SOFT=$((SOFT+1))
+        fi
     else
-        bad "poppler-utils 安装失败（软依赖，不阻断）"
+        warn "poppler-utils 缺:$pop_missing（无法自动装；软依赖，不阻断）"
         _poppler_manual_hint
         SOFT=$((SOFT+1))
     fi
-else
-    # 需用户自己装 —— 提示必须可直接复制粘贴，别让人手打（易混入中文标点/全角字符）
-    warn "poppler-utils 缺:$pop_missing（需 sudo 但当前环境不可用；软依赖，不阻断）"
-    _poppler_manual_hint
-    SOFT=$((SOFT+1))
 fi
+
 
 # --- lark-cli ---
 if command -v lark-cli >/dev/null 2>&1 || [ -x "$HOME/.local/bin/lark-cli" ]; then
