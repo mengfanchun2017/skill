@@ -267,6 +267,25 @@ images/                    图片（MinerU 裁切图 + fig_* 原图）
 
 单独调试某一步时可直接调对应脚本（各脚本头部有用法注释）。
 
+## 返工（用户说"效果不对"时）
+
+**不要重跑解析**（烧 MinerU 额度），直接按症状改渲染层：
+
+```bash
+cd ~/pdf-work/<slug>          # 结构包所在目录
+# 只重渲染（原文 + 译文），改 render.py 后立刻见效
+python3 ~/.claude/skills/fpdf/scripts/render.py <slug> --workdir . \
+  --title "标题" --keep-refs --out o.xml
+python3 ~/.claude/skills/fpdf/scripts/render.py <slug> --workdir . \
+  --title "标题（译文）" --translate-map <slug>.trans.json --keep-refs --out z.xml
+# 覆盖已有文档（不新建、不产生重名副本）
+lark-cli docs +update --doc <doc_token> --as user --command overwrite \
+  --doc-format xml --content "@./o.xml"
+```
+
+**改译文用 `<slug>.trans.json` 查表替换**，不重烧 token（除非要加译新段落）。
+**只有解析层的问题**（内容缺失/结构错）才重跑 `parse.py`。
+
 ## 与 ffeishu 的关系（解耦）
 
 fpdf **不依赖** ffeishu 的运行时，只在两处复用其成果：
