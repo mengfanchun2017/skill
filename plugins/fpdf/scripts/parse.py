@@ -29,24 +29,50 @@
 import sys, os, json, time, argparse, re, hashlib
 from pathlib import Path
 
+_SKILL_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 CONF_CANDIDATES = [
     lambda: os.environ.get("MINERU_CONF"),
+    lambda: os.path.join(_SKILL_DIR, "config.yaml"),      # 独立用户：skill 内 config.yaml
     lambda: (os.environ.get("CCPRIVATE_HOME") or os.environ.get("CCPRIVATE_DIR") or "") and
             os.path.join(os.environ.get("CCPRIVATE_HOME") or os.environ.get("CCPRIVATE_DIR"), "conf", "mineru.json"),
     lambda: os.path.expanduser("~/git/ccprivate/conf/mineru.json"),
 ]
 
+_PLACEHOLDER = ("请填入", "请到", "your key", "placeholder", "<your-")
+
+
+def _dig_token(obj):
+    """从 dict 里挖 token：既吃 {'token': x}，也吃 {'mineru': {'token': x}} 嵌套。"""
+    if not isinstance(obj, dict):
+        return ""
+    for k in ("token", "mineru_token", "api_key"):
+        v = obj.get(k)
+        if isinstance(v, str) and v.strip():
+            return v.strip()
+    for v in obj.values():
+        t = _dig_token(v) if isinstance(v, dict) else ""
+        if t:
+            return t
+    return ""
+
 
 def load_token():
     for cand in CONF_CANDIDATES:
         p = cand()
-        if p and os.path.isfile(p):
-            try:
-                t = json.load(open(p)).get("token", "")
-                if t and not any(m in t for m in ("请填入", "请到", "your key", "placeholder", "<your-")):
-                    return t
-            except Exception:
-                pass
+        if not p or not os.path.isfile(p):
+            continue
+        try:
+            if p.endswith((".yaml", ".yml")):
+                import yaml
+                obj = yaml.safe_load(open(p))
+            else:
+                obj = json.load(open(p))
+        except Exception:
+            continue
+        t = _dig_token(obj) if isinstance(obj, dict) else ""
+        if t and not any(m in t for m in _PLACEHOLDER):
+            return t
     return ""
 
 
@@ -132,8 +158,11 @@ def main():
     token = load_token()
     tier = args.tier
     if tier == "precision" and not token:
-        print("ERROR: precision 档需要 MinerU token，未在 ccprivate/conf/mineru.json 找到。\n"
-              "  降级: --tier flash（仅文本无结构）；或先配置 token: bash ccconfig/init-option.sh mineru key",
+        print("ERROR: precision 档（默认，排版必需）需要 MinerU token，四个位置都没找到：\n"
+              "  $MINERU_CONF > <skill目录>/config.yaml > $CCPRIVATE_HOME/conf/mineru.json > ~/git/ccprivate/conf/mineru.json\n"
+              "  取 token: https://mineru.net 注册 → API 管理 → 建 token\n"
+              "  写入任一位置（独立用户最简：把 token 填进 <skill目录>/config.yaml）\n"
+              "  或降级跑（仅文本、无结构、不能排版）: --tier flash",
               file=sys.stderr)
         sys.exit(3)
 

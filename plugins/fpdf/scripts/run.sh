@@ -16,6 +16,28 @@ ok()   { printf '\033[32m✓\033[0m %s\n' "$*" >&2; }
 bad()  { printf '\033[31m✗\033[0m %s\n' "$*" >&2; }
 info() { printf '\033[36m→\033[0m %s\n' "$*" >&2; }
 
+# 配置文件回退链（决定父文档 token 取哪、文档索引写哪）：
+#   $FPDF_CONFIG > <skill目录>/config.yaml > ccprivate/skill/fpdf.yaml
+# 独立用户：复制 config.yaml.example → config.yaml 填值即可，无需 ccprivate。
+# ccconfig 用户：apply-config.sh 已把 ccprivate/skill/fpdf.yaml symlink 成
+#   <skill目录>/config.yaml，故第 2 条即命中，行为与从前完全一致。
+_cfg_path() {   # $1=fpdf|ffeishu → echo 命中路径；都没命中则 echo 首选写入路径
+    _CFG_NAME="$1" _CFG_SKILL_DIR="$SKILL_DIR" python3 -c "
+import os
+n=os.environ['_CFG_NAME']; skill=os.environ['_CFG_SKILL_DIR']
+c=[]
+if n=='fpdf':
+    if os.environ.get('FPDF_CONFIG'): c.append(os.environ['FPDF_CONFIG'])
+    c.append(os.path.join(skill,'config.yaml'))
+for b in (os.environ.get('CCPRIVATE_HOME') or os.environ.get('CCPRIVATE_DIR') or '', '~/git/ccprivate'):
+    if b: c.append(os.path.join(os.path.expanduser(b),'skill',n+'.yaml'))
+hit=next((x for x in c if x and os.path.isfile(x)), None)
+print(hit or (c[0] if c else ''))
+"
+}
+export FPDF_CFG="$(_cfg_path fpdf)"
+export FFEISHU_CFG="$(_cfg_path ffeishu)"
+
 SRC=""; WORD=0; TRANS=0; TITLE=""; PARENT=""; SLUG=""; COLUMNS="flow"; KEEPREFS=0
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -48,10 +70,16 @@ esac
 if ! bash "$HERE/setup.sh" --quiet >/dev/null 2>&1; then
     info "依赖有缺项，尝试自动补齐..."
     bash "$HERE/setup.sh" >&2 || true
-    # 复查硬依赖
+    # 复查硬依赖：uv / lark-cli / MinerU token（默认 precision 档必需）
+    # 早失败优于跑到 parse.py 深水区才 exit 3（见 setup.sh 的口径纠正说明）。
     for hard in uv lark-cli; do
         command -v "$hard" >/dev/null 2>&1 || { bad "缺少必需依赖: $hard"; exit 1; }
     done
+    if ! bash "$HERE/setup.sh" --quiet 2>/dev/null | grep -q '^deps-ok$'; then
+        # token/授权这类无法自动装的项再确认一次，给出人可读出路
+        bad "关键项未就绪（多为 MinerU token 或飞书授权）——见上方 → 提示；补齐后重跑"
+        exit 1
+    fi
 fi
 
 # 工作目录：仓库外（避免 auto-sync 把版权材料推进公开库）
@@ -115,13 +143,13 @@ export LARKSUITE_CLI_CONFIG_DIR="$(grep '^configDir=' "$HOME/.lark-cli-account" 
 export PATH="$HOME/.local/bin:$PATH"
 DOC_ID=""; DOC_URL=""; TRANS_ID=""; TRANS_URL=""
 
-# 父节点：--parent 显式给 > fpdf.yaml > ffeishu.yaml 的 wiki_nodes.default
-# （fpdf.yaml 自己的可能是裸 token 串，ffeishu.yaml 是 {token:} 嵌套 dict，都要吃）
+# 父节点：--parent 显式给 > fpdf 配置 > ffeishu 配置 的 wiki_nodes.default
+# （fpdf 的可能裸 token 串，ffeishu 的常是 {token:} 嵌套 dict，都要吃）
 if [ -z "$PARENT" ]; then
-    PARENT="$(python3 -c "
+    PARENT="$(_FPDF_CFG="$FPDF_CFG" _FFEISHU_CFG="$FFEISHU_CFG" python3 -c "
 import yaml,os
-for p in [os.path.expanduser('~/git/ccprivate/skill/fpdf.yaml'), os.path.expanduser('~/git/ccprivate/skill/ffeishu.yaml')]:
-    if os.path.isfile(p):
+for p in [os.environ.get('_FPDF_CFG'), os.environ.get('_FFEISHU_CFG')]:
+    if p and os.path.isfile(p):
         d=yaml.safe_load(open(p)) or {}
         n=(d.get('wiki_nodes') or {}).get('default')
         if isinstance(n, dict): n=n.get('token')
@@ -187,10 +215,10 @@ else
 fi
 
 # 记录到索引（原文 + 译文两条，各自按 doc_token 去重）
-python3 - "$PAGE_TITLE" "$DOC_URL" "$DOC_ID" "$SRC" "$TRANS_URL" "$TRANS_ID" <<'PYEOF' >&2 2>&1 || true
+python3 - "$PAGE_TITLE" "$DOC_URL" "$DOC_ID" "$SRC" "$TRANS_URL" "$TRANS_ID" "$FPDF_CFG" <<'PYEOF' >&2 2>&1 || true
 import sys, os, yaml
-title, url, tok, src, turl, ttok = sys.argv[1:7]
-f = os.path.expanduser("~/git/ccprivate/skill/fpdf.yaml")
+title, url, tok, src, turl, ttok, f = sys.argv[1:8]
+os.makedirs(os.path.dirname(f), exist_ok=True)
 d = yaml.safe_load(open(f)) if os.path.isfile(f) else {}
 d = d or {}
 di = d.setdefault("doc_index", [])

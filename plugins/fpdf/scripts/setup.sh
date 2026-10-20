@@ -45,6 +45,44 @@ _sudo_ok() {
     return 0
 }
 
+# 查 MinerU token：与 parse.py 同一条回退链
+#   $MINERU_CONF > <skill目录>/config.yaml > $CCPRIVATE_HOME/conf/mineru.json > ~/git/ccprivate/conf/mineru.json
+# 配置可能是 json（mineru.json）或 yaml（config.yaml），token 可能嵌在子 dict 里，都要吃。
+_find_mineru_token() {
+    _SKILL_DIR="$(dirname "$HERE")" python3 -c "
+import os,sys,json
+skill=os.environ['_SKILL_DIR']
+c=[os.environ.get('MINERU_CONF'),
+   os.path.join(skill,'config.yaml'),
+   (((os.environ.get('CCPRIVATE_HOME') or os.environ.get('CCPRIVATE_DIR')) or '') and
+    os.path.join(os.environ.get('CCPRIVATE_HOME') or os.environ.get('CCPRIVATE_DIR'),'conf','mineru.json')) or None,
+   os.path.expanduser('~/git/ccprivate/conf/mineru.json')]
+PH=('请填入','请到','your key','placeholder','<your-')
+def dig(o):
+    if not isinstance(o,dict): return ''
+    for k in ('token','mineru_token','api_key'):
+        v=o.get(k)
+        if isinstance(v,str) and v.strip(): return v.strip()
+    for v in o.values():
+        if isinstance(v,dict):
+            t=dig(v)
+            if t: return t
+    return ''
+for p in c:
+    if not p or not os.path.isfile(p): continue
+    try:
+        if p.endswith(('.yaml','.yml')):
+            import yaml; o=yaml.safe_load(open(p))
+        else:
+            o=json.load(open(p))
+    except Exception: continue
+    t=dig(o)
+    if t and not any(m in t for m in PH):
+        print(p); sys.exit(0)
+sys.exit(1)
+" 2>/dev/null
+}
+
 # 需用户手动装时，给可**原样复制**的命令（提示勿手打：实测手输易混入中文顿号、
 # 全角字符，apt 会报 "Unable to locate package poppler-utils、"，白跑一趟）
 _poppler_manual_hint() {
@@ -121,17 +159,19 @@ else
     MISSING=$((MISSING+1))
 fi
 
-# --- MinerU token（Precision 档需要；Flash 不需要）---
-CONF="${CCPRIVATE_HOME:-$HOME/git/ccprivate}/conf/mineru.json"
-if [ -f "$CONF" ] && python3 -c "
-import json,sys
-t=json.load(open('$CONF')).get('token','')
-sys.exit(0 if t and not any(m in t for m in ('请填入','请到','your key','placeholder','<your-')) else 1)
-" 2>/dev/null; then
-    ok "MinerU token（Precision 档可用）"
+# --- MinerU token（run.sh 默认走 precision 档，故缺了就是硬阻断）---
+# 口径纠正：早先把这项标为"不阻断（仅 flash 档可跑）"，但 run.sh 默认 --tier precision，
+# 缺 token 时 parse.py 直接 exit 3。setup.sh 说"能跑"、run.sh 紧接着硬失败 —— 不一致。
+# 现按 run.sh 的真实默认行为判：缺 token = 阻断（用户仍可显式 --tier flash 降级）。
+TOKF="$(_find_mineru_token)"
+if [ -n "$TOKF" ]; then
+    ok "MinerU token（$TOKF）"
 else
-    warn "MinerU token 未配置 → 只能跑 flash 档（仅文本，无结构/无图，不能排版）"
-    info "配置:  bash ~/git/ccconfig/init-option.sh mineru key"
+    bad "MinerU token 未配置 —— 默认 precision 档无法解析、不能排版"
+    info "取 token: https://mineru.net → API 管理 → 建 token"
+    info "写入任一位置: \$MINERU_CONF ｜ <skill目录>/config.yaml ｜ \$CCPRIVATE_HOME/conf/mineru.json"
+    info "降级跑（仅纯文本，无结构/无图）: run.sh <pdf> 后加 parse 时 --tier flash"
+    MISSING=$((MISSING+1))
 fi
 
 if [ "$QUIET" = 1 ]; then
