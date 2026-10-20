@@ -285,5 +285,10 @@ fpdf **不依赖** ffeishu 的运行时，只在两处复用其成果：
 | `Parent node not found` | 父文档 token 无效/无权限 | 检查 `fpdf.yaml` 的 `default`，或显式 `--parent` |
 | `unsafe output path` | lark-cli 导出路径沙箱 | 已内置：先导 /tmp 再 move（勿绕过） |
 | 图片 0 字节 | MinerU SDK 的 `images` 是 dataclass 非 bytes | 已修（取 `.data`）；见 memory `mineru-sdk-image-write-bug-20261018` |
+| **图糊/被切成多块** | MinerU 把一张 figure 切碎成低清截图 | 已修：抽 PDF 原图 + `page_ok` 合并（见「图片」节） |
+| **公式裸露成 `$...$`** | 用了 v1 content_list（无公式条目） | 已修：render 默认读 v2；确认 `*.content_list_v2.json` 存在 |
+| **`<sup>` 裸露成字面量** | `esc()` 把角标转义了 | 已修：角标转 `<latex>^{}`（含图注误判还原） |
+| **文献被强加 "1."** | 一律用 `<ol>` | 已修：源无编号的用 `<ul>`（见「参考文献」节） |
+| **文档出现重名副本** | 用了 `docs +create` 而非 `+update` | 改文档一律 `docs +update --command overwrite`；副本用 `drive +delete` 清 |
 | 想重新排版 | 结构包已存在 | 直接调 `render.py`，不必重新解析 |
 | 依赖报缺想一次性装 | — | `/fpdf deps`（或"安装依赖"）跑 setup.sh；`poppler-utils` 需用户自己 sudo |
