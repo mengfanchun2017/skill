@@ -43,18 +43,19 @@ _PLACEHOLDER = ("请填入", "请到", "your key", "placeholder", "<your-")
 
 
 def _dig_token(obj):
-    """从 dict 里挖 token：既吃 {'token': x}，也吃 {'mineru': {'token': x}} 嵌套。"""
+    """挖 MinerU token：只认顶层 token/mineru_token/api_key，或 mineru 子块里的同类键。
+
+    不做任意深递归 —— config.yaml 里 wiki_nodes.default.token 是**父文档节点 token**，
+    和 MinerU token 同名，全量递归会把它误当 MinerU key 送去鉴权（实测命中过）。
+    """
     if not isinstance(obj, dict):
         return ""
     for k in ("token", "mineru_token", "api_key"):
         v = obj.get(k)
         if isinstance(v, str) and v.strip():
             return v.strip()
-    for v in obj.values():
-        t = _dig_token(v) if isinstance(v, dict) else ""
-        if t:
-            return t
-    return ""
+    sub = obj.get("mineru")
+    return _dig_token(sub) if isinstance(sub, dict) else ""
 
 
 def load_token():

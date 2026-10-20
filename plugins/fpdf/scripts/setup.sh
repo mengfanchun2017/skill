@@ -17,6 +17,8 @@
 
 set -uo pipefail
 
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 CHECK_ONLY=0; QUIET=0
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -60,15 +62,14 @@ c=[os.environ.get('MINERU_CONF'),
    os.path.expanduser('~/git/ccprivate/conf/mineru.json')]
 PH=('请填入','请到','your key','placeholder','<your-')
 def dig(o):
+    # 只认顶层 token/mineru_token/api_key 或 mineru 子块里的 —— 全递归会把
+    # wiki_nodes.default.token（父文档节点 token）误当 MinerU key（同名，实测命中过）
     if not isinstance(o,dict): return ''
     for k in ('token','mineru_token','api_key'):
         v=o.get(k)
         if isinstance(v,str) and v.strip(): return v.strip()
-    for v in o.values():
-        if isinstance(v,dict):
-            t=dig(v)
-            if t: return t
-    return ''
+    sub=o.get('mineru')
+    return dig(sub) if isinstance(sub,dict) else ''
 for p in c:
     if not p or not os.path.isfile(p): continue
     try:
