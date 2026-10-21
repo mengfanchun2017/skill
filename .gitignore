@@ -35,3 +35,5 @@ config.yaml
 
 # 误写的重定向产物（含 ~/.claude.json 内容，曾泄露）
 <stdin>
+
+<stdout>
