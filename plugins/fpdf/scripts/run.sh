@@ -33,6 +33,11 @@ _cfg_path() {   # $1=fpdf|ffeishu → echo 命中路径；都没命中则 echo �
     _CFG_NAME="$1" _CFG_SKILL_DIR="$SKILL_DIR" python3 -c "
 import os
 n=os.environ['_CFG_NAME']; skill=os.environ['_CFG_SKILL_DIR']
+# 本脚本在 fpdf/scripts 下，故 \$SKILL_DIR 恒为 fpdf 目录；查别的 skill 的
+# <skill目录>/config.yaml 必须解析到它自己的兄弟目录，否则 ffeishu 会命中
+# fpdf 的 config.yaml（本机所有 clone/plugin 用户都有该文件 → 必然命中）。
+sib=os.path.join(os.path.dirname(skill), n)
+if os.path.isdir(sib): skill = sib
 c=[]
 if n=='fpdf':
     if os.environ.get('FPDF_CONFIG'): c.append(os.environ['FPDF_CONFIG'])

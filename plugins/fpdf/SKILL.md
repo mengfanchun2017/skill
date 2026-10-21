@@ -141,7 +141,7 @@ plugin 用户把配置写在 `~/.claude/skill-config/fpdf.yaml`（cache 之外�
 
 ```yaml
 wiki_nodes:
-  default: "<wiki节点token>   # 从父文档 URL 的 /wiki/<token> 取
+  default: "<wiki节点token>"   # 从父文档 URL 的 /wiki/<token> 取（含引号，勿漏闭合）
 doc_index: []                  # 自动追加，勿手改
 ```
 

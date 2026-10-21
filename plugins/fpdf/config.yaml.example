@@ -21,8 +21,9 @@ wiki_nodes:
 
 # MinerU token（默认 precision 档必需；不填只能跑 flash 档，无结构、不能排版）
 # 获取：https://mineru.net → API 管理 → 建 token
-# 也可放在独立文件里（优先级：$MINERU_CONF > ~/.claude/skill-config/fpdf.yaml
-# > 本文件 > ccprivate/conf/mineru.json）
+# 也可放在独立文件里（优先级：$MINERU_CONF > $FPDF_CONFIG
+# > ~/.claude/skill-config/fpdf.yaml > 本文件 > $CCPRIVATE_HOME/conf/mineru.json
+# > ~/git/ccprivate/conf/mineru.json）
 mineru:
   token: ""
 
