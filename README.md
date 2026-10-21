@@ -219,6 +219,10 @@ A Claude Code marketplace with 24 self-built plugins (all registered in marketpl
 
 `init-skill.sh sync` 自动建立 symlink；改 ccprivate 立即生效。
 
-独立用户：每个 skill 自带 `config.yaml.example`，复制为 `config.yaml` 填入你的真实值即可。
+独立用户（git clone 装）：每个 skill 自带 `config.yaml.example`，复制为同目录 `config.yaml` 填入真实值。
+
+**`/plugin install` 装的用户**：`<skill目录>` 是 `~/.claude/plugins/cache/<market>/<plugin>/<版本号>/` ——
+版本化只读副本，`/plugin update` 即整目录替换，写在那里的 `config.yaml` **会丢**。
+配置改放 `~/.claude/skill-config/<skill名>.yaml`（cache 之外，跨更新稳定）。
 
 **已有配置**：`ffeishu` / `flogme` / `fmoocrec` / `fmashwork` 都需要个人配置才能工作。

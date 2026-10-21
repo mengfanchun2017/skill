@@ -24,7 +24,10 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 > 📖 完整说明 → [config.aiagt.dev](https://config.aiagt.dev/ffeishu)
 
 **ccconfig 用户**：真实值放 `ccprivate/skill/ffeishu.yaml`，`init-skill.sh sync` 自动覆盖。
-**独立用户**：`cp config.yaml.example config.yaml` 填入真实值。
+**独立用户（git clone）**：`cp config.yaml.example config.yaml` 填入真实值。
+**plugin 安装用户**：`<skill目录>` 是 `~/.claude/plugins/cache/<market>/<plugin>/<版本号>/`
+—— 版本化只读副本，`/plugin update` 即整目录替换，写在里面的 config.yaml **会丢**；
+配置改放 `~/.claude/skill-config/ffeishu.yaml`（cache 之外，跨更新稳定）。
 
 需提前准备：
 - 飞书租户（企业版/个人版）
@@ -434,8 +437,17 @@ lark-cli docs +fetch --api-version v2 --doc "$PARENT_TOKEN" --detail full | grep
 
 用户说"配置 ffeishu"时，读取 `config.yaml` 展示可配置项，用 AskUserQuestion 让用户修改，写回文件。
 
+配置文件按以下顺序找（命中即用，写入也写**命中的那个**）：
+1. `$FFEISHU_CONFIG`（环境变量显式指定）
+2. `~/.claude/skill-config/ffeishu.yaml` —— **plugin 安装的用户写这里**（cache 之外，更新不丢）
+3. `<skill目录>/config.yaml` —— git clone / ccconfig 用户
+
 ```bash
-cat "$SKILL_DIR/config.yaml"
+cfg="$FFEISHU_CONFIG"
+for p in ~/.claude/skill-config/ffeishu.yaml "$SKILL_DIR/config.yaml"; do
+  [ -z "$cfg" ] && [ -f "$p" ] && cfg="$p"
+done
+cat "${cfg:-$SKILL_DIR/config.yaml}"
 ```
 
 配置项说明见 `config.yaml` 注释。用户直接编辑该文件也可，无需重启。

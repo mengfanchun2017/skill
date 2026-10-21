@@ -1,5 +1,39 @@
 # Changelog
 
+## [0.13.3] — 2026-10-21
+
+### Fixed
+- **【坑】`_cfg_path ffeishu` 命中 fpdf 的 config.yaml**：`run.sh` 的 `_cfg_path` 里
+  `<skill目录>` 恒为 `$SKILL_DIR`（脚本在 `fpdf/scripts/` 下），查 ffeishu 时也拼成
+  fpdf 目录 → 在本机任何有 fpdf `config.yaml` 的机器上**必然命中 fpdf 配置**，
+  导致 ffeishu 父文档 token 永不生效，文档静默落到云空间根目录。改为按 name 解析
+  **兄弟目录**（`dirname(skill)/<name>`，存在才用）。实测前：`ffeishu →
+  plugins/fpdf/config.yaml`；修后指向 ffeishu 自己的配置。
+- **MinerU token 链漏 `$FPDF_CONFIG`**：`parse.py` 的 `CONF_CANDIDATES`、`setup.sh` 的
+  `_find_mineru_token` 都没查该变量，而 SKILL.md 明确把它列为第 1 顺位 —— 用户
+  `export FPDF_CONFIG=...` 且 token 在该文件时，仍报 "token 未找到" 并 `exit 3`。两处
+  均补入（插在 `$MINERU_CONF` 之后）。对应报错文案/`config.yaml.example` 优先级注释
+  同步补齐顺位与 `$CCPRIVATE_HOME/conf/mineru.json`。
+- **【坑】SKILL.md 里的 config 模板是非法 YAML**：`default: "<token>   # 注释` 开引号
+  未闭合 → `yaml.safe_load` 抛 ScannerError。用户照抄进 config.yaml 后，run.sh /
+  parse.py / setup.sh 的 yaml 解析全部异常被吞（`except: continue`），父节点与索引
+  静默失效。已补闭合引号。
+- **ffeishu 缺 plugin 安装口径**：`ffeishu/SKILL.md` 只教 `cp config.yaml.example
+  config.yaml`，plugin 用户的写入落点仍在 cache 副本里，`/plugin update` 即丢。
+  补 plugin 分支指引 + 配置文件回退链（`$FFEISHU_CONFIG` > `~/.claude/skill-config/ffeishu.yaml`
+  > `<skill目录>/config.yaml`），「配置 ffeishu」章节的读取命令改为按链查找。
+- **README 独立用户指引与 plugin 口径矛盾**：公开 README 仍教「复制为 config.yaml」，
+  未提 plugin 用户的写入会丢。补 `/plugin install` 分支与 `~/.claude/skill-config/` 落点。
+- **marketplace 版本号跳号**：上一轮实际以 `0.13.2` 发布，CHANGELOG 却记了
+  `0.13.1` 与 `0.13.2` 两节（`0.13.1` 从未作为独立 marketplace 版本号发出）。本版
+  归位为 `0.13.3` 并在此说明，后续以 marketplace.json 为准。
+
+### Verified
+- `_cfg_path` 双 name 实测：`fpdf → plugins/fpdf/config.yaml`、`ffeishu →
+  plugins/ffeishu/config.yaml`（修前两者相同）
+- SKILL.md 模板 `yaml.safe_load` 通过（修前 ScannerError）
+- `bash -n run.sh` / `bash -n setup.sh` / `parse.py` 语法检查通过
+
 ## [0.13.2] — 2026-10-21
 
 ### Fixed
