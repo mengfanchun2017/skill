@@ -32,3 +32,6 @@ config.yaml
 
 # 飞书 Slides 本地规划状态（不入库）
 .lark-slides/
+
+# 误写的重定向产物（含 ~/.claude.json 内容，曾泄露）
+<stdin>
