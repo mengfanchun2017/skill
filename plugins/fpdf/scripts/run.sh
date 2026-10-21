@@ -17,10 +17,18 @@ bad()  { printf '\033[31m✗\033[0m %s\n' "$*" >&2; }
 info() { printf '\033[36m→\033[0m %s\n' "$*" >&2; }
 
 # 配置文件回退链（决定父文档 token 取哪、文档索引写哪）：
-#   $FPDF_CONFIG > <skill目录>/config.yaml > ccprivate/skill/fpdf.yaml
-# 独立用户：复制 config.yaml.example → config.yaml 填值即可，无需 ccprivate。
-# ccconfig 用户：apply-config.sh 已把 ccprivate/skill/fpdf.yaml symlink 成
-#   <skill目录>/config.yaml，故第 2 条即命中，行为与从前完全一致。
+#   $FPDF_CONFIG > ~/.claude/skill-config/<name>.yaml > <skill目录>/config.yaml
+#     > $CCPRIVATE_HOME/skill/<name>.yaml > ~/git/ccprivate/skill/<name>.yaml
+#
+# 为何第 2 顺位是 ~/.claude/skill-config/：用 /plugin install 装的用户，
+# <skill目录> 是 ~/.claude/plugins/cache/<market>/<plugin>/<版本号>/ —— 版本化
+# 只读副本，更新即整目录替换，写在那里的 config.yaml 会丢。用户级路径在 cache
+# 之外，跨更新稳定，故 plugin 用户的配置写这里（也是无配置时的写入默认）。
+#
+# 三条路径各自的用户：
+#   ~/.claude/skill-config/  → plugin 安装的用户（推荐）
+#   <skill目录>/config.yaml  → 自己 git clone 的用户；也是 ccconfig 用户
+#                              （apply-config.sh 把它 symlink 到 ccprivate）
 _cfg_path() {   # $1=fpdf|ffeishu → echo 命中路径；都没命中则 echo 首选写入路径
     _CFG_NAME="$1" _CFG_SKILL_DIR="$SKILL_DIR" python3 -c "
 import os
@@ -28,7 +36,9 @@ n=os.environ['_CFG_NAME']; skill=os.environ['_CFG_SKILL_DIR']
 c=[]
 if n=='fpdf':
     if os.environ.get('FPDF_CONFIG'): c.append(os.environ['FPDF_CONFIG'])
-    c.append(os.path.join(skill,'config.yaml'))
+# 用户级稳定路径：plugin 安装不会覆盖，plugin 用户首选，也是写入默认
+c.append(os.path.expanduser(os.path.join('~','.claude','skill-config',n+'.yaml')))
+c.append(os.path.join(skill,'config.yaml'))
 for b in (os.environ.get('CCPRIVATE_HOME') or os.environ.get('CCPRIVATE_DIR') or '', '~/git/ccprivate'):
     if b: c.append(os.path.join(os.path.expanduser(b),'skill',n+'.yaml'))
 hit=next((x for x in c if x and os.path.isfile(x)), None)

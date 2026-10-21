@@ -1,8 +1,14 @@
 # fpdf 配置模板
 #
-# 独立用户（从公开仓库装 skill 的人）：
-#   复制本文件为 config.yaml 放同目录，填入下面两项真实值即可，无需 ccprivate。
-#   ⚠️ config.yaml 已在 .gitignore 里，不会被提交；请勿改本 template 文件本身。
+# 按你怎么装的选一种（不改本 template 文件本身）：
+#
+# A) /plugin install 装的（cache 副本随更新替换，别写进 cache）：
+#    把本文件内容抄到 ~/.claude/skill-config/fpdf.yaml，填值。该路径在 cache 之外，
+#    /plugin update 不会碰它。
+#
+# B) 自己 git clone 装的：
+#    复制本文件为同目录的 config.yaml，填值。config.yaml 已在 .gitignore 里，
+#    不会被提交。
 #
 # ccconfig 用户：
 #   真实值放 ccprivate/skill/fpdf.yaml，apply-config.sh 自动把它 symlink 成
@@ -15,7 +21,8 @@ wiki_nodes:
 
 # MinerU token（默认 precision 档必需；不填只能跑 flash 档，无结构、不能排版）
 # 获取：https://mineru.net → API 管理 → 建 token
-# 也可放在独立文件里（优先级：$MINERU_CONF > 本文件 > ccprivate/conf/mineru.json）
+# 也可放在独立文件里（优先级：$MINERU_CONF > ~/.claude/skill-config/fpdf.yaml
+# > 本文件 > ccprivate/conf/mineru.json）
 mineru:
   token: ""
 

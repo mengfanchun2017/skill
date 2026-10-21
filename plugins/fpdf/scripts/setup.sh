@@ -49,13 +49,15 @@ _sudo_ok() {
 }
 
 # 查 MinerU token：与 parse.py 同一条回退链
-#   $MINERU_CONF > <skill目录>/config.yaml > $CCPRIVATE_HOME/conf/mineru.json > ~/git/ccprivate/conf/mineru.json
+#   $MINERU_CONF > ~/.claude/skill-config/fpdf.yaml > <skill目录>/config.yaml
+#     > $CCPRIVATE_HOME/conf/mineru.json > ~/git/ccprivate/conf/mineru.json
 # 配置可能是 json（mineru.json）或 yaml（config.yaml），token 可能嵌在子 dict 里，都要吃。
 _find_mineru_token() {
     _SKILL_DIR="$(dirname "$HERE")" python3 -c "
 import os,sys,json
 skill=os.environ['_SKILL_DIR']
 c=[os.environ.get('MINERU_CONF'),
+   os.path.expanduser('~/.claude/skill-config/fpdf.yaml'),
    os.path.join(skill,'config.yaml'),
    (((os.environ.get('CCPRIVATE_HOME') or os.environ.get('CCPRIVATE_DIR')) or '') and
     os.path.join(os.environ.get('CCPRIVATE_HOME') or os.environ.get('CCPRIVATE_DIR'),'conf','mineru.json')) or None,
@@ -195,7 +197,8 @@ if [ -n "$TOKF" ]; then
 else
     bad "MinerU token 未配置 —— 默认 precision 档无法解析、不能排版"
     info "取 token: https://mineru.net → API 管理 → 建 token"
-    info "写入任一位置: \$MINERU_CONF ｜ <skill目录>/config.yaml ｜ \$CCPRIVATE_HOME/conf/mineru.json"
+    info "写入任一位置: \$MINERU_CONF ｜ ~/.claude/skill-config/fpdf.yaml ｜ <skill目录>/config.yaml"
+    info "（plugin 安装的用户写 ~/.claude/skill-config/fpdf.yaml —— cache 副本更新会丢）"
     info "降级跑（仅纯文本，无结构/无图）: run.sh <pdf> 后加 parse 时 --tier flash"
     MISSING=$((MISSING+1))
 fi

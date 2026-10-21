@@ -65,7 +65,7 @@ bash ~/.claude/skills/fpdf/scripts/setup.sh --check  # 只检查不安装
 | `uv` | `curl -LsSf https://astral.sh/uv/install.sh \| sh` | **阻断** |
 | `lark-cli` | `npm i -g @larksuite/cli`，装入 PATH（或落 `~/.local/bin`） | **阻断** |
 | 飞书授权 | `lark-cli auth login`（走扫码，一次性） | **阻断** |
-| MinerU token | https://mineru.net → API 管理 → 建 token，填进 config.yaml 的 `mineru.token` | **阻断**（默认 precision 档） |
+| MinerU token | https://mineru.net → API 管理 → 建 token；plugin 用户填 `~/.claude/skill-config/fpdf.yaml`，clone 用户填 `<skill目录>/config.yaml` 的 `mineru.token` | **阻断**（默认 precision 档） |
 | `poppler-utils` | 自动按平台装（apt / brew / dnf / pacman / apk）；装不上**只提示不阻断** | 不阻断 |
 
 > **token 口径**：`run.sh` 默认走 precision 档（排版必需），缺 token 时 `parse.py` 直接
@@ -119,14 +119,22 @@ Word 导出路径、译文文档链接一并给出。多链接用列表。
 （`run.sh` 的 `_cfg_path`）：
 
 ```
-1. $FPDF_CONFIG                （环境变量显式指定）
-2. <skill目录>/config.yaml      （独立用户默认；复制 config.yaml.example 填值）
-3. $CCPRIVATE_HOME/skill/fpdf.yaml
-4. ~/git/ccprivate/skill/fpdf.yaml   （ccc私用户；apply-config.sh 已 symlink 成第 2 条）
+1. $FPDF_CONFIG                     （环境变量显式指定）
+2. ~/.claude/skill-config/fpdf.yaml （plugin 安装的用户写这里；cache 之外，跨更新稳定）
+3. <skill目录>/config.yaml          （自行 git clone 的用户；也是 ccconfig 用户的
+                                     apply-config.sh symlink 落点）
+4. $CCPRIVATE_HOME/skill/fpdf.yaml
+5. ~/git/ccprivate/skill/fpdf.yaml
 ```
 
+**为何第 2 顺位存在**：用 `/plugin install` 装时，`<skill目录>` 是
+`~/.claude/plugins/cache/<market>/<plugin>/<版本号>/` —— 版本化只读副本，
+`/plugin update` 即整目录替换，写在那里的 `config.yaml` **会丢**。所以
+plugin 用户把配置写在 `~/.claude/skill-config/fpdf.yaml`（cache 之外，更新不碰）。
+
 未在 fpdf 配置中找到时，回落 ffeishu 配置的 default。文档索引 `doc_index` 写回
-**同一个命中的配置文件**——独立用户写自己的 config.yaml，不碰 ccprivate。
+**同一个命中的配置文件**——plugin 用户写 `~/.claude/skill-config/`，clone 用户写
+自己的 config.yaml，都不碰 ccprivate。
 
 用户说"保存父文档链接"或"配置 fpdf"时：
 用 AskUserQuestion 问父文档 URL/token → 写入**命中文件**（同上第 1 顺位命中项）：

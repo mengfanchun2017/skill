@@ -33,7 +33,9 @@ _SKILL_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 CONF_CANDIDATES = [
     lambda: os.environ.get("MINERU_CONF"),
-    lambda: os.path.join(_SKILL_DIR, "config.yaml"),      # 独立用户：skill 内 config.yaml
+    # 用户级稳定路径：plugin 安装（cache 副本，随更新替换）的用户写这里
+    lambda: os.path.expanduser("~/.claude/skill-config/fpdf.yaml"),
+    lambda: os.path.join(_SKILL_DIR, "config.yaml"),      # 自行 clone 的用户 / ccconfig symlink
     lambda: (os.environ.get("CCPRIVATE_HOME") or os.environ.get("CCPRIVATE_DIR") or "") and
             os.path.join(os.environ.get("CCPRIVATE_HOME") or os.environ.get("CCPRIVATE_DIR"), "conf", "mineru.json"),
     lambda: os.path.expanduser("~/git/ccprivate/conf/mineru.json"),
@@ -159,10 +161,12 @@ def main():
     token = load_token()
     tier = args.tier
     if tier == "precision" and not token:
-        print("ERROR: precision 档（默认，排版必需）需要 MinerU token，四个位置都没找到：\n"
-              "  $MINERU_CONF > <skill目录>/config.yaml > $CCPRIVATE_HOME/conf/mineru.json > ~/git/ccprivate/conf/mineru.json\n"
+        print("ERROR: precision 档（默认，排版必需）需要 MinerU token，五个位置都没找到：\n"
+              "  $MINERU_CONF > ~/.claude/skill-config/fpdf.yaml > <skill目录>/config.yaml\n"
+              "    > $CCPRIVATE_HOME/conf/mineru.json > ~/git/ccprivate/conf/mineru.json\n"
               "  取 token: https://mineru.net 注册 → API 管理 → 建 token\n"
-              "  写入任一位置（独立用户最简：把 token 填进 <skill目录>/config.yaml）\n"
+              "  plugin 安装的用户写 ~/.claude/skill-config/fpdf.yaml（cache 副本更新会丢）；\n"
+              "  自行 clone 的用户写 <skill目录>/config.yaml\n"
               "  或降级跑（仅文本、无结构、不能排版）: --tier flash",
               file=sys.stderr)
         sys.exit(3)

@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.13.2] — 2026-10-21
+
+### Fixed
+- **fpdf plugin 用户配置会丢**：`/plugin install` 装的用户，`<skill目录>` 实为
+  `~/.claude/plugins/cache/<market>/<plugin>/<版本号>/`（版本化只读副本），
+  `/plugin update` 即整目录替换 —— 按旧文档写在那里的 `config.yaml` 会丢。
+  新增**用户级稳定路径** `~/.claude/skill-config/fpdf.yaml`（cache 之外），
+  插入回退链第 2 顺位，也是无配置时的写入默认：
+  `$FPDF_CONFIG` > `~/.claude/skill-config/fpdf.yaml` > `<skill目录>/config.yaml`
+  > `$CCPRIVATE_HOME/skill/fpdf.yaml` > `~/git/ccprivate/skill/fpdf.yaml`
+- MinerU token 链同步插入该路径（`parse.py` 的 `CONF_CANDIDATES`、`setup.sh` 的
+  `_find_mineru_token`、两处报错/提示文案）
+- SKILL.md 父文档章节 + 依赖表、`config.yaml.example` 改为按安装方式分支指引
+  （plugin 装 → 写 `~/.claude/skill-config/`；git clone 装 → 写 `<skill目录>/config.yaml`）
+
+### Verified
+- 两场景实测：无 `~/.claude/skill-config/` 时仍命中 `<skill目录>/config.yaml`（ccconfig
+  用户行为不变）；建该文件后 run.sh/parse.py/setup.sh 三处一致命中并读到 token
+- 三个脚本语法通过、marketplace 同步通过
+
 ## [0.13.1] — 2026-10-20
 
 ### Fixed
