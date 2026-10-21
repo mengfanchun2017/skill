@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.13.1] — 2026-10-20
+
+### Fixed
+- **fpdf 可移植性（独立用户可直接用）**：此前 4 处硬编码 `~/git/ccprivate/*`，非 ccconfig 用户装上后父文档 token 取不到、索引写不进，静默降级。改为**配置文件回退链**：
+  `$FPDF_CONFIG` > `<skill目录>/config.yaml` > `$CCPRIVATE_HOME/skill/fpdf.yaml` > `~/git/ccprivate/skill/fpdf.yaml`（`run.sh` 的 `_cfg_path`，父节点与 doc_index 均走同一命中文件）
+- **MinerU token 回退链同改**：`$MINERU_CONF` > `<skill目录>/config.yaml` > `$CCPRIVATE_HOME/conf/mineru.json` > `~/git/ccprivate/conf/mineru.json`；支持 yaml/json 两种格式
+- **【坑】token 误挖父文档节点 token**：`_dig_token` 原为全量递归找 `token` 键，会命中 `wiki_nodes.default.token`（父文档节点 token）当 MinerU key 送去鉴权 → 假阳性。改为只认顶层 `token`/`mineru_token`/`api_key` 或 `mineru` 子块
+- **【坑】setup.sh `HERE` 未定义**：新加的 `_find_mineru_token` 引用了 `HERE`，但 setup.sh 从未定义它（`set -u` 下直接报 unbound variable）→ 补 `HERE="$(cd "$(dirname ...)" && pwd)"`
+- **口径纠正：MinerU token 改判为阻断项**：`run.sh` 默认走 precision 档（排版必需），缺 token 时 `parse.py` 直接 `exit 3`；原来 setup.sh 标"不阻断（仅 flash 档可跑）"与实际默认流程矛盾（说能跑、紧接着硬失败）
+- **poppler 安装跨平台**：安装分支从写死 `sudo apt-get` 改为按平台探测（apt/brew/dnf/pacman/apk），手动提示同步按平台给出可复制命令
+- **setup.sh 软/硬缺项分离**：poppler 归入 `SOFT` 计数，不阻断；`--quiet` 只表达阻断项（`deps-ok`/`deps-missing:N`），run.sh gate 据此判定
+- `run.sh` 依赖 gate 补 MinerU token/授权复查（早失败优于跑到 parse.py 深水区）
+- SKILL.md 依赖表 + 父文档章节更新为配置回退链口径；去除 ccconfig 专属命令硬引用
+
+### Verified
+- 独立用户隔离测试（无 ccprivate，HOME 指向空目录）：config.yaml 回退命中、token 解析、doc_index 幂等写入、父节点 token 幸存 —— 全通
+- 真实 PDF 端到端：11 页英文论文 → 234 条结构条目 → 飞书文档创建成功（测试文档已删）
+
 ## [0.13.0] — 2026-10-18
 
 ### Added
