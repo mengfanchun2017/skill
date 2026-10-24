@@ -1,6 +1,6 @@
 # fsysarchi 备考进度配置
 # 复制为 config.yaml 填入真实值。
-# ccprivate 覆盖: 将真实配置放到 ccprivate/config/f-sysarchi.yaml
+# ccprivate 覆盖: 将真实配置放到 ccprivate/skill/fsysarchi.yaml
 
 exam:
   target: "2027-Q2"       # 目标考试时间（YYYY-QN）

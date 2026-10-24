@@ -3,7 +3,7 @@ name: fdocx
 user-invocable: true
 description: |
   Word .docx 原生生成 — OfficeCLI 引擎，支持模板/样式/表格/图片/页眉页脚/目录。
-  Use when 用户说"创建Word"/"写Word文档"/"生成docx"/"导出Word"/"做简历"/"写报告docx"。
+  用法：用户说"创建Word"/"写Word文档"/"生成docx"/"导出Word"/"做简历"/"写报告docx"。
 allowed-tools: Read, Write, Bash, Glob
 ---
 

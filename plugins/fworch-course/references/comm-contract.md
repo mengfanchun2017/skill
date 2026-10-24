@@ -37,8 +37,8 @@ orchestrator 在 status=ok 后用 `ccprivate/bin/yaml-edit.sh` 更新 `<slug>.ya
 路径用点号分隔，支持三种操作：
 
 ```bash
-E=~/git/ccprivate/bin/yaml-edit.sh
-CFG=~/git/ccprivate/conf/fcourse/<slug>.yaml
+E=${CCPRIVATE_HOME:-$HOME/git/ccprivate}/bin/yaml-edit.sh
+CFG=${CCPRIVATE_HOME:-$HOME/git/ccprivate}/conf/fcourse/<slug>.yaml
 
 $E "$CFG" set current_step 1                                   # 设标量（数字/布尔自动推断）
 $E "$CFG" set feishu.overview_doc_url "https://feishu.cn/..."  # 中间段不存在自动建 dict

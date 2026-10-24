@@ -3,7 +3,7 @@ name: fsysarchi
 user-invocable: true
 description: |
   [personal] 系统分析师/系统架构设计师备考 — 随工作边做边学。暗号 "archi" 触发。
-  Use when 用户说"archi"/"系统分析师"/"备考"/"出题"/"grill"，
+  用法：用户说"archi"/"系统分析师"/"备考"/"出题"/"grill"，
   或想在日常工作中嵌入考试知识点学习。
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebSearch, AskUserQuestion
 ---

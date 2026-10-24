@@ -3,12 +3,12 @@
 > 项目级 AI 行为指南。**仅在 `/home/francis/git/skill/` 工作时加载**。全局规则在 `~/.claude/CLAUDE.md`。
 
 ## 项目定位
-Claude Code skill 聚合仓。**24 个自建 plugin，全部在 marketplace 注册**（每个 `plugins/<name>/` 是独立 Claude Code plugin），第三方 skill 由用户用 `npx skills` 自管（不通过 marketplace）。
+Claude Code skill 聚合仓。**26 个自建 plugin，全部在 marketplace 注册**（每个 `plugins/<name>/` 是独立 Claude Code plugin），第三方 skill 由用户用 `npx skills` 自管（不通过 marketplace）。
 
 ## 目录结构
 ```
 skill/
-├── plugins/                # 24 个自建 plugin
+├── plugins/                # 26 个自建 plugin
 ├── scripts/                # marketplace 工具脚本
 ├── .claude-plugin/         # Claude Code plugin 元数据
 ├── .github/                # CI
@@ -18,7 +18,7 @@ skill/
 └── www/                    # 静态展示页（部署到 skill.aiagt.dev）
 ```
 
-## 24 个 plugin
+## 26 个 plugin
 | Plugin | 用途 |
 |--------|------|
 | ffeishu | 飞书文档/PPT/表格/Base 操作统一入口 |

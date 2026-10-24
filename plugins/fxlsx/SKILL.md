@@ -3,7 +3,7 @@ name: fxlsx
 user-invocable: true
 description: |
   Excel .xlsx 原生生成 — OfficeCLI 引擎，支持公式/图表/条件格式/数据透视表/多工作表。
-  Use when 用户说"创建Excel"/"做表格"/"生成xlsx"/"导出报表"/"数据透视表"/"画图表(Excel)"。
+  用法：用户说"创建Excel"/"做表格"/"生成xlsx"/"导出报表"/"数据透视表"/"画图表(Excel)"。
 allowed-tools: Read, Write, Bash, Glob
 ---
 

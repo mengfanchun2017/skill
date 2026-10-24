@@ -3,10 +3,10 @@ name: ffeishu
 user-invocable: true
 description: |
   飞书文档编排层 — 创建飞书wiki/表格/白板、更新报告、整合/拆分文档、飞书↔Office双向转换、文档对比。
-  Use when 用户说"创建文档"/"写文档"、"更新文档"/"更新报告"、"整合文档"/"合并文档"、
+  用法：用户说"创建文档"/"写文档"、"更新文档"/"更新报告"、"整合文档"/"合并文档"、
   "拆分文档"、"导出Word/PPT"、"飞书转Office"、"导入到飞书"、"对比文档"、
   或给出飞书文档URL要求操作。
-  PPT 委托 fpptx，图表委托 fdiagram，
+  PPT 委托 fpptx，图表委托 fdiagram。
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 

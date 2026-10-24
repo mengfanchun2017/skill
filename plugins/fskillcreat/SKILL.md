@@ -64,8 +64,13 @@ cd ~/git/skill && python3 scripts/sync-marketplace.py --write
 
 输出创建的完整路径和下一步：
 
-- 公开：`cd ~/git/skill && git add . && git commit -m "feat: <name>" && git push`
-- 私有：`cd ~/git/ccprivate && git add . && git commit -m "feat(skill-local): <name>" && git push`
+- 公开：skill 落在 `~/git/skill/plugins/<name>/`
+- 私有：skill 落在 `~/git/ccprivate/skill-local/<name>/`
+
+> ⚠ **不要手动 `git add` / `git commit` / `git push`**。`~/git/` 下的仓库由 auto-sync
+> monitor 独占提交权（inotify → debounce → add+commit+push 全做）。手动提交会和 monitor
+> 抢跑：多 session 并行时两边改动被扫进同一个 commit，已 push 后还得 reset 拆 ——
+> 等于改写发布历史。**改完文件即止，等 monitor 自动提交。**
 
 ## 设计参考
 

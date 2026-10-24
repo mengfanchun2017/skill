@@ -104,6 +104,22 @@ def main():
             if write_mode:
                 entry["description"] = fm_desc
 
+    # 自动登记新插件：有 SKILL.md 但 marketplace 无条目 → 建条目。
+    # 此前只报 ORPHAN 不自动加 → 新 skill 永远漏登记（要人肉补 marketplace），
+    # 装出来的 skill 在 /plugin 列表里看不见。
+    added = 0
+    for name in fm_data:
+        if name in local_entries:
+            continue
+        local_entries[name] = {
+            "name": name,
+            "description": fm_data[name],
+            "source": f"./plugins/{name}",
+            "keywords": ["f"],
+        }
+        added += 1
+        print(f"  ADD    {name}（自动登记新插件）")
+
     # Report ghosts and orphans
     if ghosts:
         print(f"\n  GHOST ({len(ghosts)}): marketplace entries without plugin dirs:")
@@ -120,14 +136,14 @@ def main():
         print("  OK — marketplace.json in sync with SKILL.md frontmatter")
         return
 
-    if write_mode and changes > 0:
-        # Rebuild plugins array: local entries (updated) + external entries
+    if write_mode and (changes > 0 or added > 0):
+        # Rebuild plugins array: local entries (updated + newly registered) + external entries
         new_plugins = list(local_entries.values()) + external_entries
         mp["plugins"] = new_plugins
         with open(MARKETPLACE, "w") as f:
             json.dump(mp, f, indent=2, ensure_ascii=False)
             f.write("\n")
-        print(f"\n  WROTE {changes} description(s) updated in marketplace.json")
+        print(f"\n  WROTE {changes} description(s) updated, {added} plugin(s) added in marketplace.json")
 
     if not write_mode and total_issues > 0:
         print(f"\n  {total_issues} issue(s) — run with --write to fix description drift")

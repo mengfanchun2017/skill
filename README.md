@@ -1,6 +1,6 @@
 # skill — Claude Code skill 集合
 
-> Claude Code 技能聚合仓。**24 个自建 plugin**（全部在 marketplace 注册）+ **第三方 skill 由用户用 npx skills 自管**（不通过 marketplace）。
+> Claude Code 技能聚合仓。**26 个自建 plugin**（全部在 marketplace 注册）+ **第三方 skill 由用户用 npx skills 自管**（不通过 marketplace）。
 > 飞书 / 调研 / 撰写系统 / 文档 / PPT / Excel / 图表 / 3D 打印 一站式。
 
 ## 快速开始
@@ -73,7 +73,7 @@ cconfig 用户：`bash ccconfig/lib/init-skill.sh sync` 自动从 `conf/third-pa
 
 克隆 [ccconfig](https://github.com/mengfanchun2017/ccconfig) 后，`bash lib/init-skill.sh sync` 自动完成：symlink 自建 skill、注册 marketplace、安装第三方 skill、注入私有配置。详见 ccconfig 文档。
 
-## 自建 plugin（24 个，全部 marketplace 注册）
+## 自建 plugin（26 个，全部 marketplace 注册）
 
 | Plugin | 说明 |
 |-------|------|
@@ -147,7 +147,7 @@ lark-cli auth login
 skill/                                  ← 单聚合 marketplace 仓
 ├── .claude-plugin/
 │   └── marketplace.json                # plugin 入口（全本地）
-├── plugins/                            ← 24 个自建 plugin（全 marketplace）
+├── plugins/                            ← 26 个自建 plugin（全 marketplace）
 │   ├── ffeishu/SKILL.md
 │   ├── fpptx/SKILL.md
 │   ├── fdocx/SKILL.md

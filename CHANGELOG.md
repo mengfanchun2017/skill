@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.14.0] — 2026-10-25
+
+### Added
+- **`fsecretcheck` skill（第 26 个 plugin）**：公开仓密钥守门员。扫描工作树与 git
+  历史里的真实凭据/内网 IP/真实邮箱，判定内容该进公开仓还是私密仓，给出脱敏建议。
+  核心前提：私密仓（ccprivate）本来就是存 key 的地方，对它只报告不拦截；公开仓才阻断。
+
+### Changed
+- **`sync-marketplace.py` 自动登记新插件**：此前只报 `ORPHAN` 不自动加条目，新 skill
+  永远漏登记（要人肉补 marketplace.json，否则 `/plugin` 列表里看不见）。`--write`
+  现在会为每个有 SKILL.md 而无条目的目录自动建条目。
+- **5 个 skill 的 description 去掉英文 `Use when` 前缀**（fdocx/fxlsx/ffeishu/
+  fmoocrec/fsysarchi），改中文主动式「用法：用户说…」—— 与 `ccprivate/rules/skill.md`
+  的全中文要求一致。marketplace.json 同步。
+- **`fskillcreat` 的手动 git 提交指引改掉**：原指引教用户 `git add . && git commit
+  && git push`，与 auto-sync monitor 独占提交权直接冲突（手动提交会与 monitor 抢跑，
+  两边改动被扫进同一 commit）。改为"改完即止，等 monitor 自动提交"。
+- **`~/git/ccprivate` 硬编码改 `${CCPRIVATE_HOME:-...}`**（fworch-course /
+  fworch-interview 及其 comm-contract），换机/自定义路径不再断。
+
+### Fixed
+- **4 个 `config.yaml.example` 指向不存在的路径**：`ccprivate/config/<x>.yaml` →
+  实际是 `ccprivate/skill/<name>.yaml`（fsearch/fresearchframe/fsysarchi/fworch-report）。
+- **README/CLAUDE.md 的 plugin 计数 24 → 26**（fpdf 是第 25 个、fsecretcheck 是第 26 个，
+  此前一直漏登 fpdf）。
+
 ## [0.13.3] — 2026-10-21
 
 ### Fixed

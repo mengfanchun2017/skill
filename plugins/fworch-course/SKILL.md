@@ -34,7 +34,7 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 ## Phase A: 课程选择
 
 ```bash
-ls ~/git/ccprivate/conf/fcourse/*.yaml 2>/dev/null
+ls ${CCPRIVATE_HOME:-$HOME/git/ccprivate}/conf/fcourse/*.yaml 2>/dev/null
 ```
 
 **配置真相源**：所有课程配置存**飞书在线**（Base / docx），`conf/fcourse/<slug>.yaml` 只是本地缓存镜像（用于 orchestrator 快速读取 + 离线可见）。在线源改了需重新生成 yaml 或人工同步。
@@ -49,7 +49,7 @@ ls ~/git/ccprivate/conf/fcourse/*.yaml 2>/dev/null
 ## Phase B: 读配置
 
 ```bash
-cat ~/git/ccprivate/conf/fcourse/<slug>.yaml
+cat ${CCPRIVATE_HOME:-$HOME/git/ccprivate}/conf/fcourse/<slug>.yaml
 ```
 
 配置结构：
@@ -199,8 +199,8 @@ lark-cli drive +search --query test --page-size 1 --as user 2>&1 \
 4. status=in_progress（Step 5 后改为 completed）
 
 ```bash
-E=~/git/ccprivate/bin/yaml-edit.sh
-CFG=~/git/ccprivate/conf/fcourse/<slug>.yaml
+E=${CCPRIVATE_HOME:-$HOME/git/ccprivate}/bin/yaml-edit.sh
+CFG=${CCPRIVATE_HOME:-$HOME/git/ccprivate}/conf/fcourse/<slug>.yaml
 $E "$CFG" set current_step 1
 $E "$CFG" set feishu.research_doc_url "<url>"
 $E "$CFG" append feishu.lesson_docs chapter=1 title="导入" url="<url>"
