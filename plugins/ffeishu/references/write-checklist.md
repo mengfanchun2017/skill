@@ -46,12 +46,39 @@
 - [ ] 章节间无 `<hr/>` 分割线
 - [ ] **标题为简单连贯中文短名**（2-6 字），不带「长主语 — 解释副标题」；同一项目的子文档用统一短词风格
 
+#### 标题层级配色（可选，长文档建议启用）
+飞书 `text-color` **只认 7 个基础色相**（`red orange yellow green blue purple gray`）——RGB / hex / 数字 / `light-*` 前景**全被丢弃或归一成 blue**（2026-10-25 实测）。标题标签本身**不支持** `text-color` 属性，必须用 `<span>` 包裹。三级方案：
+
+```xml
+<h1><span background-color="blue"><b>一级标题</b></span></h1>   <!-- 深蓝底白字，章节横幅 -->
+<h2><span text-color="blue"><b>二级标题</b></span></h2>          <!-- 蓝字加粗 -->
+<h3><span text-color="gray"><b>三级标题</b></span></h3>          <!-- 灰字加粗，弱化 -->
+```
+- [ ] 想要真正的深蓝/中蓝两级区分 → **做不到**，飞书没有细分蓝。用「底/字」差异代替
+- [ ] ❌ `<h1 text-color="...">`（属性被静默丢弃）→ ✅ `<h1><span ...>` 
+- [ ] **验色必须导出 PDF 转 PNG 肉眼看**：`docs +fetch` 只返回存储值，不代表渲染色
+
 ### 表格 → 标准 HTML `<table>` XML
 - [ ] **禁止 Markdown 表格**（列宽被固定成 120），全部用 `<table>` XML
 - [ ] 结构：`<table><colgroup><col width="N"/>…</colgroup><thead><tr><th><p>…</p></th></tr></thead><tbody><tr><td><p>…</p></td></tr></tbody></table>`
 - [ ] **colgroup 列宽之和 = 822**（`round(822/N)` 均分：2列→411×2, 3列→274×3, 4列→205×2+206×2, 5列→164×4+166）
 - [ ] 单元格内容包 `<p>`；不用 `#` 标题符号
 - [ ] ⚠ **勿用 `<lark-table rows= cols= column-widths=>`**（旧写法，实测列宽丢失 + 多行被吞；2026-10-18 更正）
+
+#### 手机竖屏优化（4 列以上必须转换）
+5 列时每列仅 164px ≈ 7 个中文字，手机上必然折行成"豆腐块"。规则：
+
+- [ ] **列数 ≤ 3** → 保持横向表；首列约 26–30% 宽，其余均分（总和 822）
+- [ ] **列数 ≥ 4** → 转「分组竖排」两列表：
+  ```xml
+  <table><colgroup><col width="240"/><col width="582"/></colgroup><tbody>
+    <tr><td colspan="2" background-color="light-blue"><p><b>第 1 列的值（作为分组标题）</b></p></td></tr>
+    <tr><td><p>第 2 列表头</p></td><td><p>第 2 列值</p></td></tr>
+    …（其余表头/值逐行配对）
+  </tbody></table>
+  ```
+- [ ] 转换逻辑：原表每行 → 一个跨列蓝底标题行 + N−1 个「表头 / 值」行
+- [ ] 效果：手机竖屏下每行只有两列，不折行；分组标题提供视觉分段
 
 ### 图表 → 委托 fdiagram skill
 - [ ] 架构图/流程图等由 fdiagram 生成，通过 `block_insert_after` 嵌入
