@@ -118,9 +118,56 @@ PDF 的完整执行流程、依赖预检、父文档配置 → 见 `../fpdf/SKIL
 > 被渲染器忽略 —— 列宽全变 120、第二个 `<lark-tr>` 被吞（只剩首行）。现存文档用标准 `<table>`，
 > 本文件此前教的 lark-table 语法与实态不符，已更正。
 
+### 标题配色（长文档建议启用）
+飞书 `text-color` **只认 7 个基础色相**（`red orange yellow green blue purple gray`）——RGB / hex / 数字 / `light-*` 前景全被丢弃或归一成 blue（2026-10-25 实测）。标题标签**不支持** `text-color` 属性，必须用 `<span>` 包裹：
+
+```xml
+<h1><span background-color="blue"><b>一级标题</b></span></h1>   <!-- 深蓝底白字 -->
+<h2><span text-color="blue"><b>二级标题</b></span></h2>          <!-- 蓝字 -->
+<h3><span text-color="gray"><b>三级标题</b></span></h3>          <!-- 灰字 -->
+```
+**想要真正的「深蓝 + 中蓝」两级区分 → 做不到**，飞书没有可区分的两种蓝，用「底/字」差异代替。验色必须导出 PDF 转 PNG 肉眼看（`docs +fetch` 只见存储值）。
+
+### 表格 → 标准 HTML `<table>` XML
+- **禁止 Markdown 表格**（列宽会被固定成 120，无法控制），全部用 `<table>` XML
+- **要控制列宽必须显式写 `<colgroup>`，宽度之和 = 822**（`round(822/N)` 均分）
+- 正确结构（**唯一保留列宽和多行的写法**）：
+  ```xml
+  <table><colgroup><col width="411"/><col width="411"/></colgroup>
+    <thead><tr><th background-color="light-gray"><p>表头</p></th></tr></thead>
+    <tbody><tr><td><p>值</p></td></tr></tbody></table>
+  ```
+- 单元格内容包在 `<p>` 里，不用 `#` 标题符号
+
+#### 手机竖屏优化（≥4 列必须转换）
+5 列时每列仅 164px ≈ 7 个中文字，手机上折行成"豆腐块"。**列数 ≥ 4 → 转「分组竖排」两列表**：
+
+```xml
+<table><colgroup><col width="240"/><col width="582"/></colgroup><tbody>
+  <tr><td colspan="2" background-color="light-blue"><p><b>第 1 列的值（分组标题）</b></p></td></tr>
+  <tr><td><p>第 2 列表头</p></td><td><p>第 2 列值</p></td></tr>
+</tbody></table>
+```
+
+> ⚠ **旧写法 `<lark-table rows="N" cols="N" column-widths="...">` 已废弃**：2026-10-18 实测该标签
+> 被渲染器忽略 —— 列宽全变 120、第二个 `<lark-tr>` 被吞（只剩首行）。现存文档用标准 `<table>`，
+> 本文件此前教的 lark-table 语法与实态不符，已更正。
+
 ### 图表 → 委托 fdiagram skill
 - 架构图/流程图/时序图等由 fdiagram 生成，通过 `block_insert_after` 插入
 - 图表在对应内容位置嵌入，不在末尾
+
+### 批量转换 Markdown → DocxXML
+长文档成批入库（如课程化 18 篇）用 `references/md2docxxml.py`：
+
+```bash
+python3 ~/.claude/skills/ffeishu/references/md2docxxml.py input.md out_name "--root=画板根节点名"
+# 产出 ./gen/out_name.xml，再 cat 进 lark-cli
+cat gen/out_name.xml | lark-cli docs +create --api-version v2 --parent-token <node> \
+  --as user --title "标题" --doc-format xml --content -
+```
+
+自带：三级标题配色 + 手机竖屏宽表转竖排 + 自动剥离手动编号 + 从大纲生成结构 mindmap。
 
 ### 缩写
 - 首次出现用 DFN 格式：`中文全称（English Full Name, ABBR）`
