@@ -2,8 +2,9 @@
 """给合成 PDF 加书签（outline）+ 元数据"""
 import json, re, fitz, os
 
-T = '/home/francis/.claude/jobs/9c9c8fff/tmp/pdfbuild'
-PDF = os.path.join(T, 'Wharton商业分析复习课程.pdf')
+T = os.environ.get('BUILD_DIR', './pdfbuild')
+BOOK = os.environ.get('BOOK_TITLE', '文档合订本')
+PDF = os.path.join(T, BOOK + '.pdf')
 docs = json.load(open(os.path.join(T, 'docs.json'), encoding='utf-8'))
 sec = json.load(open(os.path.join(T, 'secpages.json'), encoding='utf-8'))
 
@@ -49,13 +50,13 @@ for gname, pred in GROUPS:
 
 d.set_toc(toc)
 d.set_metadata({
-    'title': 'Wharton 商业分析复习课程 — Business Analytics: From Data to Insights',
+    'title': BOOK,
     'author': 'Wharton / Emeritus（中文精读 + 2024—2026 演进）',
     'subject': '商业分析课程复习材料：3 篇总览 + 9 篇单元 + 9 篇案例',
     'keywords': '商业分析, 描述性分析, 预测性分析, 规范性分析, Wharton, 复习',
     'creator': 'ffeishu / lark-cli',
 })
-out = os.path.join(T, 'Wharton商业分析复习课程.bookmarked.pdf')
+out = os.path.join(T, BOOK + '.final.pdf')
 d.save(out, garbage=3, deflate=True)
 d.close()
 print('bookmarks:', len(toc), '| saved', out, os.path.getsize(out) // 1024, 'KB')
