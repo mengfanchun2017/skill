@@ -40,12 +40,16 @@ def run(a):
     return '\n'.join(l for l in r.stdout.split('\n') if not l.startswith('[lark-cli]'))
 
 def node_list(p):
-    return json.loads(run(['lark-cli','wiki','+node-list','--space-id',SPACE,
-                           '--parent-node-token',p,'--as','user','--page-size','50']))['data'].get('nodes') or []
+    ns = json.loads(run(['lark-cli','wiki','+node-list','--space-id',SPACE,
+                         '--parent-node-token',p,'--as','user','--page-size','50']))['data'].get('nodes') or []
+    # 只要 docx；附件/表格等无法 docs+fetch
+    return [n for n in ns if n.get('obj_type') == 'docx']
 
 def fetch(o):
-    return json.loads(run(['lark-cli','docs','+fetch','--api-version','v2','--doc',o,
-                           '--as','user','--detail','full']))['data']['document']['content']
+    t = run(['lark-cli','docs','+fetch','--api-version','v2','--doc',o,'--as','user','--detail','full'])
+    if not t.strip():
+        raise RuntimeError(f'fetch empty for obj={o}（非 docx 或无权访问）')
+    return json.loads(t)['data']['document']['content']
 
 nodes = {n['title']: n for n in node_list(ROOT_NODE)}
 # 排序：总览前缀在前，其余按标题（week 顺序自然排）
