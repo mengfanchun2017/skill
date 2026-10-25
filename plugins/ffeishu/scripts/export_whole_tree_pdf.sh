@@ -94,6 +94,9 @@ for tok in btoks:
     else:
         print(f'  [warn] board {tok[:12]} export failed')
 
+json.dump(docs, open(os.path.join(OUT, 'docs.json'), 'w'), ensure_ascii=False)
+anchors = {d['node']: d['title'] for d in docs if d.get('node')}
+json.dump(anchors, open(os.path.join(OUT, 'anchors.json'), 'w'), ensure_ascii=False)
 print(f'docs={len(docs)} boards={ok}/{len(btoks)}')
 PY
 LARK_SPACE_ID="$SPACE" LARKSUITE_CLI_CONFIG_DIR="$LARKSUITE_CLI_CONFIG_DIR" PATH="$PATH" \
