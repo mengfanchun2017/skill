@@ -80,23 +80,14 @@ for tok in btoks:
     if os.path.exists(p) and os.path.getsize(p) > 2000:
         ok += 1
         continue
-    t = run(['lark-cli','whiteboard','+export','--whiteboard-token',tok,
-             '--output-type','preview','--output',os.path.join(OUT,'boards'),'--as','user'])
-    try:
-        got = json.loads(t)['data'].get('preview_image_path')
-    except Exception:
-        got = None
-    if got and os.path.exists(got):
-        if os.path.abspath(got) != os.path.abspath(p):
-            os.replace(got, p)
+    # 用显式文件名输出最稳（传目录时服务端会加 whiteboard_ 前缀）
+    run(['lark-cli','whiteboard','+export','--whiteboard-token',tok,
+         '--output-type','preview','--output',p,'--as','user'])
+    if os.path.exists(p) and os.path.getsize(p) > 2000:
         ok += 1
     else:
-        print(f'  [warn] board {tok[:12]} export failed: {t[:120]}')
+        print(f'  [warn] board {tok[:12]} export failed')
 
-json.dump(docs, open(os.path.join(OUT, 'docs.json'), 'w'), ensure_ascii=False)
-# 锚点映射（供 PDF 内部链接）
-anchors = {d.get('node'): d['title'] for d in docs if d.get('node')}
-json.dump(anchors, open(os.path.join(OUT, 'anchors.json'), 'w'), ensure_ascii=False)
 print(f'docs={len(docs)} boards={ok}/{len(btoks)}')
 PY
 LARK_SPACE_ID="$SPACE" LARKSUITE_CLI_CONFIG_DIR="$LARKSUITE_CLI_CONFIG_DIR" PATH="$PATH" \
