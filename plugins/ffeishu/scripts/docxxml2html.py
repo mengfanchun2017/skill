@@ -9,7 +9,11 @@
 import json, os, re, html
 from xml.etree import ElementTree as ET
 
-ANCHORS = json.load(open(os.path.join(OUT, 'anchors.json'), encoding='utf-8'))
+OUT = os.environ.get('BUILD_DIR', './pdfbuild')
+BOARDS = os.path.join(OUT, 'boards')
+BOOK_TITLE = os.environ.get('BOOK_TITLE', '文档合订本')
+_ap = os.path.join(OUT, 'anchors.json')
+ANCHORS = json.load(open(_ap, encoding='utf-8')) if os.path.exists(_ap) else {}
 SLUG = {}
 
 
@@ -17,10 +21,6 @@ def slug_of(title):
     if title not in SLUG:
         SLUG[title] = 'sec' + str(len(SLUG) + 1)
     return SLUG[title]
-
-OUT = os.environ.get('BUILD_DIR', './pdfbuild')
-BOARDS = os.path.join(OUT, 'boards')
-BOOK_TITLE = os.environ.get('BOOK_TITLE', '文档合订本')
 
 CSS = """
 @page { size: A4; margin: 18mm 16mm 20mm 16mm; }
