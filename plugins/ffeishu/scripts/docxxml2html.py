@@ -218,7 +218,8 @@ def main():
     # 分类
     for d in docs:
         t = d['title']
-        if d['kind'] == 'root':
+        if d.get('kind') == 'root' or t == 'ROOT':
+            d['kind'] = 'root'
             continue
         if t.startswith('BADTI '):
             d['kind'] = 'overview'
