@@ -75,7 +75,8 @@ anchors = {d.get('node'): d['title'] for d in docs if d.get('node')}
 json.dump(anchors, open(os.path.join(OUT, 'anchors.json'), 'w'), ensure_ascii=False)
 print(f'docs={len(docs)} boards={ok}/{len(btoks)}')
 PY
-PREFIX_ENV="$OVERVIEW_PREFIX" python3 "$OUT/_grab.py" "$ROOT_NODE" "$ROOT_OBJ" "$OUT" "$OVERVIEW_PREFIX"
+LARK_SPACE_ID="$SPACE" LARKSUITE_CLI_CONFIG_DIR="$LARKSUITE_CLI_CONFIG_DIR" PATH="$PATH" \
+  python3 "$OUT/_grab.py" "$ROOT_NODE" "$ROOT_OBJ" "$OUT" "$OVERVIEW_PREFIX"
 
 # ---- 2. DocxXML -> HTML ----
 BUILD_DIR="$OUT" BOOK_TITLE="$BOOK" python3 "$HERE/docxxml2html.py"
