@@ -21,6 +21,12 @@ BOOK="${4:?book title}"
 OVERVIEW_PREFIX="${5:-}"
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# ⚠ lark-cli 的 --output/--content/--file 路径只允许 cwd / /tmp / ~/files。
+#   非 /tmp 的输出目录会让 whiteboard +export 静默失败，故这里强制落到 /tmp 下。
+case "$OUT" in
+  /tmp/*|"$PWD"/*) ;;
+  *) echo "[fatal] 输出目录必须在 cwd 或 /tmp 下（lark-cli 路径 allowlist），当前: $OUT" >&2; exit 2 ;;
+esac
 SPACE="${LARK_SPACE_ID:-7626581506382728129}"
 export PATH="$HOME/.local/bin:$PATH"
 export LARKSUITE_CLI_CONFIG_DIR="${LARKSUITE_CLI_CONFIG_DIR:-$HOME/.lark-cli-ailab}"
