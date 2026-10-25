@@ -25,7 +25,14 @@ SPACE="${LARK_SPACE_ID:-7626581506382728129}"
 export PATH="$HOME/.local/bin:$PATH"
 export LARKSUITE_CLI_CONFIG_DIR="${LARKSUITE_CLI_CONFIG_DIR:-$HOME/.lark-cli-ailab}"
 CHROME="${PW_CHROME:-$HOME/.local/state/pw-chromium/chrome}"
+# 自动探测 playwright-core 所在 node_modules
 NODE_MODULES="${PW_NODE_MODULES:-}"
+if [ -z "$NODE_MODULES" ]; then
+  NODE_MODULES="$(ls -d "$HOME"/.npm/_npx/*/node_modules 2>/dev/null | while read -r d; do
+      [ -d "$d/playwright-core" ] && echo "$d" && break
+    done)"
+fi
+[ -n "$NODE_MODULES" ] && export NODE_PATH="$NODE_MODULES"
 
 mkdir -p "$OUT/boards"
 
