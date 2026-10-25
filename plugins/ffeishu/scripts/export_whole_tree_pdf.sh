@@ -112,5 +112,6 @@ for i in 1 2; do
   BUILD_DIR="$OUT" BOOK_TITLE="$BOOK" python3 "$HERE/collect_pages.py" || true
 done
 BUILD_DIR="$OUT" BOOK_TITLE="$BOOK" python3 "$HERE/add_bookmarks.py"
+mv -f "$OUT/$BOOK.final.pdf" "$OUT/$BOOK.pdf"
 
 echo "✅ $OUT/$BOOK.pdf"
