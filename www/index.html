@@ -692,6 +692,40 @@ const SKILLS = [
       {trigger: '"Make a new plugin"', result: "→ Generates SKILL.md frontmatter + directory structure"}
     ],
     deps: []
+  },
+  {
+    id: "fpdf", name: "fpdf", icon: "📕", cat: "docs", needs_ccconfig: true,
+    ccconfig_zh: "ccconfig 已装：lark-cli、uv、MinerU 配套",
+    ccconfig_en: "ccconfig installs: lark-cli, uv, MinerU toolchain",
+    desc_zh: "PDF 精排 — 把 PDF 精确拆解后重排为飞书文档：还原表格列宽、行内公式、高清原图、参考文献、论文首页信息区；可选导出 Word、可选生成译文版，可自查运行依赖。",
+    desc_en: "PDF re-typesetting — decompose a PDF and rebuild it as a Feishu doc: table column widths, inline formulas, high-res images, references, paper front matter. Optional Word export and translated edition; self-checks its runtime deps.",
+    scenarios_zh: [
+      {trigger: '"把这个 PDF 排版到飞书"', result: "→ MinerU 解析 → 飞书文档重排（保表格/公式/图）"},
+      {trigger: '"图不清楚"/"公式没渲染"', result: "→ 返工重排，修表格列宽与行内公式"},
+      {trigger: '"翻译这个 PDF"/"导出 Word"', result: "→ 生成译文版 / 导出 Word"}
+    ],
+    scenarios_en: [
+      {trigger: '"Re-typeset this PDF into Feishu"', result: "→ MinerU parse → rebuild as Feishu doc (tables/formulas/images)"},
+      {trigger: '"Images are blurry" / "Formulas not rendered"', result: "→ Re-do: fix column widths and inline formulas"},
+      {trigger: '"Translate this PDF" / "Export to Word"', result: "→ Translated edition / Word export"}
+    ],
+    deps: ["lark-cli", "uv", "MinerU"]
+  },
+  {
+    id: "fsecretcheck", name: "fsecretcheck", icon: "🔐", cat: "productivity", needs_ccconfig: false,
+    ccconfig_zh: "纯技能，零外部依赖",
+    ccconfig_en: "Pure skill, zero external deps",
+    desc_zh: "密钥泄露检查 — 扫描仓库工作树与 git 历史里的真实凭据（API key/token/密码/内网 IP），判定该文件属于公开仓还是私密仓，给出脱敏建议。准备把配置/文档推到公开仓库前用。",
+    desc_en: "Secret-leak gatekeeper — scans the worktree and git history for real credentials (API keys/tokens/passwords/internal IPs), decides whether content belongs in a public or private repo, and proposes redactions. Run before pushing config or docs to a public repo.",
+    scenarios_zh: [
+      {trigger: '"检查密钥"/"有没有泄露"', result: "→ 扫工作树 + git 历史，列出凭据命中"},
+      {trigger: '"这个文件能公开吗"', result: "→ 判定公开/私密归属 + 脱敏建议"}
+    ],
+    scenarios_en: [
+      {trigger: '"Check for leaked secrets"', result: "→ Scan worktree + git history, list credential hits"},
+      {trigger: '"Can this file go public?"', result: "→ Public/private verdict + redaction advice"}
+    ],
+    deps: []
   }
 ];
 
