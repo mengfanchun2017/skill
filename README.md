@@ -199,9 +199,9 @@ MIT — 见 [LICENSE](LICENSE)
 
 ## English Summary
 
-A Claude Code marketplace with 24 self-built plugins (all registered in marketplace). Third-party skills use `npx skills` (not /plugin install) for clean dialog UX.
+A Claude Code marketplace with 26 self-built plugins (all registered in marketplace). Third-party skills use `npx skills` (not /plugin install) for clean dialog UX.
 
-- **Self-built (in repo)**: ffeishu, fpptx, fdocx, fxlsx, fdiagram, fsearch, fresearchframe, fworch, fworch-report, fworch-course, fworch-case, fworch-interview, fwstd-report, fwstd-course, fwstd-case, fwstd-interview, flogme, fmoocrec, fsysarchi, flibaudit, fsyncdoc, fmashwork, fllmpack, fskillcreat
+- **Self-built (in repo)**: ffeishu, fpptx, fdocx, fxlsx, fdiagram, fsearch, fresearchframe, fworch, fworch-report, fworch-course, fworch-case, fworch-interview, fwstd-report, fwstd-course, fwstd-case, fwstd-interview, flogme, fmoocrec, fsysarchi, flibaudit, fsyncdoc, fmashwork, fllmpack, fskillcreat, fsecretcheck
 - **Feishu CLI (system level)**: install `@larksuite/cli` via npm — ffeishu orchestrates all `lark-cli` commands
 - **Utilities (user-installed via `npx skills`)**: mattpocock/skills sub-skills (caveman, diagnose, grill-me, ...)
 
