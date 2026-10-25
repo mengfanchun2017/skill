@@ -544,6 +544,8 @@ cat "${cfg:-$SKILL_DIR/config.yaml}"
 ## 参考手册
 
 > 完整格式约束、命令速查、所有陷阱 → `references/write-checklist.md`
+> Markdown → DocxXML 转换器 → `references/md2docxxml.py`（标题配色 + 表格/列表选型 + 自动结构白板）
+> 文档树 → 合订本 PDF 工具链 → `scripts/`（`export_whole_tree_pdf.sh` 一键；`docxxml2html.py` / `html2pdf.js` / `collect_pages.py` / `add_bookmarks.py` 分步）
 
 ---
 
