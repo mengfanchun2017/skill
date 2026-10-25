@@ -9,7 +9,7 @@
 import json, os, re, html
 from xml.etree import ElementTree as ET
 
-ANCHORS = json.load(open('/home/francis/.claude/jobs/9c9c8fff/tmp/pdfbuild/anchors.json', encoding='utf-8'))
+ANCHORS = json.load(open(os.path.join(OUT, 'anchors.json'), encoding='utf-8'))
 SLUG = {}
 
 
@@ -18,9 +18,9 @@ def slug_of(title):
         SLUG[title] = 'sec' + str(len(SLUG) + 1)
     return SLUG[title]
 
-T = '/home/francis/.claude/jobs/9c9c8fff/tmp'
-OUT = os.path.join(T, 'pdfbuild')
+OUT = os.environ.get('BUILD_DIR', './pdfbuild')
 BOARDS = os.path.join(OUT, 'boards')
+BOOK_TITLE = os.environ.get('BOOK_TITLE', '文档合订本')
 
 CSS = """
 @page { size: A4; margin: 18mm 16mm 20mm 16mm; }
@@ -232,7 +232,7 @@ def main():
         slug_of(d['title'])
 
     try:
-        SECP = json.load(open('/home/francis/.claude/jobs/9c9c8fff/tmp/pdfbuild/secpages.json', encoding='utf-8'))
+        SECP = json.load(open(os.path.join(OUT, 'secpages.json'), encoding='utf-8'))
     except Exception:
         SECP = {}
 
@@ -273,9 +273,9 @@ def main():
         marker = f'<span class="mk">{slug_of(d["title"])}</span>'
         body.append(f'<div class="doc" id="{slug_of(d["title"])}">{marker}{tag}{html_body}</div>')
 
-    cover = """<div class="cover">
-      <h1>Wharton 商业分析复习课程</h1>
-      <div class="sub">Business Analytics: From Data to Insights</div>
+    cover = f"""<div class="cover">
+      <h1>{BOOK_TITLE}</h1>
+      <div class="sub">文档合订本</div>
       <div class="meta">
         <div class="box">
           <b>内容构成</b><br/>
