@@ -66,12 +66,23 @@ for t in titles:
 
 btoks = [m.group(1) for d in docs for m in re.finditer(r'<whiteboard[^>]*token="([^"]+)"', d['content'])]
 ok = 0
+# 注意：whiteboard +export 把图写到 <outdir>/<token>.jpg（--output 给目录或文件名都会被
+# 服务端返回的 preview_image_path 决定），因此以返回路径为准，并统一改名成 token.jpg 供 HTML 引用
 for tok in btoks:
     p = os.path.join(OUT, 'boards', tok + '.jpg')
-    if not (os.path.exists(p) and os.path.getsize(p) > 2000):
-        run(['lark-cli','whiteboard','+export','--whiteboard-token',tok,
-             '--output-type','preview','--output',p,'--as','user'])
-    if os.path.exists(p) and os.path.getsize(p) > 2000: ok += 1
+    if os.path.exists(p) and os.path.getsize(p) > 2000:
+        ok += 1
+        continue
+    t = run(['lark-cli','whiteboard','+export','--whiteboard-token',tok,
+             '--output-type','preview','--output',os.path.join(OUT,'boards'),'--as','user'])
+    try:
+        got = json.loads(t)['data'].get('preview_image_path')
+    except Exception:
+        got = None
+    if got and os.path.exists(got):
+        if os.path.abspath(got) != os.path.abspath(p):
+            os.replace(got, p)
+        ok += 1
 
 json.dump(docs, open(os.path.join(OUT, 'docs.json'), 'w'), ensure_ascii=False)
 # 锚点映射（供 PDF 内部链接）
