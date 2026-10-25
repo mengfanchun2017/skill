@@ -84,6 +84,25 @@
 - [ ] 架构图/流程图等由 fdiagram 生成，通过 `block_insert_after` 嵌入
 - [ ] 图表在对应内容位置嵌入，不在末尾堆砌
 
+#### 在 XML 内容里直接嵌画板（批量建文档用）
+`docs +create` / `docs +update --command overwrite` 的 XML 里可直接写画板，**一步到位**，无需再 block_insert_after：
+
+```xml
+<whiteboard type="mermaid">
+mindmap
+  root((根节点))
+    分支一
+      叶子甲
+</whiteboard>
+```
+- [ ] `type` 可为 `mermaid` / `plantuml` / `svg` / `blank`；`src=<token>` 表示复制已有画板
+- [ ] mindmap 缩进**只可靠支持两级**（H1 → H2），三层以上会渲染异常
+- [ ] 节点文本里**不能有** `"` `'` `` ` `` `/` `\`（会破坏 mermaid 语法）→ 生成前过滤
+- [ ] 节点文本过长会溢出框 → 截断到 ~14 个中文字符
+- [ ] **验证画板是否真的渲染**：`lark-cli whiteboard +export --whiteboard-token <tok> --output-type preview --output b.jpg`
+  - ⚠ **PDF 导出不渲染画板**（只显示"画板"占位框），别据此判断画板坏了
+  - `+export` 必须带 `--output-type`（`preview` / `svg` / `source` / `raw`）；`preview` 返回 jpg，输出路径扩展名要匹配
+
 ### 文本
 - [ ] 缩写首次出现用 DFN 格式：`中文全称（English Full Name, ABBR）`
 - [ ] 链接域名 `www.feishu.cn`，非 `open.feishu.cn`
@@ -101,6 +120,9 @@
 - [ ] lark-cli pipe 前先 `sed '/^\[lark-cli\]/d'` 过滤日志行（`tail -n +2` 不稳定）
 - [ ] JSON 文件路径**必须相对**：`cd /tmp && --json @file.json`，不能用 `--json @/tmp/file.json`
 - [ ] `docs +create` 返回的 URL 域名是 `www.feishu.cn`，浏览器访问需换成 `my.feishu.cn`
+- [ ] **`@file` 只能读当前目录 / `/tmp` / `~/files`**：报 `is outside the built-in allowlist` 时改用 stdin —— `cat file | lark-cli ... --content -`
+- [ ] **`docs +create`/`+update --content` 支持 stdin**（`--content -`），批量建文档时这是唯一可靠传大块 XML 的方式
+- [ ] **批量 overwrite 必须串行**：生成 shell 脚本逐条 `cat xml | lark-cli docs +update --command overwrite`，不要并行；并行会触发版本冲突静默失败
 
 ## 4. 写后验证（必做）
 
