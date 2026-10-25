@@ -90,6 +90,8 @@ for tok in btoks:
         if os.path.abspath(got) != os.path.abspath(p):
             os.replace(got, p)
         ok += 1
+    else:
+        print(f'  [warn] board {tok[:12]} export failed: {t[:120]}')
 
 json.dump(docs, open(os.path.join(OUT, 'docs.json'), 'w'), ensure_ascii=False)
 # 锚点映射（供 PDF 内部链接）
