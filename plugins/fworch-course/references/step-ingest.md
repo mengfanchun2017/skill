@@ -141,5 +141,8 @@ lark-cli wiki +move --node-token <子节点 node_token> --target-parent-token <�
 - 附件上传 `base +record-upload-attachment` 同样限于 cwd//tmp/~/files
 - `wiki +node-list` 返回的数组键是 `data.nodes`（**不是** `data.items`）；`--page-size` 上限 **50**
 - `wiki +node-delete` 必须传 `--obj-type docx` + `--yes`
-- 批量 HTML→DocxXML 转换脚本见 ffeishu 编排层：md → XML（标题配色 + 手机竖屏宽表转竖排 + 自动结构 mindmap）
+- 批量 HTML→DocxXML 转换脚本见 ffeishu 编排层：`references/md2docxxml.py`
+  （标题样式：H1 蓝字无底色 / H2 及以下默认黑；正文不撒黑体；表格按内容选型 2列→定义式列表、步骤→有序列表、3–4列→真表格、≥5列→嵌套列表；从大纲自动生成结构 mindmap）
+- **Markdown 表格分隔行有 `|-|-|` 与 `|------|` 两种**，判定正则必须容忍单横线，否则分隔行被当数据、整表错位
+- 排版细则与硬约束唯一真相源：`ffeishu/references/write-checklist.md` §2
 - 写飞书前**必调 ffeishu skill**（格式约束只在 skill 调用时加载）
