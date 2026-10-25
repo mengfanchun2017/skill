@@ -1,7 +1,25 @@
 #!/usr/bin/env python3
-"""update .md -> DocxXML (手机竖屏 + 三级配色 + 白板)
+"""Markdown -> 飞书 DocxXML 转换器（手机竖屏 + 三级标题配色 + 自动结构白板）
 
-用法: python3 convert.py <input.md> <out_name> [--board boardfile.mmd ...]
+把一份 Markdown 稿转成可直接喂给 `lark-cli docs +create/+update --doc-format xml` 的 DocxXML。
+
+用法:
+    python3 md2docxxml.py <input.md> <out_name> [--root=<画板根节点名>] [--board=key=file.mmd ...]
+
+产出:
+    <脚本同目录>/gen/<out_name>.xml   （含 <title>，可 `cat xml | lark-cli ... --content -` 直接喂）
+
+能力:
+    - 标题三级配色：H1 蓝底白字 / H2 蓝字 / H3 灰字（飞书只认 7 个基础色相，详见 write-checklist §2）
+    - 自动剥离手动标题编号（`一、` `1.2` `(1)` `第N章`）——飞书自动生成目录，手写编号会重复
+    - 手机竖屏表格：列数 > 3 时转为「分组竖排」两列表（跨列蓝底标题 + 表头/值对）
+    - 自动结构 mindmap：从 H1/H2 大纲生成白板，插在首个 H1 之前
+    - Markdown 内联：**粗体** / *斜体* / `代码` / [链接](url)
+    - 显式白板：稿中写 `<!--whiteboard:key-->`，配合 `--board=key=file.mmd` 注入
+
+设计约束（实飞书踩过的）:
+    - colgroup 列宽之和必须 = 822
+    - mermaid mindmap 缩进只可靠支持两级；节点文本禁引号/斜杠，过长会溢出（自动截断 ~14 字）
 """
 import re, sys, os, json, html
 
