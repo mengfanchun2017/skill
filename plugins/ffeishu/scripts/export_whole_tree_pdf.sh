@@ -35,8 +35,8 @@ import json, os, re, subprocess, sys
 ROOT_NODE, ROOT_OBJ, OUT, PREFIX = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
 SPACE = os.environ.get('LARK_SPACE_ID', '7626581506382728129')
 
-def run(a, stdin=None):
-    r = subprocess.run(a, capture_output=True, text=True, input=stdin)
+def run(a):
+    r = subprocess.run(a, capture_output=True, text=True, stdin=subprocess.DEVNULL)
     return '\n'.join(l for l in r.stdout.split('\n') if not l.startswith('[lark-cli]'))
 
 def node_list(p):
