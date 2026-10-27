@@ -20,9 +20,10 @@
 import sys, os, json, argparse, tempfile
 
 # 单一实现（配置路径解析）：ffeishu 是 hub，所有 skill 的 config 工具层放它下面
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "ffeishu", "references"))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 try:
-    from config_env import ccprivate_root as _ccprivate_root
+    from _skillconf_boot import config_env as _ce
+    _ccprivate_root = _ce.ccprivate_root
 except Exception:
     def _ccprivate_root():
         from pathlib import Path

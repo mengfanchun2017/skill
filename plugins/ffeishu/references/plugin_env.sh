@@ -205,6 +205,11 @@ for sub, tag in [("conf", "ccprivate/conf"), ("skill", "ccprivate/skill")]:
         p = os.path.join(ccpriv, sub, f"{name}.{ext}")
         candidates.append((p, tag))
 
+# 6.5 共享真值：多 plugin 同读一份，避免同一值（如 tenant_domain）在 N 个文件里重复。
+# 排在 per-plugin 之后 → 优先级更低，per-plugin 可覆盖。
+for ext in ("yaml", "yml", "json"):
+    candidates.append((os.path.join(ccpriv, "conf", f"_shared.{ext}"), "ccprivate/conf/_shared"))
+
 # 7./8. 旧路径
 candidates.append((os.path.join(claude_dir, "skill-config", f"{name}.yaml"), "skill-config"))
 if pdir:

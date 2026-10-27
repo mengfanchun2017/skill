@@ -34,9 +34,10 @@ SKILL_DIR = Path(__file__).resolve().parent.parent
 
 # 配置加载收敛到单一实现（2026-10-27）：`<skill>/config.yaml` 只是 8 级链里的一级，
 # 直接读它会在 plugin 安装（cache 副本无此文件）与官方通道下失败。
-sys.path.insert(0, str(SKILL_DIR.parent / "ffeishu" / "references"))
+sys.path.insert(0, str(SKILL_DIR / "references"))
 try:
-    from config_env import load_config as _load_config  # noqa: F401
+    from _skillconf_boot import config_env as _ce
+    _load_config = _ce.load_config
 except Exception:
     _load_config = None
 
@@ -136,8 +137,7 @@ def cmd_check_env(args):
     if cfg:
         _src = None
         try:
-            from config_env import source_of
-            _src = source_of(next(iter(cfg)))
+            _src = _ce.source_of(next(iter(cfg)))
         except Exception:
             pass
         print(f"  配置: ✅ 已加载" + (f" (来自 {_src})" if _src else ""))

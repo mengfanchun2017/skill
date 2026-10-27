@@ -37,9 +37,11 @@ _SKILL_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # 同名（都叫 token），通用取值会挖错值（parse.py 自己的 _dig_token 只认顶层，
 # 就是为了防这个）。故本站只借 config_env 的**路径解析**，取值仍用本文件的
 # _dig_token —— 这样"ccprivate 在哪""官方通道在哪"只有一处实现。
-sys.path.insert(0, os.path.join(_SKILL_DIR, "..", "ffeishu", "references"))
+sys.path.insert(0, os.path.join(_SKILL_DIR, "references"))
 try:
-    from config_env import _CLAUDE_DIR, plugin_name as _plugin_name, ccprivate_root as _ccprivate_root
+    # boot stub 负责定位唯一实现（自己 plugin 里没有，装的副本只有 stub）
+    from _skillconf_boot import config_env as _ce
+    _CLAUDE_DIR, _plugin_name, _ccprivate_root = _ce._CLAUDE_DIR, _ce.plugin_name, _ce.ccprivate_root
     _HAS_CONFIG_ENV = True
 except Exception:
     _HAS_CONFIG_ENV = False

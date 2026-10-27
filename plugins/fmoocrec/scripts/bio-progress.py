@@ -21,9 +21,10 @@ import yaml
 
 def load_conf():
     """配置走单一实现（2026-10-27），同 flogme。"""
-    sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "ffeishu" / "references"))
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "references"))
     try:
-        from config_env import load_config
+        from _skillconf_boot import config_env as _ce
+        load_config = _ce.load_config
         return load_config() or {}
     except Exception:
         pass

@@ -33,9 +33,10 @@ import yaml
 def _load_conf():
     """配置走单一实现（2026-10-27）：8 级链（官方两通道 + $CLAUDE_PLUGIN_DATA
     + ccprivate + 旧的 <skill>/config.yaml），不再只读 skill 根那一个文件。"""
-    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "ffeishu" / "references"))
+    sys.path.insert(0, str(Path(__file__).resolve().parent / "references"))
     try:
-        from config_env import load_config
+        from _skillconf_boot import config_env as _ce
+        load_config = _ce.load_config
         return load_config() or {}
     except Exception:
         pass

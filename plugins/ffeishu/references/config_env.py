@@ -199,6 +199,15 @@ def _candidates(key: str):
             loader = _json_load if ext == "json" else _yaml_load
             yield f"ccprivate/{sub}/{name}.{ext}", lambda p=p, l=loader: _dig(l(p), key)
 
+    # 6.5 共享真值（多个 plugin 同读一份，避免同一值在 N 个文件里重复）
+    #     放在 per-plugin 之后 = 优先级更低，per-plugin 可覆盖
+    for ext in ("yaml", "yml", "json"):
+        p = root / "conf" / f"_shared.{ext}"
+        if not p.is_file():
+            continue
+        loader = _json_load if ext == "json" else _yaml_load
+        yield f"ccprivate/conf/_shared.{ext}", lambda p=p, l=loader: _dig(l(p), key)
+
     # 7 旧用户级路径
     p = _CLAUDE_DIR / "skill-config" / f"{name}.yaml"
     if p.is_file():

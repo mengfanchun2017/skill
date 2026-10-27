@@ -39,9 +39,10 @@ lark_call() {
 # ⚠️ 实现已收敛到 plugin_env.sh 的单一实现（2026-10-27）。此前这里是**独立一份**，
 # 与 fpdf/llm 等 15 处各自维护回退链，变量名还有 3 种并存 —— 改一处必漏其余。
 # 现在 lark_conf_path / lark_conf_get 只是单实现的薄壳，保留旧名以免改动调用方。
-_PLUGIN_ENV="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}/references/plugin_env.sh"
+# 经 boot stub 定位实现（本 plugin 自己就是 ffeishu，故 stub 会直接命中）
+_PLUGIN_BOOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/_skillconf_boot.sh"
 # shellcheck source=/dev/null
-[[ -f "$_PLUGIN_ENV" ]] && source "$_PLUGIN_ENV"
+[[ -f "$_PLUGIN_BOOT" ]] && source "$_PLUGIN_BOOT"
 
 lark_conf_path() {
     if declare -F skillconf_file >/dev/null; then
@@ -83,10 +84,13 @@ PYEOF
 lark_doc_index() {
     local f
     # 单一实现解析路径；找不到也不硬编 $HOME/git/ccprivate（装机用户无此目录）
-    f="$(skillconf_file skill/ffeishu.yaml 2>/dev/null || skillconf_file ../skill/ffeishu.yaml 2>/dev/null || true)"
+    # 2026-10-27 起私有配置统一在 conf/（旧的 skill/ 根已并入），两条都试着兼容
+    f="$(skillconf_file conf/ffeishu.yaml 2>/dev/null \
+         || skillconf_file ffeishu.yaml 2>/dev/null \
+         || skillconf_file skill/ffeishu.yaml 2>/dev/null || true)"
     [[ -n "$f" && -f "$f" ]] || {
         echo "[doc-index] 未找到 ffeishu 配置（含 doc_index）；" >&2
-        echo "  自用: 应存在于 \$(skillconf_ccprivate_root)/skill/ffeishu.yaml" >&2
+        echo "  自用: 应存在于 \$(skillconf_ccprivate_root)/conf/ffeishu.yaml" >&2
         return 1
     }
     if [[ "${1:-}" == "--add" ]]; then

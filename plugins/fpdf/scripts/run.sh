@@ -12,13 +12,10 @@ set -uo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILL_DIR="$(dirname "$HERE")"
 
-# 配置解析单一实现（ffeishu 是 hub：所有 skill 的 config 工具层都放它下面，
-# 避免每个 plugin 各带一份 plugin_env.sh 副本 → 又变成 N 处实现）
-_PLUGIN_ENV="${CLAUDE_PLUGIN_ROOT:+$CLAUDE_PLUGIN_ROOT/references/plugin_env.sh}"
-[[ -f "${_PLUGIN_ENV:-}" ]] || _PLUGIN_ENV="$HOME/.claude/skills/ffeishu/references/plugin_env.sh"
-[[ -f "$_PLUGIN_ENV" ]] || _PLUGIN_ENV="$(dirname "$SKILL_DIR")/ffeishu/references/plugin_env.sh"
+# 经 boot stub 定位唯一实现（实现住在 ffeishu，本 plugin 装到 cache 后只有 stub）
+_PLUGIN_BOOT="$SKILL_DIR/references/_skillconf_boot.sh"
 # shellcheck source=/dev/null
-[[ -f "$_PLUGIN_ENV" ]] && source "$_PLUGIN_ENV"
+[[ -f "$_PLUGIN_BOOT" ]] && source "$_PLUGIN_BOOT"
 
 ok()   { printf '\033[32m✓\033[0m %s\n' "$*" >&2; }
 bad()  { printf '\033[31m✗\033[0m %s\n' "$*" >&2; }

@@ -24,8 +24,8 @@ CCCONFIG = Path(os.environ.get("CCCONFIG_ROOT", HOME / "git/ccconfig"))
 # 只认一个变量名，而 CCDIR/别的 skill 还认 CCPRIVATE_DIR → 三套名字并存。
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "ffeishu", "references"))
 try:
-    from config_env import ccprivate_root as _ccprivate_root
-    CCPRIVATE = _ccprivate_root()
+    from _skillconf_boot import config_env as _ce
+    CCPRIVATE = _ce.ccprivate_root()
 except Exception:
     CCPRIVATE = Path(os.environ.get("CCPRIVATE_HOME")
                      or os.environ.get("CCPRIVATE_DIR")
