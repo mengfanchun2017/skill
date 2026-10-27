@@ -76,17 +76,22 @@ python3 ~/.claude/skills/fpostpone/scripts/parse-time.py "<时间表达式>"
 ```
 CronCreate({
   cron: "<parse-time 的 cron 字段>",
-  prompt: "【fpostpone 延时任务·原定 <at>】先输出一行提示：⏱ 执行 fpostpone 延时任务（原定 <at>），然后执行下面的内容：\n\n<命令原文>",
+  prompt: "【fpostpone 延时任务·原定 <at>】先输出一行：⏱ 执行 fpostpone 延时任务（原定 <at>），然后依次做三件事：① 执行 bash ~/.claude/skills/fpostpone/scripts/tasks.sh start --at \"<at>\"；② 执行下面的内容；③ 执行完后调用 bash ~/.claude/skills/fpostpone/scripts/tasks.sh done --at \"<at>\"。\n\n<命令原文>",
   recurring: false,   // 一次性；用完自删
 })
 ```
+
+**重要：用排定时间 `--at` 当键，不要用 id**。`CronCreate` 返回的 id 要等调用完才知道，
+而 prompt 在调用时就固化了 → 没法把 id 写进 prompt。
+`--at`（排定时间，如 `2026-10-27 15:20`）在排任务**之前**就算出来了，稳定可写。
+`tasks.sh start/done` 同时接受 `--id`（支持前缀模糊）和 `--at`，二选一即可。
 
 **为什么必须包装**（两个硬约束叠加）：
 
 1. 注入的 prompt 到点时是**一条普通消息**，到点的 Claude 无法知道它是定时的还是刚打的
    → 必须靠 prompt 自带信息才能输出「这是延时任务」的提示。
 2. 注入时 **fpostpone 的 SKILL.md 不会加载**（只有 `/fpostpone` 被调用时才进上下文）
-   → 不能指望到点的 Claude 去读 skill 才知道该提示。
+   → 不能指望到点的 Claude 去读 skill；所有指令（提示、start、done）都得写进 prompt。
 
 包装成自然语言还顺带解决另一个坑：slash 命令（如 `/transliter <zip>`）后面
 **不能夹带说明文字**——本机实测（2026-10-27），那段说明会被**并进 `args`**
@@ -100,10 +105,14 @@ CronCreate({
 ```
 CronCreate({
   cron: "2 18 27 10 *",
-  prompt: "【fpostpone 延时任务·原定 2026-10-27 18:02】先输出一行提示：⏱ 执行 fpostpone 延时任务（原定 2026-10-27 18:02），然后执行下面的内容：\n\n用 Workflow 工具跑 transliter workflow，args 传 /abs/path/xxx.zip。跑完读日志，分析失败/部分成功的文档，给出建议。",
+  prompt: "【fpostpone 延时任务·原定 2026-10-27 18:02】先输出一行：⏱ 执行 fpostpone 延时任务（原定 2026-10-27 18:02），然后依次做三件事：① 执行 bash ~/.claude/skills/fpostpone/scripts/tasks.sh start --at \"2026-10-27 18:02\"；② 执行下面的内容；③ 执行完后调用 bash ~/.claude/skills/fpostpone/scripts/tasks.sh done --at \"2026-10-27 18:02\"。\n\n用 Workflow 工具跑 transliter workflow，args 传 /abs/path/xxx.zip。跑完读日志，分析失败/部分成功的文档，给出建议。",
   recurring: false,
 })
 ```
+
+> 实操顺序：① `parse-time.py` 算出 `at` → ② 用上面模板排任务（`at` 已知，直接写死）
+> → ③ 拿到 `CronList` 的 id，用 `tasks.sh add --id <id> --at "<at>"` 登记
+> → ④ 报告给用户。到点时执行侧靠 prompt 里的 `at` 定位记录，不依赖 id。
 
 参数：
 - `recurring: false` —— fpostpone 是延迟执行，不是循环。用户明说「每天/每周」才 `true`（并提醒 7 天自动过期）。
@@ -123,6 +132,24 @@ bash ~/.claude/skills/fpostpone/scripts/tasks.sh add \
 影子表落 `~/.cache/fpostpone/tasks.json`（不进公开仓库），`/fpostpone list` 读它。
 
 把 `id` + `at` + 「会话需保持开启」一并报给用户。
+
+### 4c. 执行侧：延时任务注入后必须调用 start/done
+
+**这一步写在 prompt 包装里，到点的 Claude 照做**（见 4b 的包装格式）。
+影子表状态机 `pending → running → finished`，**两端的实际时间都要记**：
+
+```bash
+bash ~/.claude/skills/fpostpone/scripts/tasks.sh start --id "<id>"   # 刚接手时
+# …执行命令…
+bash ~/.claude/skills/fpostpone/scripts/tasks.sh done  --id "<id>"   # 干完时
+```
+
+**为什么两端都要**：用户要看到底栏显示「已完成 15:20-15:34」这种**实际执行区间**。
+只记完成时间算不出区间；排定时间 ≠ 实际执行（实测延迟 4 秒~7 分钟不等）。
+
+**已完成记录不主动清除**——用户明确要求"不消除，让我知道做了什么"。
+底栏无待执行任务时回显最近 3 条已完成；`/fpostpone list` 列全部历史。
+只保留最近 50 条已完成，超出用 `tasks.sh prune --keep N`。
 
 ### 5. 报告
 
