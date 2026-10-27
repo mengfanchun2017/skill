@@ -270,8 +270,12 @@ skillconf_path() {
     case "$tag" in
         settings.pluginConfigs|credentials.pluginSecrets)
             echo "$HOME/.claude/<$tag>" ;;
-        ccprivate/*) echo "$(skillconf_ccprivate_root)/${tag#ccprivate/}/$(skillconf_plugin_name).yaml" ;;
-        plugin/config.yaml|skill-config|plugin-data) echo "<$tag>" ;;
+        ccprivate/conf/_shared)
+            echo "$(skillconf_ccprivate_root)/conf/_shared.yaml" ;;
+        ccprivate/conf|ccprivate/skill)
+            # tag 里只带子目录名，文件名要用 plugin 名补回
+            echo "$(skillconf_ccprivate_root)/${tag#ccprivate/}/$(skillconf_plugin_name).yaml" ;;
+        ccprivate/*) echo "<$tag>" ;;
         *) echo "<$tag>" ;;
     esac
 }

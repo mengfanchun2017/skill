@@ -3,12 +3,12 @@
 > 项目级 AI 行为指南。**仅在 `/home/francis/git/skill/` 工作时加载**。全局规则在 `~/.claude/CLAUDE.md`。
 
 ## 项目定位
-Claude Code skill 聚合仓。**26 个自建 plugin，全部在 marketplace 注册**（每个 `plugins/<name>/` 是独立 Claude Code plugin），第三方 skill 由用户用 `npx skills` 自管（不通过 marketplace）。
+Claude Code skill 聚合仓。**27 个自建 plugin，全部在 marketplace 注册**（每个 `plugins/<name>/` 是独立 Claude Code plugin），第三方 skill 由用户用 `npx skills` 自管（不通过 marketplace）。
 
 ## 目录结构
 ```
 skill/
-├── plugins/                # 26 个自建 plugin
+├── plugins/                # 27 个自建 plugin
 ├── scripts/                # marketplace 工具脚本
 ├── .claude-plugin/         # Claude Code plugin 元数据
 ├── .github/                # CI
@@ -18,7 +18,7 @@ skill/
 └── www/                    # 静态展示页（部署到 skill.aiagt.dev）
 ```
 
-## 26 个 plugin
+## 27 个 plugin
 | Plugin | 用途 |
 |--------|------|
 | ffeishu | 飞书文档/PPT/表格/Base 操作统一入口 |
@@ -92,12 +92,21 @@ git status  # 确认干净
 - 缺失时提示用户安装，不强制自动安装（避免公开仓库的安装脚本风险）
 - Config 在 `config.yaml.example`，真实值通过 ccprivate 注入
 
-## 配置注入模式
+## 配置注入模式（2026-10-27 重写）
 ```
-ccprivate/skill/<name>.yaml  →  symlink  →  ~/.claude/skills/<name>/config.yaml
+config_env.py / plugin_env.sh（唯一实现在 ffeishu/references/，8 级优先级链）
+  1. $SKILLCONF_<KEY>            环境变量
+  2. $CLAUDE_PLUGIN_DATA/config.json
+  3. settings.json → pluginConfigs      /plugin install 弹窗填的
+  4. .credentials.json → pluginSecrets  sensitive:true 的键
+  5. ccprivate/conf/<plugin>.yaml       自用多机同步
+  6. ccprivate/conf/_shared.yaml        多 plugin 共用
+  7-8. 旧路径（兼容，勿再写）
 ```
-Skill 运行时读 config.yaml 拿 API key/私有参数。公开仓只放 `config.yaml.example`（占位值/文档）。
-CI 检查 `plugins/*/config.yaml` 是否存在——有真实配置 = CI 报错。
+各 plugin 带 `references/_skillconf_boot.{sh,py}`（**生成物**）定位唯一实现 ——
+`/plugin install` 只复制 plugin 自身目录，靠 stub 才能跨 plugin 取到解析器。
+改实现后跑 `bash ccconfig/bin/sync-plugin-env.sh` 重新分发 stub。
+公开仓只放 `config.yaml.example`；CI 检查 `plugins/*/config.yaml` 不存在。
 
 ## 同步流程
 ```bash
