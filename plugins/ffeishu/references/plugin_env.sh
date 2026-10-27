@@ -29,23 +29,38 @@
 
 # ── 定位 plugin ────────────────────────────────────────────────
 # CLAUDE_PLUGIN_ROOT 只在 hook/MCP/LSP 进程与 Markdown 内联替换里存在，
-# Bash 工具里没有 —— 故必须能从调用方脚本路径反推，否则装机后拿不到自己是谁。
+# Bash 工具里没有 —— 故必须从路径反推。
+#
+# ⚠️ 必须在 **source 时刻**捕获调用方，不能在调用时刻用 ${BASH_SOURCE[1]}：
+# plugin_env.sh 住在 ffeishu 下，被别的 skill source 后再调用 skillconf_get 时，
+# 函数内部的 BASH_SOURCE[1] 指向的是 plugin_env.sh 自己（或中间函数）→ 会解析成
+# ffeishu，导致"给 fworch-case 取配置却读到 ffeishu 的"。实测踩过。
+_SKILLCONF_SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[1]:-${BASH_SOURCE[0]}}")" 2>/dev/null && pwd || true)"
+case "$(basename "${_SKILLCONF_SOURCE_DIR:-}")" in
+    references|scripts) _SKILLCONF_SOURCE_DIR="$(dirname "$_SKILLCONF_SOURCE_DIR")" ;;
+esac
+
 skillconf_plugin_dir() {
+    # 1. 显式指定（跨 plugin 取值时用）
+    if [[ -n "${SKILLCONF_PLUGIN_DIR:-}" && -d "$SKILLCONF_PLUGIN_DIR" ]]; then
+        printf '%s\n' "$SKILLCONF_PLUGIN_DIR"; return 0
+    fi
+    # 2. 官方变量（hook/MCP/LSP 进程里有）
     if [[ -n "${CLAUDE_PLUGIN_ROOT:-}" && -d "$CLAUDE_PLUGIN_ROOT" ]]; then
         printf '%s\n' "$CLAUDE_PLUGIN_ROOT"; return 0
     fi
-    # ${BASH_SOURCE[1]} = 调用方的脚本；本函数自身是 [0]
-    local src="${BASH_SOURCE[1]:-${BASH_SOURCE[0]}}"
-    local d
-    d="$(cd "$(dirname "$src")" 2>/dev/null && pwd)" || return 1
-    # 从 references/ 或 scripts/ 上跳一级即 plugin 根
-    case "$(basename "$d")" in
-        references|scripts) d="$(dirname "$d")" ;;
-    esac
-    printf '%s\n' "$d"
+    # 3. source 时刻捕获的调用方目录
+    if [[ -n "${_SKILLCONF_SOURCE_DIR:-}" && -d "$_SKILLCONF_SOURCE_DIR" ]]; then
+        printf '%s\n' "$_SKILLCONF_SOURCE_DIR"; return 0
+    fi
+    return 1
 }
 
 skillconf_plugin_name() {
+    # 显式名优先（跨 plugin 取值，如 fpdf 要读 ffeishu 的配置）
+    if [[ -n "${SKILLCONF_PLUGIN_NAME:-}" ]]; then
+        printf '%s\n' "$SKILLCONF_PLUGIN_NAME"; return 0
+    fi
     local d; d="$(skillconf_plugin_dir)" || return 1
     basename "$d"
 }
@@ -316,6 +331,55 @@ if keys:
 PYEOF
 }
 
+# ── 共享 conf 文件访问（多 skill 共用的真值）─────────────────────
+# 与 skillconf_get 的区别：
+#   skillconf_get  <key>              → 本 plugin 的私有配置（按 plugin 名定位文件）
+#   skillconf_file <relpath> <key...> → 共享真值（如 writing/case.yaml），多个 skill 同读
+# 两者共用 skillconf_ccprivate_root()，故"ccprivate 在哪"只有一处实现。
+skillconf_file() {
+    local rel="$1"
+    local base
+    base="$(skillconf_ccprivate_root)"
+    [[ -f "$base/conf/$rel" ]] && { printf '%s\n' "$base/conf/$rel"; return 0; }
+    # 迁移期兼容：旧代码写过 ../skill/... 这类相对穿透
+    [[ -f "$base/$rel" ]] && { printf '%s\n' "$base/$rel"; return 0; }
+    return 1
+}
+
+# 按点号路径逐级取值；支持列表索引（如 doc_index.3.title）
+skillconf_file_get() {
+    local rel="$1"; shift
+    local f
+    f="$(skillconf_file "$rel")" || return 1
+    python3 - "$f" "$@" <<'PYEOF'
+import sys
+try:
+    import yaml
+except ImportError:
+    sys.exit(2)
+path, keys = sys.argv[1], sys.argv[2:]
+try:
+    suf = path.rsplit(".", 1)[-1].lower()
+    with open(path) as fh:
+        node = yaml.safe_load(fh) if suf in ("yaml", "yml") else __import__("json").load(fh)
+except Exception:
+    sys.exit(1)
+if node is None:
+    sys.exit(1)
+for k in keys:
+    if isinstance(node, dict) and k in node:
+        node = node[k]
+    elif isinstance(node, list) and k.isdigit() and int(k) < len(node):
+        node = node[int(k)]
+    else:
+        sys.exit(1)
+if node is None:
+    sys.exit(1)
+print(node if not isinstance(node, bool) else str(node).lower())
+PYEOF
+}
+
 export -f skillconf_get skillconf_require skillconf_path skillconf_diag \
           skillconf_lookup skillconf_plugin_name skillconf_plugin_dir \
-          skillconf_ccprivate_root skillconf_official_key 2>/dev/null || true
+          skillconf_ccprivate_root skillconf_official_key \
+          skillconf_file skillconf_file_get 2>/dev/null || true

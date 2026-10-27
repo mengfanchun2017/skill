@@ -23,11 +23,17 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 
 > 📖 完整说明 → [config.aiagt.dev](https://config.aiagt.dev/ffeishu)
 
-**ccconfig 用户**：真实值放 `ccprivate/skill/ffeishu.yaml`，`init-skill.sh sync` 自动覆盖。
-**独立用户（git clone）**：`cp config.yaml.example config.yaml` 填入真实值。
-**plugin 安装用户**：`<skill目录>` 是 `~/.claude/plugins/cache/<market>/<plugin>/<版本号>/`
-—— 版本化只读副本，`/plugin update` 即整目录替换，写在里面的 config.yaml **会丢**；
-配置改放 `~/.claude/skill-config/ffeishu.yaml`（cache 之外，跨更新稳定）。
+配置查找由**单一实现** `references/plugin_env.sh`（Python 版 `config_env.py`）统一决定，
+所有 skill 共用同一条 8 级链（完整清单见「用户配置」一节）。
+
+| 你是哪类用户 | 配置写在哪 |
+|---|---|
+| plugin 安装（`/plugin install`） | `claude plugin configure ffeishu@<market>` 弹窗填；值落 `settings.json` 的 `pluginConfigs` 或 `.credentials.json` 的 `pluginSecrets` |
+| ccconfig 用户 | `$CCPRIVATE_HOME/conf/ffeishu.yaml`（旧位置 `skill/ffeishu.yaml` 仍兼容） |
+| 独立用户（git clone） | `cp config.yaml.example config.yaml` 填真实值，或 `$CLAUDE_PLUGIN_DATA/config.json` |
+
+⚠️ **不要**把配置写进 `<skill目录>/config.yaml` 然后指望它跨 `/plugin update` 存活 ——
+plugin 用户装的是 `cache/<market>/<plugin>/<版本号>/` 只读副本，更新即整目录替换。
 
 需提前准备：
 - 飞书租户（企业版/个人版）

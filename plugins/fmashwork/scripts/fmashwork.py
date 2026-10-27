@@ -30,9 +30,15 @@ import shlex
 import sys
 from pathlib import Path
 
-# 优先从 skill 根目录读 config.yaml（symlink → ccprivate/skill/fmashwork.yaml）
 SKILL_DIR = Path(__file__).resolve().parent.parent
-CONFIG_PATH = SKILL_DIR / "config.yaml"
+
+# 配置加载收敛到单一实现（2026-10-27）：`<skill>/config.yaml` 只是 8 级链里的一级，
+# 直接读它会在 plugin 安装（cache 副本无此文件）与官方通道下失败。
+sys.path.insert(0, str(SKILL_DIR.parent / "ffeishu" / "references"))
+try:
+    from config_env import load_config as _load_config  # noqa: F401
+except Exception:
+    _load_config = None
 
 # 自动切入 venv（if 已由 setup.sh 建好）：隔离依赖不污染系统 python。
 # 判据用 sys.prefix != sys.base_prefix——venv 的 bin/python 是指向系统 python 的 symlink，realpath 相同判不出。
@@ -50,22 +56,34 @@ def _switch_to_venv() -> None:
 
 
 def load_config():
-    """加载个人配置；不存在则返回空 dict（独立用户用 config.yaml.example 自行复制）。"""
-    if not CONFIG_PATH.exists():
+    """加载个人配置；不存在则返回空 dict（独立用户用 config.yaml.example 自行复制）。
+
+    走单一实现的 8 级链（官方 pluginConfigs/pluginSecrets + $CLAUDE_PLUGIN_DATA
+    + ccprivate + 旧的 <skill>/config.yaml），而不是只读 skill 根那一个文件。
+    """
+    if _load_config is not None:
+        try:
+            return _load_config() or {}
+        except Exception as e:
+            print(f"  ⚠️  配置加载失败: {e}", file=sys.stderr)
+            return {}
+    # 回退：单一实现不可用（不该发生）
+    p = SKILL_DIR / "config.yaml"
+    if not p.exists():
         return {}
     try:
         import yaml
 
-        with CONFIG_PATH.open(encoding="utf-8") as f:
+        with p.open(encoding="utf-8") as f:
             return yaml.safe_load(f) or {}
     except ImportError:
         print(
-            "  ⚠️  PyYAML 未装,无法读 config.yaml（独立用户请 `pip install pyyaml`）",
+            "  ⚠️  PyYAML 未装,无法读配置（独立用户请 `pip install pyyaml`）",
             file=sys.stderr,
         )
         return {}
     except Exception as e:
-        print(f"  ⚠️  config.yaml 解析失败: {e}", file=sys.stderr)
+        print(f"  ⚠️  配置解析失败: {e}", file=sys.stderr)
         return {}
 
 
@@ -116,10 +134,17 @@ def cmd_check_env(args):
     # 配置
     cfg = load_config()
     if cfg:
-        print(f"  config.yaml: ✅ 已加载 ({CONFIG_PATH})")
+        _src = None
+        try:
+            from config_env import source_of
+            _src = source_of(next(iter(cfg)))
+        except Exception:
+            pass
+        print(f"  配置: ✅ 已加载" + (f" (来自 {_src})" if _src else ""))
     else:
-        print(f"  config.yaml: ⚠️  未找到/为空 ({CONFIG_PATH})")
-        print("    → ccconfig 用户: 写 ccprivate/skill/fmashwork.yaml")
+        print("  配置: ⚠️  未找到/为空")
+        print("    → ccconfig 用户: 写 $CCPRIVATE_HOME/conf/fmashwork.yaml")
+        print("    → plugin 用户: claude plugin configure fmashwork@<market>")
         print("    → 独立用户: cp config.yaml.example config.yaml")
 
     # shared_dir

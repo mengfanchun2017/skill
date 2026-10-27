@@ -28,8 +28,8 @@ notes:
 orchestrator 在 status=ok 后用 `ccprivate/bin/yaml-edit.sh` 更新 `<slug>.yaml`：
 
 ```bash
-E=${CCPRIVATE_HOME:-$HOME/git/ccprivate}/bin/yaml-edit.sh
-CFG=${CCPRIVATE_HOME:-$HOME/git/ccprivate}/conf/finterview/<slug>.yaml
+E="$(skillconf_ccprivate_root)/bin/yaml-edit.sh"
+CFG="$(skillconf_file finterview/<slug>.yaml)"
 
 $E "$CFG" set current_step 1
 $E "$CFG" set feishu.brief_doc_url "https://feishu.cn/docx/..."

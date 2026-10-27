@@ -30,16 +30,23 @@ from pathlib import Path
 
 import yaml
 
-def _find_conf():
-    """Locate config.yaml in skill directory."""
-    skill_dir = Path(__file__).resolve().parent
-    candidate = skill_dir / "config.yaml"
-    if candidate.exists():
-        return candidate
-    sys.exit("config.yaml not found in " + str(skill_dir))
+def _load_conf():
+    """配置走单一实现（2026-10-27）：8 级链（官方两通道 + $CLAUDE_PLUGIN_DATA
+    + ccprivate + 旧的 <skill>/config.yaml），不再只读 skill 根那一个文件。"""
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "ffeishu" / "references"))
+    try:
+        from config_env import load_config
+        return load_config() or {}
+    except Exception:
+        pass
+    c = Path(__file__).resolve().parent / "config.yaml"
+    if c.exists():
+        return yaml.safe_load(c.read_text()) or {}
+    sys.exit("未找到配置：$CCPRIVATE_HOME/conf/<plugin>.yaml，"
+             "或 claude plugin configure <plugin>@<market>")
 
 
-CONF = yaml.safe_load(_find_conf().read_text())
+CONF = _load_conf()
 BASE = CONF["bases"]["okr_v2"]["token"]
 T = CONF["bases"]["okr_v2"]["tables"]
 

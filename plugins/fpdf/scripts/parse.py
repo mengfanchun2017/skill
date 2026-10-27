@@ -31,17 +31,53 @@ from pathlib import Path
 
 _SKILL_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-CONF_CANDIDATES = [
-    lambda: os.environ.get("MINERU_CONF"),
-    # $FPDF_CONFIG 是 run.sh/SKILL.md 里的第 1 顺位配置文件，token 也可能写在那
-    lambda: os.environ.get("FPDF_CONFIG"),
-    # 用户级稳定路径：plugin 安装（cache 副本，随更新替换）的用户写这里
-    lambda: os.path.expanduser("~/.claude/skill-config/fpdf.yaml"),
-    lambda: os.path.join(_SKILL_DIR, "config.yaml"),      # 自行 clone 的用户 / ccconfig symlink
-    lambda: (os.environ.get("CCPRIVATE_HOME") or os.environ.get("CCPRIVATE_DIR") or "") and
-            os.path.join(os.environ.get("CCPRIVATE_HOME") or os.environ.get("CCPRIVATE_DIR"), "conf", "mineru.json"),
-    lambda: os.path.expanduser("~/git/ccprivate/conf/mineru.json"),
-]
+# MinerU token 的文件候选链（2026-10-27 收敛）。
+#
+# ⚠️ 这里**不走** config_env 的通用取值：MinerU token 的键名与"父文档节点 token"
+# 同名（都叫 token），通用取值会挖错值（parse.py 自己的 _dig_token 只认顶层，
+# 就是为了防这个）。故本站只借 config_env 的**路径解析**，取值仍用本文件的
+# _dig_token —— 这样"ccprivate 在哪""官方通道在哪"只有一处实现。
+sys.path.insert(0, os.path.join(_SKILL_DIR, "..", "ffeishu", "references"))
+try:
+    from config_env import _CLAUDE_DIR, plugin_name as _plugin_name, ccprivate_root as _ccprivate_root
+    _HAS_CONFIG_ENV = True
+except Exception:
+    _HAS_CONFIG_ENV = False
+
+
+def _conf_files():
+    """产出可能含 MinerU token 的文件路径，顺序即优先级。"""
+    # 显式覆盖最优先（保留旧变量名）
+    for k in ("MINERU_CONF", "FPDF_CONFIG"):
+        p = os.environ.get(k)
+        if p:
+            yield p
+        if k == "FPDF_CONFIG":      # 旧名之外再加新统一名
+            p = os.environ.get("FPDF_CFG")
+            if p:
+                yield p
+
+    if not _HAS_CONFIG_ENV:
+        base = (os.environ.get("CCPRIVATE_HOME") or os.environ.get("CCPRIVATE_DIR")
+                or os.path.expanduser("~/git/ccprivate"))
+        yield os.path.join(base, "conf", "mineru.json")
+        yield os.path.join(_SKILL_DIR, "config.yaml")
+        return
+
+    n = _plugin_name()
+    cands = []
+    if os.environ.get("CLAUDE_PLUGIN_DATA"):
+        cands.append(os.path.join(os.environ["CLAUDE_PLUGIN_DATA"], "config.yaml"))
+    cands += [
+        str(_CLAUDE_DIR / "plugins" / "data" / n / "config.yaml"),   # 官方持久目录
+        str(_ccprivate_root() / "conf" / f"{n}.yaml"),               # 私有仓新位置
+        str(_ccprivate_root() / "conf" / "mineru.json"),             # 共享的 mineru 配置
+        str(_ccprivate_root() / "skill" / f"{n}.yaml"),              # 私有仓旧位置
+        str(_CLAUDE_DIR / "skill-config" / f"{n}.yaml"),             # 旧用户级路径
+        os.path.join(_SKILL_DIR, "config.yaml"),                     # 旧 symlink
+    ]
+    for c in cands:
+        yield c
 
 _PLACEHOLDER = ("请填入", "请到", "your key", "placeholder", "<your-")
 
@@ -63,8 +99,7 @@ def _dig_token(obj):
 
 
 def load_token():
-    for cand in CONF_CANDIDATES:
-        p = cand()
+    for p in _conf_files():
         if not p or not os.path.isfile(p):
             continue
         try:

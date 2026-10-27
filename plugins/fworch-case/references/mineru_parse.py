@@ -19,17 +19,36 @@
 """
 import sys, os, json, argparse, tempfile
 
-# 配置查找顺序：$MINERU_CONF > $CCPRIVATE_HOME/conf > $CCPRIVATE_DIR/conf > ~/git/ccprivate/conf
+# 单一实现（配置路径解析）：ffeishu 是 hub，所有 skill 的 config 工具层放它下面
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "ffeishu", "references"))
+try:
+    from config_env import ccprivate_root as _ccprivate_root
+except Exception:
+    def _ccprivate_root():
+        from pathlib import Path
+        base = os.environ.get("CCPRIVATE_HOME") or os.environ.get("CCPRIVATE_DIR")
+        return Path(base) if base else Path.home() / "git" / "ccprivate"
+
+# 配置路径解析已收敛到单一实现 config_env.py（2026-10-27）。
+# 此前这里自维护 "MINERU_CONF > $CCPRIVATE_HOME/conf > $CCPRIVATE_DIR/conf > ~/git/ccprivate/conf"
+# 一条回退链，与 fpdf/parse.py、fllmpack 等各自一份 —— "ccprivate 在哪"有多处实现。
 def _conf_path():
     env = os.environ.get("MINERU_CONF")
     if env:
         return os.path.expanduser(env)
-    priv = os.environ.get("CCPRIVATE_HOME") or os.environ.get("CCPRIVATE_DIR")
-    if priv:
-        p = os.path.join(priv, "conf", "mineru.json")
-        if os.path.isfile(p):
+    # 借单一实现的路径解析（官方通道 + 私有仓，顺序统一）
+    for rel in ("conf/mineru.json",):
+        p = _skillconf_file(rel)
+        if p:
             return p
-    return os.path.expanduser("~/git/ccprivate/conf/mineru.json")
+    return os.path.expanduser(str(_ccprivate_root() / "conf" / "mineru.json"))
+
+
+def _skillconf_file(rel):
+    try:
+        return str(_ccprivate_root() / rel) if (_ccprivate_root() / rel).is_file() else None
+    except Exception:
+        return None
 
 
 CONF = _conf_path()

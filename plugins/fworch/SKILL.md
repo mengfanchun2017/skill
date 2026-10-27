@@ -31,7 +31,8 @@ allowed-tools: Read, Bash, Glob, Grep
 ### Step 1: 读体裁注册表
 
 ```bash
-cat "${CCPRIVATE_HOME:-$HOME/git/ccprivate}/conf/writing/registry.yaml"
+# 路径由单一实现解析（勿手拼 $HOME/git/ccprivate —— 换机/自定义路径会断）
+bash -c 'source ~/.claude/skills/ffeishu/references/plugin_env.sh; cat "$(skillconf_file writing/registry.yaml)"'
 ```
 
 注册表 `genres` 下每条含：`trigger`（触发词）/ `orchestrator`（编排器）/ `spec`（规范）/ `config`（真值文件）/ `outputs`。
@@ -43,7 +44,7 @@ cat "${CCPRIVATE_HOME:-$HOME/git/ccprivate}/conf/writing/registry.yaml"
 判出体裁 → 读该体裁的 `config` 真值文件（父目录/根文档 token 等）：
 
 ```bash
-cat "${CCPRIVATE_HOME:-$HOME/git/ccprivate}/conf/writing/<genre>.yaml"
+bash -c 'source ~/.claude/skills/ffeishu/references/plugin_env.sh; cat "$(skillconf_file writing/<genre>.yaml)"'
 ```
 
 ### Step 3: 派发

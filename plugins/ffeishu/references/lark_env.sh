@@ -35,17 +35,29 @@ lark_call() {
 }
 
 # 私有配置读取：真值存 ccprivate/conf/<file>，公开 skill 运行时读取。
-# 用 python 解析（不依赖 yq）；缺失文件/键 → 返回空串 + 非零码，调用方自行降级。
-# 用法: lark_conf_get writing/case.yaml base_token
+#
+# ⚠️ 实现已收敛到 plugin_env.sh 的单一实现（2026-10-27）。此前这里是**独立一份**，
+# 与 fpdf/llm 等 15 处各自维护回退链，变量名还有 3 种并存 —— 改一处必漏其余。
+# 现在 lark_conf_path / lark_conf_get 只是单实现的薄壳，保留旧名以免改动调用方。
+_PLUGIN_ENV="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}/references/plugin_env.sh"
+# shellcheck source=/dev/null
+[[ -f "$_PLUGIN_ENV" ]] && source "$_PLUGIN_ENV"
+
 lark_conf_path() {
-    local rel="$1"
-    for base in "${CCPRIVATE_HOME:-}" "$HOME/git/ccprivate" "${CCPRIVATE_DIR:-}"; do
-        [[ -n "$base" && -f "$base/conf/$rel" ]] && { echo "$base/conf/$rel"; return 0; }
-    done
-    return 1
+    if declare -F skillconf_file >/dev/null; then
+        skillconf_file "$1"
+    else
+        # 回退：plugin_env.sh 缺失时内联最小实现（不该发生，防脚本整体挂掉）
+        local base="${CCPRIVATE_HOME:-${CCPRIVATE_DIR:-$HOME/git/ccprivate}}"
+        [[ -f "$base/conf/$1" ]] && echo "$base/conf/$1"
+    fi
 }
 
 lark_conf_get() {
+    if declare -F skillconf_file_get >/dev/null; then
+        skillconf_file_get "$@"
+        return $?
+    fi
     local rel="$1"; shift
     local f
     f="$(lark_conf_path "$rel")" || return 1
@@ -70,8 +82,13 @@ PYEOF
 # 追加: lark_doc_index --add title url doc_token parent_doc "description"   # 幂等（按 doc_token 去重）
 lark_doc_index() {
     local f
-    f="$(lark_conf_path ../skill/ffeishu.yaml 2>/dev/null || echo "$HOME/git/ccprivate/skill/ffeishu.yaml")"
-    [[ -f "$f" ]] || { echo "[doc-index] 未找到 $f" >&2; return 1; }
+    # 单一实现解析路径；找不到也不硬编 $HOME/git/ccprivate（装机用户无此目录）
+    f="$(skillconf_file skill/ffeishu.yaml 2>/dev/null || skillconf_file ../skill/ffeishu.yaml 2>/dev/null || true)"
+    [[ -n "$f" && -f "$f" ]] || {
+        echo "[doc-index] 未找到 ffeishu 配置（含 doc_index）；" >&2
+        echo "  自用: 应存在于 \$(skillconf_ccprivate_root)/skill/ffeishu.yaml" >&2
+        return 1
+    }
     if [[ "${1:-}" == "--add" ]]; then
         local title="$2" url="$3" tok="$4" parent="$5" desc="${6:-}"
         [[ -n "$title" && -n "$url" ]] || { echo "[doc-index] --add need title url [doc_token] [parent] [desc]" >&2; return 2; }

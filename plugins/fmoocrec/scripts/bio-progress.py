@@ -19,14 +19,22 @@ from tempfile import mkstemp
 import yaml
 
 
-def find_conf():
+def load_conf():
+    """配置走单一实现（2026-10-27），同 flogme。"""
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "ffeishu" / "references"))
+    try:
+        from config_env import load_config
+        return load_config() or {}
+    except Exception:
+        pass
     p = Path(__file__).resolve().parent.parent / "config.yaml"
     if p.exists():
-        return p
-    raise FileNotFoundError("config.yaml not found")
+        return yaml.safe_load(p.read_text()) or {}
+    raise FileNotFoundError(
+        "未找到配置：$CCPRIVATE_HOME/conf/<plugin>.yaml，或 claude plugin configure <plugin>@<market>")
 
 
-CONF = yaml.safe_load(find_conf().read_text())
+CONF = load_conf()
 BASE = CONF["base"]["token"]
 T = CONF["base"]["tables"]["progress"]
 

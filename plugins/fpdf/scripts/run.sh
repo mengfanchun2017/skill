@@ -12,43 +12,43 @@ set -uo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILL_DIR="$(dirname "$HERE")"
 
+# 配置解析单一实现（ffeishu 是 hub：所有 skill 的 config 工具层都放它下面，
+# 避免每个 plugin 各带一份 plugin_env.sh 副本 → 又变成 N 处实现）
+_PLUGIN_ENV="${CLAUDE_PLUGIN_ROOT:+$CLAUDE_PLUGIN_ROOT/references/plugin_env.sh}"
+[[ -f "${_PLUGIN_ENV:-}" ]] || _PLUGIN_ENV="$HOME/.claude/skills/ffeishu/references/plugin_env.sh"
+[[ -f "$_PLUGIN_ENV" ]] || _PLUGIN_ENV="$(dirname "$SKILL_DIR")/ffeishu/references/plugin_env.sh"
+# shellcheck source=/dev/null
+[[ -f "$_PLUGIN_ENV" ]] && source "$_PLUGIN_ENV"
+
 ok()   { printf '\033[32m✓\033[0m %s\n' "$*" >&2; }
 bad()  { printf '\033[31m✗\033[0m %s\n' "$*" >&2; }
 info() { printf '\033[36m→\033[0m %s\n' "$*" >&2; }
 
-# 配置文件回退链（决定父文档 token 取哪、文档索引写哪）：
-#   $FPDF_CONFIG > ~/.claude/skill-config/<name>.yaml > <skill目录>/config.yaml
-#     > $CCPRIVATE_HOME/skill/<name>.yaml > ~/git/ccprivate/skill/<name>.yaml
+# 配置定位已收敛到 plugin_env.sh 的单一实现（2026-10-27）。
+# 此前这里自维护一条回退链（$FPDF_CONFIG > skill-config > <skill目录>/config.yaml
+# > $CCPRIVATE_HOME/skill/... > ~/git/ccprivate/skill/...），与 ffeishu / fllmpack /
+# mineru_parse 等 15 处各自一份 —— 改一处必漏其余。
 #
-# 为何第 2 顺位是 ~/.claude/skill-config/：用 /plugin install 装的用户，
-# <skill目录> 是 ~/.claude/plugins/cache/<market>/<plugin>/<版本号>/ —— 版本化
-# 只读副本，更新即整目录替换，写在那里的 config.yaml 会丢。用户级路径在 cache
-# 之外，跨更新稳定，故 plugin 用户的配置写这里（也是无配置时的写入默认）。
-#
-# 三条路径各自的用户：
-#   ~/.claude/skill-config/  → plugin 安装的用户（推荐）
-#   <skill目录>/config.yaml  → 自己 git clone 的用户；也是 ccconfig 用户
-#                              （apply-config.sh 把它 symlink 到 ccprivate）
-_cfg_path() {   # $1=fpdf|ffeishu → echo 命中路径；都没命中则 echo 首选写入路径
-    _CFG_NAME="$1" _CFG_SKILL_DIR="$SKILL_DIR" python3 -c "
-import os
-n=os.environ['_CFG_NAME']; skill=os.environ['_CFG_SKILL_DIR']
-# 本脚本在 fpdf/scripts 下，故 \$SKILL_DIR 恒为 fpdf 目录；查别的 skill 的
-# <skill目录>/config.yaml 必须解析到它自己的兄弟目录，否则 ffeishu 会命中
-# fpdf 的 config.yaml（本机所有 clone/plugin 用户都有该文件 → 必然命中）。
-sib=os.path.join(os.path.dirname(skill), n)
-if os.path.isdir(sib): skill = sib
-c=[]
-if n=='fpdf':
-    if os.environ.get('FPDF_CONFIG'): c.append(os.environ['FPDF_CONFIG'])
-# 用户级稳定路径：plugin 安装不会覆盖，plugin 用户首选，也是写入默认
-c.append(os.path.expanduser(os.path.join('~','.claude','skill-config',n+'.yaml')))
-c.append(os.path.join(skill,'config.yaml'))
-for b in (os.environ.get('CCPRIVATE_HOME') or os.environ.get('CCPRIVATE_DIR') or '', '~/git/ccprivate'):
-    if b: c.append(os.path.join(os.path.expanduser(b),'skill',n+'.yaml'))
-hit=next((x for x in c if x and os.path.isfile(x)), None)
-print(hit or (c[0] if c else ''))
-"
+# 路径解析结果仍要交给下游 python，故导出为绝对路径（而不是只导出值）：
+# FPDF_CFG / FFEISHU_CFG 是 parse.py / run.sh 后续 open() 的目标。
+_cfg_path() {   # $1=plugin 名 → echo 命中路径；都没命中则 echo 首选写入路径
+    local n="$1"
+    # 显式覆盖优先（保持旧变量名，兼容已有部署）
+    if [[ "$n" == "fpdf" && -n "${FPDF_CONFIG:-}" ]]; then
+        printf '%s\n' "$FPDF_CONFIG"; return 0
+    fi
+    local base hit
+    base="$(skillconf_ccprivate_root)"
+    # 按单一实现优先级找：官方两 JSON 的键名不落文件路径，故这里只解析"文件类"来源
+    for hit in \
+        "$HOME/.claude/skill-config/$n.yaml" \
+        "$(dirname "$SKILL_DIR")/$n/config.yaml" \
+        "$base/conf/$n.yaml" \
+        "$base/skill/$n.yaml" ; do
+        [[ -f "$hit" ]] && { printf '%s\n' "$hit"; return 0; }
+    done
+    # 都没命中 → 给写入默认（用户级稳定路径，plugin 更新不覆盖）
+    printf '%s\n' "$HOME/.claude/skill-config/$n.yaml"
 }
 export FPDF_CFG="$(_cfg_path fpdf)"
 export FFEISHU_CFG="$(_cfg_path ffeishu)"

@@ -19,7 +19,17 @@ from pathlib import Path
 
 HOME = Path.home()
 CCCONFIG = Path(os.environ.get("CCCONFIG_ROOT", HOME / "git/ccconfig"))
-CCPRIVATE = Path(os.environ.get("CCPRIVATE_HOME", HOME / "git/ccprivate"))
+
+# "ccprivate 在哪"收敛到单一实现（2026-10-27）；此前这里用 .get("CCPRIVATE_HOME", ...)
+# 只认一个变量名，而 CCDIR/别的 skill 还认 CCPRIVATE_DIR → 三套名字并存。
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "ffeishu", "references"))
+try:
+    from config_env import ccprivate_root as _ccprivate_root
+    CCPRIVATE = _ccprivate_root()
+except Exception:
+    CCPRIVATE = Path(os.environ.get("CCPRIVATE_HOME")
+                     or os.environ.get("CCPRIVATE_DIR")
+                     or HOME / "git/ccprivate")
 
 NORMAL_FILE = CCCONFIG / "conf/llmnormal.json"
 PRIVATE_FILE = CCPRIVATE / "conf/llmprivate.json"

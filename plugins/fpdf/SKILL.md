@@ -65,7 +65,7 @@ bash ~/.claude/skills/fpdf/scripts/setup.sh --check  # 只检查不安装
 | `uv` | `curl -LsSf https://astral.sh/uv/install.sh \| sh` | **阻断** |
 | `lark-cli` | `npm i -g @larksuite/cli`，装入 PATH（或落 `~/.local/bin`） | **阻断** |
 | 飞书授权 | `lark-cli auth login`（走扫码，一次性） | **阻断** |
-| MinerU token | https://mineru.net → API 管理 → 建 token；plugin 用户填 `~/.claude/skill-config/fpdf.yaml`，clone 用户填 `<skill目录>/config.yaml` 的 `mineru.token` | **阻断**（默认 precision 档） |
+| MinerU token | https://mineru.net → API 管理 → 建 token；填法见「父文档」一节的 8 级查找链（推荐 `$CLAUDE_PLUGIN_DATA/config.json` 的 `mineru.token`，或 `$CCPRIVATE_HOME/conf/fpdf.yaml`） | **阻断**（默认 precision 档） |
 | `poppler-utils` | 自动按平台装（apt / brew / dnf / pacman / apk）；装不上**只提示不阻断** | 不阻断 |
 
 > **token 口径**：`run.sh` 默认走 precision 档（排版必需），缺 token 时 `parse.py` 直接
@@ -115,26 +115,31 @@ Word 导出路径、译文文档链接一并给出。多链接用列表。
 
 ## 父文档（所有输出落在此处）
 
-父文档 token 存在**配置文件**的 `wiki_nodes.default`。配置文件按以下顺序查找
-（`run.sh` 的 `_cfg_path`）：
+父文档 token 存在**配置文件**的 `wiki_nodes.default`。查找顺序由单一实现
+`ffeishu/references/plugin_env.sh`（Python 版 `config_env.py`）统一决定，
+所有 skill 共用同一条链：
 
 ```
-1. $FPDF_CONFIG                     （环境变量显式指定）
-2. ~/.claude/skill-config/fpdf.yaml （plugin 安装的用户写这里；cache 之外，跨更新稳定）
-3. <skill目录>/config.yaml          （自行 git clone 的用户；也是 ccconfig 用户的
-                                     apply-config.sh symlink 落点）
-4. $CCPRIVATE_HOME/skill/fpdf.yaml
-5. ~/git/ccprivate/skill/fpdf.yaml
+1. $SKILLCONF_<KEY> / $FPDF_CONFIG    （环境变量显式指定）
+2. $CLAUDE_PLUGIN_DATA/config.json    （官方持久目录，跨 /plugin update 保留）
+3. settings.json → pluginConfigs      （claude plugin configure 弹窗填的）
+4. .credentials.json → pluginSecrets  （声明 sensitive:true 的键）
+5. $CCPRIVATE_HOME/conf/fpdf.yaml     （自用多机同步主通道）
+6. $CCPRIVATE_HOME/skill/fpdf.yaml   （旧位置，迁移期兼容）
+7. ~/.claude/skill-config/fpdf.yaml   （旧用户级路径，兼容）
+8. <skill目录>/config.yaml            （旧 symlink，兼容）
 ```
 
-**为何第 2 顺位存在**：用 `/plugin install` 装时，`<skill目录>` 是
+**为何 2–4 存在**：用 `/plugin install` 装时，`<skill目录>` 是
 `~/.claude/plugins/cache/<market>/<plugin>/<版本号>/` —— 版本化只读副本，
-`/plugin update` 即整目录替换，写在那里的 `config.yaml` **会丢**。所以
-plugin 用户把配置写在 `~/.claude/skill-config/fpdf.yaml`（cache 之外，更新不碰）。
+`/plugin update` 即整目录替换，写在那里的 `config.yaml` **会丢**。
+用 `claude plugin configure` 填的值存在 2/3/4，都在 cache 之外，更新不碰。
 
-未在 fpdf 配置中找到时，回落 ffeishu 配置的 default。文档索引 `doc_index` 写回
-**同一个命中的配置文件**——plugin 用户写 `~/.claude/skill-config/`，clone 用户写
-自己的 config.yaml，都不碰 ccprivate。
+**5–8 是历史包袱**，保留只为不破坏已在跑的机器；新配置请写 2 或 5。
+
+未在 fpdf 配置中找到时，回落 ffeishu 配置的 default。诊断用
+`bash -c 'source <plugin_env.sh>; skillconf_diag tenant_domain'` 可看每个键
+实际来自哪个源。文档索引 `doc_index` 写回**同一个命中的配置文件**。
 
 用户说"保存父文档链接"或"配置 fpdf"时：
 用 AskUserQuestion 问父文档 URL/token → 写入**命中文件**（同上第 1 顺位命中项）：

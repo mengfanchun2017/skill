@@ -34,7 +34,7 @@ allowed-tools: Read, Write, Bash, Glob, Grep, AskUserQuestion
 ## Phase A: 面试选择
 
 ```bash
-ls ${CCPRIVATE_HOME:-$HOME/git/ccprivate}/conf/finterview/*.yaml 2>/dev/null
+ls "$(skillconf_file finterview/*.yaml)" 2>/dev/null
 ```
 
 **已有** → 展示列表（岗位名 + 当前步骤 + 进度）→ 选一个继续
@@ -60,7 +60,7 @@ slug 命名：全小写英文+数字，无空格横线。示例：`airline-fleet
 ## Phase B: 读配置
 
 ```bash
-cat ${CCPRIVATE_HOME:-$HOME/git/ccprivate}/conf/finterview/<slug>.yaml
+cat "$(skillconf_file finterview/<slug>.yaml)"
 ```
 
 配置结构：
@@ -127,8 +127,8 @@ lark-cli drive +search --query test --page-size 1 --as user 2>&1 \
 4. Step 8 后 `status=completed`
 
 ```bash
-E=${CCPRIVATE_HOME:-$HOME/git/ccprivate}/bin/yaml-edit.sh
-CFG=${CCPRIVATE_HOME:-$HOME/git/ccprivate}/conf/finterview/<slug>.yaml
+E="$(skillconf_ccprivate_root)/bin/yaml-edit.sh"
+CFG="$(skillconf_file finterview/<slug>.yaml)"
 $E "$CFG" set current_step 1
 $E "$CFG" set feishu.org_doc_url "<url>"
 ```

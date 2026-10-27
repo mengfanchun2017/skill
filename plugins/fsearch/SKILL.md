@@ -81,7 +81,11 @@ query 规划（判断语言 + 策略选择）
 REST 端点，key 与 LLM 预设同一把（`ccprivate/conf/llm.json` 的 `llms.minimax31`）：
 
 ```bash
-KEY=$(python3 -c "import json;print(json.load(open('$HOME/git/ccprivate/conf/llm.json'))['llms']['minimax31']['key'])")
+KEY=$(python3 -c "
+import sys, json, os
+sys.path.insert(0, os.path.expanduser('~/.claude/skills/ffeishu/references'))
+from config_env import ccprivate_root
+print(json.load(open(ccprivate_root()/'conf/llm.json'))['llms']['minimax31']['key'])")
 curl -s -X POST 'https://api.minimaxi.com/v1/coding_plan/search' \
   -H "Authorization: Bearer $KEY" -H 'Content-Type: application/json' \
   -d '{"q":"查询词"}'
