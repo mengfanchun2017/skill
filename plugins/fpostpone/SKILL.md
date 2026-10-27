@@ -42,13 +42,16 @@ allowed-tools: Bash, CronCreate, CronList, CronDelete, Read, Write, Workflow
 ### 2. 解析时间
 
 ```bash
-python3 ~/git/skill/plugins/fpostpone/scripts/parse-time.py "<时间表达式>"
+python3 ~/.claude/skills/fpostpone/scripts/parse-time.py "<时间表达式>"
 ```
 
 输出 JSON：`{ok, cron, at, human, delta_min, warn[]}`。
 
 支持：`18点` `18:30` `明天9点` `后天14点` `今晚8点` `周三9点` `下周一10点`
 `+2h` `+30m` `3天后` `13:07` `2026-10-28 09:15`
+时段词：`明天早上9点` `明天下午3点` `晚上`（光时段词取默认时刻）
+衬词自动剥：`18点运行` `明天9点跑` `后天14点执行`
+周六/日写作`周日`/`周天`均可。
 
 `ok:false` → 把 `hint` 给用户，AskUserQuestion 让他改，别自行编一个时间。
 
@@ -70,11 +73,17 @@ CronCreate({
 })
 ```
 
+参数：
+- `recurring: false` —— fpostpone 是延迟执行，不是循环。用户明说「每天/每周」才 `true`（并提醒 7 天自动过期）。
+- `durable` 默认**不加**。理由见 `references/scheduling-internals.md`：durable 会写
+  `.claude/scheduled_tasks.json`，且**恢复时只认创建它的那个项目目录**，换目录不跑。
+  用户明确要「跨会话/重启保留」才加 `true`。
+
 ⚠ **`prompt` 必须是纯净的命令本身，不能夹带任何说明文字**。
 本机实测（2026-10-27）：注入的 `/transliter <zip>` 后面跟了一段中文说明，
 展开时那段说明被**并进 `args`** 一起传给 slash 命令 → 会污染命令参数。
 
-#### 用户带后处理要求时（很常见）
+### 4b. 用户带后处理要求时
 
 原始需求形态：`/fpostpone 18点运行 /transliter "xxx.zip" 分析后给我建议`
 —— 「分析后给我建议」**不能**拼进 prompt（会被当 args 传给 workflow）。
@@ -92,12 +101,6 @@ CronCreate({
 判据：
 - 命令是**纯 slash 命令、无附加要求** → prompt 直接填 `/xxx <参数>`（会正常展开）
 - **带「跑完再分析/总结/通知我」** → 改成自然语言指令，让到点的 Claude 编排
-  （Workflow 工具 + 后续分析），不要用 slash 形式
-
-- `recurring: false` —— fpostpone 是延迟执行，不是循环。用户明说「每天/每周」才 `true`（并提醒 7 天自动过期）。
-- `durable` 默认**不加**。理由见 `references/scheduling-internals.md`：durable 会写
-  `.claude/scheduled_tasks.json`，且**恢复时只认创建它的那个项目目录**，换目录不跑。
-  用户明确要「跨会话/重启保留」才加 `true`。
 
 排完回读 `CronList` 拿 id，把 `id` + `at` + 「会话需保持开启」一并报给用户。
 
@@ -118,7 +121,7 @@ CronCreate({
 用户说「关了电脑也要跑」「关终端也要执行」或加 `--detach` 时用：
 
 ```bash
-bash ~/git/skill/plugins/fpostpone/scripts/detach-run.sh \
+bash ~/.claude/skills/fpostpone/scripts/detach-run.sh \
   --at "<parse-time 的 at 字段>" \
   --cmd "<命令原文>" \
   --name "<任务名>"
