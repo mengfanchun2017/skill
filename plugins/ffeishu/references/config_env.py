@@ -89,12 +89,43 @@ def plugin_dir() -> Path | None:
     return _dir_from_path(__file__)
 
 
+def _lookup_installed_name(root: Path) -> str | None:
+    """反查 installed_plugins.json，把安装目录映射回 plugin 名。
+
+    ⚠️ /plugin install 用户的 CLAUDE_PLUGIN_ROOT 是**带版本号**的 cache 目录
+    （.../cache/<market>/<plugin>/<version>/），直接取 basename 会得到 "0.1.0"
+    → 去查 "0.1.0@market" 的配置永远查不到。实测踩过。
+    """
+    reg = _CLAUDE_DIR / "plugins" / "installed_plugins.json"
+    try:
+        d = json.loads(reg.read_text())
+    except Exception:
+        return None
+    want = os.path.realpath(root)
+    for key, arr in (d.get("plugins") or {}).items():
+        name = key.split("@", 1)[0]
+        for rec in (arr if isinstance(arr, list) else [arr]):
+            p = rec.get("installPath") if isinstance(rec, dict) else None
+            if p and os.path.realpath(p) == want:
+                return name
+    # 命中不到（版本目录已被替换）→ 按 cache 布局推断 <market>/<plugin>/<version>
+    parts = Path(want).parts
+    if "cache" in parts:
+        i = len(parts) - 1 - parts[::-1].index("cache")
+        if len(parts) > i + 2:
+            return parts[i + 2]
+    return None
+
+
 def plugin_name() -> str:
     # 显式名优先（跨 plugin 取值，如 fpdf 要读 ffeishu 的配置）
     if os.environ.get("SKILLCONF_PLUGIN_NAME"):
         return os.environ["SKILLCONF_PLUGIN_NAME"]
     d = plugin_dir()
-    return d.name if d else "<plugin>"
+    if not d:
+        return "<plugin>"
+    n = _lookup_installed_name(d)
+    return n or d.name
 
 
 def ccprivate_root() -> Path:

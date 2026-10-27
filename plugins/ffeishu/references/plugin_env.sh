@@ -62,6 +62,38 @@ skillconf_plugin_name() {
         printf '%s\n' "$SKILLCONF_PLUGIN_NAME"; return 0
     fi
     local d; d="$(skillconf_plugin_dir)" || return 1
+
+    # ⚠️ /plugin install 用户的 CLAUDE_PLUGIN_ROOT 是**带版本号**的 cache 目录：
+    #   ~/.claude/plugins/cache/<market>/<plugin>/<version>/
+    # 直接 basename 会得到 "0.1.0"（实测踩过）→ 去查 "0.1.0@market" 的配置，
+    # 永远查不到。故：① 先反查 installed_plugins.json（权威）② 再按 cache 布局取上一层。
+    local reg="$HOME/.claude/plugins/installed_plugins.json"
+    if [[ -f "$reg" ]]; then
+        local n
+        n="$(python3 - "$reg" "$d" <<'PYEOF'
+import json, os, sys
+reg, root = sys.argv[1], os.path.realpath(sys.argv[2])
+try:
+    d = json.load(open(reg))
+except Exception:
+    sys.exit(1)
+for key, arr in (d.get("plugins") or {}).items():
+    name = key.split("@", 1)[0]
+    for rec in arr if isinstance(arr, list) else [arr]:
+        p = rec.get("installPath") if isinstance(rec, dict) else None
+        if p and os.path.realpath(p) == root:
+            print(name); sys.exit(0)
+# 命中不到（版本目录变了）时按 cache 布局推断：<market>/<plugin>/<version>
+parts = root.rstrip("/").split(os.sep)
+if "cache" in parts:
+    i = len(parts) - 1 - parts[::-1].index("cache")
+    if len(parts) > i + 2:
+        print(parts[i + 2]); sys.exit(0)
+sys.exit(1)
+PYEOF
+)"
+        [[ -n "$n" ]] && { printf '%s\n' "$n"; return 0; }
+    fi
     basename "$d"
 }
 
