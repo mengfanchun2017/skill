@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin.json",
+  "name": "fresearchframe",
+  "version": "0.1.0",
+  "description": "4 领域研究方法论 — customer（JTBD）/ generic / market / technical。 收到调研主题后自动判断领域，调 fsearch 收集数据，再按对应领域框架解读。 搜索工具调用委派 fsearch，本 skill 不直接调 API。",
+  "author": {
+    "name": "mengfanchun2017"
+  },
+  "homepage": "https://github.com/mengfanchun2017/skill",
+  "repository": "https://github.com/mengfanchun2017/skill",
+  "license": "MIT",
+  "keywords": [
+    "f"
+  ],
+  "userConfig": {
+    "tavily_api_key": {
+      "type": "string",
+      "title": "Tavily API Key",
+      "description": "委托 fsearch 时使用",
+      "sensitive": true
+    }
+  }
+}

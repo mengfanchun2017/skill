@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin.json",
+  "name": "fworch-interview",
+  "version": "0.1.0",
+  "description": "面试准备 orchestrator。读 ccprivate/conf/finterview/<slug>.yaml 配置 -> 判断准备进度 -> 读取对应 step 细则执行 -> 更新配置。所有产物存飞书父文档下的子文档。 面向\"零经验应聘者\"从岗位认知、行业组织、专业能力到未来工作思路的全链条准备。 用法：用户说\"准备面试\"/\"岗位面试\"/\"应聘准备\"/\"面试材料\"触发",
+  "author": {
+    "name": "mengfanchun2017"
+  },
+  "homepage": "https://github.com/mengfanchun2017/skill",
+  "repository": "https://github.com/mengfanchun2017/skill",
+  "license": "MIT",
+  "keywords": [
+    "f"
+  ],
+  "userConfig": {
+    "interview_wiki_node": {
+      "type": "string",
+      "title": "面试材料默认父节点 token",
+      "description": "面试文档落点"
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin.json",
+  "name": "fsyncdoc",
+  "version": "0.1.0",
+  "description": "源码文档同步 + 可选 aiagt 产品页同步。两阶段流水线，可被其他 agent 调用。 用法：代码变更后同步文档，有对应产品页则顺带更新。",
+  "author": {
+    "name": "mengfanchun2017"
+  },
+  "homepage": "https://github.com/mengfanchun2017/skill",
+  "repository": "https://github.com/mengfanchun2017/skill",
+  "license": "MIT",
+  "keywords": [
+    "f"
+  ],
+  "userConfig": {
+    "syncdoc_mapping_file": {
+      "type": "string",
+      "title": "源码↔文档映射文件路径",
+      "description": "本地 JSON 映射，不进公开仓"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin.json",
+  "name": "fdiagram",
+  "version": "0.1.0",
+  "description": "飞书画板统一入口 — 用飞书原生「画板」（whiteboard，底层 Mermaid/PlantUML）生成并嵌入架构/流程/时序/ER/类/甘特/思维导图。 默认走飞书画板完成，不手写代码；仅当用户明确要求 Mermaid/PlantUML 源码时才手动写。 用法：用户说\"画架构图\"、\"画流程图\"、\"画时序图\"、\"画ER图\"、\"画类图\"、\"画甘特图\"、\"画思维导图\"、\"画白板\"、\"课程结构图\"触发。",
+  "author": {
+    "name": "mengfanchun2017"
+  },
+  "homepage": "https://github.com/mengfanchun2017/skill",
+  "repository": "https://github.com/mengfanchun2017/skill",
+  "license": "MIT",
+  "keywords": [
+    "f"
+  ]
+}

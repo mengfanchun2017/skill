@@ -44,7 +44,8 @@ plugin 用户装的是 `cache/<market>/<plugin>/<版本号>/` 只读副本，更
 
 ## 文档父子层级规则
 
-**默认父目录**：`config.yaml → wiki_nodes.default`（真实值在私有 `ccprivate/skill/ffeishu.yaml`，本仓库只放占位）。
+**默认父目录**：配置的 `wiki_nodes.default`（真实值在私有 `$CCPRIVATE_HOME/conf/ffeishu.yaml`，
+本仓库只放 `config.yaml.example` 占位符）。
 
 **任务级父目录判断**：
 - 若用户明确给出父文档 URL → 以该 URL token 为 `--parent-token`
@@ -528,22 +529,30 @@ lark-cli docs +fetch --api-version v2 --doc "$PARENT_TOKEN" --detail full | grep
 
 ## 用户配置
 
-用户说"配置 ffeishu"时，读取 `config.yaml` 展示可配置项，用 AskUserQuestion 让用户修改，写回文件。
+用户说"配置 ffeishu"时，读取当前生效配置展示可配置项，用 AskUserQuestion 让用户修改，写回文件。
 
-配置文件按以下顺序找（命中即用，写入也写**命中的那个**）：
-1. `$FFEISHU_CONFIG`（环境变量显式指定）
-2. `~/.claude/skill-config/ffeishu.yaml` —— **plugin 安装的用户写这里**（cache 之外，更新不丢）
-3. `<skill目录>/config.yaml` —— git clone / ccconfig 用户
+查找与写入位置由单一实现决定 —— **不要手写回退链**（此前每个 skill 各一份，改一处必漏其余）：
 
 ```bash
-cfg="$FFEISHU_CONFIG"
-for p in ~/.claude/skill-config/ffeishu.yaml "$SKILL_DIR/config.yaml"; do
-  [ -z "$cfg" ] && [ -f "$p" ] && cfg="$p"
-done
-cat "${cfg:-$SKILL_DIR/config.yaml}"
+source ~/.claude/skills/ffeishu/references/plugin_env.sh
+skillconf_diag                                    # 看每个键实际来自哪个源
+cat "$(skillconf_file skill/ffeishu.yaml)"        # 默认配置文件的路径
 ```
 
-配置项说明见 `config.yaml` 注释。用户直接编辑该文件也可，无需重启。
+8 级查找链（命中即用；写入写**命中的那个**，无命中时写第 5 顺位）：
+
+```
+1. $SKILLCONF_<KEY> / $FFEISHU_CONFIG   环境变量显式指定
+2. $CLAUDE_PLUGIN_DATA/config.json      官方持久目录（跨 update 保留）
+3. settings.json → pluginConfigs         claude plugin configure 弹窗填的
+4. .credentials.json → pluginSecrets     声明 sensitive:true 的键
+5. $CCPRIVATE_HOME/conf/ffeishu.yaml     自用多机同步主通道
+6. $CCPRIVATE_HOME/skill/ffeishu.yaml    旧位置（兼容）
+7. ~/.claude/skill-config/ffeishu.yaml   旧用户级路径（兼容）
+8. <skill目录>/config.yaml               旧 symlink（兼容）
+```
+
+配置项说明见 `config.yaml.example` 注释。用户直接编辑命中的文件也可，无需重启。
 
 ---
 

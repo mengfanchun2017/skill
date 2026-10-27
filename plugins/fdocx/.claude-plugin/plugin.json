@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin.json",
+  "name": "fdocx",
+  "version": "0.1.0",
+  "description": "Word .docx 原生生成 — OfficeCLI 引擎，支持模板/样式/表格/图片/页眉页脚/目录。 用法：用户说\"创建Word\"/\"写Word文档\"/\"生成docx\"/\"导出Word\"/\"做简历\"/\"写报告docx\"。",
+  "author": {
+    "name": "mengfanchun2017"
+  },
+  "homepage": "https://github.com/mengfanchun2017/skill",
+  "repository": "https://github.com/mengfanchun2017/skill",
+  "license": "MIT",
+  "keywords": [
+    "f"
+  ]
+}

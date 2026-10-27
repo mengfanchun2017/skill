@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin.json",
+  "name": "fllmpack",
+  "version": "0.1.0",
+  "description": "LLM 预设配置导出/导入 — 把本机 LLM 预设（内置+自定义）打包成不含任何 API key 的 配置包，发给同事导入后各自填 key。导出物自包含（附脚本副本），收件方无需装本 skill 即可导入。默认输出 C:\\claudepack（WSL /mnt/c/claudepack）。 用法：用户说\"导出 LLM 配置\"/\"打包 LLM\"/\"把模型配置给同事\"/\"导入 LLM 配置\"/\"导入预设包\"触发。",
+  "author": {
+    "name": "mengfanchun2017"
+  },
+  "homepage": "https://github.com/mengfanchun2017/skill",
+  "repository": "https://github.com/mengfanchun2017/skill",
+  "license": "MIT",
+  "keywords": [
+    "f"
+  ]
+}

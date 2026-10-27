@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin.json",
+  "name": "fmoocrec",
+  "version": "0.1.0",
+  "description": "MOOC 课程推荐助手 — 基于 QS 世界排名顶级学府课程体系，为学生生成个性化 MOOC 学习路径。课程数据存 Supabase（共享），学生画像/进度存飞书 Wiki + Base（个人持久化）。用法：用户说\"课程推荐\"/\"MOOC\"/\"在线课程\"/\"自学路径\"/\"学习规划\"、问\"有什么好的网课\"/\"想系统学生物\"。",
+  "author": {
+    "name": "mengfanchun2017"
+  },
+  "homepage": "https://github.com/mengfanchun2017/skill",
+  "repository": "https://github.com/mengfanchun2017/skill",
+  "license": "MIT",
+  "keywords": [
+    "f"
+  ],
+  "userConfig": {
+    "tenant_domain": {
+      "type": "string",
+      "title": "飞书租户域名",
+      "description": "形如 your-company.feishu.cn"
+    },
+    "space_id": {
+      "type": "string",
+      "title": "飞书 wiki 空间 ID",
+      "description": "课程库所在空间"
+    },
+    "wiki_node": {
+      "type": "string",
+      "title": "课程库 wiki 节点 token",
+      "description": "推荐结果落点"
+    }
+  }
+}

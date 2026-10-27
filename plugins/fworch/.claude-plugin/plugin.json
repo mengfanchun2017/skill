@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin.json",
+  "name": "fworch",
+  "version": "0.1.0",
+  "description": "撰写系统统一入口（路由层）。读体裁注册表判断需求属于哪种体裁（课程/报告/案例/面试准备）， 派发到对应 orchestrator（fworch-course/fworch-report/fworch-case/fworch-interview）。用户只描述需求，无需记内部 skill 名。 用法：用户说\"做课程\"/\"写报告\"/\"新增案例\"/\"准备面试\"等撰写需求时触发",
+  "author": {
+    "name": "mengfanchun2017"
+  },
+  "homepage": "https://github.com/mengfanchun2017/skill",
+  "repository": "https://github.com/mengfanchun2017/skill",
+  "license": "MIT",
+  "keywords": [
+    "f"
+  ]
+}

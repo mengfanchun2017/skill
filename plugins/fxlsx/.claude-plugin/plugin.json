@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin.json",
+  "name": "fxlsx",
+  "version": "0.1.0",
+  "description": "Excel .xlsx 原生生成 — OfficeCLI 引擎，支持公式/图表/条件格式/数据透视表/多工作表。 用法：用户说\"创建Excel\"/\"做表格\"/\"生成xlsx\"/\"导出报表\"/\"数据透视表\"/\"画图表(Excel)\"。",
+  "author": {
+    "name": "mengfanchun2017"
+  },
+  "homepage": "https://github.com/mengfanchun2017/skill",
+  "repository": "https://github.com/mengfanchun2017/skill",
+  "license": "MIT",
+  "keywords": [
+    "f"
+  ]
+}

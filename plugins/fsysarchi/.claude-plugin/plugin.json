@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin.json",
+  "name": "fsysarchi",
+  "version": "0.1.0",
+  "description": "[personal] 系统分析师/系统架构设计师备考 — 随工作边做边学。暗号 \"archi\" 触发。 用法：用户说\"archi\"/\"系统分析师\"/\"备考\"/\"出题\"/\"grill\"， 或想在日常工作中嵌入考试知识点学习。",
+  "author": {
+    "name": "mengfanchun2017"
+  },
+  "homepage": "https://github.com/mengfanchun2017/skill",
+  "repository": "https://github.com/mengfanchun2017/skill",
+  "license": "MIT",
+  "keywords": [
+    "f"
+  ],
+  "userConfig": {
+    "exam_wiki_node": {
+      "type": "string",
+      "title": "备考资料父节点 token",
+      "description": "系统分析师备考文档落点"
+    }
+  }
+}

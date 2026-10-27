@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin.json",
+  "name": "fsecretcheck",
+  "version": "0.1.0",
+  "description": "密钥泄露检查 — 扫描仓库工作树与 git 历史里的真实凭据（API key/token/密码/内网 IP），判定该文件属于公开仓还是私密仓，给出脱敏建议。用法：用户说\"检查密钥\"/\"密钥泄露\"/\"扫描密钥\"/\"有没有泄露\"/\"提交前检查\"、\"这个文件能公开吗\"，或准备把配置/文档推到公开仓库前触发。",
+  "author": {
+    "name": "mengfanchun2017"
+  },
+  "homepage": "https://github.com/mengfanchun2017/skill",
+  "repository": "https://github.com/mengfanchun2017/skill",
+  "license": "MIT",
+  "keywords": [
+    "f"
+  ]
+}

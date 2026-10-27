@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin.json",
+  "name": "fwstd-course",
+  "version": "0.1.0",
+  "description": "课程文档内容规范 — 系列课程各产物（调研报告/课程体系/教案/练习/总结）的 内容架构、骨架与写作要求。飞书格式见 ffeishu，编排与执行见 fworch-course。 用法：被 fworch-course 及其子 skill 引用，一般不直接触发",
+  "author": {
+    "name": "mengfanchun2017"
+  },
+  "homepage": "https://github.com/mengfanchun2017/skill",
+  "repository": "https://github.com/mengfanchun2017/skill",
+  "license": "MIT",
+  "keywords": [
+    "f"
+  ],
+  "userConfig": {
+    "course_wiki_node": {
+      "type": "string",
+      "title": "课程默认父节点 token",
+      "description": "课程文档落点"
+    }
+  }
+}

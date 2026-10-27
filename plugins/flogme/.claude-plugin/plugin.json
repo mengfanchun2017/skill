@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin.json",
+  "name": "flogme",
+  "version": "0.1.0",
+  "description": "个人管理系统 — OKR 目标管理、Worklog 工作日志、Reflect 反思、SUM 周期/领域总结生成。数据存飞书 Base，输出到飞书文档。",
+  "author": {
+    "name": "mengfanchun2017"
+  },
+  "homepage": "https://github.com/mengfanchun2017/skill",
+  "repository": "https://github.com/mengfanchun2017/skill",
+  "license": "MIT",
+  "keywords": [
+    "f"
+  ],
+  "userConfig": {
+    "tenant_domain": {
+      "type": "string",
+      "title": "飞书租户域名",
+      "description": "形如 your-company.feishu.cn"
+    },
+    "space_id": {
+      "type": "string",
+      "title": "飞书 wiki 空间 ID",
+      "description": "工作日志 Base 所在空间"
+    },
+    "okr_wiki_node": {
+      "type": "string",
+      "title": "OKR wiki 节点 token",
+      "description": "OKR 文档父节点"
+    }
+  }
+}

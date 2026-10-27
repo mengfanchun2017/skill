@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin.json",
+  "name": "fwstd-case",
+  "version": "0.1.0",
+  "description": "案例库内容规范 — Base 字段 schema、案例起名规则、正文模版与写作要求。 飞书格式见 ffeishu；案例编排/检索/建库执行见 fworch-case。 用法：被 fworch-case 引用，一般不直接触发",
+  "author": {
+    "name": "mengfanchun2017"
+  },
+  "homepage": "https://github.com/mengfanchun2017/skill",
+  "repository": "https://github.com/mengfanchun2017/skill",
+  "license": "MIT",
+  "keywords": [
+    "f"
+  ],
+  "userConfig": {
+    "case_base_token": {
+      "type": "string",
+      "title": "案例库 Base token",
+      "description": "多维表格 base token"
+    }
+  }
+}

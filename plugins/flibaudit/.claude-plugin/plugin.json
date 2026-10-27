@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin.json",
+  "name": "flibaudit",
+  "version": "0.1.0",
+  "description": "仓库全面审计 — 大变更后对 lib 完整审核：架构/代码/文件卫生/测试/文档/发布就绪。更新测试并跑功能测试修复 bug。面向个人小项目，默认本地 markdown 报告，飞书 opt-in。用法：用户说\"审计仓库\"/\"代码审计\"/\"lib审计\"/\"上线前审计\"/\"发布审计\"、或大变更后需要完整质量审查时触发。",
+  "author": {
+    "name": "mengfanchun2017"
+  },
+  "homepage": "https://github.com/mengfanchun2017/skill",
+  "repository": "https://github.com/mengfanchun2017/skill",
+  "license": "MIT",
+  "keywords": [
+    "f"
+  ]
+}
