@@ -58,6 +58,8 @@ def main():
 
     raw = sys.argv[1].strip()
     now = datetime.now().replace(microsecond=0)
+    # 全角→半角：中文输入法下全角数字/冒号/空格极常见（如「14：50」），不规范化必解析失败
+    raw = raw.translate(str.maketrans("０１２３４５６７８９：＋　", "0123456789:+ "))
     # 剥离衬词："18点运行"/"明天9点跑"/"18点执行" —— 用户自然写法，别让它解析失败
     raw = re.sub(r"\s*(运行|跑|执行|开始|启动|触发)\s*$", "", raw).strip()
     if not raw:
