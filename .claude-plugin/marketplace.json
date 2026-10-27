@@ -220,6 +220,14 @@
       "keywords": [
         "f"
       ]
+    },
+    {
+      "name": "fpostpone",
+      "description": "定时延迟执行命令 —— 把一条命令排到将来某时刻再跑，输出回到本会话。用法：用户说\"18点运行 XX\"/\"明天9点跑 XX\"/\"晚点执行 XX\"/\"到点跑 XX\"/\"+2h 跑 XX\"/\"列出定时任务\"/\"取消定时任务\"触发。基于 Claude Code 官方 CronCreate（会话内投递），另提供 systemd 分离模式（关终端也能跑）。",
+      "source": "./plugins/fpostpone",
+      "keywords": [
+        "f"
+      ]
     }
   ]
 }
