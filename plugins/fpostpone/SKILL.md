@@ -71,11 +71,37 @@ python3 ~/.claude/skills/fpostpone/scripts/parse-time.py "<时间表达式>"
 
 ### 4. 排任务
 
+**prompt 必须用统一包装格式**（下面解释为什么）：
+
 ```
 CronCreate({
   cron: "<parse-time 的 cron 字段>",
-  prompt: "<命令原文>",
+  prompt: "【fpostpone 延时任务·原定 <at>】先输出一行提示：⏱ 执行 fpostpone 延时任务（原定 <at>），然后执行下面的内容：\n\n<命令原文>",
   recurring: false,   // 一次性；用完自删
+})
+```
+
+**为什么必须包装**（两个硬约束叠加）：
+
+1. 注入的 prompt 到点时是**一条普通消息**，到点的 Claude 无法知道它是定时的还是刚打的
+   → 必须靠 prompt 自带信息才能输出「这是延时任务」的提示。
+2. 注入时 **fpostpone 的 SKILL.md 不会加载**（只有 `/fpostpone` 被调用时才进上下文）
+   → 不能指望到点的 Claude 去读 skill 才知道该提示。
+
+包装成自然语言还顺带解决另一个坑：slash 命令（如 `/transliter <zip>`）后面
+**不能夹带说明文字**——本机实测（2026-10-27），那段说明会被**并进 `args`**
+污染命令参数。包装后整体是自然语言，由到点的 Claude 自行调用 Skill/Workflow 工具，
+不依赖 slash 文本展开，反而更稳。
+
+**示例**（用户原始需求形态）：
+
+用户打：`/fpostpone 18点运行 /transliter "xxx.zip" 分析后给我建议`
+
+```
+CronCreate({
+  cron: "2 18 27 10 *",
+  prompt: "【fpostpone 延时任务·原定 2026-10-27 18:02】先输出一行提示：⏱ 执行 fpostpone 延时任务（原定 2026-10-27 18:02），然后执行下面的内容：\n\n用 Workflow 工具跑 transliter workflow，args 传 /abs/path/xxx.zip。跑完读日志，分析失败/部分成功的文档，给出建议。",
+  recurring: false,
 })
 ```
 
@@ -84,29 +110,6 @@ CronCreate({
 - `durable` 默认**不加**。理由见 `references/scheduling-internals.md`：durable 会写
   `.claude/scheduled_tasks.json`，且**恢复时只认创建它的那个项目目录**，换目录不跑。
   用户明确要「跨会话/重启保留」才加 `true`。
-
-⚠ **`prompt` 必须是纯净的命令本身，不能夹带任何说明文字**。
-本机实测（2026-10-27）：注入的 `/transliter <zip>` 后面跟了一段中文说明，
-展开时那段说明被**并进 `args`** 一起传给 slash 命令 → 会污染命令参数。
-
-### 4b. 用户带后处理要求时
-
-原始需求形态：`/fpostpone 18点运行 /transliter "xxx.zip" 分析后给我建议`
-—— 「分析后给我建议」**不能**拼进 prompt（会被当 args 传给 workflow）。
-
-改写成**自然语言指令**（不依赖 slash 展开，到点的 Claude 自己调 Workflow 工具）：
-
-```
-CronCreate({
-  cron: "...",
-  prompt: "用 Workflow 工具跑 transliter workflow：args 传 /abs/path/xxx.zip。跑完读日志，分析失败/部分成功的文档，给出建议。",
-  recurring: false,
-})
-```
-
-判据：
-- 命令是**纯 slash 命令、无附加要求** → prompt 直接填 `/xxx <参数>`（会正常展开）
-- **带「跑完再分析/总结/通知我」** → 改成自然语言指令，让到点的 Claude 编排
 
 排完回读 `CronList` 拿 id，**并把任务登记进影子表**（用户可随时自查）：
 
