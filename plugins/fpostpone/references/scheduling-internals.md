@@ -24,6 +24,21 @@ busy 期间是在队列里等，不是丢弃、也不是另起进程。
 
 其余分钟不偏移。
 
+### slash 命令展开（实测）
+
+**实测**：排一条 prompt 内容为 `/transliter <zip路径>\n\n（中文说明文字…）`。
+到点注入后：
+
+- `/transliter` **被正确展开**为 slash 命令（收到完整展开：name、phases、`Invoke:` 指令），
+  不是当字面文本。→ CronCreate 注入的 prompt 走正常 REPL 输入处理。
+- **但**附带的中文说明文字被**并进了 `args`** —— 展开显示
+  `Invoke: Workflow({ name: "transliter", args: "<zip路径>\n\n（中文说明…）" })`。
+
+→ 教训：`CronCreate` 的 `prompt` 必须是**纯净命令本身**。任何附加说明都会污染
+slash 命令的参数。这条对「后面还要说一句自然语言」的用法是硬约束
+（用户原始需求正是 `/postpone 18点运行 /transliter "xxx.zip" 分析后给我建议`
+—— 「分析后给我建议」这句不能直接拼进 prompt，否则会被当 args）。
+
 ### durable 的取舍
 
 - `durable:false`（默认）→ 只在内存，会话结束即失。

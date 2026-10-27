@@ -21,6 +21,7 @@ REL = re.compile(r"^\+(?P<n>\d+)\s*(?P<unit>[hmd])$", re.I)
 REL_CN = re.compile(r"^(?P<n>\d+)\s*(?P<unit>分钟|小时|个小时|天)后$")
 DAYCN = re.compile(r"^(?P<day>今天|今晚|明天|明晚|后天|大后天)(?P<rest>.*)$")
 WEEK = re.compile(r"^(?P<prefix>下)?(?:周|星期)(?P<wd>[一二三四五六日天])(?P<rest>.*)$")
+PERIOD = re.compile(r"^(?P<p>早上|上午|中午|下午|傍晚|晚上|凌晨)(?P<rest>.*)$")
 ABS = re.compile(r"^(?P<Y>\d{4})-(?P<M>\d{1,2})-(?P<D>\d{1,2})\s+(?P<h>[01]?\d|2[0-3]):(?P<m>[0-5]?\d)(?::(?P<s>[0-5]?\d))?$")
 
 # 一次性任务排在 :00/:30，Claude Code 会提前最多 90 秒跑（官方 docs）。
@@ -57,6 +58,10 @@ def main():
 
     raw = sys.argv[1].strip()
     now = datetime.now().replace(microsecond=0)
+    # 剥离衬词："18点运行"/"明天9点跑"/"18点执行" —— 用户自然写法，别让它解析失败
+    raw = re.sub(r"\s*(运行|跑|执行|开始|启动|触发)\s*$", "", raw).strip()
+    if not raw:
+        raw = sys.argv[1].strip() or "（空）"
     if "--now" in sys.argv:
         i = sys.argv.index("--now")
         if i + 1 < len(sys.argv):
@@ -114,6 +119,22 @@ def main():
             expr = m.group("rest").strip() or "9点"
 
     h, mi, sec = parse_hhmm(expr)
+    if h is None:
+        # 时段前缀：「明天早上9点」→ 剥「早上」再试；前缀同时给出 am/pm 倾向
+        m2 = PERIOD.match(expr)
+        if m2:
+            period = m2.group("p")
+            rest = m2.group("rest").strip()
+            # 光有时段词没钟点 → 取该时段的默认时刻
+            if not rest:
+                rest = {"早上": "8点", "上午": "9点", "中午": "12点",
+                        "下午": "15点", "傍晚": "18点", "晚上": "20点", "凌晨": "2点"}[period]
+            h, mi, sec = parse_hhmm(rest)
+            if h is not None:
+                if period in ("下午", "晚上", "傍晚") and h <= 11:
+                    h += 12
+                elif period in ("早上", "上午", "凌晨") and h == 12:
+                    h = 0
     if h is not None and pm_bias and h <= 11:
         h += 12  # 今晚8点 → 20点
     if h is None:

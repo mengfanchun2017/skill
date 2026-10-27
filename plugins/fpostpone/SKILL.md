@@ -70,6 +70,30 @@ CronCreate({
 })
 ```
 
+⚠ **`prompt` 必须是纯净的命令本身，不能夹带任何说明文字**。
+本机实测（2026-10-27）：注入的 `/transliter <zip>` 后面跟了一段中文说明，
+展开时那段说明被**并进 `args`** 一起传给 slash 命令 → 会污染命令参数。
+
+#### 用户带后处理要求时（很常见）
+
+原始需求形态：`/fpostpone 18点运行 /transliter "xxx.zip" 分析后给我建议`
+—— 「分析后给我建议」**不能**拼进 prompt（会被当 args 传给 workflow）。
+
+改写成**自然语言指令**（不依赖 slash 展开，到点的 Claude 自己调 Workflow 工具）：
+
+```
+CronCreate({
+  cron: "...",
+  prompt: "用 Workflow 工具跑 transliter workflow：args 传 /abs/path/xxx.zip。跑完读日志，分析失败/部分成功的文档，给出建议。",
+  recurring: false,
+})
+```
+
+判据：
+- 命令是**纯 slash 命令、无附加要求** → prompt 直接填 `/xxx <参数>`（会正常展开）
+- **带「跑完再分析/总结/通知我」** → 改成自然语言指令，让到点的 Claude 编排
+  （Workflow 工具 + 后续分析），不要用 slash 形式
+
 - `recurring: false` —— fpostpone 是延迟执行，不是循环。用户明说「每天/每周」才 `true`（并提醒 7 天自动过期）。
 - `durable` 默认**不加**。理由见 `references/scheduling-internals.md`：durable 会写
   `.claude/scheduled_tasks.json`，且**恢复时只认创建它的那个项目目录**，换目录不跑。
