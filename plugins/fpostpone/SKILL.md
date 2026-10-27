@@ -22,6 +22,9 @@ allowed-tools: Bash, CronCreate, CronList, CronDelete, Read, Write, Workflow
 **用 `CronCreate` 工具**，不是自己写调度。官方语义：把 prompt 排到未来，到点在**原会话**注入执行。
 `prompt` 参数填「用户要跑的那条命令」原文，输出天然落在本会话。
 
+本机实测（2026-10-27）：排 `12:52:00` 的任务，prompt 于 `12:59:18` 注入并执行成功。
+延迟 7 分钟是因为期间会话一直 busy（我在跑工具）。→ 投递真实可用，但**排队等空闲**。
+
 **硬约束（必须告知用户）**：只在会话活着且空闲时触发。关终端 → 不触发。
 需要「关了终端也跑」→ 走 `--detach`，见下。
 
@@ -98,7 +101,13 @@ bash ~/git/skill/plugins/fpostpone/scripts/detach-run.sh \
 ```
 
 它落一个 systemd user timer，到点无头跑 `claude -p "<命令>"`，结果写
-`~/.cache/fpostpone/<name>/result.md`，并用 lark-cli 发飞书私信（配了才发）。
+`~/.cache/fpostpone/<name>/result.md`（摘要）+ `stdout.txt`（完整）。
+
+本机实测（2026-10-27）：排 `13:03:14` → systemd `13:03:22` 触发 → `13:04:15` 完成，
+输出正确、`CLAUDE_EXIT=0`、timer 自动回收、`result.md` 自动生成。
+
+**它不吃 shell 环境**：claude 认证读 `~/.claude/settings.json` 的 `env` 块，
+所以不用在 unit 里注入 key。新机器需 `loginctl enable-linger $USER`，否则登出后 timer 不跑。
 
 **代价**：输出**不回到本会话**（分离进程），只能落盘 + 通知。用户若坚持要会话内输出，
 说明只有 `CronCreate` 能做到、且需会话常开 —— 让他选。
