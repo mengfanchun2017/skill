@@ -55,7 +55,14 @@ PY
 }
 
 cmd_done() {
-    local id="$1"
+    local id=""
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --id) id="${2:-}"; shift 2 ;;
+            *)    id="${1:-}"; shift ;;
+        esac
+    done
+    [ -n "$id" ] || { echo "--id 必填" >&2; exit 1; }
     ensure_store
     python3 - "$STORE" "$id" <<'PY'
 import json, sys
@@ -110,7 +117,7 @@ PY
 case "${1:-list}" in
     add)   shift; cmd_add "$@" ;;
     list)  shift; cmd_list "$@" ;;
-    done)  [ $# -ge 2 ] || { echo "--id 必填" >&2; exit 1; }; cmd_done "$2" ;;
+    done)  shift; cmd_done "$@" ;;
     clear-finished) cmd_clear ;;
     -h|--help)
         sed -n '2,12p' "$0" | sed 's/^# \?//'
