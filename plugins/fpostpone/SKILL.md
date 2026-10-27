@@ -17,6 +17,34 @@ allowed-tools: Bash, CronCreate, CronList, CronDelete, Read, Write, Workflow
 /fpostpone cancel 8334d428
 ```
 
+## 为什么不用官方的 `/schedule`（重要）
+
+Claude Code 有**三种**调度，各自定位不同（官方 docs「Compare scheduling options」）：
+
+| | **Cloud** (`/schedule`) | Desktop | **`/loop` + CronCreate** |
+|---|---|---|---|
+| 跑在哪 | Anthropic 云 | 你的机器（桌面 App） | 你的机器（session 内） |
+| 要机器开着 | 否 | 是 | 是 |
+| **要 session 开着** | 否 | 否 | **是** |
+| 能读本地文件 | 否（新 clone） | 是 | 是 |
+| 持久跨重启 | 是 | 是 | `--resume` 恢复（有例外） |
+| 订阅要求 | Pro/Max/Team/Ent | Desktop App | 任意 |
+
+**fpostpone 用 session 内 `CronCreate`**，理由：
+1. 用户的场景是**本地批量翻译 zip**（transliter），必须读本地文件 → 排除 Cloud。
+2. 要求**输出回到本会话**（用户明确说的）→ 只有 session 内的能做到，Cloud/Desktop 都做不到。
+3. 本机用第三方 LLM 端点（非 claude.ai 账号），**没有 cloud scheduled tasks 能力**。
+
+**什么时候该建议用户换官方方案**：
+- 用户说「关了电脑也要跑/每天固定跑」→ 官方 **Desktop scheduled tasks**（`/schedule` 的 Desktop 版）
+  或 cloud 版（若其有 claude.ai 付费账号）
+- 用户要 GitHub 事件触发 / API 触发 → cloud scheduled tasks 独有
+- 用户要跨机器、要可靠不依赖本机 → cloud
+
+**fpostpone 的不可替代之处**：输出落在**当前会话的上下文里**——
+后续对话能直接引用刚跑完的结果（"刚才那个翻译，你再分析下"）。
+Cloud/Desktop 都是分离执行，结果得另取。
+
 ## 核心机制
 
 **用 `CronCreate` 工具**，不是自己写调度。官方语义：把 prompt 排到未来，到点在**原会话**注入执行。
@@ -130,6 +158,12 @@ bash ~/.claude/skills/fpostpone/scripts/tasks.sh add \
 **为什么必须登记**：session-only 的 `CronCreate` 任务**没有任何用户可见文件**
 （不写 `scheduled_tasks.json`），用户在终端里查不到 → 会怀疑任务没排上。
 影子表落 `~/.cache/fpostpone/tasks.json`（不进公开仓库），`/fpostpone list` 读它。
+
+⚠ **影子表是全局文件，但必须按 session 隔离显示**（用户反馈过 bug：多个 session
+都看到提醒，误导）。`tasks.sh add` 自动记 `CLAUDE_CODE_SESSION_ID` 到 `session` 字段；
+`statusline.sh` 从 stdin 的 `session_id` 读当前会话并按归属过滤。
+→ 别的 session 不显示本 session 的任务（`CronCreate` 本就是 session-only，
+在别的 session 里确实不会触发，显示了才是错的）。
 
 把 `id` + `at` + 「会话需保持开启」一并报给用户。
 

@@ -13,20 +13,40 @@ set -uo pipefail
 FP_HOME="${FP_HOME:-$HOME/.cache/fpostpone}"
 STORE="$FP_HOME/tasks.json"
 SHOW_FINISHED="${FP_STATUSLINE_SHOW_FINISHED:-3}"   # 无待执行时最多回显几条已完成
+SCOPE="${FP_STATUSLINE_SCOPE:-session}"             # session=只显示本 session 的；all=全部
 
 [ -f "$STORE" ] || exit 0
 
-python3 - "$STORE" "$SHOW_FINISHED" <<'PY'
+# statusLine 通过 stdin 收到会话 JSON（含 session_id）。CronCreate 是 session-only，
+# 任务只在本 session 活着 → 别的 session 不该提示，否则误导用户。
+# 读不到 stdin（如手动调试）时 session_id 为空，此时不过滤，便于人工查看。
+INPUT="$(cat 2>/dev/null || true)"
+CUR_SESSION="$(printf '%s' "$INPUT" | python3 -c "
+import json,sys
+try:
+    print(json.load(sys.stdin).get('session_id') or '')
+except Exception:
+    print('')
+" 2>/dev/null || true)"
+
+python3 - "$STORE" "$SHOW_FINISHED" "$CUR_SESSION" "$SCOPE" <<'PY'
 import json, sys
 from datetime import datetime
 
-store, show_finished = sys.argv[1], int(sys.argv[2])
+store, show_finished, cur_session, scope = (
+    sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4])
 try:
     d = json.load(open(store))
 except Exception:
     sys.exit(0)
 
 tasks = d.get("tasks", [])
+
+# 归属过滤：只保留本 session 发起的。老记录没 session 字段 → 视为本 session
+# （迁移友好：加字段前登记的记录不至于突然消失）。
+if scope == "session" and cur_session:
+    tasks = [t for t in tasks if not t.get("session") or t.get("session") == cur_session]
+
 if not tasks:
     sys.exit(0)
 

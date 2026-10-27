@@ -89,6 +89,7 @@ PY
 
 cmd_add() {
     local id="" cron="" at="" cmd="" kind="session" recurring="false"
+    local session="${CLAUDE_CODE_SESSION_ID:-}"
     while [ $# -gt 0 ]; do
         case "$1" in
             --id)        id="${2:-}"; shift 2 ;;
@@ -96,6 +97,7 @@ cmd_add() {
             --at)        at="${2:-}"; shift 2 ;;
             --cmd)       cmd="${2:-}"; shift 2 ;;
             --kind)      kind="${2:-}"; shift 2 ;;
+            --session)   session="${2:-}"; shift 2 ;;
             --recurring) recurring="${2:-}"; shift 2 ;;
             *) echo "未知参数: $1" >&2; exit 1 ;;
         esac
@@ -103,15 +105,18 @@ cmd_add() {
     [ -n "$id" ] || { echo "--id 必填" >&2; exit 1; }
 
     ensure_store
-    python3 - "$STORE" "$id" "$cron" "$at" "$cmd" "$kind" "$recurring" <<'PY'
+    python3 - "$STORE" "$id" "$cron" "$at" "$cmd" "$kind" "$recurring" "$session" <<'PY'
 import json, sys
 from datetime import datetime
-store, tid, cron, at, cmd, kind, recurring = sys.argv[1:8]
+store, tid, cron, at, cmd, kind, recurring, session = sys.argv[1:9]
 d = json.load(open(store))
 d["tasks"] = [t for t in d.get("tasks", []) if t.get("id") != tid]
 d["tasks"].append({
     "id": tid, "cron": cron, "at": at, "cmd": cmd,
     "kind": kind, "recurring": recurring == "true",
+    # session 归属：CronCreate 是 session-only，任务只在该 session 进程里活着。
+    # 记下来供 statusLine 过滤 —— 否则别的 session 也提示，误导用户。
+    "session": session,
     "created": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
     "status": "pending",
 })
