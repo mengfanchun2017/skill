@@ -18,7 +18,10 @@ CN_HOUR = re.compile(r"^(?P<h>[01]?\d|2[0-3])\s*[点時时](?:(?P<m>[0-5]?\d)\s*
 CN_HALF = re.compile(r"^(?P<h>[01]?\d|2[0-3])\s*点半$")
 COLON = re.compile(r"^(?P<h>[01]?\d|2[0-3]):(?P<m>[0-5]\d)(?::(?P<s>[0-5]\d))?$")
 REL = re.compile(r"^\+(?P<n>\d+)\s*(?P<unit>[hmd])$", re.I)
-REL_CN = re.compile(r"^(?P<n>\d+)\s*(?P<unit>分钟|小时|个小时|天)后$")
+REL_CN = re.compile(r"^(?P<n>\d+|半)\s*(?P<unit>分钟|小时|个小时|天)(?:以后|之后|后)$")
+IDLE = re.compile(r"^(?P<p>中午|午间|晚上|晚间)?闲时$")
+# 闲时窗口（分钟计）：中午 12:00-14:00，晚上 18:00 之后
+IDLE_WINDOWS = {"中午": (720, 840), "午间": (720, 840), "晚上": (1080, 1440), "晚间": (1080, 1440)}
 DAYCN = re.compile(r"^(?P<day>今天|今晚|明天|明晚|后天|大后天)(?P<rest>.*)$")
 WEEK = re.compile(r"^(?P<prefix>下)?(?:周|星期)(?P<wd>[一二三四五六日天])(?P<rest>.*)$")
 PERIOD = re.compile(r"^(?P<p>早上|上午|中午|下午|傍晚|晚上|凌晨)(?P<rest>.*)$")
@@ -32,6 +35,47 @@ def snap_minute(m: int) -> tuple[int, str | None]:
     if m == 30:
         return 32, ":30 会提前最多 90 秒触发，已挪到 :32"
     return m, None
+
+
+def idle_slot(period: str | None, now: datetime):
+    """闲时窗口 → 落在窗口内的最合适时刻 + 说明。
+
+    窗口（分钟计，0=午夜）：中午/午间 12:00-14:00，晚上/晚间 18:00-24:00。
+    不带前缀的裸「闲时」：挑下一个可用的窗口。
+    落点选窗口开头（12:00 / 18:00）—— 忙时通常在工作时段，窗口一开就进最省。
+    若当前已在窗口内，选"现在 +2 分钟"（给出缓冲，避免立即撞上 jitter）。
+    """
+    warns = []
+    if period is None:
+        # 没指定是哪个闲时：取最近的一个未来窗口
+        candidates = []
+        for p in ("中午", "晚上"):
+            at, w = idle_slot(p, now)
+            candidates.append((at, p, w))
+        at, p, w = min(candidates, key=lambda x: x[0])
+        return at, w + [f"未指定哪个闲时，取最近的「{p}闲时」"]
+
+    lo, hi = IDLE_WINDOWS[period]
+    now_min = now.hour * 60 + now.minute
+    base = now.replace(second=0, microsecond=0)
+
+    def at_minute(total: int, day_off: int = 0) -> datetime:
+        d = base + timedelta(days=day_off)
+        return d.replace(hour=total // 60, minute=total % 60)
+
+    if lo <= now_min < hi:
+        at = now + timedelta(minutes=2)
+        warns.append(f"当前已在「{period}闲时」窗口内，排在 2 分钟后")
+    else:
+        day_off = 0 if now_min < lo else 1
+        at = at_minute(lo, day_off)
+        if day_off:
+            warns.append(f"今日「{period}闲时」已过，顺延到明天")
+    warns.append(
+        f"「{period}闲时」窗口 {lo // 60:02d}:{lo % 60:02d}-{hi // 60 % 24:02d}:{hi % 60:02d}"
+        f"（按你的定义：中午=12:00-14:00，晚上=18:00 后）"
+    )
+    return at, warns
 
 
 def parse_hhmm(s: str):
@@ -87,9 +131,20 @@ def main():
 
     m = REL_CN.match(expr)
     if m:
-        n, unit = int(m.group("n")), m.group("unit")
-        delta = timedelta(days=n) if unit == "天" else timedelta(hours=n)
+        n_raw, unit = m.group("n"), m.group("unit")
+        is_min = unit == "分钟"
+        is_day = unit == "天"
+        if n_raw == "半":
+            delta = timedelta(hours=12) if is_day else timedelta(minutes=30)
+        else:
+            n = int(n_raw)
+            delta = timedelta(days=n) if is_day else (timedelta(minutes=n) if is_min else timedelta(hours=n))
         return emit(now + delta, now, warnings, raw)
+
+    m = IDLE.match(expr)
+    if m:
+        at, w = idle_slot(m.group("p"), now)
+        return emit(at, now, warnings + w, raw)
 
     day_off = 0
     pm_bias = False  # "今晚8点" 这类晚间词：裸小时数按下午/晚上理解
@@ -105,7 +160,6 @@ def main():
                 expr = "20点"  # 不带钟点，默认 20:00
 
     if expr.startswith("周") or expr.startswith("星期") or expr.startswith("下周"):
-        m = WEEK.match(expr)
         m = WEEK.match(expr)
         if m:
             next_week = m.group("prefix") == "下"
