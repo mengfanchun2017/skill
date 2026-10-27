@@ -74,11 +74,32 @@ export PATH="\$HOME/.local/bin:/usr/local/bin:/usr/bin:/bin"
 cd "\$HOME"
 # claude 认证走 ~/.claude/settings.json 的 env 块，不吃 shell 继承，故无需注入 key
 claude -p "$cmd"
-echo "---"
 echo "CLAUDE_EXIT=\$?"
 echo "END \$(date '+%F %T')"
+bash "$job_dir/summarize.sh"
 RUNNER
     chmod +x "$runner"
+
+    # 结果摘要：stdout.txt 是完整输出，result.md 是速读版（含尾部结论）
+    local summarizer="$job_dir/summarize.sh"
+    cat > "$summarizer" <<'SUMM'
+#!/usr/bin/env bash
+# fpostpone 自动生成 — 跑完后从 stdout.txt 提取摘要到 result.md
+d="$(dirname "$0")"
+{
+  echo "# fpostpone 任务结果"
+  echo
+  echo "- 任务: $(basename "$d")"
+  echo "- 完成: $(date '+%F %T')"
+  echo
+  echo '## 输出尾部'
+  echo
+  echo '```'
+  tail -40 "$d/stdout.txt"
+  echo '```'
+} > "$d/result.md"
+SUMM
+    chmod +x "$summarizer"
 
     local unit="${UNIT_PREFIX}-$(sanitize_name "$name")"
 
