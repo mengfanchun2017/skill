@@ -1,0 +1,11 @@
+# fpostpone 依赖
+# init-skill.sh sync 自动装
+# 格式: <package>  <manager>:<version>  <skill_name>
+
+# parse-time.py 只用标准库；无外部 pip 依赖
+# 运行时依赖（非 pip）:
+#   systemd --user + linger        --detach 模式需要
+#   claude CLI (>=2.1.295)         --detach 模式无头执行
+#   lark-cli                       可选，飞书通知
+#
+# 新机器开 linger: loginctl enable-linger $USER
