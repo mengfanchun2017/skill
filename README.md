@@ -1,6 +1,6 @@
 # skill — Claude Code skill 集合
 
-> Claude Code 技能聚合仓。**26 个自建 plugin**（全部在 marketplace 注册）+ **第三方 skill 由用户用 npx skills 自管**（不通过 marketplace）。
+> Claude Code 技能聚合仓。**27 个自建 plugin**（全部在 marketplace 注册）+ **第三方 skill 由用户用 npx skills 自管**（不通过 marketplace）。
 > 飞书 / 调研 / 撰写系统 / 文档 / PPT / Excel / 图表 / 3D 打印 一站式。
 
 ## 快速开始
@@ -35,6 +35,7 @@
 | 源码文档同步 | `/plugin install fsyncdoc@mengfanchun2017-skills` |
 | 库审计 | `/plugin install flibaudit@mengfanchun2017-skills` |
 | AI 图生 3D → 拓竹打印 | `/plugin install fmashwork@mengfanchun2017-skills` |
+| 定时延迟执行命令 | `/plugin install fpostpone@mengfanchun2017-skills` |
 
 可以一次装多个：
 
@@ -73,7 +74,7 @@ cconfig 用户：`bash ccconfig/lib/init-skill.sh sync` 自动从 `conf/third-pa
 
 克隆 [ccconfig](https://github.com/mengfanchun2017/ccconfig) 后，`bash lib/init-skill.sh sync` 自动完成：symlink 自建 skill、注册 marketplace、安装第三方 skill、注入私有配置。详见 ccconfig 文档。
 
-## 自建 plugin（26 个，全部 marketplace 注册）
+## 自建 plugin（27 个，全部 marketplace 注册）
 
 | Plugin | 说明 |
 |-------|------|
@@ -100,6 +101,9 @@ cconfig 用户：`bash ccconfig/lib/init-skill.sh sync` 自动从 `conf/third-pa
 | `fsyncdoc` | 源码文档同步 + 产品页同步（aiagt） |
 | `fmashwork` | AI 图生 3D → 拓竹打印自动化工作流 |
 | `fllmpack` | LLM 预设配置导出/导入（不含 API key，发给同事各自填 key） |
+| `fpostpone` | 定时延迟执行 — 把命令排到将来某时刻跑，输出回本会话（`18点运行 /transliter "x.zip"`） |
+| `fpdf` | PDF 精排 — 拆解 PDF 重排为飞书文档（表格列宽/行内公式/高清图/参考文献） |
+| `fsecretcheck` | 密钥泄露检查 — 扫描工作树与 git 历史里的真实凭据，判定属公开仓还是私密仓 |
 | `fskillcreat` | Skill 开发脚手架 — 快速创建新 skill 骨架 |
 
 ## 外部 skill — 三方上游 + 系统层 lark-cli（不通过本仓装）
@@ -147,7 +151,7 @@ lark-cli auth login
 skill/                                  ← 单聚合 marketplace 仓
 ├── .claude-plugin/
 │   └── marketplace.json                # plugin 入口（全本地）
-├── plugins/                            ← 26 个自建 plugin（全 marketplace）
+├── plugins/                            ← 27 个自建 plugin（全 marketplace）
 │   ├── ffeishu/SKILL.md
 │   ├── fpptx/SKILL.md
 │   ├── fdocx/SKILL.md
@@ -171,6 +175,7 @@ skill/                                  ← 单聚合 marketplace 仓
 │   ├── fsyncdoc/SKILL.md
 │   ├── fmashwork/SKILL.md
 │   ├── fllmpack/SKILL.md
+│   ├── fpostpone/SKILL.md
 │   └── fskillcreat/SKILL.md
 ├── README.md
 ├── CHANGELOG.md
@@ -201,7 +206,7 @@ MIT — 见 [LICENSE](LICENSE)
 
 A Claude Code marketplace with 26 self-built plugins (all registered in marketplace). Third-party skills use `npx skills` (not /plugin install) for clean dialog UX.
 
-- **Self-built (in repo)**: ffeishu, fpptx, fdocx, fxlsx, fdiagram, fsearch, fresearchframe, fworch, fworch-report, fworch-course, fworch-case, fworch-interview, fwstd-report, fwstd-course, fwstd-case, fwstd-interview, flogme, fmoocrec, fsysarchi, flibaudit, fsyncdoc, fmashwork, fllmpack, fskillcreat, fsecretcheck
+- **Self-built (in repo)**: ffeishu, fpptx, fdocx, fxlsx, fdiagram, fsearch, fresearchframe, fworch, fworch-report, fworch-course, fworch-case, fworch-interview, fwstd-report, fwstd-course, fwstd-case, fwstd-interview, flogme, fmoocrec, fsysarchi, flibaudit, fsyncdoc, fmashwork, fllmpack, fpostpone, fskillcreat, fsecretcheck
 - **Feishu CLI (system level)**: install `@larksuite/cli` via npm — ffeishu orchestrates all `lark-cli` commands
 - **Utilities (user-installed via `npx skills`)**: mattpocock/skills sub-skills (caveman, diagnose, grill-me, ...)
 
