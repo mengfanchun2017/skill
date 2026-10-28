@@ -223,7 +223,9 @@ def _candidates(key: str):
 def _resolve(key: str):
     """返回 (值, 源描述)；未命中返回 (None, None)。"""
     # 1 显式环境变量覆盖
-    envkey = "SKILLCONF_" + key.upper().replace("-", "_")
+    # 点号路径（wiki_nodes.default）也要转下划线，与 bash 版保持一致；
+    # 否则两实现在点号键上的 env 覆盖行为不同（婚配测试会抓出来）
+    envkey = "SKILLCONF_" + key.upper().replace("-", "_").replace(".", "_")
     if os.environ.get(envkey):
         return os.environ[envkey], f"env:{envkey}"
 

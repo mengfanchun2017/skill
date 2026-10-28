@@ -28,8 +28,11 @@ _skillconf_boot() {
     fi
 
     # 2. 兄弟目录（git clone 的 plugins/ 布局）
+    # ⚠️ $here 是 <plugin>/references，要上跳【两层】才到 plugins/：
+    #    一层 → <plugin>/，两层 → plugins/。原实现只跳一层，去找
+    #    <plugin>/ffeishu/… 恒不存在 → 本步从未真正生效，一直靠第 3/4 步兜底。
     if [[ -z "$cand" ]]; then
-        local pdir; pdir="$(dirname "$here")"      # <plugin>/ 的父 = plugins/ 或 <market>/
+        local pdir; pdir="$(dirname "$(dirname "$here")")"   # plugins/
         [[ -f "$pdir/ffeishu/references/plugin_env.sh" ]] && cand="$pdir/ffeishu/references/plugin_env.sh"
     fi
 

@@ -135,7 +135,10 @@ skillconf_lookup() {
     cfgdir="$HOME/.claude/plugins/data/$name"
 
     # 1. 显式环境变量覆盖
-    local envkey="SKILLCONF_$(printf '%s' "$key" | tr '[:lower:]-' '[:upper:]_')"
+    # 点号路径（wiki_nodes.default）必须一并转成下划线：不转的话构造出
+    # SKILLCONF_WIKI_NODES.DEFAULT，Bash 报 "invalid variable name" 并中止
+    # —— 点号路径是常用形态（wiki_nodes.default 几乎每个 skill 都用），实测踩过。
+    local envkey="SKILLCONF_$(printf '%s' "$key" | tr '[:lower:].-' '[:upper:]__')"
     if [[ -n "${!envkey:-}" ]]; then
         printf '%s\t%s\n' "${!envkey}" "env:$envkey"; return 0
     fi
