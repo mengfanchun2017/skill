@@ -296,8 +296,12 @@ def scan_sessions(start, end):
 
 
 def build_title(kr_title, proj_name, label):
-    """标题：{项目} {ISO周}[ 周中] 工作汇总"""
-    tag = label.replace("-mid", " 周中")
+    """标题：{项目} {ISO周} 工作汇总。
+
+    ⚠️ 周五与周一必须产出**同一标题**，否则 find_existing 按日期找到记录后
+    标题却对不上，看起来像两条（且不利于阅读）。
+    """
+    tag = label.replace("-mid", "")
     return f"{proj_name} {tag} 工作汇总"
 
 
@@ -391,7 +395,12 @@ def write_worklog(title, kr_id, desc, date_str):
 
 
 def append_worklog(rid, old_desc, new_desc):
-    payload = {"record_id_list": [rid], "patch": {"说明": old_desc + "\n\n---\n" + new_desc}}
+    """同周重跑 = 用最新内容覆盖，不累加。
+
+    ⚠️ 原先是 `old + "---" + new`，周五写一遍、周一再写一遍 → 完全相同的内容
+    重复两段。每周的记录应当反映该周最终状态，重跑就是刷新。
+    """
+    payload = {"record_id_list": [rid], "patch": {"说明": new_desc}}
     import tempfile
     fd, path = tempfile.mkstemp(suffix=".json", dir="/tmp")
     with os.fdopen(fd, "w") as f:
@@ -404,14 +413,20 @@ def append_worklog(rid, old_desc, new_desc):
         os.unlink(path)
 
 
-def _emit(groups, label, start, do_write):
-    """把聚合结果落地：每 KR 一条，已有则追加。周一/周五两条路径共用。"""
+def _emit(groups, label, anchor, do_write):
+    """把聚合结果落地：每 KR 一条，已有则追加。周一/周五两条路径共用。
+
+    anchor = 该周周一，**固定不变**。周五和周一的扫描窗口起点不同，
+    但记录日期必须锚到同一个周一，否则 find_existing 找不到周五写的那条，
+    会重复新建（实测踩过）。
+    """
     if not groups:
         print("该窗口无有效 session 活动")
         return 0
 
     km = kr_meta()
-    date_str = start.date().isoformat()
+    date_str = (anchor.date().isoformat() if isinstance(anchor, datetime)
+                 else anchor.isoformat())
     total_new, total_app = 0, 0
 
     for (kr_id, proj_name), g in sorted(groups.items(),
@@ -467,9 +482,11 @@ def main():
         last_friday = this_monday - timedelta(days=3)   # 上周五
         start_inc = datetime.combine(last_friday, datetime.min.time())
         end_inc = datetime.now()
-        _, _, lbl = week_bounds(None, this_monday - timedelta(days=7).isoformat())
-        print(f"窗口：{start_inc.date()} ~ {end_inc.date()}  ({lbl} 增量，跳过周五已写的部分)")
-        return _emit(scan_sessions(start_inc, end_inc), lbl, start_inc, args.write)
+        last_monday = this_monday - timedelta(days=7)
+        _, _, lbl = week_bounds(None, last_monday.isoformat())
+        print(f"窗口：{start_inc.date()} ~ {end_inc.date()}  ({lbl} 增量，跳过周五已写)")
+        anchor = last_monday
+        return _emit(scan_sessions(start_inc, end_inc), lbl, anchor, args.write)
 
     start, end, label = week_bounds(args.week, args.since)
     if args.this_week:
