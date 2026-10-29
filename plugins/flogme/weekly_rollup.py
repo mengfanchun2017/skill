@@ -399,7 +399,11 @@ def _emit(groups, label, start, do_write):
 
     for (kr_id, proj_name), g in sorted(groups.items(),
                                         key=lambda x: -len(x[1]["sessions"])):
-        kr_title = km.get(kr_id, "(未匹配 KR)")
+        # 用户定稿：「没有 KR 就不更新」——未匹配到 KR 的活动不记录
+        if not kr_id:
+            print(f"\n跳过 {proj_name}：未匹配到 KR（{len(g['sessions'])} session）")
+            continue
+        kr_title = km.get(kr_id, "(KR 已删除)")
         desc = build_desc(g, kr_title, label)
         title = build_title(kr_title, proj_name, label)
         print(f"\n{'='*60}")
@@ -447,7 +451,7 @@ def main():
     if args.this_week:
         # 周五跑：本周一到现在，截掉未来
         end = datetime.now()
-        label = label + " 周中"
+        label = label + "-mid"
     print(f"窗口：{start.date()} ~ {end.date()}  ({label})")
 
     groups = scan_sessions(start, end)
