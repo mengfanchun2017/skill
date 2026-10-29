@@ -314,19 +314,27 @@ def build_desc(groups_entry, kr_title, label):
 
 
 def find_existing(kr_id, date_str):
-    """查本周该 KR 是否已有 worklog（多终端并发去重）。"""
-    data = lark("base", "+record-list", "--base-token", BASE,
-                "--table-id", T["Worklog"], "--as", "user",
-                "--format", "json", "--limit", "200")
-    fields = data["data"]["fields"]
-    ids = data["data"]["record_id_list"]
-    for row, rid in zip(data["data"]["data"], ids):
-        d = dict(zip(fields, row))
-        kr = d.get("关联KR")
-        link = kr[0]["id"] if (kr and isinstance(kr, list) and kr) else None
-        if link == kr_id and str(d.get("日期", "")).startswith(date_str):
-            return rid, d
-    return None, None
+    """查本周该 KR 是否已有 worklog（多终端并发去重）。
+
+    ⚠️ 必须翻页：Worklog 已超 200 条，只查第一页会漏掉新记录，
+    第二次运行会重复新建（实测踩过）。
+    """
+    off = 0
+    while True:
+        data = lark("base", "+record-list", "--base-token", BASE,
+                    "--table-id", T["Worklog"], "--as", "user",
+                    "--format", "json", "--limit", "200", "--offset", str(off))
+        dd = data["data"]
+        fields = dd["fields"]
+        for row, rid in zip(dd["data"], dd["record_id_list"]):
+            d = dict(zip(fields, row))
+            kr = d.get("关联KR")
+            link = kr[0]["id"] if (kr and isinstance(kr, list) and kr) else None
+            if link == kr_id and str(d.get("日期", "")).startswith(date_str):
+                return rid, d
+        if not dd.get("has_more"):
+            return None, None
+        off += len(dd["data"])
 
 
 def kr_meta():
