@@ -652,8 +652,13 @@ def generate_annual_report(data: dict, year: str = "2026") -> str:
             for kr_id, kr_rec in kr_map.items():
                 if extract_link_id(kr_rec[kr_col["关联O"]]) == o_id:
                     kr_title = kr_rec[kr_col["标题"]]
-                    kr_progress = _get(kr_rec, kr_col, "进度")
-                    lines.append(f"- {kr_title}：{kr_progress}%")
+                    kr_prog_v = _get(kr_rec, kr_col, "进度")
+                    if kr_prog_v in (None, ""):
+                        # 进度字段不存在时用状态代替，不要输出 "None%"
+                        kr_prog_v = cell(_get(kr_rec, kr_col, "状态", "")) or "—"
+                    else:
+                        kr_prog_v = f"{kr_prog_v}%"
+                    lines.append(f"- {kr_title}：{kr_prog_v}")
             lines.append("")
 
     # Growth trajectory
