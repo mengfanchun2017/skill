@@ -115,11 +115,17 @@ def is_low_quality(rec):
 
 
 def is_empty_session(rec):
-    """判断是否为空 session"""
-    t = rec.get("标题", "") or ""
-    if "0 user msgs" in t:
+    """判断是否为空 session。
+
+    ⚠️ 旧实现读「用户消息数」「助手消息数」——这两个字段 2026-08 已删，
+    .get() 恒返回 0 → 每条记录都被判成空 session，--mode weekly --write
+    会把全表删光（245 条）。现改为只看记录本身有没有内容。
+    """
+    t = (rec.get("标题") or "").strip()
+    n = (rec.get("说明") or "").strip()
+    if not t and not n:
         return True
-    if rec.get("用户消息数", 0) == 0 and rec.get("助手消息数", 0) == 0:
+    if "0 user msgs" in t:
         return True
     return False
 
@@ -253,16 +259,8 @@ def cmd_daily(records, do_write):
         keep = recs[0]
         rest = recs[1:]
 
-        in_tok = keep.get("输入Token", 0) or 0
-        out_tok = keep.get("输出Token", 0) or 0
-        asst = keep.get("助手消息数", 0) or 0
-        user = keep.get("用户消息数", 0) or 0
         all_notes = [(keep.get("说明") or "").strip()]
         for r in rest:
-            in_tok += r.get("输入Token", 0) or 0
-            out_tok += r.get("输出Token", 0) or 0
-            asst += r.get("助手消息数", 0) or 0
-            user += r.get("用户消息数", 0) or 0
             note = (r.get("说明") or "").strip()
             if note and note not in all_notes:
                 all_notes.append(note)
@@ -274,13 +272,7 @@ def cmd_daily(records, do_write):
 
         if do_write:
             merged_note = "\n\n---\n".join(n for n in all_notes if n)
-            update_record(keep["_rid"], {
-                "说明": merged_note,
-                "输入Token": in_tok,
-                "输出Token": out_tok,
-                "助手消息数": asst,
-                "用户消息数": user,
-            })
+            update_record(keep["_rid"], {"说明": merged_note})
             for r in rest:
                 delete_record(r["_rid"])
             print(f"       → merged, kept {keep['_rid'][-8:]}, deleted {len(rest)}")

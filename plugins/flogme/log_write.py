@@ -100,8 +100,79 @@ def update_kr_field(kr_id, fields_dict):
          "--data", json.dumps(payload), "--as", "user")
 
 
+FIELD_CACHE = {}
+
+# KR 状态字段真名。历史上改名过（KR.状态 → KR.status），写错名 API 不报错只静默丢弃。
+KR_STATUS_FIELD = "KR.status"
+
+
+def table_fields(table_key):
+    """取某表全部字段名（带缓存）。写之前用它校验，避免静默丢弃。"""
+    if table_key in FIELD_CACHE:
+        return FIELD_CACHE[table_key]
+    data = lark("base", "+field-list", "--base-token", BASE,
+                "--table-id", T[table_key], "--as", "user")
+    names = {f["name"] for f in data["data"]["fields"]}
+    FIELD_CACHE[table_key] = names
+    return names
+
+
+def verify_field(table_key, field_name):
+    """字段不存在 → 报错退出，而不是让 API 静默吞掉。"""
+    names = table_fields(table_key)
+    if field_name not in names:
+        sys.exit(f"字段不存在: {table_key}.{field_name}\n"
+                 f"该表现有字段: {sorted(names)}\n"
+                 f"（bitable API 对未知字段静默丢弃并返回成功，故此处硬拦）")
+
+
+SELECT_CACHE = {}
+
+
+def verify_select_value(table_key, field_name, value):
+    """单选值必须在选项里，否则 API 报错或写入无效值。"""
+    key = (table_key, field_name)
+    if key not in SELECT_CACHE:
+        data = lark("base", "+field-list", "--base-token", BASE,
+                    "--table-id", T[table_key], "--as", "user")
+        for f in data["data"]["fields"]:
+            if f["name"] == field_name:
+                SELECT_CACHE[key] = {o["name"] for o in (f.get("options") or [])}
+                break
+        else:
+            SELECT_CACHE[key] = set()
+    allowed = SELECT_CACHE[key]
+    if allowed and value not in allowed:
+        sys.exit(f"无效值: {table_key}.{field_name}={value!r}\n"
+                 f"可选: {sorted(allowed)}")
+
+
+def read_kr_field(kr_id, field_name):
+    """读回校验写入是否真生效。"""
+    data = lark("base", "+record-list", "--base-token", BASE,
+                "--table-id", T["KR"], "--as", "user", "--format", "json",
+                "--limit", "200")
+    fields = data["data"]["fields"]
+    ids = data["data"]["record_id_list"]
+    for row, rid in zip(data["data"]["data"], ids):
+        if rid == kr_id:
+            return dict(zip(fields, row)).get(field_name)
+    return None
+
+
 def cmd_worklog(args):
     date_str = args.date or date.today().isoformat()
+
+    # 「每条必须关联 KR」此前只是文档约定，脚本不校验 → 33 条裸记录。
+    # 这里硬拦，除非显式 --allow-no-kr。
+    if not args.kr and not getattr(args, "allow_no_kr", False):
+        sys.exit("缺少 --kr：Worklog 规则要求每条关联一个 KR。\n"
+                 "确实无法归类时用 --allow-no-kr 显式豁免。\n"
+                 f"可用 KR: python3 {Path(__file__).name} kr-list")
+    if args.type:
+        verify_select_value("Worklog", "成果类型", args.type)
+    if args.kr:
+        verify_field("Worklog", "关联KR")
 
     fields = ["标题", "成果类型", "关联KR", "日期", "说明"]
     row = [
@@ -128,7 +199,8 @@ def cmd_worklog(args):
 def cmd_reflect(args):
     date_str = args.date or date.today().isoformat()
 
-    fields = ["标题", "周期类型", "关联O", "做得好", "待改进", "学到", "下阶段", "日期"]
+    # 关联KR 之前只打印不落库（batch-kr 假成功），这里真正写入
+    fields = ["标题", "周期类型", "关联O", "做得好", "待改进", "学到", "下阶段", "日期", "关联KR"]
     row = [
         args.title,
         args.period or "周",
@@ -138,6 +210,7 @@ def cmd_reflect(args):
         args.learned or "",
         args.next or "",
         date_str,
+        [{"id": k} for k in args.batch_kr] if args.batch_kr else None,
     ]
     payload = {"fields": fields, "rows": [row]}
     path = write_json_file(payload)
@@ -155,9 +228,38 @@ def cmd_reflect(args):
 
 
 def cmd_kr_status(args):
-    """手动更新 KR.状态 (Active / Done / Cancelled)"""
-    update_kr_field(args.kr, {"KR.状态": args.status})
-    print(json.dumps({"kr_id": args.kr, "status": args.status}, ensure_ascii=False, indent=2))
+    """手动更新 KR.状态 (Active / Done / Cancelled)
+
+    字段名是 KR.status（带点号），不是旧文档写的 KR.状态 —— 旧名不存在时
+    bitable API 静默丢弃该键、仍返回成功，造成「假成功」。这里先校验字段存在。
+    """
+    verify_field("KR", KR_STATUS_FIELD)
+    update_kr_field(args.kr, {KR_STATUS_FIELD: args.status})
+    got = read_kr_field(args.kr, KR_STATUS_FIELD)
+    ok = got == args.status or (isinstance(got, list) and args.status in got)
+    print(json.dumps({"kr_id": args.kr, "status": args.status,
+                      "verified": ok, "read_back": got}, ensure_ascii=False, indent=2))
+    return 0 if ok else 1
+
+
+def cmd_kr_list(args):
+    """列出 KR（id + 标题 + 状态），供 worklog 关联时查 record_id。"""
+    data = lark("base", "+record-list", "--base-token", BASE,
+                "--table-id", T["KR"], "--as", "user", "--format", "json",
+                "--limit", "200")
+    fields = data["data"]["fields"]
+    ids = data["data"]["record_id_list"]
+    rows = []
+    for row, rid in zip(data["data"]["data"], ids):
+        d = dict(zip(fields, row))
+        rows.append({
+            "kr_id": rid,
+            "标题": d.get("标题"),
+            "KR.status": d.get(KR_STATUS_FIELD),
+            "KR.domain": d.get("KR.domain"),
+            "KR.para": d.get("KR.para"),
+        })
+    print(json.dumps(rows, ensure_ascii=False, indent=2))
     return 0
 
 
@@ -172,6 +274,8 @@ def main():
     w.add_argument("--note", help="说明")
     # usage fields removed: token/msg counts now handled by maintain.sh token
     w.add_argument("--date", help="日期 YYYY-MM-DD")
+    w.add_argument("--allow-no-kr", action="store_true",
+                   help="显式豁免「必须关联 KR」规则")
     w.set_defaults(func=cmd_worklog)
 
     r = sub.add_parser("reflect")
@@ -188,8 +292,11 @@ def main():
 
     k = sub.add_parser("kr-status")
     k.add_argument("--kr", required=True, help="KR record_id")
-    k.add_argument("--status", required=True, choices=["Active", "Done", "Cancelled"])
+    k.add_argument("--status", required=True, help="取 KR.status 字段的选项值")
     k.set_defaults(func=cmd_kr_status)
+
+    kl = sub.add_parser("kr-list", help="列出可用 KR（写 worklog 前查 record_id）")
+    kl.set_defaults(func=cmd_kr_list)
 
     args = p.parse_args()
     sys.exit(args.func(args))
