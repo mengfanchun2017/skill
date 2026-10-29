@@ -387,34 +387,10 @@ def append_worklog(rid, old_desc, new_desc):
         os.unlink(path)
 
 
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--week", help="ISO 周，如 2026-W43")
-    ap.add_argument("--since", help="起始日 YYYY-MM-DD（7 天窗口）")
-    ap.add_argument("--last-week", action="store_true",
-                    help="汇总上一个完整周（周一 00:01 定时跑用）")
-    ap.add_argument("--this-week", action="store_true",
-                    help="汇总本周至今（周五 00:01 定时跑用）")
-    ap.add_argument("--write", action="store_true", help="写入飞书（默认预览）")
-    args = ap.parse_args()
-
-    if args.last_week:
-        today = date.today()
-        # 周一 00:01 跑时，今天就是这个周一 → 上一个完整周是 -7 天开始的周
-        this_monday = today - timedelta(days=today.weekday())
-        args.since = (this_monday - timedelta(days=7)).isoformat()
-    elif args.this_week:
-        # 周五 00:01 跑时，本周从周一算；截到此刻，不含未来
-        start, _e, label = week_bounds(None, None)
-        groups_now = scan_sessions(start, datetime.now())
-        return _emit(groups_now, label, start, args.write)
-
-    start, end, label = week_bounds(args.week, args.since)
-    print(f"窗口：{start.date()} ~ {(end - timedelta(days=1)).date()}  ({label})")
-
-    groups = scan_sessions(start, end)
+def _emit(groups, label, start, do_write):
+    """把聚合结果落地：每 KR 一条，已有则追加。周一/周五两条路径共用。"""
     if not groups:
-        print("本周无有效 session 活动")
+        print("该窗口无有效 session 活动")
         return 0
 
     km = kr_meta()
@@ -429,27 +405,53 @@ def main():
         print(f"\n{'='*60}")
         print(f"KR: {kr_title}")
         print(f"项目: {proj_name} | session: {len(g['sessions'])} | "
-              f"commit: {len(g['commits'])} | 文件: {len(g['edits'])}")
+              f"提交: {g.get('commit_count', 0)} | 文件: {len(g['edits'])}")
         print(f"标题: {title}")
 
         rid, old = find_existing(kr_id, date_str)
         if rid:
             print(f"→ 已有本周记录 {rid}，追加说明")
-            if args.write:
+            if do_write:
                 append_worklog(rid, old.get("说明") or "", desc)
                 total_app += 1
         else:
             print(f"→ 新建")
-            if args.write:
+            if do_write:
                 nid = write_worklog(title, kr_id, desc, date_str)
                 print(f"   写入 {nid}")
                 total_new += 1
 
-    if args.write:
+    if do_write:
         print(f"\n完成：新建 {total_new} 条，追加 {total_app} 条")
     else:
         print(f"\n⚠ 预览模式。加 --write 写入飞书。")
     return 0
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--week", help="ISO 周，如 2026-W43")
+    ap.add_argument("--since", help="起始日 YYYY-MM-DD（7 天窗口）")
+    ap.add_argument("--last-week", action="store_true",
+                    help="上一个完整周（周一 00:01 定时跑用）")
+    ap.add_argument("--this-week", action="store_true",
+                    help="本周至今（周五 00:01 定时跑用）")
+    ap.add_argument("--write", action="store_true", help="写入飞书（默认预览）")
+    args = ap.parse_args()
+
+    if args.last_week:
+        this_monday = date.today() - timedelta(days=date.today().weekday())
+        args.since = (this_monday - timedelta(days=7)).isoformat()
+
+    start, end, label = week_bounds(args.week, args.since)
+    if args.this_week:
+        # 周五跑：本周一到现在，截掉未来
+        end = datetime.now()
+        label = label + " 周中"
+    print(f"窗口：{start.date()} ~ {end.date()}  ({label})")
+
+    groups = scan_sessions(start, end)
+    return _emit(groups, label, start, args.write)
 
 
 if __name__ == "__main__":
