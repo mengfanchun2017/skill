@@ -24,7 +24,7 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE))
+sys.path.insert(0, str(HERE / "references"))
 
 
 def _conf():
@@ -284,7 +284,7 @@ def kr_meta():
                 "--format", "json", "--limit", "200")
     fields = data["data"]["fields"]
     out = {}
-    for row, rid in zip(data["data"]["data"], data["record_id_list"]):
+    for row, rid in zip(data["data"]["data"], data["data"]["record_id_list"]):
         d = dict(zip(fields, row))
         out[rid] = d.get("标题")
     return out
