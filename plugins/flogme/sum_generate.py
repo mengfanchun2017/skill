@@ -82,6 +82,17 @@ def _get(rec, col, logical, default=None):
     return rec[i] if i < len(rec) else default
 
 
+def _kr_period(kr_rec, kr_map, o_map, kr_col, o_col):
+    """KR 表本身没有周期字段，周期从关联 O 继承（历史设计如此）。"""
+    direct = _get(kr_rec, kr_col, "周期")
+    if direct not in (None, ""):
+        return direct
+    o_id = extract_link_id(_get(kr_rec, kr_col, "关联O"))
+    if o_id and o_id in o_map:
+        return _get(o_map[o_id], o_col, "周期", "")
+    return ""
+
+
 def extract_link_id(val) -> str | None:
     """Extract record ID from linked field value like [{'id': 'recXXXX'}]."""
     if isinstance(val, list) and len(val) > 0 and isinstance(val[0], dict):
@@ -618,7 +629,7 @@ def generate_annual_report(data: dict, year: str = "2026") -> str:
 
         lines.append(f"| {cat_labels[cat]} | {len(cat_o)} | {cat_kr_count} | {cat_wl_count} | {cat_rf_count} |")
 
-    lines.append(f"| **合计** | **{sum(1 for rid, rec in o_map.items() if period_match(rec[o_col['周期']], year))}** | **{sum(1 for rid, rec in kr_map.items() if period_match(rec[kr_col['周期']], year))}** | **{len(all_wl_ids)}** | **{len(all_rf_ids)}** |")
+    lines.append(f"| **合计** | **{sum(1 for rid, rec in o_map.items() if period_match(rec[o_col['周期']], year))}** | **{sum(1 for rid, rec in kr_map.items() if period_match(_kr_period(rec, kr_map, o_map, kr_col, o_col), year))}** | **{len(all_wl_ids)}** | **{len(all_rf_ids)}** |")
     lines.append("")
 
     # Category breakdowns
