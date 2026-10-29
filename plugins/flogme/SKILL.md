@@ -161,8 +161,51 @@ weekly_rollup.py
 **为什么不用 SessionEnd hook**：hook 删了静默失效、难观测、跨终端不汇总。
 周汇总是有状态检查的显式命令，跑没跑一目了然。
 
-定时：说「设 worklog 周汇总每周一 9:00 执行」→ CronCreate durable；
-或手动 `python3 weekly_rollup.py --write`。
+## 定时任务（已就绪）
+
+| 时间 | 命令 | 内容 |
+|------|------|------|
+| 每周一 00:01 | `weekly_rollup.py --last-week --write` | 汇总上一个完整周 |
+| 每周五 00:01 | `weekly_rollup.py --this-week --write` | 汇总本周一到此刻 |
+
+已注册为 Claude durable cron（`fe6d7915` 周一 / `5243e810` 周五），**7 天后自动过期**，
+到时说「重建 worklog 周汇总定时」即可重注册。
+
+## 手动跑
+
+```bash
+cd ~/git/skill/plugins/flogme
+export LARKSUITE_CLI_CONFIG_DIR="$HOME/.lark-cli-ailab"
+
+# 汇总上一个完整周（周一该跑的那个）
+python3 weekly_rollup.py --last-week
+
+# 汇总本周至今（周五该跑的那个）
+python3 weekly_rollup.py --this-week
+
+# 指定某一周
+python3 weekly_rollup.py --week 2026-W43
+
+# 指定任意 7 天窗口
+python3 weekly_rollup.py --since 2026-10-19
+
+# 以上全部默认预览；确认无误后加 --write 才写飞书
+python3 weekly_rollup.py --last-week --write
+```
+
+**建议流程**：先不带 `--write` 跑一遍看聚合结果对不对（会打印每个 KR 的 session 数、提交数、文件数、标题），确认再加 `--write`。
+
+## 归档
+
+主表只留当年，旧年份搬到 `Worklog_Archive`（同 Base 内，`tbld4zKDq0mrtd2H`）。
+
+```bash
+python3 archive_worklogs.py --before 2026-01-01          # 预览
+python3 archive_worklogs.py --before 2026-01-01 --write  # 执行
+```
+
+**安全设计**：先写归档表、条数核对一致才删主表；不一致立即中止。
+建议每年初跑一次。**执行前先备份**（`record-list` 全量导出 JSON）。
 
 ## 参考
 
