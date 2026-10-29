@@ -391,8 +391,23 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--week", help="ISO 周，如 2026-W43")
     ap.add_argument("--since", help="起始日 YYYY-MM-DD（7 天窗口）")
+    ap.add_argument("--last-week", action="store_true",
+                    help="汇总上一个完整周（周一 00:01 定时跑用）")
+    ap.add_argument("--this-week", action="store_true",
+                    help="汇总本周至今（周五 00:01 定时跑用）")
     ap.add_argument("--write", action="store_true", help="写入飞书（默认预览）")
     args = ap.parse_args()
+
+    if args.last_week:
+        today = date.today()
+        # 周一 00:01 跑时，今天就是这个周一 → 上一个完整周是 -7 天开始的周
+        this_monday = today - timedelta(days=today.weekday())
+        args.since = (this_monday - timedelta(days=7)).isoformat()
+    elif args.this_week:
+        # 周五 00:01 跑时，本周从周一算；截到此刻，不含未来
+        start, _e, label = week_bounds(None, None)
+        groups_now = scan_sessions(start, datetime.now())
+        return _emit(groups_now, label, start, args.write)
 
     start, end, label = week_bounds(args.week, args.since)
     print(f"窗口：{start.date()} ~ {(end - timedelta(days=1)).date()}  ({label})")
