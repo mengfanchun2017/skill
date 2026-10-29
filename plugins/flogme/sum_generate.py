@@ -27,9 +27,59 @@ def parse_records(data: dict) -> tuple[list[str], list[list]]:
     return data["data"]["fields"], data["data"]["data"]
 
 
-def field_index(fields: list[str]) -> dict[str, int]:
-    """Build field name → index map for record array access."""
-    return {name: i for i, name in enumerate(fields)}
+# 逻辑字段名 → 候选真名（按顺序取第一个存在的）
+# 2026-10-29：Base 字段改过名，脚本按旧名索引直接 KeyError 崩溃。加这一层别名，
+# 将来再改名只需往候选表里加一项，脚本不用动。
+FIELD_ALIASES = {
+    "O": {
+        "周期": ["周期"], "分类": ["分类"], "状态": ["状态"],
+        "标题": ["标题"], "说明": ["说明"], "优先级": ["优先级"],
+        "更新日期": ["更新日期"],
+    },
+    "KR": {
+        "标题": ["标题"], "关联O": ["关联O"], "说明": ["说明"], "更新日期": ["更新日期"],
+        "类型": ["KR.type", "类型"],
+        "进度": ["KR.进度", "进度", "KR.progress"],
+        "信心": ["KR.信心", "信心"],
+        "最终评分": ["KR.最终评分", "最终评分", "评分"],
+        "PARA": ["KR.para", "KR.PARA"],
+        "状态": ["KR.status", "KR.状态"],
+        "分类": ["KR.domain", "分类"],
+    },
+    "WL": {
+        "标题": ["标题"], "关联KR": ["关联KR"], "日期": ["日期"], "说明": ["说明"],
+        "成果类型": ["成果类型"], "量化结果": ["量化结果"],
+    },
+    "RF": {
+        "标题": ["标题"], "关联O": ["关联O"], "做得好": ["做得好"], "待改进": ["待改进"],
+        "学到": ["学到"], "下阶段": ["下阶段"], "日期": ["日期"],
+    },
+}
+
+
+def field_index(fields: list[str], kind: str | None = None) -> dict[str, int]:
+    """Build field name → index map for record array access.
+
+    kind 给出时，按 FIELD_ALIASES 把逻辑名解析到实际存在的字段；
+    解析不到的**跳过**（宁缺勿崩），调用方用 _get(rec, col, "名") 安全取值。
+    """
+    idx = {name: i for i, name in enumerate(fields)}
+    if not kind:
+        return idx
+    for logical, cands in FIELD_ALIASES.get(kind, {}).items():
+        for c in cands:
+            if c in idx:
+                idx.setdefault(logical, idx[c])
+                break
+    return idx
+
+
+def _get(rec, col, logical, default=None):
+    """按逻辑字段名安全取值：字段缺失返回 default 而不是 KeyError。"""
+    if logical not in col:
+        return default
+    i = col[logical]
+    return rec[i] if i < len(rec) else default
 
 
 def extract_link_id(val) -> str | None:
@@ -116,10 +166,10 @@ def load_all(okr_o_path, okr_kr_path, worklog_path, reflect_path):
     rf_map = {rid: rec for rid, rec in zip(rf_ids, rf_records)}
 
     return {
-        "o": {"fields": o_fields, "records": o_records, "map": o_map, "ids": o_ids, "col": field_index(o_fields)},
-        "kr": {"fields": kr_fields, "records": kr_records, "map": kr_map, "ids": kr_ids, "col": field_index(kr_fields)},
-        "wl": {"fields": wl_fields, "records": wl_records, "map": wl_map, "ids": wl_ids, "col": field_index(wl_fields)},
-        "rf": {"fields": rf_fields, "records": rf_records, "map": rf_map, "ids": rf_ids, "col": field_index(rf_fields)},
+        "o": {"fields": o_fields, "records": o_records, "map": o_map, "ids": o_ids, "col": field_index(o_fields, "O")},
+        "kr": {"fields": kr_fields, "records": kr_records, "map": kr_map, "ids": kr_ids, "col": field_index(kr_fields, "KR")},
+        "wl": {"fields": wl_fields, "records": wl_records, "map": wl_map, "ids": wl_ids, "col": field_index(wl_fields, "WL")},
+        "rf": {"fields": rf_fields, "records": rf_records, "map": rf_map, "ids": rf_ids, "col": field_index(rf_fields, "RF")},
     }
 
 
@@ -238,9 +288,10 @@ def generate_period_summary(data: dict, filtered: dict) -> str:
         for i, kr_id in enumerate(kr_ids):
             kr_rec = kr_map[kr_id]
             kr_title = kr_rec[kr_col["标题"]]
-            kr_type = cell(kr_rec[kr_col["类型"]])
-            kr_progress = f"{kr_rec[kr_col['进度']]}%"
-            kr_score = cell(kr_rec[kr_col["最终评分"]]) if kr_rec[kr_col["最终评分"]] else "—"
+            kr_type = cell(_get(kr_rec, kr_col, "类型", ""))
+            kr_prog_v = _get(kr_rec, kr_col, "进度")
+            kr_progress = f"{kr_prog_v}%" if kr_prog_v not in (None, "") else "—"
+            kr_score = cell(_get(kr_rec, kr_col, "最终评分")) or "—"
             o_display = o_title if i == 0 else ""
             lines.append(f"| {o_display} | {kr_title} | {kr_type} | {kr_progress} | {kr_score} |")
 
@@ -272,7 +323,7 @@ def generate_period_summary(data: dict, filtered: dict) -> str:
         wl_rec = wl_map[wl_id]
         wl_title = wl_rec[wl_col["标题"]]
         wl_desc = wl_rec[wl_col["说明"]] if wl_rec[wl_col["说明"]] else ""
-        wl_quant = wl_rec[wl_col["量化结果"]] if wl_rec[wl_col["量化结果"]] else ""
+        wl_quant = _get(wl_rec, wl_col, "量化结果", "") or ""
         quant_str = f"（{wl_quant}）" if wl_quant else ""
         lines.append(f"- **{wl_title}**{quant_str}：{wl_desc}")
 
@@ -288,7 +339,7 @@ def generate_period_summary(data: dict, filtered: dict) -> str:
     # 计算完成率
     total_kr = len(filtered["kr_ids"])
     if total_kr > 0:
-        done_kr = sum(1 for kid in filtered["kr_ids"] if kr_map[kid][kr_col["进度"]] == 100)
+        done_kr = sum(1 for kid in filtered["kr_ids"] if _get(kr_map[kid], kr_col, "进度") == 100)
         lines.append(f"- KR 完成率：{done_kr}/{total_kr}（{done_kr*100//total_kr}%）")
     lines.append("")
 
@@ -453,10 +504,11 @@ def generate_okr_review(data: dict, period: str) -> str:
             if linked_o != o_id:
                 continue
             kr_title = kr_rec[kr_col["标题"]]
-            kr_type = cell(kr_rec[kr_col["类型"]])
-            kr_confidence = cell(kr_rec[kr_col["信心"]])
-            kr_progress = f"{kr_rec[kr_col['进度']]}%"
-            kr_score = kr_rec[kr_col["最终评分"]] if kr_rec[kr_col["最终评分"]] else 0
+            kr_type = cell(_get(kr_rec, kr_col, "类型", ""))
+            kr_confidence = cell(_get(kr_rec, kr_col, "信心", ""))
+            kr_prog_v = _get(kr_rec, kr_col, "进度")
+            kr_progress = f"{kr_prog_v}%" if kr_prog_v not in (None, "") else "—"
+            kr_score = _get(kr_rec, kr_col, "最终评分") or 0
 
             lines.append(f"| {kr_title} | {kr_type} | {kr_confidence} | {kr_progress} | {kr_score} |")
 
@@ -464,11 +516,11 @@ def generate_okr_review(data: dict, period: str) -> str:
             total_score += float(kr_score)
             if kr_type == "Committed":
                 committed_total += 1
-                if kr_rec[kr_col["进度"]] == 100:
+                if _get(kr_rec, kr_col, "进度") == 100:
                     committed_done += 1
             elif kr_type == "Aspirational":
                 aspirational_total += 1
-                if kr_rec[kr_col["进度"]] >= 70:
+                if (_get(kr_rec, kr_col, "进度") or 0) >= 70:
                     aspirational_done += 1
 
         lines.append("")
@@ -589,7 +641,7 @@ def generate_annual_report(data: dict, year: str = "2026") -> str:
             for kr_id, kr_rec in kr_map.items():
                 if extract_link_id(kr_rec[kr_col["关联O"]]) == o_id:
                     kr_title = kr_rec[kr_col["标题"]]
-                    kr_progress = kr_rec[kr_col["进度"]]
+                    kr_progress = _get(kr_rec, kr_col, "进度")
                     lines.append(f"- {kr_title}：{kr_progress}%")
             lines.append("")
 
