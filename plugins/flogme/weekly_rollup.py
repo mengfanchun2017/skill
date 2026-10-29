@@ -48,6 +48,33 @@ PROJECTS_DIR = Path.home() / ".claude" / "projects"
 SKIP_CWD_PATTERNS = ("/tmp", "/mnt/c/Users", "/home/francis--claude-jobs")
 
 
+def git_commits_since(proj_name, start, end):
+    """从 git log 直接拉提交。
+
+    ⚠️ 不能靠 transcript 里的 `git commit` 命令：~/git/ 下的仓库由 auto-sync
+    monitor 独占提交权，session 从不自己 commit，transcript 里根本没有 commit 命令
+    （实测上周 19 个 session，commit 命中 0）。真提交只在 git log 里。
+    """
+    repo = Path.home() / "git" / proj_name
+    if not (repo / ".git").exists():
+        return []
+    r = subprocess.run(
+        ["git", "-C", str(repo), "log",
+         f"--since={start.isoformat()}", f"--until={end.isoformat()}",
+         "--pretty=format:%s", "--no-merges"],
+        capture_output=True, text=True)
+    if r.returncode != 0:
+        return []
+    out = []
+    for line in r.stdout.splitlines():
+        s = line.strip()
+        # auto-sync 的提交信息带文件清单，噪音大，只保留有语义的
+        if not s or s.startswith("Auto-sync:"):
+            continue
+        out.append(s[:150])
+    return out
+
+
 def lark(*args):
     r = subprocess.run(["lark-cli", *args], capture_output=True, text=True,
                        env=ENV, cwd="/tmp")
@@ -165,7 +192,8 @@ def week_bounds(week=None, since=None):
     if since:
         start = datetime.fromisoformat(since)
         end = start + timedelta(days=7)
-        return start, end, f"{since}~{(end - timedelta(days=1)).date()}"
+        iso = start.isocalendar()
+        return start, end, f"{iso[0]}-W{iso[1]:02d}"
     if week:
         y, w = week.split("-W")
         start = datetime.fromisocalendar(int(y), int(w), 1)
@@ -225,11 +253,15 @@ def scan_sessions(start, end):
             for k in g["tokens"]:
                 g["tokens"][k] += parsed["tokens"][k]
 
+    # 补真提交（transcript 里没有，见 git_commits_since 注释）
+    for (kr_id, proj_name), g in groups.items():
+        g["commits"] += git_commits_since(proj_name, start, end)
+
     return groups
 
 
 def build_title(kr_title, proj_name, label):
-    """标题：{项目} {周} 工作汇总"""
+    """���题：{项目} {ISO周} 工作汇总"""
     return f"{proj_name} {label} 工作汇总"
 
 
