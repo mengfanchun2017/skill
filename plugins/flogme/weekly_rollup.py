@@ -45,7 +45,8 @@ ENV = {
 PROJECTS_DIR = Path.home() / ".claude" / "projects"
 
 # 会话噪音：这些 cwd 不算「工作」
-SKIP_CWD_PATTERNS = ("/tmp", "/mnt/c/Users", "/home/francis--claude-jobs")
+SKIP_CWD_PATTERNS = ("/tmp", "/mnt/c/Users", "--claude-jobs-")
+SKIP_EDIT_PATTERNS = ("/tmp/", "--claude-jobs-", "/.claude/jobs/")
 
 
 def git_commits_since(proj_name, start, end):
@@ -298,11 +299,15 @@ def build_desc(groups_entry, kr_title, label):
     if g["edits"]:
         by_dir = defaultdict(list)
         for e in g["edits"]:
+            # /tmp 与作业目录是临时文件，不算工作产出
+            if any(p in e for p in SKIP_EDIT_PATTERNS):
+                continue
             by_dir[os.path.dirname(e)].append(os.path.basename(e))
-        parts.append("\n改动文件：")
-        for d, fs in sorted(by_dir.items(), key=lambda x: -len(x[1]))[:6]:
-            shown = "、".join(fs[:4]) + ("…" if len(fs) > 4 else "")
-            parts.append(f"  · {d or '.'}：{len(fs)} 个（{shown}）")
+        if by_dir:
+            parts.append("\n改动文件：")
+            for d, fs in sorted(by_dir.items(), key=lambda x: -len(x[1]))[:6]:
+                shown = "、".join(fs[:4]) + ("…" if len(fs) > 4 else "")
+                parts.append(f"  · {d or '.'}：{len(fs)} 个（{shown}）")
 
     if g["prompts"]:
         parts.append("\n涉及任务：")

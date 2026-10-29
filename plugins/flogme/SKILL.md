@@ -69,8 +69,9 @@ KR 写法：✅ "模型分流系统上线，P99 延迟降低 50%" ❌ "完成模
 **手动**：用户说"写日志"/"记录工作" → agent 判断 → 调 flogme skill → 写飞书 Base。
 或直接运行 `log_write.py worklog --title ... --kr recXXX [--tokens-in N --tokens-out N --asst-msgs N --user-msgs N]`。
 
-**日合并**：每天 12:01 自动 consolidate 当日 worklog，去重合并。
-（配置方式见下方 § 日合并定时器配置）
+**周汇总（当前主路径）**：`weekly_rollup.py` 扫全部 session transcript，按 KR 聚合，
+**每个 KR 每周一条 worklog**。多 session 合进同一条，已有本周记录则追加。
+→ [references/weekly-rollup.md](references/weekly-rollup.md)
 
 KR 自动路由、质量规则、合并策略、字段规范 → [references/data-model.md](references/data-model.md)。
 整合脚本用法 → `worklog_consolidate.py --mode merge|weekly|monthly|dry-run`，详见 [references/data-model.md](references/data-model.md)。
@@ -138,21 +139,30 @@ SUM 生成飞书文档时，**必须通过 ffeishu skill 创建**（不裸调 la
 
 flogme 职责：从 Base 聚合数据 → 按模板填 Markdown → 交给 ffeishu 创建文档。
 
-## 日合并定时器配置
+## 自动化状态（2026-10-29 重构）
 
-Worklog 日合并通过 Claude 的 durable cron 机制运行（非系统 cron），需在 Claude 对话中创建：
+**旧架构已废弃**：2026-07-20 一次提交删掉了 `SessionEnd` hook + `session-end-aggregator.sh`
++ `session_end_aggregator.py` + `worklog_daily_research.py`（858 行），
+worklog 因此**断裂 80 天**（最后一条 2026-08-10，发现于 2026-10-29）。
+删除本身无报错、无告警 —— 自动化链路必须可观测。
 
-> **首次配置**：在 Claude 对话中说"设 worklog 日合并每天中午12:01执行"即可。
-> **改时间**：说"改 worklog 日合并时间到 HH:MM"。
+**新架构**：每周一次 `weekly_rollup.py`，不再每 session 一条。
 
-底层命令：
 ```
-CronCreate(cron="1 12 * * *",
-  prompt="cd ~/git/skill/plugins/flogme && python3 worklog_consolidate.py --mode merge --write 2>&1",
-  recurring=true, durable=true)
+weekly_rollup.py
+  ├─ 扫 ~/.claude/projects/**/*.jsonl（时间窗内）
+  ├─ parse_transcript → commits / edits / user_prompts / tokens
+  ├─ 按 cwd 匹配 kr_route → KR record_id
+  ├─ 按 (KR, 项目) 聚合
+  ├─ git log 补真提交（auto-sync 独占提交权，transcript 里没有 commit 命令）
+  └─ 查本周是否已有该 KR 记录 → 有则追加，无则新建
 ```
 
-> ⚠️ `durable=true` 会将任务持久化到 `.claude/scheduled_tasks.json`，重启 Claude 后继续生效。
+**为什么不用 SessionEnd hook**：hook 删了静默失效、难观测、跨终端不汇总。
+周汇总是有状态检查的显式命令，跑没跑一目了然。
+
+定时：说「设 worklog 周汇总每周一 9:00 执行」→ CronCreate durable；
+或手动 `python3 weekly_rollup.py --write`。
 
 ## 参考
 
