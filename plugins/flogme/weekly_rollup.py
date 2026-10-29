@@ -461,8 +461,15 @@ def main():
     args = ap.parse_args()
 
     if args.last_week:
+        # ⚠️ 不能整周重扫：周五 00:01 已把「本周一~此刻」写进去了，
+        # 周一若再扫同一窗口会整段重复追加。故只扫「上周五 00:01 之后」的增量。
         this_monday = date.today() - timedelta(days=date.today().weekday())
-        args.since = (this_monday - timedelta(days=7)).isoformat()
+        last_friday = this_monday - timedelta(days=3)   # 上周五
+        start_inc = datetime.combine(last_friday, datetime.min.time())
+        end_inc = datetime.now()
+        _, _, lbl = week_bounds(None, this_monday - timedelta(days=7).isoformat())
+        print(f"窗口：{start_inc.date()} ~ {end_inc.date()}  ({lbl} 增量，跳过周五已写的部分)")
+        return _emit(scan_sessions(start_inc, end_inc), lbl, start_inc, args.write)
 
     start, end, label = week_bounds(args.week, args.since)
     if args.this_week:
