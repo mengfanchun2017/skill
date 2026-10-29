@@ -476,17 +476,16 @@ def main():
     args = ap.parse_args()
 
     if args.last_week:
-        # ⚠️ 不能整周重扫：周五 00:01 已把「本周一~此刻」写进去了，
-        # 周一若再扫同一窗口会整段重复追加。故只扫「上周五 00:01 之后」的增量。
+        # 周一整周重扫（幂等）：周五写的是「本周一~本周五」，本周一跑时
+        # 这一周已完整，重扫得到**完整一周**（含周末尾巴），覆盖周五那版。
+        # append_worklog 已是覆盖语义，重跑不会累加，故整周重扫是安全的。
         this_monday = date.today() - timedelta(days=date.today().weekday())
-        last_friday = this_monday - timedelta(days=3)   # 上周五
-        start_inc = datetime.combine(last_friday, datetime.min.time())
-        end_inc = datetime.now()
         last_monday = this_monday - timedelta(days=7)
+        start_full = datetime.combine(last_monday, datetime.min.time())
+        end_full = datetime.combine(this_monday, datetime.min.time())
         _, _, lbl = week_bounds(None, last_monday.isoformat())
-        print(f"窗口：{start_inc.date()} ~ {end_inc.date()}  ({lbl} 增量，跳过周五已写)")
-        anchor = last_monday
-        return _emit(scan_sessions(start_inc, end_inc), lbl, anchor, args.write)
+        print(f"窗口：{start_full.date()} ~ {(end_full - timedelta(days=1)).date()}  ({lbl} 完整一周，覆盖周五版本)")
+        return _emit(scan_sessions(start_full, end_full), lbl, last_monday, args.write)
 
     start, end, label = week_bounds(args.week, args.since)
     if args.this_week:
