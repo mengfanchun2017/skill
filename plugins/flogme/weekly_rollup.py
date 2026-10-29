@@ -68,11 +68,28 @@ def git_commits_since(proj_name, start, end):
     out = []
     for line in r.stdout.splitlines():
         s = line.strip()
-        # auto-sync 的提交信息带文件清单，噪音大，只保留有语义的
-        if not s or s.startswith("Auto-sync:"):
+        if not s:
+            continue
+        # auto-sync 的提交通常是 "Auto-sync: <repo> N 文件"，语义为零，只记数量
+        if s.startswith("Auto-sync:"):
             continue
         out.append(s[:150])
     return out
+
+
+def git_commit_count(proj_name, start, end):
+    """auto-sync 独占提交权，提交信息无语义，但数量能反映活跃度。"""
+    repo = Path.home() / "git" / proj_name
+    if not (repo / ".git").exists():
+        return 0
+    r = subprocess.run(
+        ["git", "-C", str(repo), "rev-list", "--count",
+         f"--since={start.isoformat()}", f"--until={end.isoformat()}", "HEAD"],
+        capture_output=True, text=True)
+    try:
+        return int(r.stdout.strip())
+    except ValueError:
+        return 0
 
 
 def lark(*args):
@@ -256,6 +273,7 @@ def scan_sessions(start, end):
     # 补真提交（transcript 里没有，见 git_commits_since 注释）
     for (kr_id, proj_name), g in groups.items():
         g["commits"] += git_commits_since(proj_name, start, end)
+        g["commit_count"] = git_commit_count(proj_name, start, end)
 
     return groups
 
@@ -270,6 +288,8 @@ def build_desc(groups_entry, kr_title, label):
     g = groups_entry
     parts = [f"周期：{label}", f"session 数：{len(g['sessions'])}"]
 
+    if g.get("commit_count"):
+        parts.append(f"\n提交数：{g['commit_count']} 个")
     if g["commits"]:
         parts.append("\n主要提交：")
         for c in list(dict.fromkeys(g["commits"]))[:12]:
