@@ -224,7 +224,12 @@ def week_bounds(week=None, since=None):
 
 
 def kr_for_cwd(cwd):
-    """cwd → KR record_id（按 kr_route 前缀匹配）"""
+    """cwd → KR record_id（按 kr_route 前缀匹配）。
+
+    kr_route 没配的 ~/git/<repo> 会落到 _default，而用户定稿「没有 KR 就不更新」
+    → 这些活动会整块丢弃。所以未命中时按「AI 辅助编程工作流」这个 KR 兜底
+    （~/git 下的开发工作本质都属于它），而不是静默丢掉。
+    """
     home = os.path.expanduser("~")
     for name, kid in KR_ROUTE.items():
         if name == "_default" or not kid:
@@ -232,7 +237,18 @@ def kr_for_cwd(cwd):
         prefix = os.path.join(home, "git", name)
         if cwd and cwd.startswith(prefix):
             return kid, name
-    return KR_ROUTE.get("_default") or None, "_default"
+
+    # 非 ~/git 下的 cwd 不是开发工作 → 不记录
+    gitroot = os.path.join(home, "git") + os.sep
+    if not (cwd or "").startswith(gitroot):
+        return None, ""
+
+    default = KR_ROUTE.get("_default")
+    if default:
+        # 从 cwd 反推仓库名当项目标签
+        rel = (cwd or "")[len(gitroot):].split(os.sep)[0]
+        return default, rel or "_default"
+    return None, ""
 
 
 def scan_sessions(start, end):
