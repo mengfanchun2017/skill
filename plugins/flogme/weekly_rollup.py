@@ -296,8 +296,9 @@ def scan_sessions(start, end):
 
 
 def build_title(kr_title, proj_name, label):
-    """���题：{项目} {ISO周} 工作汇总"""
-    return f"{proj_name} {label} 工作汇总"
+    """标题：{项目} {ISO周}[ 周中] 工作汇总"""
+    tag = label.replace("-mid", " 周中")
+    return f"{proj_name} {tag} 工作汇总"
 
 
 def build_desc(groups_entry, kr_title, label):
