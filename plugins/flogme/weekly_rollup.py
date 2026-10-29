@@ -433,7 +433,7 @@ def _emit(groups, label, anchor, do_write):
                                         key=lambda x: -len(x[1]["sessions"])):
         # 用户定稿：「没有 KR 就不更新」——未匹配到 KR 的活动不记录
         if not kr_id:
-            print(f"\n跳过 {proj_name}：未匹配到 KR（{len(g['sessions'])} session）")
+            print(f"\n跳过非工作目录活动（{len(g['sessions'])} session，无 KR 归属）")
             continue
         kr_title = km.get(kr_id, "(KR 已删除)")
         desc = build_desc(g, kr_title, label)
