@@ -10,8 +10,9 @@ Base `okr_v2` 含 4 个表，token 在 ccprivate config.yaml 中。
 | 分类 | 单选 | work / learn / project |
 | 周期 | 单选 | 2026Q1, 2026Q2, 2026Q3, 2026Q4, 2026 Full Year |
 | 状态 | 单选 | Active / Completed / Abandoned |
-| 优先级 | 数字 | 1-5，1 最高 |
-| 说明 | 多行文本 | 为什么这个 O 重要 |
+| 说明 | 多行文本 | 职责范围、考核锚点、与其他 O 的边界 |
+
+**O 表没有「优先级」字段**（2026-10-30 删除）。四个 O 是分工关系不是排名关系；投入程度由下属 KR 的 `KR.health` 按 `KR.type` 加权汇总得出，见「O 投入程度汇总」一节。
 | 更新日期 | 日期 | 最后修改日期 |
 
 ## OKR_KR 表字段
@@ -26,7 +27,8 @@ Base `okr_v2` 含 4 个表，token 在 ccprivate config.yaml 中。
 | 关联O | 关联列 → OKR_O | 必须关联一个 O |
 | KR.type | 单选 | `committed` / `aspirational` / `learning` |
 | KR.para | 单选 | `projects` / `areas` / `research` / `archive` |
-| KR.status | 单选 | `active` / `smooth` / `challenge` / `cancelled` |
+| KR.status | 单选 | `active` / `done` / `paused` / `cancelled` —— **只表示生命周期** |
+| KR.health | 单选 | `on_track` / `at_risk` / `off_track` / `n_a` —— 只表示进展健康度 |
 | KR.domain | 单选 | `work` / `personal` |
 | 编号 | 数字 | |
 | 说明 | 文本 | KR 的上下文 |
@@ -35,12 +37,34 @@ Base `okr_v2` 含 4 个表，token 在 ccprivate config.yaml 中。
 **注意**：KR 表**没有**「周期」字段——周期从关联 O 继承（`sum_generate.py` 的
 `_kr_period()` 处理）。也**没有**「进度 / 信心 / 最终评分」字段（v1 表有，v2 迁移时丢失）。
 
-**状态语义**：`KR.status` 是 KR 进展的唯一状态字段。完成 KR 时主动跑
-`log_write.py kr-status --kr recXXX --status <选项值>`，脚本会读回校验 `verified`。
-不靠 worklog/reflect 自动触发。
+**状态语义**：`KR.status` 只表示生命周期，**不再表示进展好坏**。完成 KR 时主动跑
+`log_write.py kr-status --kr recXXX --status done`，脚本会读回校验 `verified`。
+KR 的进展好坏填 `KR.health`，每月 audit 检查时更新一次，判据见主文档「用 KR 状态
+衡量 O 的投入程度」一节。
 
-**值域陷阱**：`KR.status` 选项是 `active/smooth/challenge/cancelled`，
-不是文档曾写的 `Active/Done/Cancelled`。写错值会报错或被拒。
+### O 投入程度汇总
+
+O 层不手工填进度，从 KR 算：
+
+1. 只算 `KR.status` 为 `active` / `paused` 的 KR；`done` 记 1.0；`cancelled` 完全排除（放弃的目标不该拉低健康分）
+2. 折算：`on_track`=1.0 / `at_risk`=0.5 / `off_track`=0.0
+3. 按 `KR.type` 加权：committed=3 / aspirational=2 / learning=1
+4. O 健康分 = Σ(折算值 × 权重) ÷ Σ(权重)
+5. 同时看 off_track 与 at_risk 的条数——同样的分数，一条满分一条零分与两条都 at_risk 含义完全不同
+
+**值域陷阱（2026-10-30 已修）**：`KR.status` 选项曾是 `active/smooth/challenge/cancelled`，
+而字段 description 却写「Active/Done/Cancelled」——**说明与选项不对应**。根因是
+`smooth/challenge` 把「进展健康」混进了「生命周期」，两个轴挤在一个字段里，选了一个
+就丢另一个。现已拆成两个字段：`KR.status`（active/done/paused/cancelled）与
+`KR.health`（on_track/at_risk/off_track/n_a）。
+
+**三根正交的轴**，改动任一字段前先确认自己在动哪根：
+
+| 轴 | 字段 | 回答的问题 |
+|---|---|---|
+| 承诺强度 | KR.type | 失败时多难交代 |
+| 生命周期 | KR.status | 还活着吗 |
+| 进展健康 | KR.health | 按现在节奏能不能按时达成 |
 
 ## Worklog 表字段
 

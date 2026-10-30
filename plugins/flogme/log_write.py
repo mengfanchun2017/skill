@@ -5,7 +5,7 @@ flogme 数据写入助手
 子命令:
 - worklog: 写 worklog
 - reflect: 写 reflect（含批量关联 KR, 仅写入关联，不触发 KR 字段更新）
-- kr-status: 改 KR.状态 (Active / Done / Cancelled)
+- kr-status: 改 KR.status (active / done / paused / cancelled)，只管生命周期
 
 设计变化 (2026-06-12):
 - 移除 KR_Progress 历史快照（表已废弃）
@@ -246,7 +246,11 @@ def cmd_reflect(args):
 
 
 def cmd_kr_status(args):
-    """手动更新 KR.状态 (Active / Done / Cancelled)
+    """手动更新 KR.status (active / done / paused / cancelled)
+
+    只管生命周期，不表达进展好坏——进展健康度在 KR.health（on_track/at_risk/
+    off_track/n_a），由每月 audit 检查更新。旧选项 smooth/challenge 已废弃，
+    它把「进展健康」混进了「生命周期」，选了一个就丢另一个。
 
     字段名是 KR.status（带点号），不是旧文档写的 KR.状态 —— 旧名不存在时
     bitable API 静默丢弃该键、仍返回成功，造成「假成功」。这里先校验字段存在。
