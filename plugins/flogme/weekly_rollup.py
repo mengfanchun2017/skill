@@ -146,19 +146,23 @@ def _extract_commit_msg(cmd):
     if i < 0:
         return None
     tail = cmd[i:]
+    # 两种写法取**位置最靠前**的那个：同一条命令里常有多段 heredoc
+    # （`git commit -m x` 后面再 `cat > run.sh <<EOF`），先按顺序匹配就会
+    # 抓到后面那段的首行（`#!/bin/bash`）当提交信息。
+    cands = []
     m = re.search(r"<<-?['\"]?(\w+)['\"]?\s*\n(.+?)\n\s*\1", tail, re.DOTALL)
     if m:
         line = m.group(2).strip().split("\n")[0][:200]
-        # `-m "$(cat <<'EOF'` 这种，heredoc 体才是正文；上面已按 tail 截取，
-        # 但首行可能是 `"$(cat` 碎片，落回下面的简式匹配
-        if not line.startswith("$(") and not line.startswith('"$('):
-            return line
+        if not line.startswith("$("):
+            cands.append((m.start(), line))
     m = re.search(r'-m\s+["\']([^"\'\n]+)["\']', tail)
     if m:
         v = m.group(1).strip()
-        if v and not v.startswith("$("):
-            return v[:200]
-    return None
+        if v and not v.startswith("$(") and "<<" not in v:
+            cands.append((m.start(), v[:200]))
+    if not cands:
+        return None
+    return min(cands, key=lambda x: x[0])[1]
 
 
 def parse_transcript(path, since_ts=None, until_ts=None):
