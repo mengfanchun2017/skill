@@ -105,6 +105,23 @@ FIELD_CACHE = {}
 # KR 状态字段真名。历史上改名过（KR.状态 → KR.status），写错名 API 不报错只静默丢弃。
 KR_STATUS_FIELD = "KR.status"
 
+# 逻辑字段名 → 候选真名（按顺序取第一个存在的）。
+# 教训：Worklog 的 KR 链接列在 Base 里被改名成「所属KR」，脚本还按「关联KR」读写 →
+# 写报 not_found、读 .get() 恒 None。读错名不报错，是静默失效（weekly_rollup 的去重
+# 因此永不命中，每周重复新建）。写死字段名一律走本表。
+FIELD_ALIASES = {
+    "Worklog": {"关联KR": ["所属KR", "关联KR"]},
+}
+
+
+def field_name(table_key, logical):
+    """逻辑字段名 → 该表里真实存在的字段名，找不到返回 None。"""
+    names = table_fields(table_key)
+    for cand in FIELD_ALIASES.get(table_key, {}).get(logical, [logical]):
+        if cand in names:
+            return cand
+    return None
+
 
 def table_fields(table_key):
     """取某表全部字段名（带缓存）。写之前用它校验，避免静默丢弃。"""
