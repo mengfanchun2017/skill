@@ -352,9 +352,10 @@ def find_existing(kr_id, date_str):
                     "--format", "json", "--limit", "200", "--offset", str(off))
         dd = data["data"]
         fields = dd["fields"]
+        kr_col = _kr_field()
         for row, rid in zip(dd["data"], dd["record_id_list"]):
             d = dict(zip(fields, row))
-            kr = d.get("关联KR")
+            kr = d.get(kr_col)
             link = kr[0]["id"] if (kr and isinstance(kr, list) and kr) else None
             if link == kr_id and str(d.get("日期", "")).startswith(date_str):
                 return rid, d

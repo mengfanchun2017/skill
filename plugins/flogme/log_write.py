@@ -188,10 +188,11 @@ def cmd_worklog(args):
                  f"可用 KR: python3 {Path(__file__).name} kr-list")
     if args.type:
         verify_select_value("Worklog", "成果类型", args.type)
-    if args.kr:
-        verify_field("Worklog", "关联KR")
+    kr_field = field_name("Worklog", "关联KR")
+    if args.kr and not kr_field:
+        verify_field("Worklog", "关联KR")  # 抛错列出真实字段
 
-    fields = ["标题", "成果类型", "关联KR", "日期", "说明"]
+    fields = ["标题", "成果类型", kr_field, "日期", "说明"]
     row = [
         args.title,
         args.type or "工具开发",
