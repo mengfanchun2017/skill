@@ -136,12 +136,28 @@ def lark(*args):
 #    该段逻辑本身没坏，坏的是它写入的字段名和调度方式） ──────────────
 
 def _extract_commit_msg(cmd):
-    m = re.search(r"<<-?['\"]?EOF['\"]?\s*\n(.+?)\n\s*EOF", cmd, re.DOTALL)
+    """从 `git commit -m ...` 里取真实提交信息。
+
+    ⚠️ 只在 `git commit` 之后的片段里找 heredoc。裸匹配全文 `<<EOF...EOF`
+    会命中同一条命令里**前面**的其它 heredoc（`cat > x.sh <<'EOF'`），
+    取到 `#!/bin/bash` 之类的垃圾当提交信息（实测混进汇总结论）。
+    """
+    i = cmd.find("git commit")
+    if i < 0:
+        return None
+    tail = cmd[i:]
+    m = re.search(r"<<-?['\"]?(\w+)['\"]?\s*\n(.+?)\n\s*\1", tail, re.DOTALL)
     if m:
-        return m.group(1).strip().split("\n")[0][:200]
-    m = re.search(r'git commit[^|]*-m\s+["\']([^"\']+)["\']', cmd)
+        line = m.group(2).strip().split("\n")[0][:200]
+        # `-m "$(cat <<'EOF'` 这种，heredoc 体才是正文；上面已按 tail 截取，
+        # 但首行可能是 `"$(cat` 碎片，落回下面的简式匹配
+        if not line.startswith("$(") and not line.startswith('"$('):
+            return line
+    m = re.search(r'-m\s+["\']([^"\'\n]+)["\']', tail)
     if m:
-        return m.group(1)[:200]
+        v = m.group(1).strip()
+        if v and not v.startswith("$("):
+            return v[:200]
     return None
 
 
