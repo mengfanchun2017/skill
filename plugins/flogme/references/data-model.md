@@ -48,10 +48,15 @@ Base `okr_v2` 含 4 个表，token 在 ccprivate config.yaml 中。
 |------|------|---------|
 | 标题 | 文本 | ≤60 字，无 `##`/`【】` 前缀 |
 | 成果类型 | 单选 | `log_write.py --type`，默认工具开发 |
-| 关联KR | 链接 → OKR_KR | kr_route 或 weekly_rollup 匹配，**每条必须关联** |
+| 所属KR | 链接 → OKR_KR | kr_route 或 weekly_rollup 匹配，**每条必须关联** |
 | 日期 | 日期 | 当天（周汇总取周一） |
 | 说明 | 多行文本 | 结构化摘要 |
-| 关联KR标题 | 查找引用 | 自动从 KR 表反查（只读） |
+| KR标题 | 查找引用 | 自动从 KR 表反查（只读） |
+
+⚠️ **字段真名以 `+field-list` 为准，本文档历史上漂移过**：KR 链接列在 Base 里叫
+`所属KR`（旧名 `关联KR`），反查列叫 `KR标题`（旧名 `关联KR标题`）。脚本按旧名读写
+→ 写报 `not_found`、读 `.get()` 恒 None，且**读错名完全不报错**（静默失效）。
+代码里一律走 `log_write.field_name()` / `weekly_rollup._kr_field()` 运行时解析，不要写死。
 
 分类（work/learn/project）通过关联 KR→O 自动继承，Worklog 不重复维护。
 

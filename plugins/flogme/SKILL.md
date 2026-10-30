@@ -168,8 +168,12 @@ weekly_rollup.py
 | 每周一 00:01 | `weekly_rollup.py --last-week --write` | 汇总上一个完整周 |
 | 每周五 00:01 | `weekly_rollup.py --this-week --write` | 汇总本周一到此刻 |
 
-已注册为 Claude durable cron（`fe6d7915` 周一 / `5243e810` 周五），**7 天后自动过期**，
+已注册为 Claude durable cron（`434d675d` 周一 / `5243e810` 周五），**7 天后自动过期**，
 到时说「重建 worklog 周汇总定时」即可重注册。
+
+⚠️ 周一那条原写的是 `--since-last-week`（脚本没这个参数，每次跑都
+`unrecognized arguments` 直接失败），2026-10-30 已改成 `--last-week` 并重注册。
+改 cron 命令后**必须实跑一次**验证参数有效 —— 定时任务失败不报错，只在没人看的输出里。
 
 ## 手动跑
 

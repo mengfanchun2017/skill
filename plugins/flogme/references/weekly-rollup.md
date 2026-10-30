@@ -66,6 +66,8 @@ auto-sync 的提交信息是 `Auto-sync: <repo> N 文件`，语义为零，故�
 | 现象 | 原因 | 修法 |
 |------|------|------|
 | 第二次运行又新建一条 | `find_existing` 只查第一页 200 条，Worklog 已 240+ 条 | 必须翻页（`--offset` + `has_more`） |
+| 每周重复新建（2026-10-30 修） | `find_existing` 读 `关联KR`，Base 里真名是 `所属KR` → 恒 None，去重永不命中；写也报 not_found | 运行时 `_kr_field()` 查真名 |
+| 汇总里出现 `#!/bin/bash` 当提交信息 | `_extract_commit_msg` 在 `git commit` 之后贪心匹配 heredoc，抓到命令里更靠后的另一个 heredoc | 取位置最靠前的匹配 |
 | `commit: 0` | transcript 里没有 commit 命令（auto-sync 独占提交） | 从 git log 拉 |
 | `/tmp` 文件排第一 | 编辑统计没过滤临时路径 | `SKIP_EDIT_PATTERNS` |
 | `ModuleNotFoundError: _skillconf_boot` | 在 `references/` 下 | `sys.path.insert(0, HERE/"references")` |
