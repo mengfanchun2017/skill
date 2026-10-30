@@ -66,6 +66,9 @@ def fetch_all(table):
         fields = d["fields"]
         for row, rid in zip(d["data"], d["record_id_list"]):
             rec = dict(zip(fields, row))
+            # Worklog 的 KR 链接列在 Base 里叫「所属KR」（历史改名），归一成下游读的名字
+            if "关联KR" not in rec and "所属KR" in rec:
+                rec["关联KR"] = rec["所属KR"]
             rec["_rid"] = rid
             out.append(rec)
         if not d.get("has_more"):

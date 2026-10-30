@@ -44,6 +44,25 @@ ENV = {
 
 PROJECTS_DIR = Path.home() / ".claude" / "projects"
 
+# Worklog 的 KR 链接列在 Base 里叫「所属KR」（历史改名，旧名「关联KR」）。
+# 读错名不报错、`.get()` 恒 None → find_existing 永不命中 → 每周重复新建。
+# 别写死，运行时查真名。
+_KR_FIELD_CACHE = []
+
+
+def _kr_field():
+    if _KR_FIELD_CACHE:
+        return _KR_FIELD_CACHE[0]
+    data = lark("base", "+field-list", "--base-token", BASE,
+                "--table-id", T["Worklog"], "--as", "user")
+    names = {f["name"] for f in data["data"]["fields"]}
+    for cand in ("所属KR", "关联KR"):
+        if cand in names:
+            _KR_FIELD_CACHE.append(cand)
+            return cand
+    sys.exit(f"Worklog 表没有 KR 链接字段，现有: {sorted(names)}")
+
+
 # 会话噪音：这些 cwd 不算「工作」
 SKIP_CWD_PATTERNS = ("/tmp", "/mnt/c/Users", "--claude-jobs-")
 SKIP_EDIT_PATTERNS = ("/tmp/", "--claude-jobs-", "/.claude/jobs/")
@@ -379,7 +398,7 @@ def kr_meta():
 
 def write_worklog(title, kr_id, desc, date_str):
     from log_write import cmd_worklog  # noqa: F401  (复用其字段校验)
-    payload = {"fields": ["标题", "成果类型", "关联KR", "日期", "说明"],
+    payload = {"fields": ["标题", "成果类型", _kr_field(), "日期", "说明"],
                "rows": [[title, "工具开发", [{"id": kr_id}] if kr_id else None,
                          date_str, desc]]}
     import tempfile

@@ -71,6 +71,14 @@ def lark(*args):
     return json.loads("\n".join(lines))
 
 
+def normalize_kr_field(d):
+    """Worklog 的 KR 链接列在 Base 里叫「所属KR」（历史改名）。
+    统一归一成「关联KR」，下游全部按这个名字读；不归一就是静默 None。"""
+    if "关联KR" not in d and "所属KR" in d:
+        d["关联KR"] = d["所属KR"]
+    return d
+
+
 def fetch_all_worklogs():
     """分页拉取全部 worklog 记录"""
     records = []
@@ -86,6 +94,7 @@ def fetch_all_worklogs():
         rec_ids = data["data"]["record_id_list"]
         for i, row in enumerate(chunk):
             d = dict(zip(fields, row))
+            d = normalize_kr_field(d)
             rid = rec_ids[i] if i < len(rec_ids) else "?"
             d["_record_id"] = rid
             d["_rid"] = rid
