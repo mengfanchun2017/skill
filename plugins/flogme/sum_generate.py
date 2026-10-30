@@ -32,12 +32,12 @@ def parse_records(data: dict) -> tuple[list[str], list[list]]:
 # 将来再改名只需往候选表里加一项，脚本不用动。
 FIELD_ALIASES = {
     "O": {
-        "周期": ["周期"], "分类": ["分类"], "状态": ["状态"],
+        "关联KR": ["关联KR"], "周期": ["周期"], "分类": ["分类"], "状态": ["状态"],
         "标题": ["标题"], "说明": ["说明"], "优先级": ["优先级"],
         "更新日期": ["更新日期"],
     },
     "KR": {
-        "标题": ["标题"], "关联O": ["关联O"], "说明": ["说明"], "更新日期": ["更新日期"],
+        "标题": ["标题"], "关联O": ["所属O", "关联O"], "说明": ["说明"], "更新日期": ["更新日期"],
         "类型": ["KR.type", "类型"],
         "进度": ["KR.进度", "进度", "KR.progress"],
         "信心": ["KR.信心", "信心"],
@@ -51,8 +51,9 @@ FIELD_ALIASES = {
         "成果类型": ["成果类型"], "量化结果": ["量化结果"],
     },
     "RF": {
-        "标题": ["标题"], "关联O": ["关联O"], "做得好": ["做得好"], "待改进": ["待改进"],
-        "学到": ["学到"], "下阶段": ["下阶段"], "日期": ["日期"],
+        "标题": ["标题"], "关联KR": ["关联KR"], "做得好": ["做得好"], "待改进": ["待改进"],
+        "学到": ["学到"], "下阶段": ["下阶段"], "日期": ["日期", "Date"],
+        "周期类型": ["周期类型"],
     },
 }
 
@@ -218,7 +219,7 @@ def filter_by_period(data: dict, period: str, category: str | None = None):
     matched_kr_ids = set()
     kr_by_o = {}
     for rid, rec in kr_map.items():
-        o_id = extract_link_id(rec[kr_col["关联O"]])
+        o_id = extract_link_id(_get(rec, kr_col, "关联O"))
         if o_id in matched_o_ids:
             matched_kr_ids.add(rid)
             kr_by_o.setdefault(o_id, []).append(rid)
@@ -227,7 +228,7 @@ def filter_by_period(data: dict, period: str, category: str | None = None):
     matched_wl_ids = set()
     wl_by_kr = {}
     for rid, rec in wl_map.items():
-        kr_id = extract_link_id(rec[wl_col["关联KR"]])
+        kr_id = extract_link_id(_get(rec, wl_col, "关联KR"))
         if kr_id in matched_kr_ids:
             matched_wl_ids.add(rid)
             wl_by_kr.setdefault(kr_id, []).append(rid)
@@ -236,7 +237,9 @@ def filter_by_period(data: dict, period: str, category: str | None = None):
     matched_rf_ids = set()
     rf_by_o = {}
     for rid, rec in rf_map.items():
-        o_id = extract_link_id(rec[rf_col["关联O"]])
+        # Reflect 表没有 O 链接列（只有 关联KR），走 KR→O 反查
+        kr_id = extract_link_id(_get(rec, rf_col, "关联KR"))
+        o_id = extract_link_id(_get(kr_map.get(kr_id, []), kr_col, "关联O")) if kr_id else None
         if o_id in matched_o_ids:
             matched_rf_ids.add(rid)
             rf_by_o.setdefault(o_id, []).append(rid)
