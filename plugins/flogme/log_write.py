@@ -16,7 +16,7 @@ flogme 数据写入助手
 用法示例:
   python3 log_write.py worklog --title "X" --kr recXXX --type "项目交付" --date 2026-06-12
   python3 log_write.py reflect --title "Q2 W3" --o recYYY --date 2026-06-12 --good "A" --improve "B" --learned "C" --next "D" --batch-kr recXXX recYYY
-  python3 log_write.py kr-status --kr recXXX --status Done
+  python3 log_write.py kr-status --kr recXXX --status done
 """
 import argparse
 import json
