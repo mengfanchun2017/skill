@@ -263,20 +263,42 @@ def week_bounds(week=None, since=None):
     return start, end, f"{iso[0]}-W{iso[1]:02d}"
 
 
-def kr_for_cwd(cwd):
-    """cwd → KR record_id（按 kr_route 前缀匹配）。
+def kr_for_cwd(cwd, prompts=None, edits=None):
+    """cwd → KR record_id（按 kr_route 前缀匹配 + 关键词二次路由）。
 
-    kr_route 没配的 ~/git/<repo> 会落到 _default，而用户定稿「没有 KR 就不更新」
-    → 这些活动会整块丢弃。所以未命中时按「AI 辅助编程工作流」这个 KR 兜底
-    （~/git 下的开发工作本质都属于它），而不是静默丢掉。
+    先按仓库名匹配 kr_route（现有逻辑）。
+    如果配到的 KR 不是唯一结果，且该仓库配置了 kr_keyword，
+    则按 session 内的用户 prompt 关键词做二次路由。
     """
     home = os.path.expanduser("~")
+    repo_name = None
+    kid_by_repo = None
+
     for name, kid in KR_ROUTE.items():
         if name == "_default" or not kid:
             continue
         prefix = os.path.join(home, "git", name)
         if cwd and cwd.startswith(prefix):
-            return kid, name
+            repo_name = name
+            kid_by_repo = kid
+            break
+
+    # 关键词二次路由：如果当前仓库配置了 kr_keyword 规则
+    if repo_name and KR_KEYWORD and prompts:
+        for rule in KR_KEYWORD:
+            rule_repos = rule.get("repos", [])
+            if repo_name not in rule_repos:
+                continue
+            kw = rule.get("keywords", [])
+            all_text = " ".join(prompts).lower()
+            # 按关键词命中优先匹配，不区分大小写
+            for k in kw:
+                if k.lower() in all_text:
+                    kid = rule["kr"]
+                    if kid != kid_by_repo:
+                        return kid, f"{repo_name}/{rule.get('label','keyword')}"
+    if repo_name:
+        return kid_by_repo, repo_name
 
     # 非 ~/git 下的 cwd 不是开发工作 → 不记录
     gitroot = os.path.join(home, "git") + os.sep
@@ -285,7 +307,6 @@ def kr_for_cwd(cwd):
 
     default = KR_ROUTE.get("_default")
     if default:
-        # 从 cwd 反推仓库名当项目标签
         rel = (cwd or "")[len(gitroot):].split(os.sep)[0]
         return default, rel or "_default"
     return None, ""
