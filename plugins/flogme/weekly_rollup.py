@@ -339,7 +339,7 @@ def scan_sessions(start, end):
             cwd = parsed["cwd"]
             if any(p in cwd for p in SKIP_CWD_PATTERNS):
                 continue
-            kr_id, proj_name = kr_for_cwd(cwd)
+            kr_id, proj_name = kr_for_cwd(cwd, parsed["user_prompts"], parsed["edits"])
             g = groups[(kr_id, proj_name)]
             g["sessions"].append(parsed["sid"][:8])
             g["commits"] += parsed["commits"]
