@@ -36,6 +36,7 @@ CONF = _conf()
 BASE = CONF["bases"]["okr_v2"]["token"]
 T = CONF["bases"]["okr_v2"]["tables"]
 KR_ROUTE = CONF.get("kr_route") or {}
+KR_KEYWORD = CONF.get("kr_keyword") or []  # [{"keywords":["..."], "kr":"rec...", "repos":["ccconfig"]}, ...]
 ENV = {
     **os.environ,
     "LARKSUITE_CLI_CONFIG_DIR": os.path.expanduser(CONF["lark_cli"]["config_dir"]),
