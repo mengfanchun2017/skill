@@ -229,7 +229,9 @@ lark-cli base +record-upsert --base-token "$BASE_TOKEN" --table-id "tblwUDLiiho0
   --as user
 ```
 
-**weekly_rollup 整合**：跑周汇总时，同时读 Supplement 表中本周的记录，按 KR 分组追加到对应 worklog 的说明末尾（标注 `📝 补充来源`）。
+**weekly_rollup 整合**：跑周汇总时，同时读 Supplement 表中本周的记录，按 `关联KR` 分组，追加到该 KR 的 worklog 说明末尾的「补充来源：」段（`📝` 标记）。
+
+**只有补充、没有 session 的 KR 也会出记录**——公司会议/沟通本来就不在终端里，这正是补充机制存在的理由。此时项目名记为「部门工作」，说明只有「周期：xxxx」+ 补充来源，不写 session 数/用量（那是噪音）。该 KR 本周已有 session 记录时不另开一条，补充文字并进主记录，避免 `Log.count` 翻倍。
 
 ### 扩展二：部门工作记录表读取
 
@@ -239,31 +241,49 @@ lark-cli base +record-upsert --base-token "$BASE_TOKEN" --table-id "tblwUDLiiho0
 - 工作记录表 `tblCdxkqxtpw0M6S`：241 条记录，含填写日期、周期、工作内容、ai简短总结、ai关联任务、记录人
 - 工作总结表 `tblNMkFG8r8tAZj8`：40 条记录，含类别（周总结/详细周总结/AI培训总结）、本周总结、下周计划
 
-**weekly_rollup 整合**：扫描窗口内记录人为「孟繁春」的记录，提取工作内容摘要，按 ai关联任务 关键词映射到对应 KR，追加到 worklog 说明（标注 `📋 部门周报`）。
+**weekly_rollup 整合**：扫描窗口内 `记录人=孟繁春` 且 `周期=本周` 的记录，按 `ai关联任务` 查 `config.work_base.task_kr` 映射到 KR，追加到 worklog 说明（`📋` 标记）。
 
-**局限性**：部门工作记录表按「本周/下周」分类而非具体日期，无法精确到天。整合时取「本周」记录即可。
+**映射必须显式配置，不做模糊匹配**。未映射的任务不进任何 worklog（否则同一段文字会被挂到所有 KR 上），只在跑汇总时打印「⚠ N 条未映射」提示补映射：
+
+```yaml
+work_base:
+  token: "Ei2ybk3FRagHbksfqXzcujsYnWf"
+  tables:
+    records: "tblCdxkqxtpw0M6S"
+    summary: "tblNMkFG8r8tAZj8"
+  task_kr:                              # 部门任务名 → 本系统 KR record_id
+    "运维AI大脑搭建": "recvmWXG8X7gZA"
+    "运维知识智能问数": "recvmWTjTz0HTo"
+    # ... 没列的任务不写入
+```
+
+**坑**：部门表的 `ai简短总结` 自带「任务名：」前缀，不去掉会写成 `📋 运维AI培训赋能：运维AI培训赋能：…` 双重前缀。
+
+**局限性**：部门表按「本周/下周」分类而非具体日期，只能取「本周」这一档，无法精确到天。
 
 ### 扩展三：ailab 工作群消息（当前不可行）
 
-当前 ailab 账号的 scope 不含 IM 消息读取权限（`im +chat-list` 返回 0 个会话），**无法直接读取工作群消息**。
+2026-11-01 实测：ailab 账号 auth 正常（`identities.user.available=true`），但 `im +chat-list --types p2p,group` 返回 **0 个会话**——这个 bot 身份没有 IM 消息读取 scope，**读不到工作群消息**。
 
-替代方案：
-1. **用户通过「扩展一」手动转发**：将工作群中的重要消息描述后写入 Supplement 表（来源=工作群消息）
-2. **后续扩展 ailab bot scope**：如需要自动读取，需在飞书开放平台给 ailab 应用添加 `im:message` 相关权限并重新授权
-3. **转发给 ailab**：用户在工作群 @ailab bot 转发消息，bot 可收到事件（需额外开发消息接收处理）
+替代方案（按成本排序）：
+1. **手动转发到 Supplement 表**（现成可用）：把工作群里有价值的信息描述后写入，`来源=工作群消息`
+2. **用户直接转给 ailab bot 后让 flogme 读**：需 bot 已收到消息事件，且要额外开发消息接收处理链路——当前没有
+3. **给 ailab 应用加 scope**：飞书开放平台加 `im:message` / `im:chat:readonly` 后重新授权。注意这是 bot 应用权限，加了才能列会话、读消息
 
-### 汇总时的优先级融合
+**现状结论**：工作群信息目前只能走方案 1（手动）。如果后续要做自动化，先确认方案 3 的 scope 能否批下来。
 
-三条数据源在 weekly_rollup 中以固定优先级融合：
+### 汇总时怎么融合
+
+三条数据源在 `_emit` 里合流，最终一条 worklog = session 正文 + 补充来源段：
 
 ```
-worklog 正文（session transcript 为主）
-  + 部门工作记录（📋 标记）— 按 KR 映射挂在对应 KR 下
-  + 用户补充（📝 标记）— 按关联KR 挂在对应 KR 下
-= 完整周报
+build_desc(session transcript)          ← 主体：commit / 改动文件 / 任务
+  + merge_supplements(部门工作记录)      ← 📋 按 task_kr 挂到对应 KR
+  + merge_supplements(Supplement 表)     📝 按关联KR 挂到对应 KR
+  = 该 KR 本周的 worklog 说明
 ```
 
-同一 KR 的记录按日期混合排序，来源标签保留原文可追溯。
+来源标签（📋 / 📝）保留在正文里，回看时能区分「终端里做的」和「别处发生的」。补充段只挂到映射命中的那一条 KR，不会串到别的 KR 上。
 
 ## 归档
 
