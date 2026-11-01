@@ -584,6 +584,10 @@ def read_im_chat(date_from, date_to):
             txt = (m.get("content") or "").strip()
             if not txt or len(txt) < 12:
                 continue
+            # 短纯链接消息（转发文档地址）没有信息量，正文里只会堆一串 URL。
+            # 长转发消息即使含 URL 也要留——里面是真讨论，链接只是引用。
+            if len(txt) < 120 and re.fullmatch(r"(https?://\S+\s*)+", txt):
+                continue
             when = (m.get("create_time") or "")[:10]
             who = (m.get("sender") or {}).get("name", "")
             if m.get("msg_type") == "interactive":
