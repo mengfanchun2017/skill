@@ -40,6 +40,7 @@ KR_KEYWORD = CONF.get("kr_keyword") or []  # [{"keywords":["..."], "kr":"rec..."
 SUPP_TABLE = T.get("Supplement")  # 用户补充表（可选）
 WBASE = CONF.get("work_base") or {}  # 部门工作记录 Base（可选）
 WBASE_T = (WBASE.get("tables") or {}) if WBASE else {}
+IM_CHAT = CONF.get("im_chat") or {}  # 工作群会话（可选，需 IM scope）
 ENV = {
     **os.environ,
     "LARKSUITE_CLI_CONFIG_DIR": os.path.expanduser(CONF["lark_cli"]["config_dir"]),
@@ -552,6 +553,51 @@ def read_work_base(date_from, date_to):
     return dict(out)
 
 
+def read_im_chat(date_from, date_to):
+    """工作群消息 → {kr_id: [条目]}。
+
+    消息不自动挂 KR：群里既有本人发言也有别人发言，靠关键词硬匹配必然错。
+    只有命中 `im_chat.kw_kr` 里配置的关键词才落到对应 KR，其余进 `_unmapped`
+    由 _emit 打印。卡片消息（周总结自动推送）单独提取正文，比纯文本信息密度高。
+    """
+    chats = (IM_CHAT.get("chats") or [])
+    if not chats:
+        return {}
+    kw_kr = IM_CHAT.get("kw_kr") or {}
+    start_ts = f"{date_from} 00:00:00"
+    end_ts = f"{date_to} 23:59:59"
+    out = defaultdict(list)
+    for c in chats:
+        cid = c.get("chat_id") if isinstance(c, dict) else c
+        if not cid:
+            continue
+        try:
+            data = lark("im", "+chat-messages-list", "--chat-id", cid,
+                        "--start-time", start_ts, "--end-time", end_ts,
+                        "--page-size", "100", "--as", "user")
+        except Exception:
+            continue
+        for m in (data.get("data", {}).get("messages") or []):
+            if m.get("deleted"):
+                continue
+            txt = (m.get("content") or "").strip()
+            if not txt or len(txt) < 12:
+                continue
+            when = (m.get("create_time") or "")[:10]
+            who = (m.get("sender") or {}).get("name", "")
+            if m.get("msg_type") == "interactive":
+                txt = re.sub(r"<[^>]+>", " ", txt)
+                txt = re.sub(r"\s+", " ", txt).strip()
+            body = f"💬 {when} {who}：{txt[:300]}"
+            hit = None
+            for kw, kid in kw_kr.items():
+                if kw in txt:
+                    hit = kid
+                    break
+            out[hit or "_unmapped"].append(body)
+    return dict(out)
+
+
 def merge_supplements(desc, supps_by_kr, kr_id):
     """把外部补充数据追加到 worklog 说明末尾。只取该 KR 自己的那桶。"""
     extras = list(supps_by_kr.get(kr_id) or [])
@@ -610,7 +656,9 @@ def _emit(groups, label, anchor, do_write):
     a_date = anchor.date() if isinstance(anchor, datetime) else anchor
     week_end = a_date + timedelta(days=7)
     supps = read_supplement(a_date.isoformat(), week_end.isoformat())
-    wb_supps = read_work_base(a_date.isoformat(), week_end.isoformat())
+    wb_supps = read_work_base(a_date.isoformat(), (week_end - timedelta(days=1)).isoformat())
+    im_supps = read_im_chat(a_date.isoformat(), (week_end - timedelta(days=1)).isoformat())
+    im_chat_n = sum(len(v) for v in im_supps.values())
 
     # 只有补充数据、没有 session 活动的 KR 也要出记录——公司里的会议/沟通
     # 本来就不在终端里，这正是补充机制存在的理由。漏掉等于白补。
@@ -618,7 +666,7 @@ def _emit(groups, label, anchor, do_write):
     # 否则同一 KR 本周会出两条 worklog，Log.count 翻倍。
     groups = dict(groups)
     have = {kr for (kr, _p) in groups}
-    for src in (supps, wb_supps):
+    for src in (supps, wb_supps, im_supps):
         for kr_id in src:
             if not kr_id or kr_id == "_unmapped" or kr_id in have:
                 continue
@@ -643,6 +691,7 @@ def _emit(groups, label, anchor, do_write):
         desc = build_desc(g, kr_title, label)
         desc = merge_supplements(desc, supps, kr_id)
         desc = merge_supplements(desc, wb_supps, kr_id)
+        desc = merge_supplements(desc, im_supps, kr_id)
         title = build_title(kr_title, proj_name, label)
         print(f"\n{'='*60}")
         print(f"KR: {kr_title}")
@@ -668,6 +717,11 @@ def _emit(groups, label, anchor, do_write):
         print(f"\n⚠ 部门工作记录有 {len(unmapped)} 条未映射到 KR（config.work_base.task_kr 缺映射），未写入：")
         for t in unmapped:
             print(f"  · {t.splitlines()[0]}")
+
+    im_unmapped = im_supps.get("_unmapped") or []
+    if im_chat_n:
+        print(f"\n工作群消息：命中映射 {im_chat_n - len(im_unmapped)} 条，未映射 {len(im_unmapped)} 条"
+              f"（config.im_chat.kw_kr 配关键词后才会挂到 KR）")
 
     if do_write:
         print(f"\n完成：新建 {total_new} 条，追加 {total_app} 条")
