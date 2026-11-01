@@ -121,3 +121,101 @@ lark-cli docs +update --api-version v2 --doc <doc_token> --as user --command app
 - 每条记录是数组，按 `data.fields` 顺序排列，不是 dict
 - `has_more: true` 时用 `--offset` 分页（limit 最大有效值 ~200）
 - Python 解析：`fields = data['data']['fields']; for rec in data['data']['data']: d = dict(zip(fields, rec))`
+
+## base 字段操作（实测 2026-10-31）
+
+### 建 link / lookup 的 JSON（唯一正确写法）
+
+```bash
+# link（双向）
+--json '{"name":"X","type":"link","link_table":"tbl...","bidirectional":true,"bidirectional_link_field_name":"反向名"}'
+
+# lookup（四要素 from/select/where/aggregate）
+--json '{"name":"Y","type":"lookup","from":"tbl...","select":"字段名",
+         "where":{"logic":"and","conditions":[["源表字段","intersects",{"type":"field_ref","field":"本表link字段"}]]},
+         "aggregate":"max"}'
+```
+
+- ❌ `{"type":21,"property":{"table_id":"tbl..."}}` → `800010701 Invalid discriminator value`（同 Base 也失败）
+- ✅ 必须用 `"type":"link"` + `"link_table"` 平铺写法
+- `from` 写 **table_id 最稳**；写表名有时 `800030104 not_found`（改过字段的表尤其）
+- 建 lookup 需 `--i-have-read-guide`；`+field-create` **不吃 `--yes`**（只有 `+field-update` 吃）
+
+### lookup 的 where 三个坑
+
+1. **`conditions: []` 空数组被拒** → `800010701 Array must contain at least 1 element(s)`
+2. **侥幸建成空条件 → 整列恒空且 API 全 success**，看起来像"确实没数据"，必须读回记录对账
+3. **跨类型匹配静默返回空**：源表存 text `"1"`、本表是 number `1` → `is` 永远空。必须另存同类型字段做匹配键
+
+`aggregate` 取值（**全小写 snake_case**）：`raw_value` / `sum` / `average` / `max` / `min` / `counta`（不是 `count`）/ `unique_counta` / `unique`。
+
+### 改字段必须传完整定义
+
+只传 `{"name":"新名"}` 改 link/lookup → `800010701`。因为改名接口走的是同一套 `type` 判别，缺字段就判不出来：
+
+```bash
+# link 改名：带 link_table + bidirectional
+--json '{"name":"新名","type":"link","link_table":"tbl...","bidirectional":true,"bidirectional_link_field_name":"反名"}'
+
+# lookup 改名：带 from + select + where + aggregate
+--json '{"name":"新名","type":"lookup","from":"tbl...","select":"原字段","where":{...},"aggregate":"max"}'
+```
+
+- 反向字段（`bidirectional_link_field_name` 生成的那个）**不能改名** → `unsafe_operation_blocked: Updating a link field type, bidirectional setting, or duplex target table is not supported`
+
+### 跨 Base 关联的唯一正解：共享数据源同步表
+
+link/lookup 的 `from` **硬限同 Base**，拿别 Base 的 table_id 建一律 `800010701`。
+
+解法是「共享数据源 → 同步成主 Base 内的只读表」：
+
+| 步骤 | 操作 | 能否 API |
+|---|---|---|
+| 1. 发布 | 源 Base 表名右侧 `⋮ 更多操作 → 发布为共享数据源`（**不是**右上角分享按钮） | ❌ 纯 UI |
+| 2. 接入 | 目标 Base 左下 `新建 → 导入/同步数据 → 连接器中心 → 管理数据源 → 组织共享数据源` | ❌ 纯 UI |
+| 3. 同步表落地 | 目标 Base 多出一张带闪电图标的只读表 | — |
+| 4. 建 link | `link_table` 指向该同步表的 table_id | ✅ |
+
+**关键认知**（易误判，务必记牢）：
+
+- **同步表只读的是「数据行」，表本身可以当 link 目标**。往同步表加记录 → `800080821 unsafe_operation_blocked`；但建 link 指向它 → 成功，反向字段自动生成在同步表侧。不要因为"只读"就放弃这条路。
+- **退化的是「行内关联字段的值」，不是 link 能力**。源侧 link/lookup 同步后变文本（如逗号拼接 `"4,5"`），只影响跨表反查，不影响当字典查。
+- **只发布不接入 = 目标 Base 里什么都不出现**，`is_synced` 也一直是 None。必须两步都做完。
+
+同步机制：每小时一次；超 10 天未浏览目标 Base → 降 24 小时；超 30 天 → **自动关闭，需手动重开**。同步表可加新字段（number/text/formula 都行），同步不覆盖自建字段。
+
+发布/接入无 OpenAPI：`/syncs`、`/datasources`、`/tables/{id}/sync`、`/bases/{t}/publish`、`/shared_data_sources` 实测全 404。
+
+### 同步表上的取值限制
+
+同步表只读，多值文本（`"4,5"`）无法精确拆：
+
+- 数字字段 vs 文本 → 静默空
+- `intersects` 文本对文本 → **误匹配**，`"101"/"10"/"11"` 都含 `"1"`
+- formula `FIND` 精确拆 → 恒为 1，无效
+- 拆行 → 只读，加不了记录
+
+能用的只有：加 number 列做精确匹配（仅命中单值行），或改用 `aggregate: max/unique` 走 link 聚合（推荐）。
+
+### 导出文件污染仓库（高频事故）
+
+`+record-list` 把 ndjson 落到 **cwd**。若 cwd 是 git 仓库且 auto-sync 在跑，30 秒内被推上远程。
+
+- 文件名两种形态：**按 table_id 调用** → `tblXXX_<日期>_<时间>_<序号>.ndjson`；**按表名调用** → `<表名>_<日期>_<时间>_<序号>.ndjson`
+- `.gitignore` **只挡 `tbl*` 会漏**表名形态（`oKR_` / `worklog_`），必须加时间戳模式
+
+```gitignore
+tbl*_*.ndjson
+*_[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]_[0-9][0-9][0-9][0-9][0-9][0-9]_[0-9][0-9][0-9].ndjson
+*.manifest.json
+```
+
+- 操作前 `cd /tmp`（或 `~/files/<project>/`），别在仓库根跑
+
+### 其他必知
+
+- `+record-batch-update` 的 JSON 是 `{"update_records":{"recX":{"字段":[值]},...}}`，**不是** `{"records":[{record_id,fields}...]}`
+- `+record-batch-create` 用 `{"fields":[...],"rows":[[...]]}`，link 值传 `[{"id":"recX"}]`
+- 反向字段/`+field-delete` 需 `--yes`；`+table-delete --yes`
+- 同步表判断：`api GET /open-apis/bitable/v1/apps/{token}/tables` 里看 `is_synced`；但同步表在该接口常返回 `is_synced: None`，改用名称/闪电识别或直接查表名
+- **裸 `lark-cli api` 缺 scope**：查记录类端点会 `99991679 missing_scope`（要 `bitable:app:readonly` 等）。优先用 `base +record-list` 等 shortcut，它们走已授权的 scope
