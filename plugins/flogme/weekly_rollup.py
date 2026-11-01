@@ -608,9 +608,8 @@ def _emit(groups, label, anchor, do_write):
             continue
         kr_title = km.get(kr_id, "(KR 已删除)")
         desc = build_desc(g, kr_title, label)
-        desc = merge_supplements(desc, supps, kr_id, label)
-        if "" in wb_supps:
-            desc = merge_supplements(desc, wb_supps, "", label)
+        desc = merge_supplements(desc, supps, kr_id)
+        desc = merge_supplements(desc, wb_supps, kr_id)
         title = build_title(kr_title, proj_name, label)
         print(f"\n{'='*60}")
         print(f"KR: {kr_title}")
