@@ -593,7 +593,19 @@ def read_im_chat(date_from, date_to):
             if m.get("msg_type") == "interactive":
                 txt = re.sub(r"<[^>]+>", " ", txt)
                 txt = re.sub(r"\s+", " ", txt).strip()
-            body = f"💬 {when} {who}：{txt[:300]}"
+            # 转发合并消息：去掉图片/文件占位符和重复的转发头，只留讨论正文
+            txt = re.sub(r"!?\[(Image|文件)[^\]]*\]\(?[^)\s]*\)?", "", txt)
+            txt = re.sub(r"<file [^>]*/>", "", txt)
+            txt = re.sub(r"\[Image: [^\]]*\]", "", txt)
+            txt = re.sub(r"<forwarded_messages>|</forwarded_messages>", "", txt)
+            txt = re.sub(r"[ \t]+", " ", txt)
+            txt = re.sub(r"\n{3,}", "\n\n", txt).strip()
+            if len(txt) < 12:
+                continue
+            # worklog 是索引不是存档：转发消息只留开头，细节回群里查
+            body = f"💬 {when} {who}：{txt[:240]}"
+            if len(txt) > 240:
+                body += " …"
             hit = None
             for kw, kid in kw_kr.items():
                 if kw in txt:
