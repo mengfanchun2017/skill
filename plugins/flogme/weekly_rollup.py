@@ -583,21 +583,29 @@ def _emit(groups, label, anchor, do_write):
     但记录日期必须锚到同一个周一，否则 find_existing 找不到周五写的那条，
     会重复新建（实测踩过）。
     """
-    if not groups:
-        print("该窗口无有效 session 活动")
-        return 0
-
     km = kr_meta()
     date_str = (anchor.date().isoformat() if isinstance(anchor, datetime)
                  else anchor.isoformat())
-    # 读取补充数据
-    if isinstance(anchor, datetime):
-        a_date = anchor.date()
-    else:
-        a_date = anchor
+    a_date = anchor.date() if isinstance(anchor, datetime) else anchor
     week_end = a_date + timedelta(days=7)
     supps = read_supplement(a_date.isoformat(), week_end.isoformat())
     wb_supps = read_work_base(a_date.isoformat(), week_end.isoformat())
+
+    # 只有补充数据、没有 session 活动的 KR 也要出记录——公司里的会议/沟通
+    # 本来就不在终端里，这正是补充机制存在的理由。漏掉等于白补。
+    groups = dict(groups)
+    for src in (supps, wb_supps):
+        for kr_id in src:
+            if kr_id and kr_id != "_unmapped" and (kr_id, "-") not in groups:
+                groups.setdefault((kr_id, "补充"), {
+                    "sessions": [], "commits": [], "commit_count": 0,
+                    "edits": set(), "prompts": [],
+                    "tokens": {"input_tokens": 0, "output_tokens": 0}})
+
+    if not groups:
+        print("该窗口无有效 session 活动，且无补充记录")
+        return 0
+
     total_new, total_app = 0, 0
 
     for (kr_id, proj_name), g in sorted(groups.items(),
@@ -629,6 +637,12 @@ def _emit(groups, label, anchor, do_write):
                 nid = write_worklog(title, kr_id, desc, date_str)
                 print(f"   写入 {nid}")
                 total_new += 1
+
+    unmapped = wb_supps.get("_unmapped") or []
+    if unmapped:
+        print(f"\n⚠ 部门工作记录有 {len(unmapped)} 条未映射到 KR（config.work_base.task_kr 缺映射），未写入：")
+        for t in unmapped:
+            print(f"  · {t.splitlines()[0]}")
 
     if do_write:
         print(f"\n完成：新建 {total_new} 条，追加 {total_app} 条")
