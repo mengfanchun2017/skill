@@ -302,29 +302,46 @@ work_base:
 
 **局限性**：部门表按「本周/下周」分类而非具体日期，只能取「本周」这一档，无法精确到天。
 
-### 扩展三：ailab 工作群消息（当前不可行）
+### 扩展三：工作群消息（2026-11-01 已打通）
 
-2026-11-01 实测：ailab 账号 auth 正常（`identities.user.available=true`），但 `im +chat-list --types p2p,group` 返回 **0 个会话**——这个 bot 身份没有 IM 消息读取 scope，**读不到工作群消息**。
+原先 ailab 没有 IM scope，`im +chat-list` 返回 0 个会话。2026-11-01 用 `lark-cli auth login --recommend` 重新授权后，**IM 已可读**——`+chat-list` 返回 24 个会话，`+chat-messages-list` 能读历史消息，包括转发合并消息（`merge_forward`，一条能含几千字的多人讨论）。
 
-替代方案（按成本排序）：
-1. **手动转发到 Supplement 表**（现成可用）：把工作群里有价值的信息描述后写入，`来源=工作群消息`
-2. **用户直接转给 ailab bot 后让 flogme 读**：需 bot 已收到消息事件，且要额外开发消息接收处理链路——当前没有
-3. **给 ailab 应用加 scope**：飞书开放平台加 `im:message` / `im:chat:readonly` 后重新授权。注意这是 bot 应用权限，加了才能列会话、读消息
+配置在 `config.im_chat`：
 
-**现状结论**：工作群信息目前只能走方案 1（手动）。如果后续要做自动化，先确认方案 3 的 scope 能否批下来。
+```yaml
+im_chat:
+  chats:
+    - chat_id: "oc_xxx"
+      label: "孟繁春（工作转发）"
+  kw_kr:                    # 关键词 → KR，命中才挂
+    "知识库": "recvmWTjTz0HTo"
+    "培训": "reczz28TY5yh3Sx2"
+    # ... 没命中的进 _unmapped，只统计条数不写入
+```
+
+**消息不自动挂 KR**：群里既有本人发言也有别人发言和系统卡片推送，靠关键词硬匹配必然错。只有命中 `kw_kr` 的才落到对应 KR，其余进 `_unmapped` 桶，跑汇总时只打印条数。
+
+**消息清洗**（实测踩出来的）：
+
+- 纯链接消息（转发文档地址，50-80 字）没有信息量，正文里只会堆一串 URL → 过滤。但**长转发消息即使含 URL 也要留**，里面是真讨论，链接只是引用，所以过滤条件是「长度 < 120 且全是 URL」
+- `merge_forward` 消息要剥 `<forwarded_messages>` 标签、`[Image: img_xxx]` 占位符、`<file key=.../>` 附件标记，否则正文里全是噪音
+- 消息截断到 240 字 + `…`：worklog 是索引不是存档，细节回群里查
+
+**参数坑**：`+chat-messages-list` 的时间参数是 `--start` / `--end`（ISO 8601），不是 `--start-time` / `--end-time`。写错不报错，静默返回空列表。
 
 ### 汇总时怎么融合
 
-三条数据源在 `_emit` 里合流，最终一条 worklog = session 正文 + 补充来源段：
+四条数据源在 `_emit` 里合流，最终一条 worklog = session 正文 + 补充来源段：
 
 ```
 build_desc(session transcript)          ← 主体：commit / 改动文件 / 任务
   + merge_supplements(部门工作记录)      ← 📋 按 task_kr 挂到对应 KR
-  + merge_supplements(Supplement 表)     📝 按关联KR 挂到对应 KR
+  + merge_supplements(Supplement 表)     ← 📝 按关联KR 挂到对应 KR
+  + merge_supplements(工作群消息)        ← 💬 按 kw_kr 挂到对应 KR
   = 该 KR 本周的 worklog 说明
 ```
 
-来源标签（📋 / 📝）保留在正文里，回看时能区分「终端里做的」和「别处发生的」。补充段只挂到映射命中的那一条 KR，不会串到别的 KR 上。
+来源标签（📋 / 📝 / 💬）保留在正文里，回看时能区分「终端里做的」和「别处发生的」。补充段只挂到映射命中的那一条 KR，不会串到别的 KR 上。
 
 ## 归档
 
