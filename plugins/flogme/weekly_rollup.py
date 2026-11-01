@@ -364,8 +364,17 @@ def build_title(kr_title, proj_name, label):
 
     ⚠️ 周五与周一必须产出**同一标题**，否则 find_existing 按日期找到记录后
     标题却对不上，看起来像两条（且不利于阅读）。
+    ⚠️ 只有补充数据的 KR 都用同一个 proj_name「部门工作」，标题会撞车 →
+    这类条目改用 KR 标题前缀区分。
     """
     tag = label.replace("-mid", "")
+    if proj_name == "部门工作":
+        short = (kr_title or "").strip()
+        for p in ("（待完善）", "(", "（"):
+            if short.startswith(p):
+                short = short[len(p):]
+        short = re.split(r"[，。：:（(]", short)[0][:20]
+        return f"{short} {tag} 工作汇总"
     return f"{proj_name} {tag} 工作汇总"
 
 
