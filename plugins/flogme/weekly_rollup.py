@@ -467,7 +467,7 @@ def read_supplement(date_from, date_to):
                         "--page-size", "200", "--field-names", "日期,标题,内容,来源,关联KR")
     out = defaultdict(list)
     for r in rows:
-        dt = r.get("日期") or ""
+        dt = (r.get("日期") or "")[:10]
         if not dt or dt < date_from or dt >= date_to:
             continue
         kr_link = r.get("关联KR") or []
@@ -488,10 +488,16 @@ def read_supplement(date_from, date_to):
 
 
 def read_work_base(date_from, date_to):
-    """部门工作记录表中孟繁春的记录 → {kr_id: [条目]}"""
+    """部门工作记录表中孟繁春的「本周」记录 → {kr_id: [条目]}。
+
+    任务名 → KR 靠 config.work_base.task_kr 显式映射。未映射的任务不进任何
+    worklog（避免同一段文字被挂到所有 KR 上），只记在 `_unmapped` 桶里由
+    _emit 打印，提示用户补映射。
+    """
     if not WBASE_T or not WBASE.get("token"):
         return {}
     token = WBASE["token"]
+    task_kr = WBASE.get("task_kr") or {}
     rows = _lark_ndjson("base", "+record-list", "--base-token", token,
                         "--table-id", WBASE_T.get("records", ""),
                         "--as", "user", "--page-size", "300",
@@ -508,6 +514,9 @@ def read_work_base(date_from, date_to):
             period = period[0]
         if period != "本周":
             continue
+        dt = (r.get("填写日期") or "")[:10]
+        if not dt or dt < date_from or dt >= date_to:
+            continue
         task = r.get("ai关联任务") or ""
         if isinstance(task, list) and task:
             task = task[0]
@@ -516,23 +525,18 @@ def read_work_base(date_from, date_to):
         text = f"📋 {task}"
         if summary:
             text += f"：{summary}"
-        if content:
+        if content and content not in summary:
             text += f"\n    {content[:200]}"
-        # 按任务名映射到 KR（尽量匹配），兜底不映射也保留到 default
-        out[""].append(text)
+        out[task_kr.get(task, "_unmapped")].append(text)
     return dict(out)
 
 
-def merge_supplements(desc, supps_by_kr, kr_id, label):
-    """把外部补充数据追加到 worklog 说明末尾。"""
-    extras = []
-    for sid, texts in supps_by_kr.items():
-        if sid and sid != kr_id:
-            continue
-        extras.extend(texts)
+def merge_supplements(desc, supps_by_kr, kr_id):
+    """把外部补充数据追加到 worklog 说明末尾。只取该 KR 自己的那桶。"""
+    extras = list(supps_by_kr.get(kr_id) or [])
     if not extras:
         return desc
-    return desc + "\n\n" + "\n".join(extras)
+    return desc + "\n\n补充来源：\n" + "\n".join(extras)
 
 
 def write_worklog(title, kr_id, desc, date_str):
