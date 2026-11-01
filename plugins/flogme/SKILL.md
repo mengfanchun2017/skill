@@ -199,6 +199,72 @@ python3 weekly_rollup.py --last-week --write
 
 **建议流程**：先不带 `--write` 跑一遍看聚合结果对不对（会打印每个 KR 的 session 数、提交数、文件数、标题），确认再加 `--write`。
 
+## 数据补充扩展（2026-11-01）
+
+claude code 的 session transcript 只覆盖在终端里做的事，公司聊天、会议、线下沟通等不在记录范围内。以下三个扩展补全这些缺口。
+
+### 扩展一：用户手动补充（Supplement 表）
+
+用户手动写入 claude code 中缺失的工作信息（会议、沟通、非终端工作等）：
+
+**如何识别**：用户以口语化方式说「flogme 记一下 xxx」或「帮我记录 xxx」，判断属于工作内容但不来自 session → 写入 Supplement 表。
+
+**如何存储**：Base 内新增 `Supplement` 表（`tblwUDLiiho0AkjP`），4 个字段：
+
+| 字段 | 类型 | 作用 |
+|------|------|------|
+| 标题 | text | 主字段，简短描述 |
+| 日期 | datetime | 发生日期 |
+| 内容 | text | 详细描述：背景、动作、结果、涉及方 |
+| 来源 | select | 工作群消息 / 会议 / 文档 / 口头沟通 / 其他 |
+| 关联KR | link → oKR | 双向关联，对侧字段为`补充记录` |
+
+**写入方式**：同 worklog/reflect，用 `record-upsert` 写入：
+
+```bash
+export LARKSUITE_CLI_CONFIG_DIR="$HOME/.lark-cli-ailab"
+BASE_TOKEN="LX5lb6VfdaJHWrsRbTgc8Y50nmj"
+lark-cli base +record-upsert --base-token "$BASE_TOKEN" --table-id "tblwUDLiiho0AkjP" \
+  --json '{"标题":"...","日期":"2026-11-01","内容":"...","来源":["会议"],"关联KR":[{"id":"rec..."}]}' \
+  --as user
+```
+
+**weekly_rollup 整合**：跑周汇总时，同时读 Supplement 表中本周的记录，按 KR 分组追加到对应 worklog 的说明末尾（标注 `📝 补充来源`）。
+
+### 扩展二：部门工作记录表读取
+
+公司部门的工作记录多维表格（工作任务列表 Base，`Ei2ybk3FRagHbksfqXzcujsYnWf`）可作为独立数据源：
+
+- Base 名：工作任务列表（wiki 节点 `ZDyhwRkHmiWFOHkuJBfc8I8Hn8b`）
+- 工作记录表 `tblCdxkqxtpw0M6S`：241 条记录，含填写日期、周期、工作内容、ai简短总结、ai关联任务、记录人
+- 工作总结表 `tblNMkFG8r8tAZj8`：40 条记录，含类别（周总结/详细周总结/AI培训总结）、本周总结、下周计划
+
+**weekly_rollup 整合**：扫描窗口内记录人为「孟繁春」的记录，提取工作内容摘要，按 ai关联任务 关键词映射到对应 KR，追加到 worklog 说明（标注 `📋 部门周报`）。
+
+**局限性**：部门工作记录表按「本周/下周」分类而非具体日期，无法精确到天。整合时取「本周」记录即可。
+
+### 扩展三：ailab 工作群消息（当前不可行）
+
+当前 ailab 账号的 scope 不含 IM 消息读取权限（`im +chat-list` 返回 0 个会话），**无法直接读取工作群消息**。
+
+替代方案：
+1. **用户通过「扩展一」手动转发**：将工作群中的重要消息描述后写入 Supplement 表（来源=工作群消息）
+2. **后续扩展 ailab bot scope**：如需要自动读取，需在飞书开放平台给 ailab 应用添加 `im:message` 相关权限并重新授权
+3. **转发给 ailab**：用户在工作群 @ailab bot 转发消息，bot 可收到事件（需额外开发消息接收处理）
+
+### 汇总时的优先级融合
+
+三条数据源在 weekly_rollup 中以固定优先级融合：
+
+```
+worklog 正文（session transcript 为主）
+  + 部门工作记录（📋 标记）— 按 KR 映射挂在对应 KR 下
+  + 用户补充（📝 标记）— 按关联KR 挂在对应 KR 下
+= 完整周报
+```
+
+同一 KR 的记录按日期混合排序，来源标签保留原文可追溯。
+
 ## 归档
 
 主表只留当年，旧年份搬到 `Worklog_Archive`（同 Base 内，`tbld4zKDq0mrtd2H`）。

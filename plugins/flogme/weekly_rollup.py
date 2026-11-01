@@ -37,6 +37,9 @@ BASE = CONF["bases"]["okr_v2"]["token"]
 T = CONF["bases"]["okr_v2"]["tables"]
 KR_ROUTE = CONF.get("kr_route") or {}
 KR_KEYWORD = CONF.get("kr_keyword") or []  # [{"keywords":["..."], "kr":"rec...", "repos":["ccconfig"]}, ...]
+SUPP_TABLE = T.get("Supplement")  # 用户补充表（可选）
+WBASE = CONF.get("work_base") or {}  # 部门工作记录 Base（可选）
+WBASE_T = (WBASE.get("tables") or {}) if WBASE else {}
 ENV = {
     **os.environ,
     "LARKSUITE_CLI_CONFIG_DIR": os.path.expanduser(CONF["lark_cli"]["config_dir"]),
@@ -438,6 +441,100 @@ def kr_meta():
     return out
 
 
+def _lark_ndjson(*args):
+    """lark-cli ndjson export → 记录列表。"""
+    raw = lark(*args)
+    fname = raw.get("record_file", "")
+    if not fname or not os.path.exists(fname):
+        return []
+    records = []
+    with open(fname) as f:
+        for line in f:
+            records.append(json.loads(line))
+    os.unlink(fname)
+    mfile = raw.get("manifest_file", "")
+    if mfile and os.path.exists(mfile):
+        os.unlink(mfile)
+    return records
+
+
+def read_supplement(date_from, date_to):
+    """Supplement 表中指定日期范围记录 → {kr_id: [条目]}"""
+    if not SUPP_TABLE:
+        return {}
+    rows = _lark_ndjson("base", "+record-list", "--base-token", BASE,
+                        "--table-id", SUPP_TABLE, "--as", "user",
+                        "--page-size", "200", "--field-names", "日期,标题,内容,来源,关联KR")
+    out = defaultdict(list)
+    for r in rows:
+        dt = r.get("日期") or ""
+        if not dt or dt < date_from or dt >= date_to:
+            continue
+        kr_link = r.get("关联KR") or []
+        kr_id = kr_link[0].get("id") if (kr_link and isinstance(kr_link, list)) else None
+        if not kr_id:
+            continue
+        src = r.get("来源") or [""]
+        src = src[0] if isinstance(src, list) else src
+        title = r.get("标题") or ""
+        content = r.get("内容") or ""
+        text = f"📝 {title}"
+        if content:
+            text += f"：{content}"
+        if src:
+            text += f"（来源：{src}）"
+        out[kr_id].append(text)
+    return dict(out)
+
+
+def read_work_base(date_from, date_to):
+    """部门工作记录表中孟繁春的记录 → {kr_id: [条目]}"""
+    if not WBASE_T or not WBASE.get("token"):
+        return {}
+    token = WBASE["token"]
+    rows = _lark_ndjson("base", "+record-list", "--base-token", token,
+                        "--table-id", WBASE_T.get("records", ""),
+                        "--as", "user", "--page-size", "300",
+                        "--field-names", "填写日期,周期,工作内容,ai简短总结,ai关联任务,记录人")
+    out = defaultdict(list)
+    for r in rows:
+        person = r.get("记录人") or ""
+        if isinstance(person, list) and person:
+            person = person[0]
+        if not person or "孟繁春" not in str(person):
+            continue
+        period = r.get("周期") or ""
+        if isinstance(period, list) and period:
+            period = period[0]
+        if period != "本周":
+            continue
+        task = r.get("ai关联任务") or ""
+        if isinstance(task, list) and task:
+            task = task[0]
+        content = r.get("工作内容") or ""
+        summary = r.get("ai简短总结") or ""
+        text = f"📋 {task}"
+        if summary:
+            text += f"：{summary}"
+        if content:
+            text += f"\n    {content[:200]}"
+        # 按任务名映射到 KR（尽量匹配），兜底不映射也保留到 default
+        out[""].append(text)
+    return dict(out)
+
+
+def merge_supplements(desc, supps_by_kr, kr_id, label):
+    """把外部补充数据追加到 worklog 说明末尾。"""
+    extras = []
+    for sid, texts in supps_by_kr.items():
+        if sid and sid != kr_id:
+            continue
+        extras.extend(texts)
+    if not extras:
+        return desc
+    return desc + "\n\n" + "\n".join(extras)
+
+
 def write_worklog(title, kr_id, desc, date_str):
     from log_write import cmd_worklog  # noqa: F401  (复用其字段校验)
     payload = {"fields": ["标题", "成果类型", _kr_field(), "日期", "说明"],
@@ -489,6 +586,14 @@ def _emit(groups, label, anchor, do_write):
     km = kr_meta()
     date_str = (anchor.date().isoformat() if isinstance(anchor, datetime)
                  else anchor.isoformat())
+    # 读取补充数据
+    if isinstance(anchor, datetime):
+        a_date = anchor.date()
+    else:
+        a_date = anchor
+    week_end = a_date + timedelta(days=7)
+    supps = read_supplement(a_date.isoformat(), week_end.isoformat())
+    wb_supps = read_work_base(a_date.isoformat(), week_end.isoformat())
     total_new, total_app = 0, 0
 
     for (kr_id, proj_name), g in sorted(groups.items(),
@@ -499,6 +604,9 @@ def _emit(groups, label, anchor, do_write):
             continue
         kr_title = km.get(kr_id, "(KR 已删除)")
         desc = build_desc(g, kr_title, label)
+        desc = merge_supplements(desc, supps, kr_id, label)
+        if "" in wb_supps:
+            desc = merge_supplements(desc, wb_supps, "", label)
         title = build_title(kr_title, proj_name, label)
         print(f"\n{'='*60}")
         print(f"KR: {kr_title}")
