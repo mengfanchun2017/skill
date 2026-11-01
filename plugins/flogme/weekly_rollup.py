@@ -673,6 +673,7 @@ def _emit(groups, label, anchor, do_write):
         print(f"\n完成：新建 {total_new} 条，追加 {total_app} 条")
     else:
         print(f"\n⚠ 预览模式。加 --write 写入飞书。")
+    _emit.last = {"new": total_new, "appended": total_app}
     return 0
 
 
@@ -718,30 +719,55 @@ def main():
                     help="本周至今（周一二三 12:01 定时跑用）")
     ap.add_argument("--force", action="store_true",
                     help="忽略本周已记录守卫，强制重跑")
+    ap.add_argument("--once", action="store_true",
+                    help="本周已成功写过就跳过（周一二三 cron 用，保证每周只跑一次）")
     ap.add_argument("--write", action="store_true", help="写入飞书（默认预览）")
     args = ap.parse_args()
 
     if args.last_week:
-        # 周一整周重扫（幂等）：周五写的是「本周一~本周五」，本周一跑时
-        # 这一周已完整，重扫得到**完整一周**（含周末尾巴），覆盖周五那版。
-        # append_worklog 已是覆盖语义，重跑不会累加，故整周重扫是安全的。
+        # 整周重扫（幂等）：扫「上一个完整周」的 Mon~Sun，锚点固定为该周周一。
+        # append_worklog 是覆盖语义，重跑不会累加，故重扫是安全的。
         this_monday = date.today() - timedelta(days=date.today().weekday())
         last_monday = this_monday - timedelta(days=7)
+        # 守卫：周一二三三天的 cron 共用同一锚点，成功一次就够。
+        # 判据是「同一锚点已成功写过」，不是「今天跑过」——周一写成功，
+        # 周二周三跳过；周一写失败，周二能补上；三天都没跑，下周一换锚点照常跑。
+        if args.once and not args.force and already_done(last_monday):
+            st = _load_state()
+            print(f"本周汇总已写入（{st.get('when')}，锚点 {st.get('last_anchor')}），跳过。")
+            print("要强制重跑加 --force。")
+            return 0
         start_full = datetime.combine(last_monday, datetime.min.time())
         end_full = datetime.combine(this_monday, datetime.min.time())
         _, _, lbl = week_bounds(None, last_monday.isoformat())
-        print(f"窗口：{start_full.date()} ~ {(end_full - timedelta(days=1)).date()}  ({lbl} 完整一周，覆盖周五版本)")
-        return _emit(scan_sessions(start_full, end_full), lbl, last_monday, args.write)
+        print(f"窗口：{start_full.date()} ~ {(end_full - timedelta(days=1)).date()}  ({lbl} 完整一周)")
+        rc = _emit(scan_sessions(start_full, end_full), lbl, last_monday, args.write)
+        if args.write and rc == 0:
+            last = getattr(_emit, "last", {}) or {}
+            mark_done(last_monday, lbl, last.get("new", 0), last.get("appended", 0))
+        return rc
 
     start, end, label = week_bounds(args.week, args.since)
+    anchor = start.date() if isinstance(start, datetime) else start
     if args.this_week:
-        # 周五跑：本周一到现在，截掉未来
+        # 周一二三中午跑：本周一到此刻，截掉未来。
+        # 三天共用同一锚点（本周一），所以周一写过周二周三就跳过；
+        # 周二补跑覆盖周一那版，周三补跑覆盖周二那版——始终是同一周同一条记录。
         end = datetime.now()
         label = label + "-mid"
+        if args.once and not args.force and already_done(anchor):
+            st = _load_state()
+            print(f"本周汇总已写入（{st.get('when')}，锚点 {st.get('last_anchor')}），跳过。")
+            print("要强制重跑加 --force。")
+            return 0
     print(f"窗口：{start.date()} ~ {end.date()}  ({label})")
 
     groups = scan_sessions(start, end)
-    return _emit(groups, label, start, args.write)
+    rc = _emit(groups, label, start, args.write)
+    if args.this_week and args.write and rc == 0:
+        last = getattr(_emit, "last", {}) or {}
+        mark_done(anchor, label, last.get("new", 0), last.get("appended", 0))
+    return rc
 
 
 if __name__ == "__main__":
