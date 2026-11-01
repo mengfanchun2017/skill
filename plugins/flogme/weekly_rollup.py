@@ -370,8 +370,14 @@ def build_title(kr_title, proj_name, label):
 
 
 def build_desc(groups_entry, kr_title, label):
-    """说明：结构化摘要，多 session 合并。"""
+    """说明：结构化摘要，多 session 合并。
+
+    无 session 的条目（只有补充数据）不写 session/用量行——写「session 数：0
+    / 用量：0 tokens」是纯噪音，读者只关心做了什么。
+    """
     g = groups_entry
+    if not g["sessions"]:
+        return f"周期：{label}"
     parts = [f"周期：{label}", f"session 数：{len(g['sessions'])}"]
 
     if g.get("commit_count"):
@@ -522,6 +528,12 @@ def read_work_base(date_from, date_to):
             task = task[0]
         content = r.get("工作内容") or ""
         summary = r.get("ai简短总结") or ""
+        # 部门表的 ai简短总结 自带「任务名：」前缀，不去掉会写成
+        # 「📋 运维AI培训赋能：运维AI培训赋能：…」双重前缀。
+        if summary.startswith(task + "："):
+            summary = summary[len(task) + 1:]
+        elif summary.startswith(task + ":"):
+            summary = summary[len(task) + 1:]
         text = f"📋 {task}"
         if summary:
             text += f"：{summary}"
@@ -593,14 +605,18 @@ def _emit(groups, label, anchor, do_write):
 
     # 只有补充数据、没有 session 活动的 KR 也要出记录——公司里的会议/沟通
     # 本来就不在终端里，这正是补充机制存在的理由。漏掉等于白补。
+    # 该 KR 已有 session 分组时不另开一条，补充文字并进主分组，
+    # 否则同一 KR 本周会出两条 worklog，Log.count 翻倍。
     groups = dict(groups)
+    have = {kr for (kr, _p) in groups}
     for src in (supps, wb_supps):
         for kr_id in src:
-            if kr_id and kr_id != "_unmapped" and (kr_id, "-") not in groups:
-                groups.setdefault((kr_id, "补充"), {
-                    "sessions": [], "commits": [], "commit_count": 0,
-                    "edits": set(), "prompts": [],
-                    "tokens": {"input_tokens": 0, "output_tokens": 0}})
+            if not kr_id or kr_id == "_unmapped" or kr_id in have:
+                continue
+            groups[(kr_id, "部门工作")] = {
+                "sessions": [], "commits": [], "commit_count": 0,
+                "edits": set(), "prompts": [],
+                "tokens": {"input_tokens": 0, "output_tokens": 0}}
 
     if not groups:
         print("该窗口无有效 session 活动，且无补充记录")
