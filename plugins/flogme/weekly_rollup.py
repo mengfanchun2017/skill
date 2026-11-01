@@ -564,8 +564,8 @@ def read_im_chat(date_from, date_to):
     if not chats:
         return {}
     kw_kr = IM_CHAT.get("kw_kr") or {}
-    start_ts = f"{date_from} 00:00:00"
-    end_ts = f"{date_to} 23:59:59"
+    start_ts = f"{date_from}T00:00:00+08:00"
+    end_ts = f"{date_to}T23:59:59+08:00"
     out = defaultdict(list)
     for c in chats:
         cid = c.get("chat_id") if isinstance(c, dict) else c
@@ -573,8 +573,9 @@ def read_im_chat(date_from, date_to):
             continue
         try:
             data = lark("im", "+chat-messages-list", "--chat-id", cid,
-                        "--start-time", start_ts, "--end-time", end_ts,
-                        "--page-size", "100", "--as", "user")
+                        "--start", start_ts, "--end", end_ts,
+                        "--page-size", "50", "--page-all", "--order", "asc",
+                        "--as", "user")
         except Exception:
             continue
         for m in (data.get("data", {}).get("messages") or []):
