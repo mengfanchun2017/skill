@@ -676,14 +676,48 @@ def _emit(groups, label, anchor, do_write):
     return 0
 
 
+STATE_FILE = Path.home() / ".claude" / "flogme_rollup_state.json"
+
+
+def _load_state():
+    try:
+        return json.loads(STATE_FILE.read_text())
+    except (OSError, ValueError):
+        return {}
+
+
+def _save_state(st):
+    STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    tmp = STATE_FILE.with_suffix(".tmp")
+    tmp.write_text(json.dumps(st, ensure_ascii=False, indent=2))
+    tmp.replace(STATE_FILE)
+
+
+def already_done(anchor_date):
+    """���周是否已成功写入过。守卫用，防止周一二三重跑同一次周汇总。
+
+    判据是「锚点周相同的成功记录」，不是「跑过」——预览跑不算、写失败不算。
+    """
+    st = _load_state()
+    return st.get("last_anchor") == anchor_date.isoformat() and st.get("ok")
+
+
+def mark_done(anchor_date, label, new, app):
+    _save_state({"last_anchor": anchor_date.isoformat(), "when":
+                 datetime.now().isoformat(timespec="seconds"),
+                 "label": label, "new": new, "appended": app, "ok": True})
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--week", help="ISO 周，如 2026-W43")
     ap.add_argument("--since", help="起始日 YYYY-MM-DD（7 天窗口）")
     ap.add_argument("--last-week", action="store_true",
-                    help="上一个完整周（周一 00:01 定时跑用）")
+                    help="上一个完整周（周日/周一 12:01 定时跑用）")
     ap.add_argument("--this-week", action="store_true",
-                    help="本周至今（周五 00:01 定时跑用）")
+                    help="本周至今（周一二三 12:01 定时跑用）")
+    ap.add_argument("--force", action="store_true",
+                    help="忽略本周已记录守卫，强制重跑")
     ap.add_argument("--write", action="store_true", help="写入飞书（默认预览）")
     args = ap.parse_args()
 
