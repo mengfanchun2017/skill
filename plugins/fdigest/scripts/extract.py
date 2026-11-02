@@ -20,13 +20,27 @@ import re
 import sys
 
 PAGE_SPLIT = re.compile(r'<div style="--justify:justify;--position:absolute;[^"]*height:792pt[^"]*"')
-LINE_RE = re.compile(r'<div style="font-size:[^"]*"[^>]*>(.*?)</div>', re.S)
+# SEC 的定位 div 首属性不固定：标题行是 `font-size:...`，正文段落是 `line-height:...`。
+# 早期只匹配 font-size → 正文段落整段漏抽（实测 14MB 文件只抽到 33.6 万字符，实际可见
+# 159.5 万，覆盖率 21%）。这里放宽到任意属性，靠「内含 <font>」过滤掉纯布局 div。
+LINE_RE = re.compile(r'<div style="([^"]*)"[^>]*>(.*?)</div>', re.S)
 FONT_RE = re.compile(r'<font style="([^"]*)"[^>]*>([^<]*)</font>')
 IMG_RE = re.compile(r'<img([^>]*)>')
+TOP_RE = re.compile(r'top:([\d.]+)pt')
+LEFT_RE = re.compile(r'left:([\d.]+)pt')
 
 
 def strip_tags(s):
     return re.sub(r'\s+', ' ', H.unescape(re.sub(r'<[^>]+>', ' ', s))).strip()
+
+
+def _first_pos(fonts, pat):
+    """外层 div 没写定位时，取首个 font 的绝对定位值（SEC 把坐标挂在 font 上）。"""
+    for st, _ in fonts:
+        m = re.search(pat, st)
+        if m:
+            return float(m.group(1))
+    return 0.0
 
 
 def extract_html(src):
@@ -37,24 +51,29 @@ def extract_html(src):
     for idx, p in enumerate(pages_src, 1):
         lines = []
         for lm in LINE_RE.finditer(p):
-            inner = lm.group(1)
+            style, inner = lm.group(1), lm.group(2)
             fonts = FONT_RE.findall(inner)
-            if fonts:
-                txt, maxsz, bold = '', 0.0, False
-                for st, ft in fonts:
-                    txt += H.unescape(re.sub(r'<[^>]+>', '', ft))
-                    ms = re.search(r'font-size:(\d+(?:\.\d+)?)pt', st)
-                    if ms:
-                        maxsz = max(maxsz, float(ms.group(1)))
-                    if 'font-weight:bold' in st:
-                        bold = True
-            else:
-                txt, maxsz, bold = strip_tags(inner), 0.0, False
+            if not fonts:
+                continue      # 纯布局 div（无文字），跳过
+            txt, maxsz, bold = '', 0.0, False
+            for st, ft in fonts:
+                txt += H.unescape(re.sub(r'<[^>]+>', '', ft))
+                ms = re.search(r'font-size:(\d+(?:\.\d+)?)pt', st)
+                if ms:
+                    maxsz = max(maxsz, float(ms.group(1)))
+                if 'font-weight:bold' in st:
+                    bold = True
             txt = re.sub(r'\s+', ' ', txt).strip()
             if not txt:
                 continue
             # 行内片段被 SEC 拆成多个 font 标签，需按位置拼接而非空格分隔
-            lines.append({'t': txt, 'sz': maxsz, 'b': bold})
+            tm_, lm_ = TOP_RE.search(style), LEFT_RE.search(style)
+            lines.append({
+                't': txt, 'sz': maxsz, 'b': bold,
+                # 行内 font 自带绝对定位；外层 div 的 top/left 缺失时用 font 的值
+                'y': float(tm_.group(1)) if tm_ else _first_pos(fonts, r'top:([\d.]+)pt'),
+                'x': float(lm_.group(1)) if lm_ else _first_pos(fonts, r'left:([\d.]+)pt'),
+            })
             if maxsz >= 12 and bold:
                 headings.append({'page': idx, 'size': maxsz, 'text': txt})
 
