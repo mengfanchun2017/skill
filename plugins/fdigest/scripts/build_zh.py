@@ -32,6 +32,15 @@ def esc(s):
     return s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
 
 
+def strip_manual_number(t):
+    """去掉标题里的手动编号（飞书自动生成目录，手写编号会重复）。
+
+    财报附注的 "2. 收入" 是原文编号，保留编号本身会让飞书目录出现
+    "2 2. 收入" 这类重复；按 ffeishu 规范一律剥掉前缀。
+    """
+    return re.sub(r'^\s*(?:[一二三四五六七八九十]+[、.]|\d+(?:\.\d+)*[.、）)]?)\s*', '', t).strip()
+
+
 def _filter_lines(lines):
     """与 translate.py 的行筛选保持逐字一致 —— 译文缓存按这个顺序对齐。"""
     out = [l['t'] for l in lines
@@ -223,6 +232,9 @@ def main():
                 continue
             if b['kind'] == 'h':
                 lvl = min(b['level'], 3)
+                txt = strip_manual_number(txt)
+                if not txt:
+                    continue
                 if lvl == 1:
                     out.append(f'<h1><span text-color="blue">{esc(txt)}</span></h1>')
                 else:
