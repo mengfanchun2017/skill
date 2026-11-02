@@ -51,14 +51,16 @@ def main():
 
     if lang == 'zh' and has_zh and len(q) >= 3:
         # trigram 分词：按整串匹配中文子串；<3 字时 trigram 无法命中，走 LIKE 兜底
-        sql = '''SELECT z.slug, z.page, '' AS chapter, '' AS section,
-                        snippet(zh_chunks, 2, '《', '》', '…', 40) AS snip,
+        # snippet 的列序号按 DDL：0=slug 1=page 2=chapter 3=section 4=text。
+        # 早期写成 2 取到了 chapter 列，所以摘要恒为空 —— 必须取 4。
+        sql = '''SELECT z.slug, z.page, z.chapter, z.section,
+                        snippet(zh_chunks, 4, '《', '》', '…', 40) AS snip,
                         d.title, d.feishu_url
                  FROM zh_chunks z LEFT JOIN docs d ON d.slug=z.slug
                  WHERE zh_chunks MATCH ?'''
         fq = '"' + q.replace('"', '') + '"'
     elif lang == 'zh' and has_zh:
-        sql = '''SELECT z.slug, z.page, '' AS chapter, '' AS section,
+        sql = '''SELECT z.slug, z.page, z.chapter, z.section,
                         substr(z.text,1,200) AS snip,
                         d.title, d.feishu_url
                  FROM zh_chunks z LEFT JOIN docs d ON d.slug=z.slug
