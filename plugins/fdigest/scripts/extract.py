@@ -108,14 +108,27 @@ def extract_html(src):
 
 
 def merge_headings(headings):
-    """把同一页同一字号的碎片合并成完整标题（SEC 常把一句话拆成多个 font 标签）。"""
+    """把同一页同一字号且纵向相邻的碎片合并成完整标题。
+
+    SEC 常把一句话拆成多个 font 标签（"Anthropic, PBC Table of Contents" 里的
+    "of Contents" 原本是另一半）。早期只看 page+size 就合并，把页脚也吞进标题；
+    这里加 y 邻近判据（<8pt 才算同一行），并剔除页眉页脚区（y<40 或 y>700）。
+    """
     out = []
     for h in headings:
-        if out and out[-1]['page'] == h['page'] and out[-1]['size'] == h['size']:
+        y = h.get('y', 0)
+        if y and (y < 40 or y > 700):
+            continue          # 页眉 / 页脚，不是标题
+        if (out and out[-1]['page'] == h['page'] and out[-1]['size'] == h['size']
+                and abs(out[-1].get('y', 0) - y) < 8):
             out[-1]['text'] = (out[-1]['text'] + ' ' + h['text']).strip()
         else:
             out.append(dict(h))
-    return [h for h in out if len(h['text']) > 1]
+    out = [h for h in out if len(h['text']) > 1]
+    # 兜底：合并后仍残留 "Table of Contents" 尾巴的（页脚与正文同字号同 y 邻近），剥掉
+    for h in out:
+        h['text'] = re.sub(r'\s*(Table of Contents|of Contents)\s*$', '', h['text']).strip()
+    return [h for h in out if h['text']]
 
 
 def build_page_text(pages):
