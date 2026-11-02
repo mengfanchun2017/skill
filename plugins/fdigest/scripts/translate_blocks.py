@@ -84,7 +84,8 @@ def main():
         if not blocks and n not in tb:
             json.dump({'page': n, 'blocks': [], 'tables': []}, open(out, 'w'), ensure_ascii=False)
             continue
-        todo.append((n, blocks, [r for rs in tb.get(n, []) for r in rs], out))
+        # rows 保持三层：表格列表 → 行 → 单元格（不能拍平，否则每行变成一个独立表格）
+        todo.append((n, blocks, tb.get(n, []), out))
 
     print(f'待翻 {len(todo)} 页', file=sys.stderr)
     done, failed = 0, 0
@@ -117,15 +118,17 @@ def main():
             for batch in batches([{'text': t, 'kind': blocks[i]['kind']}
                                   for i, t in enumerate(texts)]):
                 zhs.extend(tr_many([x['text'] for x in batch]))
-            # 表格：逐行逐格
+            # 表格：每张表逐行逐格翻。rows 是 [表格][行][单元格] 三层，必须原样保留，
+            # 拍平会让每行变成一个独立表格（曾导致 158 张表变成几百张单行表，渲染全丢）。
             tzh = []
-            for rows_ in rows:
+            for tbl in rows:
                 out_rows = []
-                for r in rows_:
-                    if any(re.search(r'[A-Za-z]{3,}', c) for c in r):
-                        out_rows.append(tr_many(r))
+                for r in tbl:
+                    cells = [str(c) for c in r]
+                    if any(re.search(r'[A-Za-z]{3,}', c) for c in cells):
+                        out_rows.append(tr_many(cells))
                     else:
-                        out_rows.append(r)   # 纯数字行不翻
+                        out_rows.append(cells)   # 纯数字行不翻
                 tzh.append(out_rows)
             json.dump({'page': n,
                        'blocks': [{'kind': b['kind'], 'level': b.get('level'), 'zh': z}
