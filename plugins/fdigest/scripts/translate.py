@@ -15,6 +15,8 @@ import sys
 import time
 import urllib.error
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
+import threading
 
 LLM_MERGED = os.path.expanduser('~/.cache/llm-merged.json')
 
@@ -110,6 +112,7 @@ def main():
     ap.add_argument('--start', type=int, default=1)
     ap.add_argument('--end', type=int, default=None)
     ap.add_argument('--force', action='store_true', help='忽略缓存重翻')
+    ap.add_argument('--workers', type=int, default=8, help='并行页数')
     args = ap.parse_args()
 
     d = os.path.join(args.workdir, args.slug)
@@ -122,7 +125,8 @@ def main():
     print(f"预设 {cfg['name']} / 模型 {cfg['model']}", file=sys.stderr)
 
     end = args.end or man['pages']
-    done = skipped = failed = 0
+    todo = []
+    skipped = 0
     for p in pages:
         n = p['page']
         if n < args.start or n > end:
@@ -138,20 +142,32 @@ def main():
             json.dump({'page': n, 'src': [], 'zh': []}, open(out, 'w'), ensure_ascii=False)
             skipped += 1
             continue
-        # 一次请求译整页，但要求逐段编号返回，便于与原文段一一对应
-        numbered = '\n'.join(f'{i+1}. {l}' for i, l in enumerate(lines))
+        todo.append((n, lines, out))
+
+    print(f'待翻 {len(todo)} 页，并行 {args.workers}', file=sys.stderr)
+    done = failed = 0
+    counter = threading.Lock()
+
+    def work(item):
+        nonlocal done, failed
+        n, lines, out = item
+        numbered = '\n'.join(f'{i+1}. {text}' for i, text in enumerate(lines))
         res = call(cfg, numbered)
-        if res is None:
-            failed += 1
-            print(f'  第 {n} 页翻译失败，跳过（重跑会补）', file=sys.stderr)
-            continue
-        zh = [re.sub(r'^\s*\d+[.、]\s*', '', x).strip()
-              for x in res.split('\n')
-              if x.strip() and not re.fullmatch(r'\s*-{3,}\s*', x)]
-        json.dump({'page': n, 'src': lines, 'zh': zh}, open(out, 'w'), ensure_ascii=False)
-        done += 1
-        if done % 10 == 0:
-            print(f'  已翻 {done} 页（当前 p{n}）', file=sys.stderr)
+        with counter:
+            if res is None:
+                failed += 1
+                print(f'  第 {n} 页失败，重跑会补', file=sys.stderr)
+                return
+            zh = [re.sub(r'^\s*\d+[.、]\s*', '', x).strip()
+                  for x in res.split('\n')
+                  if x.strip() and not re.fullmatch(r'\s*-{3,}\s*', x)]
+            json.dump({'page': n, 'src': lines, 'zh': zh}, open(out, 'w'), ensure_ascii=False)
+            done += 1
+            if done % 20 == 0:
+                print(f'  已完成 {done}/{len(todo)}', file=sys.stderr)
+
+    with ThreadPoolExecutor(max_workers=args.workers) as ex:
+        list(ex.map(work, todo))
 
     print(json.dumps({'slug': args.slug, 'translated': done,
                       'cached': skipped, 'failed': failed}, ensure_ascii=False))
