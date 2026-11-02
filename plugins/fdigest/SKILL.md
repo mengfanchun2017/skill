@@ -37,18 +37,32 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, mcp__mineru__parse_documents
 
 真实 token 属于私有配置，不放公开仓库；运行时从 `ccprivate/conf/fdigest.yaml` 读，缺失时用 `lark-cli drive +search --query digestlib` 现查。
 
+## 能力边界
+
+**做什么**：大宗文件（SEC 文件、年报、研报、白皮书）的结构化抽取、段落级检索、
+分节详解、全文中文化、飞书三层归档。
+
+**不做什么**：不做论文精排（那是 fpdf，复杂公式/双栏/原图提取）；不做报告撰写
+（那是 fworch）；不做外部调研（那是 fresearchframe）；**不自己实现翻译**——
+LLM 调用统一走 `scripts/llm.py`（与 fpdf 同源），本 skill 只决定「翻什么粒度」。
+
+**对华限制分析**：写公司档案时必须单列「对中国的限制与不友好」一节，区分
+(a) 招股书原文直接披露（可复核、标页码）与 (b) 外部可查证的公开政策事实。
+两者不混用、不互相背书。
+
 ## 三层结构
 
 ```
 主题档案层（横向，跨报告复用，增量更新）
-  公司档案 / 赛道档案 / 财务基准
+  公司档案 / 赛道与财务基准
         ↑ 报告里链接，不复制
 
 报告归档层（纵向，一份报告一套）
   YYYY-MM-DD 类型 主体 文档种类详解        ← 父文档：Falcon 视角分节详解
-    ├── 全文中文翻译
+    ├── 中文全文 · 章节（pN-M）             ← 按章节分卷，扁平挂，不套中间层
     ├── 来源与原文索引
-    └── 关键图表
+    ├── 关键图表
+    └── 原档 PDF                            ← SEC 只给 HTML 时本地转排生成
 
 检索索引层（本地，派生物）
   ~/digest-work/index.db  SQLite FTS5
@@ -120,12 +134,23 @@ python3 ~/.claude/skills/fdigest/scripts/search.py "净收入留存" --limit 5
 
 ### Step 5：翻译（可选，按需）
 
+**翻译不是本 skill 的能力，是复用的公共层。** LLM 预设解析与协议调用统一走
+`scripts/llm.py`（与 fpdf 同源），本 skill 只负责「翻什么」。
+
 ```bash
-python3 ~/.claude/skills/fdigest/scripts/translate.py <slug> --workers 12
-python3 ~/.claude/skills/fdigest/scripts/render_zh.py <slug>
+# 块级翻译（推荐）：按还原后的结构块翻，段落/标题不断裂
+python3 ~/.claude/skills/fdigest/scripts/translate_blocks.py <slug> --workers 12
+
+# 拼装为飞书文档（长文按页区间分卷）
+python3 ~/.claude/skills/fdigest/scripts/build_zh.py <slug> \
+  --title "章节名" --page-start 41 --page-end 143 --out ~/files/fdigest/vol-41.xml
 ```
 
-按页缓存，中断可续跑。实测 415 页 / 12 并发约 25 分钟，零失败。
+- 译文缓存 `zh-blocks/NNNN.json`，按页可续跑
+- 表格保持「表格→行→单元格」三层，拍平会让每行变成独立表格（实测踩过）
+- **长文档必须分卷**：4,000 块以上飞书 API 会超时（实测 1.4MB XML 直接 timeout），按章节切 5 卷各 350-1,100 块
+
+`translate.py`（逐行）+ `render_zh.py` 是早期实现，**逐行译文拼回段落会断裂**，仅保留给需要逐行对照的场景。
 
 ### Step 6：归档到飞书
 
@@ -159,8 +184,11 @@ python3 ~/.claude/skills/fdigest/scripts/render_zh.py <slug>
 | `extract.py` | 结构化抽取 | 源文件 → pages/heads/tables/images/text + manifest |
 | `index.py` | 建段落级索引 | 结构包 → SQLite FTS5 |
 | `search.py` | 中英文检索 | 查询 → 页码 + 章节 + 片段 + 飞书链接 |
-| `translate.py` | 并行分段翻译 | 结构包 → 逐页译文 JSON（可续跑） |
-| `render_zh.py` | 拼装译文 XML | 译文 JSON → 飞书 DocxXML（分卷） |
+| `llm.py` | **公共 LLM 层**（与 fpdf 共用） | 预设 + 协议自适应调用 |
+| `build_zh.py` | 版面结构还原 | 结构包 → 带标题层级/段落/表格的 DocxXML |
+| `translate_blocks.py` | 块级翻译（推荐） | 结构包 → zh-blocks/NNNN.json |
+| `translate.py` | 逐行翻译（旧） | 结构包 → 逐页逐行 JSON |
+| `render_zh.py` | 逐行译文拼装（旧） | 逐行 JSON → DocxXML |
 | `parents_tpl.xml` 等 | 文档模板 | 占位符 → 可上传 XML |
 
 ## 与 fpdf 的关系
