@@ -48,7 +48,7 @@ def extract_html(src):
                         maxsz = max(maxsz, float(ms.group(1)))
                     if 'font-weight:bold' in st:
                         bold = True
-           else:
+            else:
                 txt, maxsz, bold = strip_tags(inner), 0.0, False
             txt = re.sub(r'\s+', ' ', txt).strip()
             if not txt:
