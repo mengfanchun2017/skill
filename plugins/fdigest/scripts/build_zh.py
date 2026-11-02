@@ -170,7 +170,10 @@ def table_xml(rows):
         return ''
     first = round(COLWIDTH_TOTAL * 0.30)
     rest = round((COLWIDTH_TOTAL - first) / (ncol - 1))
-    cols = ''.join(f'<col width="{first if i == 0 else rest}"/>' for i in range(ncol))
+    # 均分后补差：round 会让 n 列累加偏离 822（实测 4 列得 823），飞书要求严格相等
+    widths = [first] + [rest] * (ncol - 1)
+    widths[-1] += COLWIDTH_TOTAL - sum(widths)
+    cols = ''.join(f'<col width="{w}"/>' for w in widths)
     out = [f'<table><colgroup>{cols}</colgroup>']
     for ri, r in enumerate(rows):
         padded = r + [''] * (ncol - len(r))
