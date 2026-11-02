@@ -149,7 +149,11 @@ def align_zh(page_lines, zh):
 
 def table_xml(rows):
     """还原为飞书真表格：colgroup 宽度和 = 822，首列 30%，其余均分。"""
-    rows = [r for r in rows if r]
+    # 传进来的可能是「行列表」也可能是单个字符串（调用方结构不一致时的兜底）
+    if isinstance(rows, str):
+        return ''
+    rows = [r if isinstance(r, list) else [r] for r in rows]
+    rows = [r for r in rows if r and any(str(c).strip() for c in r)]
     if not rows:
         return ''
     ncol = max(len(r) for r in rows)
@@ -160,9 +164,10 @@ def table_xml(rows):
     cols = ''.join(f'<col width="{first if i == 0 else rest}"/>' for i in range(ncol))
     out = [f'<table><colgroup>{cols}</colgroup>']
     for ri, r in enumerate(rows):
+        padded = r + [''] * (ncol - len(r))
         cells = ''.join(
             f'<td>{("<b>" + esc(c) + "</b>") if ri == 0 else esc(c)}</td>'
-            for c in (r + [''] * (ncol - len(r))) if c
+            for c in padded
         )
         body = f'<tr>{cells}</tr>'
         out.append(f'<thead>{body}</thead>' if ri == 0 else f'<tbody>{body}</tbody>')
