@@ -1,0 +1,78 @@
+<title>{{TITLE}}</title>
+
+<callout emoji="📄" background-color="light-gray">
+<p>本页不重存原文全文。原文 14MB HTML 存本地（版权与体积原因不重复占用飞书），这里记录来源、校验值和可复核路径。</p>
+</callout>
+
+<h1><span text-color="blue">一手来源</span></h1>
+
+<ul>
+<li><b>原始链接</b>：<a href="{{SRC_URL}}">{{SRC_URL}}</a></li>
+<li><b>披露机构</b>：美国证券交易委员会（SEC）EDGAR 系统</li>
+<li><b>表单类型</b>：S-1 注册说明书</li>
+<li><b>披露日期</b>：2026-10-26</li>
+<li><b>提交主体</b>：Anthropic, PBC</li>
+<li><b>CIK</b>：2130357</li>
+<li><b>Accession Number</b>：0001628280-26-067168</li>
+</ul>
+
+<h1><span text-color="blue">文件校验</span></h1>
+
+<callout emoji="🔐" background-color="light-blue">
+<p>SHA256：{{SHA256}}</p>
+<p>文件大小：{{SIZE}} 字节（约 13.5 MB）</p>
+<p>本机留存路径：{{LOCAL_PATH}}</p>
+<p>用途：判断 SEC 是否发布过 amendment（修正案）。源哈希变化即代表原文变更，已归档的详解需要复核。</p>
+</callout>
+
+<h1><span text-color="blue">解析产物清单</span></h1>
+
+<p>fdigest 对原文做了结构化解析，产物落在本地工作目录，供检索索引和复核使用。</p>
+
+<ul>
+<li><b>pages.json</b>：415 页逐页行结构，每行带字号和加粗标记，用于还原标题层级</li>
+<li><b>heads.json</b>：68 个章节标题及对应页码</li>
+<li><b>tables.json</b>：158 张表格的结构化行列</li>
+<li><b>images.json</b>：43 张图片（34 张为整页扫描图，9 张为内容图）</li>
+<li><b>text.txt</b>：157 万字符全文本，供段落级检索切块</li>
+</ul>
+
+<callout emoji="⚠️" background-color="light-red">
+<p>这份文件是混合态，解析时必须注意：</p>
+<p>大部分正文在 HTML 文本层，可直接抽取，零 OCR 成本；但客户案例跨页（DoorDash、Mozilla、Rakuten、Walmart、Jane Street、Salesforce）全部在图片里，文本层搜索命中为零。所以解析走文本层直抽加关键页 vision 识图双通道，既不无脑 OCR 也不纯文本。</p>
+</callout>
+
+<h1><span text-color="blue">章节定位表</span></h1>
+
+<table><colgroup><col width="330"/><col width="160"/><col width="332"/></colgroup>
+<thead><tr><th><p>章节</p></th><th><p>起始页</p></th><th><p>说明</p></th></tr></thead>
+<tbody>
+<tr><td><p>Prospectus Summary</p></td><td><p>16</p></td><td><p>发行概要，核心优势与治理概述</p></td></tr>
+<tr><td><p>The Offering</p></td><td><p>29</p></td><td><p>发行条款（价格待定）</p></td></tr>
+<tr><td><p>Summary Consolidated Financial Data</p></td><td><p>33</p></td><td><p>三年加两期财务总表，本文核心数据来源</p></td></tr>
+<tr><td><p>Risk Factors</p></td><td><p>38</p></td><td><p>92 页，占全文 22%</p></td></tr>
+<tr><td><p>Use of Proceeds</p></td><td><p>135</p></td><td><p>募资用途</p></td></tr>
+<tr><td><p>Capitalization</p></td><td><p>137</p></td><td><p>资本结构</p></td></tr>
+<tr><td><p>MD&amp;A</p></td><td><p>144</p></td><td><p>管理层讨论与分析，含算力承诺条款</p></td></tr>
+<tr><td><p>Business</p></td><td><p>190</p></td><td><p>业务详述，含客户案例与垂直方案</p></td></tr>
+<tr><td><p>Governance Structure</p></td><td><p>254</p></td><td><p>PBC、长期利益信托、创始人投票结构</p></td></tr>
+<tr><td><p>Compensation</p></td><td><p>275</p></td><td><p>高管薪酬</p></td></tr>
+<tr><td><p>Related Person Transactions</p></td><td><p>293</p></td><td><p>关联交易</p></td></tr>
+<tr><td><p>Description of Capital Stock</p></td><td><p>300</p></td><td><p>股权描述</p></td></tr>
+<tr><td><p>Financial Statements</p></td><td><p>344</p></td><td><p>合并财务报表全文</p></td></tr>
+<tr><td><p>Exhibit Index</p></td><td><p>412</p></td><td><p>附件清单（含全部合同文本索引）</p></td></tr>
+</tbody></table>
+
+<callout emoji="💡" background-color="light-yellow">
+<p>如果要做尽职调查，附件清单（p412）比正文更有价值——它列出了所有提交的合同文本名称，包括与 AWS、Google、Broadcom、AMD 的具体协议。正文只讲条款要点，附件里是原文合同。</p>
+</callout>
+
+<h1><span text-color="blue">复核方法</span></h1>
+
+<p>本库支持段落级检索，任何论断都可以按关键词反查原文页码。</p>
+
+<ol>
+<li>用 fdigest search 检索关键词，输出会带页码和章节路径</li>
+<li>用 lark-cli docs +fetch 拉取对应子文档核对上下文</li>
+<li>涉及数字的论断，一律回 p33 财务总表核对，不采信二手转述</li>
+</ol>
