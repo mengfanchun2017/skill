@@ -44,6 +44,14 @@ def init_db(conn):
         text,
         tokenize = 'unicode61'
     );
+    CREATE VIRTUAL TABLE IF NOT EXISTS zh_chunks USING fts5(
+        slug UNINDEXED,
+        page UNINDEXED,
+        chapter,
+        section,
+        text,
+        tokenize = 'trigram'
+    );
     CREATE TABLE IF NOT EXISTS figs (
         slug TEXT, page INTEGER, file TEXT, kind TEXT, caption TEXT
     );
@@ -115,6 +123,29 @@ def index_doc(conn, workdir, slug, meta=None):
                     'INSERT INTO chunks (slug,page,chapter,section,text) VALUES (?,?,?,?,?)',
                     (slug, p['page'], chap, sect, piece))
                 n += 1
+
+    # 中文索引：从 zh-blocks 取块级译文，按页 + 章节路径入库。
+    # 中文必须用 trigram（unicode61 对中文不分词）；不足 3 字由 search.py 走 LIKE。
+    zhdir = os.path.join(d, 'zh-blocks')
+    if os.path.isdir(zhdir):
+        conn.execute('DELETE FROM zh_chunks WHERE slug=?', (slug,))
+        zh_n = 0
+        for fn in sorted(os.listdir(zhdir)):
+            if not fn.endswith('.json'):
+                continue
+            z = json.load(open(os.path.join(zhdir, fn)))
+            pg = z.get('page')
+            chap, sect = chapter_path(heads, pg)
+            for b in z.get('blocks') or []:
+                t = (b.get('zh') or '').strip()
+                if len(t) < MIN_CHUNK // 4:      # 中文信息密度高，阈值放宽
+                    continue
+                for piece in split_long(t):
+                    conn.execute(
+                        'INSERT INTO zh_chunks (slug,page,chapter,section,text) VALUES (?,?,?,?,?)',
+                        (slug, pg, chap, sect, piece))
+                    zh_n += 1
+        print(f'  中文块 {zh_n}', file=sys.stderr)
 
     conn.execute('''INSERT OR REPLACE INTO docs
         (slug,title,source_url,source_file,sha256,pages,chars,feishu_url,archived_at,disclosed_at,subject,doc_kind)
