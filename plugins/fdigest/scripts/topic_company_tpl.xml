@@ -1,0 +1,100 @@
+<title>公司档案 Anthropic</title>
+
+<callout emoji="🏢" background-color="light-blue">
+<p>本页是横向复用档案，不跟单份报告走。读过新的 Anthropic 披露文件后增量更新此页，报告里只链接不复制。</p>
+<p>当前数据基准：2026-10-26 S-1 招股说明书。</p>
+</callout>
+
+<h1><span text-color="blue">公司基本面</span></h1>
+
+<ul>
+<li><b>全称</b>：Anthropic, PBC（特拉华州公益公司）</li>
+<li><b>成立</b>：2021 年，由一批定义了现代 AI 突破的研究者创立</li>
+<li><b>定位</b>：首先是一家研究实验室，使命是负责任地开发和维护先进 AI 以造福人类</li>
+<li><b>CEO</b>：Dario Amodei（联合创始人）　<b>President</b>：Daniela Amodei（联合创始人）</li>
+<li><b>总部</b>：548 Market Street PMB 90375, San Francisco, CA 94104</li>
+<li><b>员工</b>：约 5,300 人（2026-09-30）</li>
+<li><b>核心产品</b>：Claude 模型系列、Claude Platform、Claude Code、Claude Cowork、Claude in Chrome</li>
+</ul>
+
+<h1><span text-color="blue">四项自我宣称的核心优势</span></h1>
+
+<p>招股书把这些定义为「让我们区别于其他 AI 公司的结构性优势」，值得逐条评估而不是照单全收。</p>
+
+<h2>使命与专注</h2>
+
+<p>所有努力由单一使命引导。宣称这样可以把人才、研究、算力投资集中在最高价值的工作上，避免优先级冲突。</p>
+
+<callout emoji="🔍" background-color="light-gray">
+<p>评估：这是定性主张，无法证伪。但有制度支撑——PBC 章程加长期利益信托，至少保证了它不会被短期资本强行改道。比起纯口号，它有治理结构兜底。</p>
+</callout>
+
+<h2>人才与文化</h2>
+
+<p>宣称吸引并留住世界级人才，文化强调低自我（low-ego）、求真（truth-seeking），认为前沿能力与安全研究互为强化。</p>
+
+<callout emoji="🔍" background-color="light-gray">
+<p>评估：有可验证的侧面证据——人均 TTM 收入 660 万美元，一年前是 140 万；约 5,300 人做出半年 162.86 亿收入。无论文化如何，这个产出密度是客观事实。</p>
+</callout>
+
+<h2>前沿与安全研究</h2>
+
+<p>宣称持续聚焦智能前沿的研究是造出最强且最安全 AI 系统的必要条件，前沿能力与安全研究深度整合，直接影响模型设计、训练和部署。</p>
+
+<callout emoji="🔍" background-color="light-gray">
+<p>评估：这条最有争议，也最值得持续观察。行业普遍质疑「能力与安全能否同步推进」。招股书给了唯一可验证的抓手：闭环保密机制（closing the loop）——每代模型参与构建下一代，2026 年 9 月代码库 90% 贡献由 Claude 写成。这是效率证据，不是安全证据，两者要分开看。</p>
+</callout>
+
+<h2>算力策略</h2>
+
+<p>把算力当单一可互换池子，多芯片架构（AWS Trainium、Google TPU、NVIDIA GPU、AMD GPU），按边际产出动态调度。宣称这带来更优的价格性能比。</p>
+
+<callout emoji="🔍" background-color="light-gray">
+<p>评估：这条最实在。收入增速 1,368% 对成本增速 300%，是算力效率的直接财务体现。但代价是刚性承诺——Amazon、Google、AMD 的协议均不可撤销，支出不足要补差额。</p>
+</callout>
+
+<h1><span text-color="blue">财务坐标（S-1 口径）</span></h1>
+
+<table><colgroup><col width="280"/><col width="542"/></colgroup><tbody>
+<tr><td colspan="2" background-color="light-blue"><p><b>收入</b></p></td></tr>
+<tr><td><p>2023 至 2025</p></td><td><p>0.41 亿 → 3.86 亿 → 45.85 亿（美元）</p></td></tr>
+<tr><td><p>2026 上半年</p></td><td><p>162.86 亿（同比 2025 上半年 11.63 亿，增 1,300%）</p></td></tr>
+<tr><td colspan="2" background-color="light-blue"><p><b>盈利</b></p></td></tr>
+<tr><td><p>经营利润</p></td><td><p>2026 上半年 +6.93 亿，首次转正</p></td></tr>
+<tr><td><p>经营利润率</p></td><td><p>2026 上半年 +4%，Q2 单季 +8%</p></td></tr>
+<tr><td><p>调整后经营利润率</p></td><td><p>2026 上半年 +10%</p></td></tr>
+<tr><td colspan="2" background-color="light-blue"><p><b>资产</b></p></td></tr>
+<tr><td><p>累计融资</p></td><td><p>1,411 亿美元（截至 2026-06-30）</p></td></tr>
+<tr><td><p>现金及短期投资</p></td><td><p>1,316.51 亿美元</p></td></tr>
+<tr><td><p>总债务</p></td><td><p>62 亿美元（可转债本金）</p></td></tr>
+<tr><td><p>股东权益</p></td><td><p>负 1,276.19 亿美元</p></td></tr>
+</tbody></table>
+
+<h1><span text-color="blue">竞争位置</span></h1>
+
+<p>frontier AI 头部格局里，Anthropic 是第一个走 IPO 的。这个先发在披露上意义重大——它被迫成为行业财务基准的提供者。</p>
+
+<ul>
+<li><b>与企业市场的关系</b>：明确走企业优先路线，不追消费者流量。NRR 900% 说明这条路走通了。</li>
+<li><b>与云厂商的关系</b>：既是客户（买算力）又是被投资对象（AWS、Google 都是股东），多重身份带来议价张力。</li>
+<li><b>与开源的关系</b>：主打闭源前沿模型，靠性能和安全性而非开源生态竞争。</li>
+<li><b>与监管的关系</b>：主动拥抱监管框架叙事，把安全研究作为合规资产而非成本。</li>
+</ul>
+
+<callout emoji="💡" background-color="light-yellow">
+<p>Falcon 视角：研究一家 AI 公司时，看它怎么处理「与云厂商的关系」最能说明问题。Anthropic 一边从 AWS 和 Google 买算力、一边被它们持股、一边还和它们在企业市场正面竞争。这种结构在任何传统行业都极其罕见，它意味着算力供应方同时掌握着竞争对手的命脉——这是 frontier AI 行业独有的结构性矛盾。</p>
+</callout>
+
+<h1><span text-color="blue">待补充项</span></h1>
+
+<callout emoji="📝" background-color="light-gray">
+<p>以下字段需要后续报告增量填充，当前 S-1 未披露或不完整。</p>
+</callout>
+
+<ul>
+<li><b>定价与估值</b>：S-1 中发行价留空，待定价后填</li>
+<li><b>市占率</b>：未披露第三方份额数据，需外部报告补充</li>
+<li><b>竞品财务对比</b>：OpenAI、Google DeepMind 均未上市，无可比公开数据</li>
+<li><b>组织架构细节</b>：仅披露高管与董事，未披露完整组织图</li>
+<li><b>技术路线细节</b>：未披露模型参数、训练方法的具体规格</li>
+</ul>
