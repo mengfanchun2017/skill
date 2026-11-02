@@ -49,8 +49,22 @@ def extract_html(src):
     pages, tables, headings, images = [], [], [], []
 
     for idx, p in enumerate(pages_src, 1):
+        for tm in re.finditer(r'<table.*?</table>', p, re.S):
+            rows = []
+            for rm in re.finditer(r'<tr.*?</tr>', tm.group(0), re.S):
+                cells = [strip_tags(c) for c in re.findall(r'<t[dh][^>]*>(.*?)</t[dh]>', rm.group(0), re.S)]
+                cells = [c for c in cells if c]
+                if cells:
+                    rows.append(cells)
+            if rows:
+                tables.append({'page': idx, 'rows': rows})
+
+        # 表格结构已单独产出，正文行抽取前先摘掉 <table>：SEC 会把每个单元格
+        # 也渲染成绝对定位行，混进来会得到一堆断裂碎片（实测 p171 抽出 161 行，
+        # 其中 146 行在表格内）。摘掉后该页正文只剩 15 行，结构清晰。
+        p_lines_src = re.sub(r'(?is)<table.*?</table>', ' ', p)
         lines = []
-        for lm in LINE_RE.finditer(p):
+        for lm in LINE_RE.finditer(p_lines_src):
             style, inner = lm.group(1), lm.group(2)
             fonts = FONT_RE.findall(inner)
             if not fonts:
@@ -76,16 +90,6 @@ def extract_html(src):
             })
             if maxsz >= 12 and bold:
                 headings.append({'page': idx, 'size': maxsz, 'text': txt})
-
-        for tm in re.finditer(r'<table.*?</table>', p, re.S):
-            rows = []
-            for rm in re.finditer(r'<tr.*?</tr>', tm.group(0), re.S):
-                cells = [strip_tags(c) for c in re.findall(r'<t[dh][^>]*>(.*?)</t[dh]>', rm.group(0), re.S)]
-                cells = [c for c in cells if c]
-                if cells:
-                    rows.append(cells)
-            if rows:
-                tables.append({'page': idx, 'rows': rows})
 
         for im in IMG_RE.finditer(p):
             a = im.group(1)
