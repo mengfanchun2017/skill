@@ -138,17 +138,15 @@ def main():
             json.dump({'page': n, 'src': [], 'zh': []}, open(out, 'w'), ensure_ascii=False)
             skipped += 1
             continue
-        zh = []
-        for batch in para_batches(lines):
-            res = call(cfg, '\n'.join(batch))
-            if res is None:
-                failed += 1
-                print(f'  第 {n} 页翻译失败，跳过（重跑会补）', file=sys.stderr)
-                zh = None
-                break
-            zh.extend(x.strip() for x in res.split('\n---\n') if x.strip())
-        if zh is None:
+        # 一次请求译整页，但要求逐段编号返回，便于与原文段一一对应
+        numbered = '\n'.join(f'{i+1}. {l}' for i, l in enumerate(lines))
+        res = call(cfg, numbered)
+        if res is None:
+            failed += 1
+            print(f'  第 {n} 页翻译失败，跳过（重跑会补）', file=sys.stderr)
             continue
+        zh = [re.sub(r'^\s*\d+[.、]\s*', '', x).strip()
+              for x in res.split('\n') if x.strip()]
         json.dump({'page': n, 'src': lines, 'zh': zh}, open(out, 'w'), ensure_ascii=False)
         done += 1
         if done % 10 == 0:
