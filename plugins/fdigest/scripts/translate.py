@@ -22,8 +22,8 @@ SYSTEM = ('你是专业金融文件翻译。把给定英文段落译成中文，
           '① 数字、百分比、货币金额原样保留，不改写不换算；'
           '② 专有名词保留英文原名（如 Anthropic、Claude、AWS Trainium、Claude Code）；'
           '③ 不增删内容，不加解释，不合并段落；'
-          '④ 逐段输出，每段一行，段间用单独一行 ---  分隔，顺序与原文一致；'
-          '⑤ 只输出译文，不要任何前言后记。')
+          '④ 输入按 1. 2. 3. 编号，输出必须保持同样编号，编号后直接接译文；'
+          '⑤ 只输出译文行，不要任何前言后记，不要分隔线。')
 
 
 def load_preset(name=None):
@@ -146,7 +146,8 @@ def main():
             print(f'  第 {n} 页翻译失败，跳过（重跑会补）', file=sys.stderr)
             continue
         zh = [re.sub(r'^\s*\d+[.、]\s*', '', x).strip()
-              for x in res.split('\n') if x.strip()]
+              for x in res.split('\n')
+              if x.strip() and not re.fullmatch(r'\s*-{3,}\s*', x)]
         json.dump({'page': n, 'src': lines, 'zh': zh}, open(out, 'w'), ensure_ascii=False)
         done += 1
         if done % 10 == 0:
