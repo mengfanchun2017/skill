@@ -177,6 +177,7 @@ def main():
     ap.add_argument('--title', default='全文中文翻译')
     ap.add_argument('--out', default=None)
     ap.add_argument('--max-blocks', type=int, default=3000)
+    ap.add_argument('--vol', type=int, default=1, help='分卷号（超长文档）')
     args = ap.parse_args()
 
     d = os.path.join(args.workdir, args.slug)
@@ -187,41 +188,32 @@ def main():
     for t in tables:
         tb_by_page.setdefault(t['page'], []).append(t['rows'])
 
-    zhdir = os.path.join(d, 'zh')
-    zh_by_page = {}
-    if os.path.isdir(zhdir):
-        for fn in os.listdir(zhdir):
+    # 译文真相源是 zh-blocks（块级），不是 zh（旧的逐行）。块级译文与 build_blocks
+    # 的输出一一对应，直接按下标取用，不需要再对齐行。
+    zdir = os.path.join(d, 'zh-blocks')
+    zb_by_page = {}
+    if os.path.isdir(zdir):
+        for fn in os.listdir(zdir):
             if fn.endswith('.json'):
-                z = json.load(open(os.path.join(zhdir, fn)))
-                zh_by_page[z['page']] = z['zh']
+                z = json.load(open(os.path.join(zdir, fn)))
+                zb_by_page[z['page']] = z
 
     out = [f'<title>{esc(args.title)}</title>']
-    blocks_total = 1
-    missing = 0
+    nblocks = 1
+    missing, mismatched = 0, []
     for p in pages:
         n = p['page']
-        kept = _filter_lines(p['lines'])
-        zh = zh_by_page.get(n, [])
-        if len(zh) != len(kept):
+        zrec = zb_by_page.get(n)
+        blocks = build_blocks(p, [], [r for rs in tb_by_page.get(n, []) for r in rs])
+        zblocks = (zrec or {}).get('blocks') or []
+        if len(zblocks) != len(blocks):
+            if blocks:
+                mismatched.append(n)
             missing += 1
-            zh = zh + [''] * (len(kept) - len(zh))
-        # 筛后行 → 译文；再按同样规则把译文顺序贴到结构块
-        counter = {'i': 0}
 
-        def take(line_text):
-            i = counter['i']
-            counter['i'] += 1
-            return zh[i] if i < len(zh) else ''
-
-        rows_here = [r for rs in tb_by_page.get(n, []) for r in rs]
-        blocks = build_blocks(p, zh, rows_here)
-        # 逐块配译文：正文块按覆盖行数取，表格块不取
-        for b in blocks:
-            if b['kind'] == 'h' or b['kind'] == 'p':
-                b['zh'] = ' '.join(take(b['text']) for _ in range(1))
-
-        for b in blocks:
-            txt = b.get('zh') or b['text']
+        for i, b in enumerate(blocks):
+            zh = zblocks[i]['zh'] if i < len(zblocks) else ''
+            txt = (zh or '').strip() or b['text']
             if not txt:
                 continue
             if b['kind'] == 'h':
@@ -230,19 +222,25 @@ def main():
                     out.append(f'<h1><span text-color="blue">{esc(txt)}</span></h1>')
                 else:
                     out.append(f'<h{lvl}>{esc(txt)}</h{lvl}>')
-            elif b['kind'] == 'p':
+            else:
                 out.append(f'<p>{esc(txt)}</p>')
-        for rows in tb_by_page.get(n, []):
-            tx = table_xml(rows)
+
+        # 表格：优先用块级译文里的 tables（与 tables.json 结构一致）
+        ztables = (zrec or {}).get('tables') or []
+        src_tables = tb_by_page.get(n, [])
+        for ti, rows in enumerate(src_tables):
+            tr = ztables[ti] if ti < len(ztables) and ztables[ti] else rows
+            tx = table_xml(tr)
             if tx:
                 out.append(tx)
-        blocks_total += len(blocks)
+        nblocks += len(blocks) + len(src_tables)
 
     xml = '\n'.join(out)
     outp = args.out or os.path.join(d, 'zh-structured.xml')
     open(outp, 'w', encoding='utf-8').write(xml)
-    print(json.dumps({'out': outp, 'pages': len(pages), 'blocks': blocks_total,
-                      'zh_mismatch_pages': missing}, ensure_ascii=False))
+    print(json.dumps({'out': outp, 'pages': len(pages), 'blocks': nblocks,
+                      'pages_missing_zh': missing,
+                      'block_count_mismatch': mismatched[:10]}, ensure_ascii=False))
 
 
 if __name__ == '__main__':
