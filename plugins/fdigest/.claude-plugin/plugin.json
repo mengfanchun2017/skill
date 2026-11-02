@@ -1,0 +1,6 @@
+{
+  "name": "fdigest",
+  "version": "0.1.0",
+  "description": "大宗报告阅读与归档 — 结构化抽取、段落级检索、分节详解、飞书归档",
+  "author": {"name": "Francis Meng"}
+}
