@@ -43,30 +43,44 @@ def load_preset(name=None):
             'key': k, 'model': cfg.get('model')}
 
 
-def call(cfg, text, max_tokens=8000, retries=3):
-    body = json.dumps({
-        'model': cfg['model'],
-        'max_tokens': max_tokens,
-        'system': SYSTEM,
-        'messages': [{'role': 'user', 'content': text}],
-    }).encode()
+def endpoint(cfg):
+    """两种网关形态：base_url 已带 /v1 → OpenAI chat/completions；否则 Anthropic messages。"""
     base = cfg['base_url']
-    # base_url 有两种形态：OpenAI 风格已带 /v1，Anthropic 风格不带；避免拼成 /v1/v1
-    url = base + '/messages' if base.endswith('/v1') else base + '/v1/messages'
+    if base.endswith('/v1'):
+        return base + '/chat/completions', 'openai'
+    return base + '/v1/messages', 'anthropic'
+
+
+def call(cfg, text, max_tokens=8000, retries=3):
+    url, proto = endpoint(cfg)
+    if proto == 'openai':
+        body = json.dumps({
+            'model': cfg['model'], 'max_tokens': max_tokens,
+            'messages': [{'role': 'system', 'content': SYSTEM},
+                         {'role': 'user', 'content': text}],
+        }).encode()
+        headers = {'Content-Type': 'application/json',
+                   'Authorization': 'Bearer ' + cfg['key']}
+    else:
+        body = json.dumps({
+            'model': cfg['model'], 'max_tokens': max_tokens, 'system': SYSTEM,
+            'messages': [{'role': 'user', 'content': text}],
+        }).encode()
+        headers = {'Content-Type': 'application/json',
+                   'x-api-key': cfg['key'], 'anthropic-version': '2023-06-01'}
     for attempt in range(retries):
-        req = urllib.request.Request(url, data=body, headers={
-            'Content-Type': 'application/json',
-            'x-api-key': cfg['key'],
-            'anthropic-version': '2023-06-01',
-        })
+        req = urllib.request.Request(url, data=body, headers=headers)
         try:
             with urllib.request.urlopen(req, timeout=180) as r:
                 d = json.loads(r.read())
-            blocks = d.get('content') or []
-            out = ''.join(b.get('text', '') for b in blocks if b.get('type') == 'text')
+            if proto == 'openai':
+                out = (d.get('choices') or [{}])[0].get('message', {}).get('content') or ''
+            else:
+                blocks = d.get('content') or []
+                out = ''.join(b.get('text', '') for b in blocks if b.get('type') == 'text')
             if out.strip():
                 return out
-            # 空内容 → 回落非流式重试（内网网关已知问题）
+            # 空内容 → 已知网关故障，重试
             sys.stderr.write(f'  空内容，重试 {attempt+1}/{retries}\n')
         except urllib.error.HTTPError as e:
             sys.stderr.write(f'  HTTP {e.code}: {e.read()[:200]}\n')
