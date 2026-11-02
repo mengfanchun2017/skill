@@ -46,6 +46,23 @@ def _heading_level(sz):
     return None
 
 
+def _is_bold_lead(l):
+    """加粗引导行是不是小节标题。
+
+    SEC 的 10pt 加粗短行（"Our Core Advantages"）不靠字号分层，但结构上就是
+    H3。判据：加粗 + 短 + 不带句子标点 + 不是项目符号。带 "•" 的是列表项主体
+    （"•Adoption of Claude. The advancing..."），不能当标题。
+    """
+    t = l['t'].strip()
+    if not l['b'] or _heading_level(l['sz']):
+        return False
+    if t.startswith('•') or t.startswith('-'):
+        return False
+    if len(t) > 60 or t.endswith(('.', '。', ':', '：', ';', '；')):
+        return False
+    return len(t.split()) <= 8
+
+
 def _is_furniture(l):
     """页眉页脚 / 页码 / 目录行 —— 不属于正文。"""
     if l['y'] and (l['y'] < HEADER_Y or l['y'] > FOOTER_Y):
@@ -68,9 +85,21 @@ def build_blocks(page, zh_lines, table_rows):
     while i < len(lines):
         l = lines[i]
         lvl = _heading_level(l['sz']) if l['b'] else None
-        if lvl:
-            blocks.append({'kind': 'h', 'level': lvl, 'text': l['t']})
-            i += 1
+        if lvl or _is_bold_lead(l):
+            lvl = lvl or 3
+            # SEC 会把长标题折成多行（"Management's Discussion and Analysis of" +
+            # "Financial Condition and Results of Operations"），同字号同加粗且行距
+            # 相邻的一律并回一个标题，否则飞书目录里会出现两个半截标题。
+            txt, j = l['t'], i + 1
+            while (j < len(lines) and lines[j]['sz'] == l['sz'] and lines[j]['b']
+                   and (_heading_level(lines[j]['sz']) == lvl or not _heading_level(lines[j]['sz']))
+                   and not _is_bold_lead(lines[j])
+                   and abs(lines[j]['x'] - l['x']) < 8
+                   and 0 < lines[j]['y'] - lines[j - 1]['y'] <= 26):
+                txt += ' ' + lines[j]['t']
+                j += 1
+            blocks.append({'kind': 'h', 'level': lvl, 'text': txt})
+            i = j
             continue
         # 表格单元格散行：该行文本是某个单元格 → 由表格还原，正文跳过
         if l['t'].strip() in table_cells:
