@@ -78,7 +78,10 @@ def build_blocks(page, zh_lines, table_rows):
     标题行单独成块。表格页优先输出真表格，其单元格文本不再作为正文重复。
     """
     lines = [l for l in page['lines'] if not _is_furniture(l)]
-    lines.sort(key=lambda l: (round(l['x'] / 8), l['y']))   # 左栏在上，再按纵向
+    # 单栏 SEC 文档按 y 排序即可。早期按 x 再 y（分栏思路）会把居中标题拆散：
+    # 标题首行居中（x=140）、折行后靠左（x=72），按 x 排会让 "Transactions"
+    # 排到 "Relationships and Related Person" 之前。同 y 才按 x（真左右分栏）。
+    lines.sort(key=lambda l: (round(l['y'] / 4), l['x']))
 
     table_cells = set()
     blocks, i = [], 0
@@ -94,7 +97,7 @@ def build_blocks(page, zh_lines, table_rows):
             while (j < len(lines) and lines[j]['sz'] == l['sz'] and lines[j]['b']
                    and (_heading_level(lines[j]['sz']) == lvl or not _heading_level(lines[j]['sz']))
                    and not _is_bold_lead(lines[j])
-                   and abs(lines[j]['x'] - l['x']) < 8
+                   and abs(lines[j]['x'] - l['x']) < 90
                    and 0 < lines[j]['y'] - lines[j - 1]['y'] <= 26):
                 txt += ' ' + lines[j]['t']
                 j += 1
