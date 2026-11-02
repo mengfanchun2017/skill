@@ -50,7 +50,9 @@ def call(cfg, text, max_tokens=8000, retries=3):
         'system': SYSTEM,
         'messages': [{'role': 'user', 'content': text}],
     }).encode()
-    url = cfg['base_url'] + '/v1/messages'
+    base = cfg['base_url']
+    # base_url 有两种形态：OpenAI 风格已带 /v1，Anthropic 风格不带；避免拼成 /v1/v1
+    url = base + '/messages' if base.endswith('/v1') else base + '/v1/messages'
     for attempt in range(retries):
         req = urllib.request.Request(url, data=body, headers={
             'Content-Type': 'application/json',
