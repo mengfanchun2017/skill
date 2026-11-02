@@ -49,13 +49,21 @@ def main():
     if lang == 'auto':
         lang = 'zh' if re.search(r'[\u4e00-\u9fff]', q) else 'en'
 
-    if lang == 'zh' and has_zh:
-        # trigram 分词：按整串匹配中文子串，不做 OR 拆词（拆了会碎片命中）
+    if lang == 'zh' and has_zh and len(q) >= 3:
+        # trigram 分词：按整串匹配中文子串；<3 字时 trigram 无法命中，走 LIKE 兜底
         sql = '''SELECT z.slug, z.page, '' AS chapter, '' AS section,
                         snippet(zh_chunks, 2, '《', '》', '…', 40) AS snip,
                         d.title, d.feishu_url
                  FROM zh_chunks z LEFT JOIN docs d ON d.slug=z.slug
                  WHERE zh_chunks MATCH ?'''
+        fq = '"' + q.replace('"', '') + '"'
+    elif lang == 'zh' and has_zh:
+        sql = '''SELECT z.slug, z.page, '' AS chapter, '' AS section,
+                        substr(z.text,1,200) AS snip,
+                        d.title, d.feishu_url
+                 FROM zh_chunks z LEFT JOIN docs d ON d.slug=z.slug
+                 WHERE z.text LIKE ?'''
+        fq = '%' + q + '%'
     else:
         sql = '''SELECT c.slug, c.page, c.chapter, c.section,
                         snippet(chunks, 4, '《', '》', '…', 40) AS snip,
