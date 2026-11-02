@@ -1,0 +1,104 @@
+<title>财务基准 AI 板块盈利</title>
+
+<callout emoji="📊" background-color="light-blue">
+<p>本页是横向复用档案，收集 AI 板块公司的盈利数据，用于横向对比与趋势判断。读过新的财报后增量更新。</p>
+<p>当前数据基准：2026-11-02，核心一手数据来自 Anthropic S-1（2026-10-26）。</p>
+</callout>
+
+<callout emoji="⚠️" background-color="light-red">
+<p>口径警告，用这些数字前必须确认三件事。</p>
+<p>一是收入是否含云渠道分成。Anthropic 计入经 AWS、Google Cloud 等合作伙伴的销售；OpenAI 不计入。直接对比会系统性高估 Anthropic。</p>
+<p>二是看经营利润还是净利润。AI 公司普遍有大额可转债公允价值变动，导致净亏损剧烈失真——Anthropic 2026 上半年净亏损 807 亿，其中 724 亿是会计项，实际经营是盈利 6.93 亿。</p>
+<p>三是一手还是转述。媒体报道的数字往往滞后一个季度甚至更多。</p>
+</callout>
+
+<h1><span text-color="blue">Anthropic 盈利结构（一手，S-1 口径）</span></h1>
+
+<p>这是目前唯一有完整一手财务披露的 frontier AI 公司，因此成为整个板块的基准。</p>
+
+<h2>从亏损到转正的完整曲线</h2>
+
+<table><colgroup><col width="240"/><col width="582"/></colgroup><tbody>
+<tr><td colspan="2" background-color="light-blue"><p><b>收入（百万美元）</b></p></td></tr>
+<tr><td><p>2023 至 2025</p></td><td><p>41 → 386 → 4,585</p></td></tr>
+<tr><td><p>2025 上半年 → 2026 上半年</p></td><td><p>1,163 → 16,286（同比 +1,300%）</p></td></tr>
+<tr><td colspan="2" background-color="light-blue"><p><b>经营利润（百万美元）</b></p></td></tr>
+<tr><td><p>2023 至 2025</p></td><td><p>(551) → (2,980) → (8,060)</p></td></tr>
+<tr><td><p>2025 上半年 → 2026 上半年</p></td><td><p>(2,135) → +693（首次转正）</p></td></tr>
+<tr><td colspan="2" background-color="light-blue"><p><b>经营利润率</b></p></td></tr>
+<tr><td><p>2025 全年 → 2026 上半年</p></td><td><p>(176)% → +4%（Q2 单季 +8%）</p></td></tr>
+<tr><td colspan="2" background-color="light-blue"><p><b>调整后经营利润率</b></p></td></tr>
+<tr><td><p>2025 全年 → 2026 上半年</p></td><td><p>(106)% → +10%</p></td></tr>
+</tbody></table>
+
+<h2>成本结构：算力是绝对大头</h2>
+
+<p>2026 上半年费用构成（百万美元）。</p>
+
+<ul>
+<li><b>算力与基础设施</b>：8,945（占运营费用 53%）</li>
+<li><b>销售与市场</b>：3,168（19%，同比增速最快，说明在铺企业销售）</li>
+<li><b>人员</b>：3,152（19%）</li>
+<li><b>其他运营与管理</b>：1,714（10%）</li>
+</ul>
+
+<callout emoji="💡" background-color="light-yellow">
+<p>Falcon 视角：算力占运营费用 53%，这个比例解释了为什么 AI 公司必须先把规模做起来才能盈利——固定成本占比极高，只有收入跑过盈亏平衡点，利润率才会陡峭上升。也解释了为什么它们要死磕算力效率：省 1% 算力成本等于多 0.5% 经营利润率。</p>
+</callout>
+
+<h1><span text-color="blue">板块对比（口径已标注）</span></h1>
+
+<table><colgroup><col width="200"/><col width="311"/><col width="311"/></colgroup>
+<thead><tr><th><p>公司</p></th><th><p>收入</p></th><th><p>盈利状态</p></th></tr></thead>
+<tbody>
+<tr><td><p>Anthropic</p></td><td><p>2026 上半年 162.86 亿（<b>一手</b>，S-1）</p></td><td><p><b>经营已转正</b>：2026 上半年 +6.93 亿（一手）</p></td></tr>
+<tr><td><p>OpenAI</p></td><td><p>250 亿年化（2026-02）、500 亿年化（2026-09）（<b>媒体转述</b>）</p></td><td><p>仍亏损，高盛测算每 1 美元收入对应 0.69 美元亏损（<b>媒体转述</b>）</p></td></tr>
+<tr><td><p>Google / Microsoft</p></td><td><p>未单列 AI 收入</p></td><td><p>Google 增量营业利润率约 53%、Microsoft 约 59%（<b>媒体转述</b>）</p></td></tr>
+</tbody></table>
+
+<callout emoji="⚠" background-color="light-red">
+<p>上表中只有 Anthropic 那一行是可复核的一手数据。OpenAI 与 Google/Microsoft 的行为媒体转述，且 OpenAI 的数字在不同报道间差异极大（250 亿 / 500 亿 / 700 亿预期），引用时必须标注时点与来源，不能当成确定值。</p>
+</callout>
+
+<h1><span text-color="blue">三个可复用的判断框架</span></h1>
+
+<h2>AI 公司盈利的判断顺序</h2>
+
+<ol>
+<li>先看经营利润，不看净利润——可转债公允价值变动会完全掩盖真实经营情况</li>
+<li>再看经营利润率的变化斜率，不看绝对值——重资产模式下绝对值早期必然难看</li>
+<li>然后看算力成本占收入比的变化，这是效率改善的核心指标</li>
+<li>最后看 NRR，它决定收入曲线是线性还是加速</li>
+</ol>
+
+<h2>收入的可比性检查</h2>
+
+<ul>
+<li>是否含云渠道分成（Anthropic 含，OpenAI 不含）</li>
+<li>是年化（run-rate）还是实际期间收入（GAAP）——前者是外推，后者是已发生</li>
+<li>是总消费额（gross bookings）还是净收入（net revenue）</li>
+<li>是否含一次性项目（如 Anthropic 2025 年有 15 亿 Bartz 和解）</li>
+</ul>
+
+<h2>重资产模式的危险信号</h2>
+
+<ul>
+<li>算力承诺不可撤销且支出不足要补差额——需求下滑时成本不降</li>
+<li>股东权益为负——Anthropic 2026-06-30 股东权益 -1,276 亿</li>
+<li>累计亏损超过累计融资——需持续融资才能维持</li>
+<li>毛利率受算力价格波动直接影响——芯片供应紧张时利润被挤压</li>
+</ul>
+
+<h1><span text-color="blue">待补充项</span></h1>
+
+<callout emoji="📝" background-color="light-gray">
+<p>以下数据缺口需要在后续报告中补齐。</p>
+</callout>
+
+<ul>
+<li><b>OpenAI 一手财务</b>：未上市，无 SEC 披露，只能靠媒体转述</li>
+<li><b>Google / Microsoft 的 AI 分部损益</b>：均未单独披露，混在云业务里</li>
+<li><b>中国市场 AI 厂商盈利</b>：需单独检索国内上市或披露的厂商</li>
+<li><b>毛利率明细</b>：Anthropic S-1 未单列毛利率，只有经营利润率</li>
+<li><b>算力成本的量价拆分</b>：未披露单位算力价格与用量</li>
+</ul>
