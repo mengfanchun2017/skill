@@ -1,0 +1,104 @@
+<title>赛道档案 AI Agent</title>
+
+<callout emoji="🏁" background-color="light-blue">
+<p>本页是横向复用档案，不跟单份报告走。读过新的行业报告后增量更新，报告里只链接不复制。</p>
+<p>当前数据基准：2026-11-02 检索的外部公开信息。</p>
+</callout>
+
+<callout emoji="⚠️" background-color="light-red">
+<p>来源等级说明，本页严格分级标注，请勿混用。</p>
+<p>一级（一手披露，可复核）：公司向 SEC 提交的文件，如 S-1、10-K。本文所有 Anthropic 财务数字均来自此级。</p>
+<p>二级（机构研究，需付费原文）：Gartner、IDC 等研究机构的公开摘要转述。本页引用此类数据时标注为 Gartner 口径。</p>
+<p>三级（媒体转述，未核实原始出处）：财经媒体报道的分析师预测。本页引用时标注为媒体转述，不作为事实使用。</p>
+</callout>
+
+<h1><span text-color="blue">市场规模的三个不同口径</span></h1>
+
+<p>检索发现不同来源的市场规模数字差异巨大，根因是统计口径不同。混用会得出完全错误的结论，所以这里分开列。</p>
+
+<h2>AI 总支出（全行业，含基础设施）</h2>
+
+<callout emoji="📊" background-color="light-gray">
+<p>Gartner 口径：2026 年全球 AI 总支出约 2.52 万亿至 2.7 万亿美元，同比增长约 49.5%，2027 年预计 3.64 万亿。其中 AI 基础设施支出约 1.48 万亿，占总支出超过一半。</p>
+<p>来源：媒体转述 Gartner 预测，未取得 Gartner 原文报告。数字在两个转述来源间有 2.52 与 2.7 万的差异，取区间。</p>
+</callout>
+
+<h2>AI Agent 软件支出</h2>
+
+<callout emoji="📊" background-color="light-gray">
+<p>Gartner 口径：2026 年 AI Agent 软件支出预计 2,019 亿美元，另一转述称 2,065 亿美元（同比增长 139%）。</p>
+<p>另有统计口径（SaaS Ultra）：2026 年 AI Agent 市场约 109 亿美元，CAGR 超 45%，2030 年预计 503 亿。</p>
+<p>来源：媒体转述，两个口径差近 20 倍——前者含平台与基础设施，后者仅计纯 agent 软件。引用时必须说明是哪个口径。</p>
+</callout>
+
+<h2>企业 AI 编程 Agent（与 Anthropic 最相关的细分）</h2>
+
+<callout emoji="🎯" background-color="light-yellow">
+<p>Gartner 口径（2026-05-20 发布）：企业 AI 编程 agent 市场年化规模 98 亿至 110 亿美元（截至 2026 年 4 月）。</p>
+<p>这是与 Anthropic 主战场最贴近的细分市场。Gartner 首次为此品类单独出了 Magic Quadrant（此前是 AI Code Assistants 品类）。</p>
+<p>领导者象限四家：Anthropic、Cursor、GitHub、OpenAI。</p>
+</callout>
+
+<h1><span text-color="blue">Gartner 关键预判</span></h1>
+
+<ul>
+<li><b>40% 的企业应用</b>将在 2026 年底内置任务专用 AI agent，2025 年这一比例不足 5%</li>
+<li><b>65% 的工程团队</b>将在 2027 年认为 IDE 变成可选项</li>
+<li><b>Agentic AI 支出</b>在 2027 年将超过传统 chatbot 的消费总额</li>
+<li><b>Guardian Agents</b>（守护型 agent）作为新品类出现，需要安全标准化的多 agent 通信，集成成熟度预计未来 12 至 24 个月显著提升</li>
+<li><b>2026 年 Hype Cycle for Agentic AI</b>：焦点从对 agent 的兴奋转向理解其成熟路径</li>
+</ul>
+
+<callout emoji="💡" background-color="light-yellow">
+<p>Falcon 视角：Gartner 那句「人、流程和治理会成为约束 AI 编程 agent 价值释放的首要瓶颈」值得单独拎出来。这跟企业 AI 落地的实际经验完全吻合——工具买回来用不起来，卡住的从来不是模型能力，是组织配套。这条可以直接作为企业 AI 培训需求的论证依据：培训不是教工具怎么点，是补流程和治理的缺口。</p>
+</callout>
+
+<h1><span text-color="blue">竞争格局</span></h1>
+
+<h2>企业 AI 编程 agent 领导者</h2>
+
+<ul>
+<li><b>Anthropic</b>：Claude Code，走模型能力加 agent 自动化路线，企业渗透率高</li>
+<li><b>Cursor</b>：编辑器原生集成，开发者体验强</li>
+<li><b>GitHub</b>：Copilot 生态，装机量最大（累计付费用户约 470 万，市占约 42%）</li>
+<li><b>OpenAI</b>：Codex 系列，靠 ChatGPT 流量和企业销售双通道</li>
+</ul>
+
+<h2>收入口径的关键差异</h2>
+
+<callout emoji="⚠️" background-color="light-red">
+<p>检索到的一条重要事实：Anthropic 与 OpenAI 计算收入的方式不同。</p>
+<p>Anthropic 将通过 AWS、Google Cloud 等云合作伙伴产生的销售收入计入自己的收入；OpenAI 不包含这部分。这意味着两家的收入数字不能直接横向比较，Anthropic 的数字天然偏高。</p>
+<p>来源：媒体转述英国金融时报报道。这条口径差异比具体数字更重要，引用任何两家对比时都应该先说明。</p>
+</callout>
+
+<h1><span text-color="blue">与本份 S-1 的交叉验证</span></h1>
+
+<p>用一手数据校准二手数据，是本档案最重要的用法。</p>
+
+<table><colgroup><col width="250"/><col width="286"/><col width="286"/></colgroup>
+<thead><tr><th><p>指标</p></th><th><p>媒体口径</p></th><th><p>S-1 一手口径</p></th></tr></thead>
+<tbody>
+<tr><td><p>Anthropic 年化收入</p></td><td><p>约 300 亿美元（媒体，2026-04 官方披露转述）</p></td><td><p>2026 上半年 GAAP 收入 162.86 亿；Q2 单季 116 亿</p></td></tr>
+<tr><td><p>Anthropic TTM</p></td><td><p>未直接给</p></td><td><p>按 Q2 单季 116 亿年化约 464 亿；实际 TTM 需按四季合计</p></td></tr>
+<tr><td><p>经营是否盈利</p></td><td><p>媒体普遍称仍在亏损</p></td><td><p>2026 上半年经营利润 +6.93 亿，已转正</p></td></tr>
+</tbody></table>
+
+<callout emoji="🔍" background-color="light-gray">
+<p>交叉验证结论：媒体口径的 300 亿与 S-1 的 162.86 亿半年数不矛盾——前者是 4 月时点的年化，后者是上半年实际。但媒体普遍停留在「Anthropic 仍在大额亏损」的叙事，没有跟上 Q2 2026 经营转正这个事实。这说明二手信息在快速变化的公司上会系统性滞后。</p>
+<p>这也是本档案存在的理由：一手披露优先，二手只作补充和交叉验证。</p>
+</callout>
+
+<h1><span text-color="blue">待补充项</span></h1>
+
+<callout emoji="📝" background-color="light-gray">
+<p>以下数据缺口需要后续获取，当前只有二手转述或完全没有。</p>
+</callout>
+
+<ul>
+<li><b>Gartner 原文报告</b>：Magic Quadrant for Enterprise AI Coding Agents（2026-05-20），需付费或客户权限</li>
+<li><b>IDC 口径</b>：仅检索到转述「2030 年 45% 组织将大规模编排 AI 智能体」，未取得原文</li>
+<li><b>McKinsey 口径</b>：转述「2025 年 62% 组织已开展 agent 相关实践」，未取得原文</li>
+<li><b>细分行业渗透率</b>：金融、制造、医疗各自的 agent 采用率，无可靠公开数据</li>
+<li><b>中国市场对比</b>：国内 agent 市场规模与厂商格局，需单独的行业报告</li>
+</ul>
