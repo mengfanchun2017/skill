@@ -8,6 +8,7 @@ import argparse
 import json
 import os
 import sqlite3
+import re
 import sys
 
 DEFAULT_DB = os.path.expanduser('~/digest-work/index.db')
@@ -29,6 +30,8 @@ def main():
     ap.add_argument('--limit', type=int, default=8)
     ap.add_argument('--context', type=int, default=280, help='片段截断长度')
     ap.add_argument('--json', action='store_true')
+    ap.add_argument('--lang', choices=['auto', 'en', 'zh'], default='auto',
+                    help='检索语言：auto 按查询字符自动判断')
     args = ap.parse_args()
 
     if not os.path.exists(args.db):
@@ -40,14 +43,28 @@ def main():
         sys.exit('查询为空')
 
     conn = sqlite3.connect(args.db)
-    sql = '''SELECT c.slug, c.page, c.chapter, c.section,
-                    snippet(chunks, 4, '《', '》', '…', 40) AS snip,
-                    d.title, d.feishu_url
-             FROM chunks c LEFT JOIN docs d ON d.slug=c.slug
-             WHERE chunks MATCH ?'''
+    has_zh = conn.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name='zh_chunks'").fetchone()
+    lang = args.lang
+    if lang == 'auto':
+        lang = 'zh' if re.search(r'[\u4e00-\u9fff]', q) else 'en'
+
+    if lang == 'zh' and has_zh:
+        # trigram 分词：按整串匹配中文子串，不做 OR 拆词（拆了会碎片命中）
+        sql = '''SELECT z.slug, z.page, '' AS chapter, '' AS section,
+                        snippet(zh_chunks, 2, '《', '》', '…', 40) AS snip,
+                        d.title, d.feishu_url
+                 FROM zh_chunks z LEFT JOIN docs d ON d.slug=z.slug
+                 WHERE zh_chunks MATCH ?'''
+    else:
+        sql = '''SELECT c.slug, c.page, c.chapter, c.section,
+                        snippet(chunks, 4, '《', '》', '…', 40) AS snip,
+                        d.title, d.feishu_url
+                 FROM chunks c LEFT JOIN docs d ON d.slug=c.slug
+                 WHERE chunks MATCH ?'''
     params = [fq]
     if args.slug:
-        sql += ' AND c.slug=?'
+        sql += (' AND z.slug=?' if lang == 'zh' and has_zh else ' AND c.slug=?')
         params.append(args.slug)
     sql += ' ORDER BY rank LIMIT ?'
     params.append(args.limit)
