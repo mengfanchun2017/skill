@@ -19,7 +19,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from build_zh import build_blocks  # noqa: E402
-from translate import call, endpoint, load_preset  # noqa: E402
+from llm import call, load_preset  # noqa: E402  公共 LLM 层，与 fpdf 共用
 
 SYSTEM = (
     '你是金融文件的专业译者。把英文译成简体中文。规则：'
@@ -96,7 +96,7 @@ def main():
         if not texts:
             return []
         numbered = '\n'.join(f'{i+1}. {t}' for i, t in enumerate(texts))
-        res = call(cfg, numbered, max_tokens=8000)
+        res = call(cfg, (SYSTEM, numbered), max_tokens=8000)
         out = []
         for line in res.split('\n'):
             if not line.strip():
