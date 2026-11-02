@@ -194,7 +194,9 @@ def main():
     ap.add_argument('--title', default='全文中文翻译')
     ap.add_argument('--out', default=None)
     ap.add_argument('--max-blocks', type=int, default=3000)
-    ap.add_argument('--vol', type=int, default=1, help='分卷号（超长文档）')
+    ap.add_argument('--vol', type=int, default=0, help='分卷号（0=不分卷）')
+    ap.add_argument('--page-start', type=int, default=1)
+    ap.add_argument('--page-end', type=int, default=0)
     args = ap.parse_args()
 
     d = os.path.join(args.workdir, args.slug)
@@ -220,6 +222,8 @@ def main():
     missing, mismatched = 0, []
     for p in pages:
         n = p['page']
+        if args.page_end and not (args.page_start <= n <= args.page_end):
+            continue
         zrec = zb_by_page.get(n)
         blocks = build_blocks(p, [], [r for rs in tb_by_page.get(n, []) for r in rs])
         zblocks = (zrec or {}).get('blocks') or []
