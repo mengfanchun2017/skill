@@ -274,6 +274,7 @@ def main():
 
     out = [f'<title>{esc(args.title)}</title>']
     nblocks = 1
+    nimages = 0
     missing, mismatched = 0, []
     for p in pages:
         n = p['page']
@@ -287,7 +288,29 @@ def main():
                 mismatched.append(n)
             missing += 1
 
+        # 页面图片按 y 插入：渲染每个块时，把 y 小于该块起始 y 的图先放出来。
+        # 块没有记录 y，用「块的第一个文本行」的 y 反查。
+        page_imgs = list(img_by_page.get(n, []))
+        first_y = {}
+        fl = [l for l in p['lines'] if not _is_furniture(l)]
+        fl.sort(key=lambda l: (round(l['y'] / 4), l['x']))
+        bi = 0
+        for b in blocks:
+            head = b['text'][:30]
+            for cand in fl[bi:]:
+                if cand['t'].startswith(head[:12]):
+                    first_y[id(b)] = cand['y']
+                    bi = fl.index(cand)
+                    break
+
         for i, b in enumerate(blocks):
+            by = first_y.get(id(b))
+            if by is not None:
+                while page_imgs and page_imgs[0].get('y', 0) <= by:
+                    im = page_imgs.pop(0)
+                    pth = os.path.join(args.images_dir, im['file'])
+                    out.append(image_xml(pth, f"第 {im['page']} 页 · {im['file']}"))
+                    nimages += 1
             zh = zblocks[i]['zh'] if i < len(zblocks) else ''
             txt = (zh or '').strip() or b['text']
             if not txt:
@@ -304,6 +327,13 @@ def main():
             else:
                 out.append(f'<p>{esc(txt)}</p>')
 
+        # 页面尾部剩余的图（y 大于所有正文块）
+        while page_imgs:
+            im = page_imgs.pop(0)
+            pth = os.path.join(args.images_dir, im['file'])
+            out.append(image_xml(pth, f"第 {im['page']} 页 · {im['file']}"))
+            nimages += 1
+
         # 表格：优先用块级译文里的 tables（与 tables.json 结构一致）
         ztables = (zrec or {}).get('tables') or []
         src_tables = tb_by_page.get(n, [])
@@ -317,7 +347,10 @@ def main():
     xml = '\n'.join(out)
     outp = args.out or os.path.join(d, 'zh-structured.xml')
     open(outp, 'w', encoding='utf-8').write(xml)
+    cost = block_cost(xml)
     print(json.dumps({'out': outp, 'pages': len(pages), 'blocks': nblocks,
+                      'feishu_blocks': cost, 'images': nimages,
+                      'over_5000': cost > 5000,
                       'pages_missing_zh': missing,
                       'block_count_mismatch': mismatched[:10]}, ensure_ascii=False))
 
