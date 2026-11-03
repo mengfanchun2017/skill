@@ -200,9 +200,10 @@ done
 ### 硬约束
 
 - **源文件、索引库、中间产物全部落 `~/digest-work/`**，绝不落 `~/git/` 任何仓库
-- **lark-cli 的 `--content @file` 有路径 allowlist**（cwd / `/tmp` / `~/files`）。放别处 → 静默失败。统一用 `~/files/fdigest/` 中转
+- **lark-cli 的 `--content @file` / `<img path=>` 有路径 allowlist**（cwd / `/tmp` / `~/files`）。放别处 → 静默失败。统一用 `~/files/fdigest/` 中转
 - **子文档 parent-token 用 wiki node token**，用 docx obj_token 会报 `Parent node not found`（3380002）
 - **飞书文档格式**：H1 蓝字无底色、H2 及以下默认黑、无 `<hr/>`、无手动编号、colgroup 宽度和 = 822、正文不撒黑体、≥4 列表格转两列竖排
+- **块数上限是「单次请求」不是「文档总量」**：`DOC_OPERATION_BLOCK_LIMIT` 报的 `actual` 是这一次 append 的块数，上限 5,000。同一文档多次 append 累积到 17,563 块实测成功
 
 ### 检索层注意
 
