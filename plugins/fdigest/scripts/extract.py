@@ -99,9 +99,14 @@ def extract_html(src):
                 continue
             h_pt = float(st_m.group(1)) if st_m else 0.0
             w_pt = float(st_m.group(2)) if st_m else 0.0
+            # 图片的纵向位置在外层布局 div 上（<div top:103.8pt><div left:81pt><img>），
+            # img 标签自己只有尺寸。往回找最近的 top: 才能把图插到正文正确位置。
+            before = p[max(0, im.start() - 400):im.start()]
+            tops = re.findall(r'top:([\d.]+)pt', before)
             images.append({
                 'page': idx, 'file': src_m.group(1),
                 'height_pt': h_pt, 'width_pt': w_pt,
+                'y': float(tops[-1]) if tops else 0.0,
                 # 整页扫描图判据：高≈792pt 且宽≈612pt
                 'full_page_scan': h_pt >= 780 and w_pt >= 600,
             })
