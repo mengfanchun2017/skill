@@ -60,7 +60,7 @@ def main():
     # SEC 的 src 是相对文件名，基址 = 源文档 URL 去掉末段。
     # manifest 里没有 source_url 时（早期 extract 调用没传），退到 manifest
     # 的 source_file 同目录找同名图片；再不行才报错。
-    src_url = man.get('source_url') or ''
+    src_url = args.source_url or man.get('source_url') or ''
     base = src_url.rsplit('/', 1)[0] + '/' if '/' in src_url else ''
     local_dir = os.path.dirname(man.get('source_file') or '')
 
