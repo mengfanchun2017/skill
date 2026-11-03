@@ -37,6 +37,8 @@ def main():
     ap.add_argument('--max-px', type=int, default=1600)
     ap.add_argument('--quality', type=int, default=85)
     ap.add_argument('--no-resize', action='store_true')
+    ap.add_argument('--source-url', default='',
+                    help='源文档 URL；manifest 里缺 source_url 时用它补')
     args = ap.parse_args()
 
     d = os.path.join(args.workdir, args.slug)
@@ -52,12 +54,15 @@ def main():
         print(json.dumps({'error': 'no images.json', 'dir': d}))
         return
 
-    out = args.out or os.path.expanduser(f'~/files/fdigest/{args.slug}-images')
+    out = os.path.expanduser(args.out or f'~/files/fdigest/{args.slug}-images')
     os.makedirs(out, exist_ok=True)
 
-    # SEC 的 src 是相对文件名，基址 = 源文档 URL 去掉末段
+    # SEC 的 src 是相对文件名，基址 = 源文档 URL 去掉末段。
+    # manifest 里没有 source_url 时（早期 extract 调用没传），退到 manifest
+    # 的 source_file 同目录找同名图片；再不行才报错。
     src_url = man.get('source_url') or ''
     base = src_url.rsplit('/', 1)[0] + '/' if '/' in src_url else ''
+    local_dir = os.path.dirname(man.get('source_file') or '')
 
     seen, downloaded, already, failed = set(), 0, 0, []
     for im in imgs:
@@ -69,6 +74,16 @@ def main():
         if os.path.exists(fp) and os.path.getsize(fp) > 0:
             already += 1
             continue
+        # 本地已有原图（源文件同目录）优先，省一次下载
+        local = os.path.join(local_dir, fn) if local_dir else ''
+        if local and os.path.exists(local):
+            try:
+                import shutil
+                shutil.copy2(local, fp)
+                downloaded += 1
+                continue
+            except Exception:
+                pass
         if not base:
             failed.append({'file': fn, 'why': 'no source_url in manifest'})
             continue
