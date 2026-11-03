@@ -144,29 +144,56 @@ python3 ~/.claude/skills/fdigest/scripts/search.py "净收入留存" --limit 5
 
 详解文档必须带页码回溯表，所有论断可复核。
 
-### Step 5：翻译（可选，按需）
+### Step 5：翻译 + 排版（可选，按需）
 
-**翻译不是本 skill 的能力，是复用的公共层。** LLM 预设解析与协议调用统一走
-`scripts/llm.py`（与 fpdf 同源），本 skill 只负责「翻什么」。
+**翻译不是本 skill 的能力，是复用的公共层。** LLM 预设解析、协议调用、并发治理
+统一走 `scripts/llm.py`（与 fpdf / transliter 同源），本 skill 只负责「翻什么粒度」。
+
+`llm.py` 里的并发治理是从 transliter 移植的（一份代码两处用）：
+- `acquire_slot()` / `release_slot()` — flock 槽位池，**跨进程**在途上限。多份报告并行时
+  不会各开一个线程池叠成 N 倍打爆端点
+- `backoff()` — 尊重 `Retry-After`，否则指数退避加抖动。无脑 `sleep(1.5*n)` 在 429 下会拖死
+- `FALLBACK_FAIL_RATIO` — 失败率超 5% 才判「模型不行」整批重做。单段失败就重烧整轮代价极高
+- `RETRY_STATS` — 调并发唯一的依据就是 429 计数，以前只写 stderr 被 tail 掉
 
 ```bash
 # 块级翻译（推荐）：按还原后的结构块翻，段落/标题不断裂
-python3 ~/.claude/skills/fdigest/scripts/translate_blocks.py <slug> --workers 12
+LLM_MAX_INFLIGHT=8 python3 ~/.claude/skills/fdigest/scripts/translate_blocks.py <slug> --workers 12
 
-# 拼装为飞书文档（长文按页区间分卷）
+# 排版 + 嵌图 + 按飞书块数切段（一次产出全部段落）
 python3 ~/.claude/skills/fdigest/scripts/build_zh.py <slug> \
-  --title "章节名" --page-start 41 --page-end 143 --out ~/files/fdigest/vol-41.xml
+  --title "…中文版" --images-dir images-web --split-cost 4500
+# → <workdir>/zh-parts/part01.xml … part05.xml
 ```
 
 - 译文缓存 `zh-blocks/NNNN.json`，按页可续跑
 - 表格保持「表格→行→单元格」三层，拍平会让每行变成独立表格（实测踩过）
-- **长文档必须分卷**：4,000 块以上飞书 API 会超时（实测 1.4MB XML 直接 timeout），按章节切 5 卷各 350-1,100 块
+- **图片先压缩再嵌**：SEC 原图 142MB，缩到 1600px/quality85 后 10MB。不压直接传很慢
+- **块数换算**（实测标定，不是标签数）：`1 + <p> + <h> + <table> + 2×<td> + 2×<li>`。
+  单次 append 超 5,000 块被拒（`DOC_OPERATION_BLOCK_LIMIT`），按顶层块边界切段
 
 `translate.py`（逐行）+ `render_zh.py` 是早期实现，**逐行译文拼回段落会断裂**，仅保留给需要逐行对照的场景。
 
 ### Step 6：归档到飞书
 
 父文档挂到「报告归档」节点下，得到 wiki node token 后再建子文档（**子文档的 parent-token 必须是父文档的 wiki node token，不是 docx token**）。
+
+**全文中文化**：建**一个**子文档，逐段 `--command append` 直到全部段落。
+
+```bash
+cd ~/files/fdigest   # lark-cli 的 allowlist 是 cwd / /tmp / ~/files
+lark-cli docs +create --api-version v2 --title "<父文档名>中文版" --parent-token <wiki_node_token> --as user
+for i in 01 02 03 04 05; do
+  lark-cli docs +update --api-version v2 --doc <doc_token> --as user \
+    --command append --doc-format xml --content @./work/part$i.xml
+done
+```
+
+**不要 overwrite**：含 `<img>` / 白板 / 表格的文档禁 overwrite，只能 append 或 block_*。
+
+**HTML 来源不转 PDF**：源文件本来就是 HTML/网页时，**不强行先生成 PDF 再纳管**，
+在根文档（父文档）里写明「本报告原始提交为 HTML，无官方 PDF」即可。
+只有 PDF 来源才附原档 PDF。
 
 ## 关键约束
 
@@ -188,6 +215,27 @@ python3 ~/.claude/skills/fdigest/scripts/build_zh.py <slug> \
 - **HTML 有文本层就直抽，不丢给 OCR**：文本层免费，OCR 贵 100 倍
 - **只对整页扫描图做 vision**，且只做需要引用的页
 - **翻译按需**：415 页全文翻译约 25 分钟，不是每份都必须做
+- **图片压缩后再上传**：`thumbnail((1600,1600), LANCZOS)` + `quality=85`，实测 142MB→10MB
+
+## 什么时候走 workflow（fdigest-build）
+
+`fdigest-build` 是本 skill 的**确定性重活**部分：预检 → 索引 → 翻译 → 排版 → 格式断言，
+跑完停在**交付前**。
+
+**为什么拆出去**：实测首战 S-1 全流程 445 次 Bash 里，只有 18% 走到脚本，
+49% 是现场手写 python 和格式返工。这些环节没有判断空间，只是要跑对——
+该由代码编排，不该由模型每次重新发明。
+
+**为什么停在交付前**：详解撰写要论断可复核、上传删除不可逆，这两件必须人看。
+workflow 只保证「产物正确且可上传」，不替人做决定。
+
+```bash
+# 结构包已存在时
+Workflow({name: "fdigest-build", args: "<slug>"})
+```
+
+不在 workflow 范围内的（留在主上下文）：抓取源文件（要看 URL 是否可信）、
+写分节详解（要判断什么值得说）、决定传哪个父节点、删哪些旧节点。
 
 ## 脚本清单
 
@@ -196,8 +244,8 @@ python3 ~/.claude/skills/fdigest/scripts/build_zh.py <slug> \
 | `extract.py` | 结构化抽取 | 源文件 → pages/heads/tables/images/text + manifest |
 | `index.py` | 建段落级索引 | 结构包 → SQLite FTS5 |
 | `search.py` | 中英文检索 | 查询 → 页码 + 章节 + 片段 + 飞书链接 |
-| `llm.py` | **公共 LLM 层**（与 fpdf 共用） | 预设 + 协议自适应调用 |
-| `build_zh.py` | 版面结构还原 | 结构包 → 带标题层级/段落/表格的 DocxXML |
+| `llm.py` | **公共 LLM 层**（与 fpdf / transliter 共用） | 预设 + 协议自适应 + flock 并发闸 + 429 退避 |
+| `build_zh.py` | 版面结构还原 + 嵌图 + 切段 | 结构包 → DocxXML / 按块数切好的 zh-parts |
 | `translate_blocks.py` | 块级翻译（推荐） | 结构包 → zh-blocks/NNNN.json |
 | `translate.py` | 逐行翻译（旧） | 结构包 → 逐页逐行 JSON |
 | `render_zh.py` | 逐行译文拼装（旧） | 逐行 JSON → DocxXML |
