@@ -9,14 +9,92 @@
 真相源：~/.cache/llm-merged.json（init-llm.sh 合并 llm.json 的 key +
 llmprivate.json 的 base_url/model 后的快照）。
 """
+import fcntl
 import json
 import os
+import random
 import time
+import urllib.error
 import urllib.request
 
 LLM_MERGED = os.path.expanduser('~/.cache/llm-merged.json')
 LLM_CURRENT = os.path.expanduser('~/.claude/llm-current')
 BRIDGE = 'http://127.0.0.1:8898'
+
+# ---- 并发治理层（从 transliter/translate-doc.py 移植，两边共用一份）----
+# 为什么用 flock 槽位而不是进程内信号量：每份报告是一个独立 python 进程，
+# 彼此看不见，单靠进程内线程池约束不住总量（N 份报告 = N 个独立池，叠成 N 倍
+# 打爆端点）。flock 随进程消亡自动释放，被 kill 的进程不会漏占槽位。
+LLM_MAX_INFLIGHT = int(os.environ.get('LLM_MAX_INFLIGHT', '0'))   # 0 = 不限
+SLOT_DIR = os.environ.get('SLOT_DIR',
+                          os.path.expanduser('~/.cache/transliter/llm_slots'))
+RETRY_CODES = {408, 429, 500, 502, 503, 504}
+RETRY_N = int(os.environ.get('LLM_RETRY_N', '5'))
+RETRY_BASE = float(os.environ.get('LLM_RETRY_BASE', '1.5'))
+# 失败率超过此值才认为「这个模型不行」并整批重译。单个段落失败就重烧整轮
+# 代价极高（实测 2564 段文档仅 1 段失败也白烧 45 万 prompt token）。
+FALLBACK_FAIL_RATIO = float(os.environ.get('FALLBACK_FAIL_RATIO', '0.05'))
+
+_retry_lock = None
+RETRY_STATS = {'total': 0, 'http': {}, 'net': 0, 'empty': 0}
+
+
+def acquire_slot():
+    if LLM_MAX_INFLIGHT <= 0:
+        return None
+    os.makedirs(SLOT_DIR, exist_ok=True)
+    n = LLM_MAX_INFLIGHT
+    while True:
+        start = random.randrange(n)   # 随机起点，避免所有线程都从 0 号槽撞起
+        for k in range(n):
+            path = os.path.join(SLOT_DIR, 's%05d' % ((start + k) % n))
+            try:
+                fd = os.open(path, os.O_CREAT | os.O_RDWR, 0o600)
+            except OSError:
+                continue
+            try:
+                fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                return fd
+            except OSError:
+                os.close(fd)
+        time.sleep(0.02 + random.uniform(0, 0.05))
+
+
+def release_slot(fd):
+    if fd is None:
+        return
+    try:
+        fcntl.flock(fd, fcntl.LOCK_UN)
+    finally:
+        os.close(fd)
+
+
+def backoff(e, attempt):
+    """优先尊重 Retry-After，否则指数退避加抖动。"""
+    try:
+        ra = e.headers.get('Retry-After')
+    except Exception:
+        ra = None
+    if ra:
+        try:
+            return max(0.0, float(ra))
+        except ValueError:
+            pass
+    return RETRY_BASE ** (attempt + 1) + random.uniform(0, 0.5)
+
+
+def count_retry(kind, code=None):
+    """调并发时唯一的依据就是 429 有多少。以前只写 stderr，一被 tail 就丢。"""
+    import threading
+    global _retry_lock
+    if _retry_lock is None:
+        _retry_lock = threading.Lock()
+    with _retry_lock:
+        RETRY_STATS['total'] += 1
+        if code is not None:
+            RETRY_STATS['http'][str(code)] = RETRY_STATS['http'].get(str(code), 0) + 1
+        else:
+            RETRY_STATS[kind] = RETRY_STATS.get(kind, 0) + 1
 
 
 def load_preset(name=None):
@@ -61,8 +139,8 @@ def endpoint(cfg):
     return base + '/v1/messages', 'anthropic'
 
 
-def call(cfg, text, max_tokens=8000, retries=3, temperature=0.2):
-    """发一次请求，返回正文字符串。空内容/超时/5xx 会重试。"""
+def call(cfg, text, max_tokens=8000, retries=None, temperature=0.2):
+    """发一次请求，返回正文字符串。429/5xx 按 Retry-After 或指数退避重试。"""
     url, proto = endpoint(cfg)
     sys_prompt = None
     if isinstance(text, tuple):        # (system, user)
@@ -93,7 +171,10 @@ def call(cfg, text, max_tokens=8000, retries=3, temperature=0.2):
     req = urllib.request.Request(
         url, data=json.dumps(body).encode(), headers=hdrs)
     last = None
-    for attempt in range(retries):
+    for attempt in range(RETRY_N if retries is None else max(retries, RETRY_N)):
+        last_attempt = attempt == (RETRY_N if retries is None else max(retries, RETRY_N)) - 1
+        wait = 0.0
+        slot = acquire_slot()      # 跨进程在途闸：槽位抢不到就在这里等
         try:
             with urllib.request.urlopen(req, timeout=600) as r:
                 d = json.loads(r.read())
@@ -106,7 +187,21 @@ def call(cfg, text, max_tokens=8000, retries=3, temperature=0.2):
             if out.strip():
                 return out
             last = 'empty content'
+            count_retry('empty')
+        except urllib.error.HTTPError as e:
+            last = f'HTTP {e.code}'
+            if e.code not in RETRY_CODES or last_attempt:
+                raise RuntimeError(f'LLM 调用失败: {last}')
+            wait = backoff(e, attempt)
+            count_retry('http', e.code)
         except Exception as e:
             last = str(e)
-        time.sleep(1.5 * (attempt + 1))
+            if last_attempt:
+                break
+            wait = RETRY_BASE ** (attempt + 1) + random.uniform(0, 0.5)
+            count_retry('net')
+        finally:
+            release_slot(slot)     # 退避期间让出槽位，别占着空转
+        if wait:
+            time.sleep(wait)
     raise RuntimeError(f'LLM 调用失败: {last}')
