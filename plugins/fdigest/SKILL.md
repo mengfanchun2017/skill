@@ -246,6 +246,7 @@ Workflow({name: "fdigest-build", args: "<slug>"})
 | `index.py` | 建段落级索引 | 结构包 → SQLite FTS5 |
 | `search.py` | 中英文检索 | 查询 → 页码 + 章节 + 片段 + 飞书链接 |
 | `llm.py` | **公共 LLM 层**（与 fpdf / transliter 共用） | 预设 + 协议自适应 + flock 并发闸 + 429 退避 |
+| `prepare_images.py` | 下载 + 压缩原文图片 | manifest+images → `~/files/fdigest/<slug>-images/` |
 | `build_zh.py` | 版面结构还原 + 嵌图 + 切段 | 结构包 → DocxXML / 按块数切好的 zh-parts |
 | `translate_blocks.py` | 块级翻译（推荐） | 结构包 → zh-blocks/NNNN.json |
 | `translate.py` | 逐行翻译（旧） | 结构包 → 逐页逐行 JSON |
