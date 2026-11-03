@@ -1,39 +1,20 @@
 <title>{{TITLE}}</title>
 
 <callout emoji="🖼️" background-color="light-gray">
-<p>这份 S-1 共 43 张图片，其中 34 张是整页扫描图（封面、案例页、章节扉页），9 张是内容图（图表、示意图）。本页列出对理解业务有价值的关键图，并标注其在原文的页码与内容类型。</p>
-<p>整页扫描图多为设计与案例展示，不含财务数据；真正的数据在文本层的 158 张表格里。</p>
+<p>{{IMG_SUMMARY}}</p>
+<p>下图均为原文图片，已按出现页码顺序嵌入，可直接判断哪张需要细看或做视觉处理。</p>
 </callout>
 
-<h1><span text-color="blue">值得关注的图</span></h1>
+<h1><span text-color="blue">{{IMG_HEADING}}</span></h1>
 
-<table><colgroup><col width="280"/><col width="140"/><col width="402"/></colgroup>
-<thead><tr><th><p>文件名</p></th><th><p>页码</p></th><th><p>内容</p></th></tr></thead>
-<tbody>
-<tr><td><p>business2a.jpg</p></td><td><p>190 区</p></td><td><p>Business 章节示意，模型与平台结构</p></td></tr>
-<tr><td><p>mda2aa.jpg</p></td><td><p>144 区</p></td><td><p>MD&amp;A 数据图，收入与成本趋势</p></td></tr>
-<tr><td><p>mda3aa.jpg</p></td><td><p>144 区</p></td><td><p>MD&amp;A 数据图</p></td></tr>
-<tr><td><p>mda4aa.jpg</p></td><td><p>144 区</p></td><td><p>MD&amp;A 数据图</p></td></tr>
-<tr><td><p>a2026-09x27xgraphicsxcompe.jpg</p></td><td><p>算力章节</p></td><td><p>算力效率对比图</p></td></tr>
-<tr><td><p>business4a.jpg</p></td><td><p>190 区</p></td><td><p>业务结构图</p></td></tr>
-<tr><td><p>business5b.jpg</p></td><td><p>190 区</p></td><td><p>业务结构图</p></td></tr>
-</tbody></table>
+<p>{{IMG_INTRO}}</p>
 
-<callout emoji="⚠️" background-color="light-red">
-<p>关键提醒：客户案例页（DoorDash、Mozilla、Rakuten、Walmart、Jane Street、Salesforce、Lilly、SAP、PayPal、Shopify、Verizon、Salesforce、Travelers、UST、MercadoLibre、Bristol、Legora、AIG）全部是整页扫描图，文本层搜索命中为零。</p>
-<p>这意味着：如果想引用某个客户案例的具体表述，必须做 vision 识别，不能靠文本检索。本文详解未引用这些案例，避免引入识别误差。</p>
-</callout>
-
-<h1><span text-color="blue">图片获取方式</span></h1>
-
-<p>所有图片在 SEC EDGAR 目录下可直接下载，相对原始 HTML 的路径。</p>
-
-<ul>
-<li><b>目录地址</b>：https://www.sec.gov/Archives/edgar/data/2130357/000162828026067168/</li>
-<li><b>索引文件</b>：同目录 index.json，列出全部 90 个文件的名称与大小</li>
-<li><b>访问要求</b>：SEC 要求请求带 User-Agent 声明，否则拒绝</li>
-</ul>
+<!-- 每张图一段：<!-- IMG_ITEM_BEGIN --> -->
+<h2>{{IMG_PAGE_TITLE}}</h2>
+<img path="@{{IMG_PATH}}" caption="{{IMG_CAPTION}}"/>
+<p>{{IMG_NOTE}}</p>
+<!-- IMG_ITEM_END -->
 
 <callout emoji="💡" background-color="light-yellow">
-<p>Falcon 视角：这份文件的图表价值远低于财务表格。它是一份文字与表格为主的披露文件，图主要承担设计与案例展示功能。做分析时精力应该放在 p33 财务总表和 MD&amp;A 的文字条款上，而不是图。</p>
+<p>{{IMG_TAKEAWAY}}</p>
 </callout>
