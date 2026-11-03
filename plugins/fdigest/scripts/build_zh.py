@@ -156,6 +156,50 @@ def align_zh(page_lines, zh):
     return idx_of
 
 
+def block_cost(xml):
+    """飞书真实块数（实测标定，不是标签数）。
+
+    DOC_OPERATION_BLOCK_LIMIT 的 actual 值 = 1(标题) + <p> + <h> + <table>
+    + 2×<td> + 2×<li>。表格每个单元格按 2 块算（cell + 内部 p），行/列组不计。
+    实测 vol-344 用此式得 8,312，API 报 8,313。
+    """
+    return (1 + len(re.findall(r'<p\b', xml)) + len(re.findall(r'<h[1-3]\b', xml))
+            + len(re.findall(r'<table\b', xml)) + 2 * len(re.findall(r'<t[hd]\b', xml))
+            + 2 * len(re.findall(r'<li\b', xml)))
+
+
+def split_by_cost(xml, limit=4500):
+    """按顶层块累积块数切成若干段，每段 < limit。
+
+    飞书 append 是累积计数：同一文档多次追加的总块数不能超 5000。
+    单段超限时 API 直接拒，所以切分要按顶层块边界，不能拦腰断表格。
+    """
+    parts = re.split(r'(?=<(?:h1|h2|h3|p|table|ul|ol|callout|blockquote|img)\b)', xml)
+    chunks, cur, cur_cost = [], [], 0
+    for p in parts:
+        if not p.strip():
+            continue
+        c = block_cost(p)
+        if cur and cur_cost + c > limit:
+            chunks.append(''.join(cur))
+            cur, cur_cost = [p], c
+        else:
+            cur.append(p)
+            cur_cost += c
+    if cur:
+        chunks.append(''.join(cur))
+    return chunks
+
+
+def image_xml(path, caption=''):
+    """嵌真图。实测 <img path="@./xxx.jpg"> 会生成 block_type=image。
+
+    path 必须相对 CLI 当前工作目录（lark-cli 的 allowlist：cwd / /tmp / ~/files）。
+    """
+    cap = f' caption="{esc(caption)}"' if caption else ''
+    return f'<img path="@{path}"{cap}/>'
+
+
 def table_xml(rows):
     """还原为飞书真表格：colgroup 宽度和 = 822，首列 30%，其余均分。"""
     # 传进来的可能是「行列表」也可能是单个字符串（调用方结构不一致时的兜底）
@@ -197,6 +241,8 @@ def main():
     ap.add_argument('--vol', type=int, default=0, help='分卷号（0=不分卷）')
     ap.add_argument('--page-start', type=int, default=1)
     ap.add_argument('--page-end', type=int, default=0)
+    ap.add_argument('--images-dir', default=None,
+                    help='图片本地目录（相对 lark-cli cwd）；给了才嵌图')
     args = ap.parse_args()
 
     d = os.path.join(args.workdir, args.slug)
@@ -206,6 +252,15 @@ def main():
     tb_by_page = {}
     for t in tables:
         tb_by_page.setdefault(t['page'], []).append(t['rows'])
+
+    # 图片按页归组，页内按 y 排序 —— 正文逐块渲染时按行距插到对应位置
+    img_by_page = {}
+    ipath = os.path.join(d, 'images.json')
+    if args.images_dir and os.path.exists(ipath):
+        for im in json.load(open(ipath)):
+            img_by_page.setdefault(im['page'], []).append(im)
+        for v in img_by_page.values():
+            v.sort(key=lambda x: x.get('y', 0))
 
     # 译文真相源是 zh-blocks（块级），不是 zh（旧的逐行）。块级译文与 build_blocks
     # 的输出一一对应，直接按下标取用，不需要再对齐行。
