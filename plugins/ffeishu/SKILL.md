@@ -304,6 +304,29 @@ grep -c '<whiteboard\|<sheet\|<bitable\|<img\|<file'
 - 同一 block 的 `block_replace` 只能执行一次
 - `str_replace` 不能跨 block；pattern 须文档内唯一
 - 白板只能 `block_insert_after` 插入，不能 `str_replace` 插 `<whiteboard>` 标签
+- 🚨 **`block_replace --block-id -1` 会截断文档**：`-1` 表示「到文档末尾」，会把后面的内容全部替换掉。
+  2026-11-03 实测用它改标题，19.5KB 正文只剩 6.2KB
+
+### 改文档标题（唯一可行路径）
+
+```bash
+# 本地有完整 XML → 改 <title> 后整篇 overwrite。文档标题与 wiki 节点标题同步
+lark-cli docs +update --api-version v2 --doc <doc_token> --as user \
+  --command overwrite --doc-format xml --content @./doc_fixed.xml
+```
+
+- ❌ `block_replace --block-id -1`（截断风险）
+- ❌ wiki `update_title` API（缺 `wiki:wiki wiki:node:update` scope，报 99991679）
+- 改 `<title>` 同步 wiki 节点标题，不需要额外 scope
+
+### 误操作恢复
+
+```bash
+lark-cli docs +history-list --doc <token> --as user --format json   # 取 history_version_id
+lark-cli docs +history-revert --doc <token> --history-version-id <id> --as user
+```
+
+`+fetch --revision-id N` 不能预览历史版本（返回空），只能回滚后看。
 
 ### Step 5: 验证（必做，ok:true 不代表生效）
 
