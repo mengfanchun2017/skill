@@ -85,6 +85,43 @@ lark-cli docs +update --api-version v2 --doc <doc_token> --as user --command app
 - 删除 Drive 文件（**必须带 `--params '{"type":"file"}'`**，否则 99992402 validation failed）：
   `lark-cli api DELETE /open-apis/drive/v1/files/{token} --params '{"type":"file"}'`
 
+### 正文嵌图（实测 2026-11-03，可用的唯一写法）
+
+```xml
+<img path="@./images-web/business2a.jpg" caption="第 22 页 · 核心财务摘要图"/>
+```
+
+```bash
+cd ~/files/fdigest      # cwd 必须在 allowlist 内（cwd / /tmp / ~/files）
+lark-cli docs +update --api-version v2 --doc <doc> --as user \
+  --command append --doc-format xml --content @./part01.xml
+# 返回 new_blocks[].block_type = "image" 即成功
+```
+
+- `path` 必须**相对 CLI 当前工作目录**，且目录在 allowlist 内，否则静默丢图
+- 图会作为独立 block 插在对应位置，跟正文段落可任意交错
+- **大图必须先压缩**：实测 SEC 原图 142MB（单张 7MB），压到 1600px / quality85 后 10MB，
+  飞书正文宽度只有约 800px，看不出差别
+- 图片压缩用 `uv run --with pillow`（本机无 system PIL）
+
+### 长文合并成一篇（块数切段）
+
+单次写请求上限 5,000 块，但**不是文档总量上限**——同一文档多次 append 可累积上万块。
+
+```bash
+# 按顶层块边界切成 <4500 块的多段（别拦腰断表格）
+python3 build_zh.py <slug> --split-cost 4500   # → zh-parts/part01.xml …
+lark-cli docs +create --api-version v2 --title "…中文版" --parent-token <parent> --as user
+for i in 01 02 03 04 05; do
+  lark-cli docs +update --api-version v2 --doc <doc> --as user \
+    --command append --doc-format xml --content @./part$i.xml
+done
+```
+
+- 块数换算（实测标定）：`1 + <p> + <h> + <table> + 2×<td> + 2×<li>`
+- 实测 415 页 / 158 表 / 43 图 → 17,563 块 / 1.2MB，分 5 段全成功
+- 报 `actual: 8313 limit: 5000` 时 `actual` 是**这一段**的块数，切细就行，不用拆文档
+
 ## 关键约束
 
 - **含嵌入资源（白板/图片/电子表格）禁止 overwrite** — 只能用 str_replace / block_insert_after / block_delete
