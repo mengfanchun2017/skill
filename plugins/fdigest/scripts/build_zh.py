@@ -243,6 +243,9 @@ def main():
     ap.add_argument('--page-end', type=int, default=0)
     ap.add_argument('--images-dir', default=None,
                     help='图片本地目录（相对 lark-cli cwd）；给了才嵌图')
+    ap.add_argument('--split-cost', type=int, default=0,
+                    help='按飞书块数切成多段（0=不切）。单次 append 上限 5000')
+    ap.add_argument('--split-dir', default=None, help='多段输出目录')
     args = ap.parse_args()
 
     d = os.path.join(args.workdir, args.slug)
@@ -345,9 +348,28 @@ def main():
         nblocks += len(blocks) + len(src_tables)
 
     xml = '\n'.join(out)
+    cost = block_cost(xml)
+
+    if args.split_cost and cost > args.split_cost:
+        spdir = args.split_dir or os.path.join(d, 'zh-parts')
+        os.makedirs(spdir, exist_ok=True)
+        for f in os.listdir(spdir):
+            if f.endswith('.xml'):
+                os.remove(os.path.join(spdir, f))
+        chunks = split_by_cost(xml, args.split_cost)
+        paths = []
+        for i, c in enumerate(chunks, 1):
+            fp = os.path.join(spdir, f'part{i:02d}.xml')
+            open(fp, 'w', encoding='utf-8').write(c)
+            paths.append(fp)
+        print(json.dumps({'parts': paths, 'pages': len(pages),
+                          'feishu_blocks': cost, 'part_counts': [block_cost(c) for c in chunks],
+                          'images': nimages, 'pages_missing_zh': missing,
+                          'block_count_mismatch': mismatched[:10]}, ensure_ascii=False))
+        return
+
     outp = args.out or os.path.join(d, 'zh-structured.xml')
     open(outp, 'w', encoding='utf-8').write(xml)
-    cost = block_cost(xml)
     print(json.dumps({'out': outp, 'pages': len(pages), 'blocks': nblocks,
                       'feishu_blocks': cost, 'images': nimages,
                       'over_5000': cost > 5000,
