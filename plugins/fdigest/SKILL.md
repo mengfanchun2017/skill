@@ -278,6 +278,32 @@ HTML（SEC 披露、网页年报）走本 skill 的 extract.py；PDF 走 fpdf。
 | 建表报 `validation_error` | 表名重复（同名表已存在） | 先改名或删旧表 |
 | 删除字段报 `unsafe_operation_blocked` | 不能删表里唯一字段 | 新建正确表后删旧表 |
 | 表格列宽全变 120 | 用了废弃的 `<lark-table>` 语法 | 改标准 `<table>` + `<colgroup>`，宽度和 822 |
+| fetch 看到 `<colgroup><col/><col/>` 宽度全 0 | 用了 `--detail simple`（默认），它不返回 width | 校验必须用 `--detail with-ids` 或 `full` |
+| append 报 `DOC_OPERATION_BLOCK_LIMIT actual:8313 limit:5000` | `actual` 是**这一次** append 的块数，不是文档总量。表格每格算 2 块 | 用 `split_by_cost()` 切成 <4500 块的多段，逐段 append 到同一文档 |
+| `wiki +node-delete` 报 `--obj-type is required` | 必须显式给文档类型 | 加 `--obj-type docx`（或 file/sheet） |
+| `wiki +node-delete` 报 `--space-id does not match` | 用了 `+space-list` 的 space_id，不是节点真实所属 | 用 `wiki +node-get` 返回的 `space_id` |
+| `wiki ... update_title` 报 `missing_scope` | 缺 `wiki:wiki wiki:node:update` 授权 | 别走 wiki API；直接 `docs +update --command overwrite` 传带新 `<title>` 的 XML，文档标题与 wiki 标题会同步 |
+| `block_replace --block-id -1` 把文档截断成只剩首页 | `-1` 是「替换到文档末尾」，不是「最后一个块」 | **别用它改标题**。改标题一律 `overwrite` 整篇（本地有完整 XML 时） |
+
+### 改父文档标题的正确做法（实测踩过）
+
+```bash
+# ❌ block_replace --block-id -1 会把从该块到末尾全部替换 → 文档只剩一小段
+# ✅ 本地有完整 XML 时，改 <title> 后整篇 overwrite
+python3 -c "
+s=open('parent.xml').read().replace('<title>旧名</title>','<title>新名</title>')
+open('parent_fixed.xml','w').write(s)"
+lark-cli docs +update --api-version v2 --doc <doc_token> --as user \
+  --command overwrite --doc-format xml --content @./parent_fixed.xml
+```
+
+文档标题与 wiki 节点标题会同步，不需要单独的 wiki 改名 scope。
+
+### 误操作后的恢复
+
+`lark-cli docs +history-list --doc <token> --as user --format json` 拿 `history_version_id`，
+再 `+history-revert --doc <token> --history-version-id <id> --as user` 回滚。
+注意 fetch 的 `--revision-id` 不能用来预览历史版本（返回空），只能靠回滚后再看。
 
 ## 归档命名与形态（用户定过的规则）
 
