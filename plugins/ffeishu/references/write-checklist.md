@@ -35,7 +35,10 @@
 | docs +update str_replace | `--command str_replace --pattern "..." --content "..."` | `--json '{"old_str":...}'` |
 | docs +update overwrite | `--command overwrite --content "..."` | 缺 `--command` 或 `--content` |
 | block_insert_after | `--command block_insert_after --block-id "xxx" --content "..."` | 缺 `--block-id` |
-| docs +fetch 验证结构 | `--detail full` 或 `with-ids` | 默认（隐藏 colgroup/block ID） |
+| docs +fetch 验证结构 | `--detail full` 或 `with-ids` | 默认 `simple`（丢 colgroup width） |
+| 改文档标题 | `--command overwrite` 传改过 `<title>` 的完整 XML | `block_replace --block-id -1`（会截断文档） |
+| wiki 节点删除 | `--space-id <node-get 返回的>` `--obj-type docx` | `+space-list` 的 space_id / 缺 `--obj-type` |
+| 回滚版本 | `--history-version-id <history-list 的>` | `--version-id` / `--revision-id <N>` |
 
 ## 2. 格式自检（逐项核对）
 
@@ -167,10 +170,53 @@ mindmap
 
 - [ ] fetch 验证：`lark-cli docs +fetch --api-version v2 --doc "{token}" --detail full`
   - `ok: true` **不代表生效**，必须 re-fetch
-  - 用 `--detail full`（不用 `keyword`/默认，会隐藏 colgroup 和 block 属性）
+  - 用 `--detail full` 或 `with-ids`（**默认 `simple` 会丢 `<colgroup>` 的 width，看到 `<col/><col/>` 全是假象**）
 - [ ] 表格验证：检查 `<colgroup>` 列宽之和 = 822
 - [ ] 嵌入资源验证：grep `<whiteboard token=` 数量是否与编辑前一致
 - [ ] 标题验证：grep `^#` 检查无手动编号（`一、` `1.1` 等前缀）
+
+### 块数（大文档必查）
+
+飞书单次写请求上限 **5,000 块**，超了报 `DOC_OPERATION_BLOCK_LIMIT`。
+
+- [ ] `actual` 是**这一次请求**的块数，**不是文档总量** —— 同一文档多次 append 可以累积到上万块
+- [ ] 块数换算式（实测标定）：`1 + <p> + <h> + <table> + 2×<td> + 2×<li>`
+  - 表格每个单元格算 **2 块**（单元格本身 + 内部段落），`<tr>`/`<colgroup>` 不单独计
+- [ ] 长文入库：按顶层块边界切成 <4500 块的多段，逐段 append 到**同一文档**
+  - 实测 415 页 / 158 表 / 43 图合并为一篇：17,563 块 / 1.2MB，分 5 段追加全部成功
+  - 单段超限时别试图「一次传大文件」——飞书也会 timeout
+
+## 4b. 危险操作黑名单
+
+### ❌ `block_replace --block-id -1` 会截断文档
+
+`--block-id -1` 是「从这个 block 一直到**文档末尾**」，不是「最后一个 block」。
+2026-11-03 实测：想改文档标题，用它替换了 19.5KB → 6.2KB，**正文被砍掉八成**。
+
+```bash
+# ❌ 会删掉后面所有内容
+--command block_replace --block-id -1 --content '<title>新标题</title>'
+# ✅ 改标题：本地有完整 XML 时整篇 overwrite
+--command overwrite --doc-format xml --content @./doc_fixed.xml
+```
+
+### ❌ 含 `<img>` 的文档禁止 overwrite
+
+含嵌入资源（img / whiteboard / sheet / bitable / file）只能用
+`str_replace` / `block_*`。唯一例外：**你自己刚建的空文档**可 overwrite。
+
+### ✅ 误操作后的恢复路径
+
+```bash
+# 1. 查历史版本（history_version_id 不是 revision_id）
+lark-cli docs +history-list --doc <token> --as user --format json
+# 2. 回滚（参数名是 --history-version-id）
+lark-cli docs +history-revert --doc <token> --history-version-id 5120 --as user
+```
+
+- `+fetch --revision-id N` **不能预览历史版本**（返回空），只能回滚后再看
+- 回滚是异步任务，返回 `task_id` + `status:done` 即成功
+- **回滚前先想清楚**：本地有完整 XML 时，`overwrite` 比回滚更可控
 
 ## 5. 输出规范
 
