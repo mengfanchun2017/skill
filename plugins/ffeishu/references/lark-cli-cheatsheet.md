@@ -44,6 +44,9 @@ lark-cli drive +search --query test --page-size 1 --as user 2>&1 | sed '/^\[lark
 | `drive +upload` | `--folder-token --file "./rel"` | 必须相对路径，先 cd |
 | `drive +export-download` | `--file-token --file-name` | 必须相对路径 |
 | `wiki +node-get` | `--token "URL"` 或 `--node-token` + `--obj-type` | 支持 URL |
+| `wiki +node-delete` | `--node-token X --space-id Y --obj-type docx --yes` | **缺 `--obj-type` 直接报错**；`--space-id` 必须用 node-get 返回的，不是 space-list 的 |
+| `docs +history-list` | `--doc X --format json` | 拿 `history_version_id`，不是 `revision_id` |
+| `docs +history-revert` | `--doc X --history-version-id N --as user` | 参数名是 `--history-version-id`，不是 `--version-id` |
 
 ## 文件上传 / 下载（实测 2026-10-06）
 
