@@ -260,11 +260,27 @@ EOF
 lark-cli docs +fetch --api-version v2 --doc "{token}" --detail full
 ```
 检查：
-- `grep '<colgroup'` → 列宽之和 = 822
+- `grep '<colgroup'` → 列宽之和 = 822（**默认 `simple` 会丢 width，别用它验）**
 - `grep '^#'` → 无 `一、` `1.1` `(1)` 等手动编号前缀
 - 白板/嵌入资源数量与预期一致
 
 创建后追加到「线上文档索引」表格。
+
+### 超长文档（>5,000 块）
+
+单次写请求上限 5,000 块，但**同一文档可多次追加累积到上万块**。
+块数换算：`1 + <p> + <h> + <table> + 2×<td> + 2×<li>`（表格单元格算 2 块）。
+
+```bash
+# 按顶层块边界切段，逐段 append 到同一文档
+lark-cli docs +create --api-version v2 --title "…" --parent-token <parent> --as user
+for i in 01 02 03 04 05; do
+  lark-cli docs +update --api-version v2 --doc <doc> --as user \
+    --command append --doc-format xml --content @./part$i.xml
+done
+```
+
+报 `DOC_OPERATION_BLOCK_LIMIT actual:8313 limit:5000` 时，`actual` 是**这一段**的块数，切细即可。
 
 ---
 
