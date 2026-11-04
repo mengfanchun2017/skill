@@ -25,6 +25,10 @@ HTML（SEC 披露、网页年报）走本 skill 的 extract.py；PDF 走 fpdf。
 | 建表报 `validation_error` | 表名重复（同名表已存在） | 先改名或删旧表 |
 | 删除字段报 `unsafe_operation_blocked` | 不能删表里唯一字段 | 新建正确表后删旧表 |
 | 表格列宽全变 120 | 用了废弃的 `<lark-table>` 语法 | 改标准 `<table>` + `<colgroup>`，宽度和 822 |
+| **风险条目被切成两半**（「…我们的业务、财务 / 状况和经营业绩…」） | 段落合并判据 `abs(x差) > 8pt` 太紧。SEC 项目符号 `•` 在 x=90、正文 x=108，**差 18pt** | 阈值放宽到 20pt。实测 p27 抽出 31 块实际只有 16 个条目 |
+| **H1 出现残句**（`and Selling Stockholders`/`of Capital Stock`/`Matters`） | `FONT_RE` 用 `([^<]*)` 匹配不到嵌套 `<font>`。SEC 把大标题**逐字母拆成独立 font 标签** | 改 `(.*?)` 跨标签。实测找回 6,921 字符，H1 从 29（含 4 残句）变 33 完整标题 |
+| **目录层级扁平**（MD&A 一个 H1 下挂 115 个 H3） | `HEAD_SIZES` 旧表把 12pt 归 H3 | 改 `[(18,1),(12,2),(9.9,3)]`。实测 SEC 字号分层：20pt=章 / 12pt=节 / 10pt=小节 |
+| **中文版结构散乱、学 AI 用不上** | IPO 程序性章节（承销/税务/法律意见/附件索引）占篇幅 | `--drop-legal` 剔除 p315-343、p407-415；`--skip-front-matter` 弃 p1-15 |
 | fetch 看到 `<colgroup><col/><col/>` 宽度全 0 | 用了 `--detail simple`（默认），它不返回 width | 校验必须用 `--detail with-ids` 或 `full` |
 | append 报 `DOC_OPERATION_BLOCK_LIMIT actual:8313 limit:5000` | `actual` 是**这一次** append 的块数，不是文档总量。表格每格算 2 块 | 用 `split_by_cost()` 切成 <4500 块的多段，逐段 append 到同一文档 |
 | `wiki +node-delete` 报 `--obj-type is required` | 必须显式给文档类型 | 加 `--obj-type docx`（或 file/sheet） |

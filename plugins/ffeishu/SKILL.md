@@ -154,7 +154,8 @@ bash ~/.claude/skills/ffeishu/scripts/export_whole_tree_pdf.sh \
 | 表格 XML | `<colgroup>` 宽度和 = **822** |
 | 正文加粗 | 克制，`<p>` 里的 `**x**` 降级为纯文本；只有列表项短术语（≤12 字 + `：`）保留 |
 
-机械可判的部分跑 `fcore fmt-xml` 一次报全。完整清单 → `references/write-checklist.md` §2。
+机械可判的部分跑 `fcore fmt-xml` 一次报全。**完整清单**（唯一真相源）→
+`references/write-checklist.md` §2；**写代码时的速查摘要** → `references/format-summary.md`。
 
 ## 委托速查
 
