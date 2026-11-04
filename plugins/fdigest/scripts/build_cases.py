@@ -123,7 +123,8 @@ def main():
              '<p>本页收录原文中的客户案例。每页一张原图，图下是 OCR 提取的案例正文。</p>'
              f'<p>共 {len(ordered)} 页（第 {ordered[0]}-{ordered[-1]} 页）。'
              '原文件中这些页是整页扫描图，文字不在文本层，'
-             '已用 MinerU 视觉 OCR 通道提取。</p></callout>')
+             '已用 MinerU 视觉 OCR 通道提取并译成中文。</p>'
+             '<p>每节先放原图，图下是中文译文；需要核对英文时看原图。</p></callout>')
 
     # 清单
     o.append('<h1><span text-color="blue">案例清单</span></h1>')
@@ -137,8 +138,15 @@ def main():
             if line.startswith('#'):
                 title = re.sub(r'^#+\s*', '', line).strip()
                 break
+        # 关键点取案例自带指标表的首列（原文这些案例都用「数字 | 说明」两列表带成果）
+        pts = []
+        for rm in re.finditer(r'<tr>(.*?)</tr>', md, re.S):
+            cells = [re.sub(r'<[^>]+>', '', c).strip()
+                     for c in re.findall(r'<td>(.*?)</td>', rm.group(1), re.S)]
+            if len(cells) == 2 and cells[0]:
+                pts.append(cells[0])
         o.append(f'<tr><td><p>{p}</p></td><td><p>{esc(title) or esc(fn)}</p></td>'
-                 f'<td><p>{esc(fn)}</p></td></tr>')
+                 f'<td><p>{esc(" / ".join(pts[:3]))}</p></td></tr>')
     o.append('</tbody></table>')
 
     # 详情

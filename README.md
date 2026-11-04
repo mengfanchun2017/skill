@@ -184,15 +184,15 @@ plugins/<name>/
 
 ```mermaid
 flowchart LR
-    A["1. 环境变量<br/>F_KEY"] --> Z{"命中?"}
-    B["2. CLAUDE_PLUGIN_DATA<br/>config.json"] --> Z
-    C["3. ~/.claude/plugins/data/<br/><plugin>/config.json"] --> Z
-    D["4. settings.json<br/>pluginConfigs"] --> Z
-    E["5. .credentials.json<br/>pluginSecrets"] --> Z
-    F["6. ccprivate/conf/<br/><plugin>.yaml"] --> Z
-    G["7. ccprivate/conf/<br/>_shared.yaml"] --> Z
-    H["8. ~/.claude/skill-config/<br/><plugin>.yaml"] --> Z
-    I["9. <plugin目录>/<br/>config.yaml"] --> Z
+    A["1 环境变量<br/>F_KEY"] --> Z{"命中?"}
+    B["2 CLAUDE_PLUGIN_DATA<br/>config.json"] --> Z
+    C["3 ~/.claude/plugins/data<br/>/插件名/config.json"] --> Z
+    D["4 settings.json<br/>pluginConfigs"] --> Z
+    E["5 .credentials.json<br/>pluginSecrets"] --> Z
+    F["6 ccprivate/conf<br/>/插件名.yaml"] --> Z
+    G["7 ccprivate/conf<br/>/_shared.yaml"] --> Z
+    H["8 ~/.claude/skill-config<br/>/插件名.yaml"] --> Z
+    I["9 插件目录<br/>/config.yaml"] --> Z
     Z -->|是| OK["取值"]
     Z -->|否| DEG["降级：跳过需要真值的步骤<br/>不阻断主流程"]
 ```
