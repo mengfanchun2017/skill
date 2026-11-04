@@ -82,6 +82,7 @@ def main():
     ap.add_argument('--title', default='客户案例')
     ap.add_argument('--images-dir', required=True)
     ap.add_argument('--ocr', default='', help='MinerU OCR 结果 json（build_cases_ocr 产出）')
+    ap.add_argument('--ocr-zh', default='', help='OCR markdown 的中文译文 json（translate_cases 产出）')
     ap.add_argument('--out', required=True)
     args = ap.parse_args()
 
@@ -108,10 +109,13 @@ def main():
             seen.add(x['file'])
             by_page.setdefault(x['page'], []).append(x)
 
-    ocr = {}
+    ocr, ocr_zh = {}, {}
     if args.ocr and os.path.exists(args.ocr):
         for fn, v in json.load(open(args.ocr)).items():
             ocr[v['page']] = v.get('md', '')
+    if args.ocr_zh and os.path.exists(args.ocr_zh):
+        for fn, v in json.load(open(args.ocr_zh)).items():
+            ocr_zh[v['page']] = v.get('md', '')
 
     ordered = sorted(by_page)
     o = [f'<title>{esc(args.title)}</title>']
@@ -142,8 +146,11 @@ def main():
     for p in ordered:
         x = by_page[p][0]
         md = ocr.get(p, '')
+        zh = ocr_zh.get(p, '')
+        # 标题取中文版（有就用），保证目录和正文语言一致
+        src_for_title = zh or md
         title = ''
-        for line in md.split('\n'):
+        for line in src_for_title.split('\n'):
             if line.startswith('#'):
                 title = re.sub(r'^#+\s*', '', line).strip()
                 break
@@ -151,8 +158,12 @@ def main():
         o.append(f'<h2>{esc(head)}</h2>')
         pth = os.path.join(args.images_dir, x['file'])
         o.append(f'<img path="@{pth}" caption="第 {p} 页 · {esc(title) or esc(x["file"])}"/>')
-        if md.strip():
+        if zh.strip():
+            o.append(md_to_xml(zh))
+        elif md.strip():
             o.append(md_to_xml(md))
+            o.append('<callout emoji="⚠️" background-color="light-yellow">'
+                     '<p>本页暂无中文译文，以上为 MinerU OCR 原文。</p></callout>')
         else:
             o.append('<callout emoji="⚠️" background-color="light-red">'
                      '<p>本页 OCR 未提取到文字，需人工查看原图。</p></callout>')
