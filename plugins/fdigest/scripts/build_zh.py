@@ -139,7 +139,7 @@ def build_blocks(page, zh_lines, table_rows):
     while i < len(lines):
         l = lines[i]
         lvl = _heading_level(l['sz']) if l['b'] else None
-        if lvl or _is_bold_lead(l):
+        if lvl or _is_bold_lead(l) or _is_standalone_heading(lines, i):
             lvl = lvl or 3
             # SEC 会把长标题折成多行（"Management's Discussion and Analysis of" +
             # "Financial Condition and Results of Operations"），同字号同加粗且行距
