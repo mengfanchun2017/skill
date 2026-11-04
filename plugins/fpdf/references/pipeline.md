@@ -18,7 +18,7 @@ bash ~/.claude/skills/fpdf/scripts/setup.sh --check  # 只检查不安装
 | `uv` | `curl -LsSf https://astral.sh/uv/install.sh \| sh` | **阻断** |
 | `lark-cli` | `npm i -g @larksuite/cli`，装入 PATH（或落 `~/.local/bin`） | **阻断** |
 | 飞书授权 | `lark-cli auth login`（走扫码，一次性） | **阻断** |
-| MinerU token | https://mineru.net → API 管理 → 建 token；填法见「父文档」一节的 8 级查找链（推荐 `$CLAUDE_PLUGIN_DATA/config.json` 的 `mineru.token`，或 `$CCPRIVATE_HOME/conf/fpdf.yaml`） | **阻断**（默认 precision 档） |
+| MinerU token | https://mineru.net → API 管理 → 建 token；填法：`fcore conf set mineru.token <token>`（落 `~/.claude/skill-config/fpdf.yaml`，升级不覆盖） | **阻断**（默认 precision 档） |
 | `poppler-utils` | 自动按平台装（apt / brew / dnf / pacman / apk）；装不上**只提示不阻断** | 不阻断 |
 
 > **token 口径**：`run.sh` 默认走 precision 档（排版必需），缺 token 时 `parse.py` 直接
