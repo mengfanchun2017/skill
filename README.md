@@ -90,15 +90,15 @@ cconfig 用户：`bash ccconfig/lib/init-skill.sh sync` 自动从 `conf/third-pa
 | `fdiagram` | L1 | 飞书画板统一入口（Mermaid/PlantUML：架构/流程/时序/ER/类/甘特/思维导图） |
 | `fsearch` | L1 | 搜索活动统一原语（分语言路由：中文→MiniMax、英文→Tavily，耗尽切 Exa） |
 | `fresearchframe` | L1 | 4 领域研究方法论（customer/generic/market/technical） |
-| `fworch` | L1 | 撰写系统统一入口（按体裁路由到 course/report/case/interview） |
-| `fworch-report` | L1 | 报告生成 orchestrator（JSON/大纲/素材 → 结构化 Markdown） |
-| `fworch-course` | L1 | 系列课程创作 orchestrator（从零创作 / 现有材料课程化） |
-| `fworch-case` | L1 | 案例库编排器（飞书 wiki 三层案例库 + Base 元数据） |
-| `fworch-interview` | L1 | 面试准备 orchestrator（岗位认知 → 专业能力 → 未来工作思路） |
-| `fwstd-report` | L1 | 报告写作横向规范（4 套模板：研究/分析/对比/方案） |
-| `fwstd-course` | L1 | 课程文档内容规范（被 fworch-course 引用） |
-| `fwstd-case` | L1 | 案例库内容规范（被 fworch-case 引用） |
-| `fwstd-interview` | L1 | 面试准备内容规范（被 fworch-interview 引用） |
+| `fworch` | L3 编排（旧） | 撰写系统统一入口，**建议改走 fhub**（功能已并入 fcore genre） |
+| `fworch-report` | L3 编排 | 报告生成 orchestrator（JSON/大纲/素材 → 结构化 Markdown） |
+| `fworch-course` | L3 编排 | 系列课程创作 orchestrator（从零创作 / 现有材料课程化） |
+| `fworch-case` | L3 编排 | 案例库编排器（飞书 wiki 三层案例库 + Base 元数据） |
+| `fworch-interview` | L3 编排 | 面试准备 orchestrator（岗位认知 → 专业能力 → 未来工作思路） |
+| `fwstd-report` | L2 规范 | 报告写作横向规范（4 套模板：研究/分析/对比/方案） |
+| `fwstd-course` | L2 规范 | 课程文档内容规范（被 fworch-course 引用） |
+| `fwstd-case` | L2 规范 | 案例库内容规范（被 fworch-case 引用） |
+| `fwstd-interview` | L2 规范 | 面试准备内容规范（被 fworch-interview 引用） |
 | `flogme` | L1 | 个人管理系统（OKR/Worklog/Reflect/SUM，飞书 Base） |
 | `fmoocrec` | L1 | MOOC 课程推荐（QS 课程 + 学习路径，飞书 Base + Supabase） |
 | `fsysarchi` | L1 | 系统分析师备考 — 暗号 `archi` 触发，随工边做边学 |
