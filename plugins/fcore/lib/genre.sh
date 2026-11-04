@@ -57,10 +57,20 @@ def hits(triggers, text):
                 best = (s, t)
     if best[0]:
         return best
-    # 词元兜底：把触发词与文本都切成 2 字以上的中文块 + 英文词
+    # 词元兜底：中文按**二元组**切（不能用 [一-鿿]{2,} —— 正则贪婪匹配会把
+    # 整句"帮我写个行业报告"连成一个词元，永远匹配不到"写报告"，实测踩过），
+    # 英文按整词切。
     import re
     def toks(s):
-        return set(re.findall(r"[A-Za-z]+|[一-鿿]{2,}", s.lower()))
+        s = s.lower()
+        out = set(re.findall(r"[a-z]+", s))
+        for run in re.findall(r"[一-鿿]+", s):
+            if len(run) == 1:
+                out.add(run)
+            else:
+                for i in range(len(run) - 1):
+                    out.add(run[i:i + 2])
+        return out
     tt = toks(text)
     for t in triggers or []:
         if not t:
