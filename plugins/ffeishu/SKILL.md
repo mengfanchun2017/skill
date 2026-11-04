@@ -182,6 +182,10 @@ bash ~/.claude/skills/ffeishu/scripts/export_whole_tree_pdf.sh \
 | `references/feishu-office-bridge.md` | 飞书↔Office 转换细节 |
 | `references/setup.md` | 安装、配置、用户配置详解 |
 
+**合订本 PDF 工具链**（`scripts/`）：`export_whole_tree_pdf.sh` 一键出书；
+分步用 `collect_pages.py`（抓页面）→ `docxxml2html.py`（转 HTML）→ `html2pdf.js`（打印）
+→ `add_bookmarks.py`（加书签）。
+
 ## 文档索引
 
 创建/编辑的文档追加到私有索引 `<ccprivate>/skill/ffeishu.yaml` 的 `doc_index`
