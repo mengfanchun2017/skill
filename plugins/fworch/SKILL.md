@@ -10,7 +10,14 @@ allowed-tools: Read, Bash, Glob, Grep
 
 # fworch — 撰写系统统一入口（L4）
 
+> ⚠️ **职能已并入 `fhub` + `fcore genre`（2026-11-04，ADR-0058）**。新流程走：
+> `fhub` 跑 `fcore genre "<用户原话>"` 判域 → 派 orchestrator。
+> 本 skill 保留只为不打断已在用的习惯；其触发词清单已并入
+> `<ccprivate>/conf/fcore.yaml`，**不要再在此处增删触发词**（曾经三处各写一份，实测漂移过）。
+
 职责：需求 → 判体裁 → 派 orchestrator。**不自己撰写**，只做路由。
+`allowed-tools` 缺 `Skill` 工具，故派发实际靠"提示模型进流程"而非工具调用 —— 这也是
+由 `fhub`（已声明 `Skill`）取代它的原因之一。
 
 ## 架构
 
