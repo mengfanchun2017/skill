@@ -27,15 +27,24 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, mcp__mineru__parse_documents
 
 ## 飞书落点
 
-| 层 | 节点 |
-|---|---|
-| 根节点 digestlib（bitable） | `GQktwgQRaiVMtpkwJvacmH6gn4f` / base `FJb6bh2XkamxbEsEki6ceXBinEI` |
-| 报告档案表 | table `报告档案` |
-| 阅读说明与索引 | wiki `TYwcwsj0siT7Q8kQoNxcsku1n3E` |
-| 主题档案（横向复用） | wiki `OsXQwe8QBiFoe5kL5ywcpKGxnfb` |
-| 报告归档（按份存） | wiki `MQb1wnB3fiCbKykZSoFczvErncd` |
+| 层 | 节点 | 配置键 |
+|---|---|---|
+| 根节点 digestlib（bitable） | `<digestlib-wiki-node>` / base `<digestlib-base-token>` | `digestlib_wiki_node` / `digestlib_base` |
+| 报告档案表 | table `报告档案` | `table_archive` |
+| 阅读说明与索引 | wiki `<index-wiki-node>` | `index_wiki_node` |
+| 主题档案（横向复用） | wiki `<topic-wiki-node>` | `topic_wiki_node` |
+| 报告归档（按份存） | wiki `<archive-wiki-node>` | `archive_wiki_node` |
 
-真实 token 属于私有配置，不放公开仓库；运行时从 `ccprivate/conf/fdigest.yaml` 读，缺失时用 `lark-cli drive +search --query digestlib` 现查。
+真实 token 属于私有配置，不进公开仓库。运行时读取顺序（同一套 `skillconf_*` 解析）：
+
+```bash
+source ~/.claude/skills/ffeishu/references/lark_env.sh
+lark_conf_get fdigest.yaml digestlib_wiki_node
+```
+
+`skillconf_file` 解析不到时（未装 ccprivate 的独立用户），提示用户把 5 个 token 写进
+`~/.claude/skill-config/fdigest.yaml`（用户级稳定路径，`/plugin update` 不覆盖）。
+缺配置不阻断：只做本地抽取/索引/检索，跳过飞书归档步骤。
 
 ## 能力边界
 
