@@ -74,37 +74,42 @@ cconfig 用户：`bash ccconfig/lib/init-skill.sh sync` 自动从 `conf/third-pa
 
 克隆 [ccconfig](https://github.com/mengfanchun2017/ccconfig) 后，`bash lib/init-skill.sh sync` 自动完成：symlink 自建 skill、注册 marketplace、安装第三方 skill、注入私有配置。详见 ccconfig 文档。
 
-## 自建 plugin（27 个，全部 marketplace 注册）
+## 自建 plugin（30 个，全部 marketplace 注册）
 
-| Plugin | 说明 |
-|-------|------|
-| `ffeishu` | 飞书文档编排层（wiki/表格/白板、报告整合/拆分/转换/对比） |
-| `fpptx` | PPT/X 总控（PPTX 或飞书 Slides，6 套设计主题） |
-| `fdocx` | Word .docx 总控（OfficeCLI 引擎：模板/样式/表格/图片/目录） |
-| `fxlsx` | Excel .xlsx 总控（OfficeCLI 引擎：公式/图表/条件格式/透视表） |
-| `fdiagram` | 飞书画板统一入口（Mermaid/PlantUML：架构/流程/时序/ER/类/甘特/思维导图） |
-| `fsearch` | 搜索活动统一原语（分语言路由：中文→MiniMax、英文→Tavily，耗尽切 Exa） |
-| `fresearchframe` | 4 领域研究方法论（customer/generic/market/technical） |
-| `fworch` | 撰写系统统一入口（按体裁路由到 course/report/case/interview） |
-| `fworch-report` | 报告生成 orchestrator（JSON/大纲/素材 → 结构化 Markdown） |
-| `fworch-course` | 系列课程创作 orchestrator（从零创作 / 现有材料课程化） |
-| `fworch-case` | 案例库编排器（飞书 wiki 三层案例库 + Base 元数据） |
-| `fworch-interview` | 面试准备 orchestrator（岗位认知 → 专业能力 → 未来工作思路） |
-| `fwstd-report` | 报告写作横向规范（4 套模板：研究/分析/对比/方案） |
-| `fwstd-course` | 课程文档内容规范（被 fworch-course 引用） |
-| `fwstd-case` | 案例库内容规范（被 fworch-case 引用） |
-| `fwstd-interview` | 面试准备内容规范（被 fworch-interview 引用） |
-| `flogme` | 个人管理系统（OKR/Worklog/Reflect/SUM，飞书 Base） |
-| `fmoocrec` | MOOC 课程推荐（QS 课程 + 学习路径，飞书 Base + Supabase） |
-| `fsysarchi` | 系统分析师备考 — 暗号 `archi` 触发，随工边做边学 |
-| `flibaudit` | 仓库全面审计 — 架构/代码/文件卫生/测试/文档/发布就绪 |
-| `fsyncdoc` | 源码文档同步 + 产品页同步（aiagt） |
-| `fmashwork` | AI 图生 3D → 拓竹打印自动化工作流 |
-| `fllmpack` | LLM 预设配置导出/导入（不含 API key，发给同事各自填 key） |
-| `fpostpone` | 定时延迟执行 — 把命令排到将来某时刻跑，输出回本会话（`18点运行 /transliter "x.zip"`） |
-| `fpdf` | PDF 精排 — 拆解 PDF 重排为飞书文档（表格列宽/行内公式/高清图/参考文献） |
-| `fsecretcheck` | 密钥泄露检查 — 扫描工作树与 git 历史里的真实凭据，判定属公开仓还是私密仓 |
-| `fskillcreat` | Skill 开发脚手架 — 快速创建新 skill 骨架 |
+不确定用哪个技能时走 **`fhub`**：它跑 `fcore genre "<你的原话>"` 判域再派发，口语化描述即可
+（"帮我写个行业报告" → fworch-report；"把这个PDF排到飞书" → fpdf）。
+
+| Plugin | 层 | 说明 |
+|-------|-----|------|
+| `fcore` | L0 机械 | 路径解析、配置读写（升级不覆盖）、lark-cli 授权预检、文档增改查上传、格式断言、派发匹配 |
+| `fhub` | L1 总入口 | 判断需求属哪个子技能并派发，用户不必记技能名 |
+| `ffeishu` | L1 飞书 | 飞书文档编排层（wiki/表格/白板、报告整合/拆分/转换/对比） |
+| `fpptx` | L1 | PPT/X 总控（PPTX 或飞书 Slides，6 套设计主题） |
+| `fdocx` | L1 | Word .docx 总控（OfficeCLI 引擎：模板/样式/表格/图片/目录） |
+| `fxlsx` | L1 | Excel .xlsx 总控（OfficeCLI 引擎：公式/图表/条件格式/透视表） |
+| `fdiagram` | L1 | 飞书画板统一入口（Mermaid/PlantUML：架构/流程/时序/ER/类/甘特/思维导图） |
+| `fsearch` | L1 | 搜索活动统一原语（分语言路由：中文→MiniMax、英文→Tavily，耗尽切 Exa） |
+| `fresearchframe` | L1 | 4 领域研究方法论（customer/generic/market/technical） |
+| `fworch` | L1 | 撰写系统统一入口（按体裁路由到 course/report/case/interview） |
+| `fworch-report` | L1 | 报告生成 orchestrator（JSON/大纲/素材 → 结构化 Markdown） |
+| `fworch-course` | L1 | 系列课程创作 orchestrator（从零创作 / 现有材料课程化） |
+| `fworch-case` | L1 | 案例库编排器（飞书 wiki 三层案例库 + Base 元数据） |
+| `fworch-interview` | L1 | 面试准备 orchestrator（岗位认知 → 专业能力 → 未来工作思路） |
+| `fwstd-report` | L1 | 报告写作横向规范（4 套模板：研究/分析/对比/方案） |
+| `fwstd-course` | L1 | 课程文档内容规范（被 fworch-course 引用） |
+| `fwstd-case` | L1 | 案例库内容规范（被 fworch-case 引用） |
+| `fwstd-interview` | L1 | 面试准备内容规范（被 fworch-interview 引用） |
+| `flogme` | L1 | 个人管理系统（OKR/Worklog/Reflect/SUM，飞书 Base） |
+| `fmoocrec` | L1 | MOOC 课程推荐（QS 课程 + 学习路径，飞书 Base + Supabase） |
+| `fsysarchi` | L1 | 系统分析师备考 — 暗号 `archi` 触发，随工边做边学 |
+| `flibaudit` | L1 | 仓库全面审计 — 架构/代码/文件卫生/测试/文档/发布就绪 |
+| `fsyncdoc` | L1 | 源码文档同步 + 产品页同步（aiagt） |
+| `fmashwork` | L1 | AI 图生 3D → 拓竹打印自动化工作流 |
+| `fllmpack` | L1 | LLM 预设配置导出/导入（不含 API key，发给同事各自填 key） |
+| `fpostpone` | L1 | 定时延迟执行 — 把命令排到将来某时刻跑，输出回本会话（`18点运行 /transliter "x.zip"`） |
+| `fpdf` | L1 | PDF 精排 — 拆解 PDF 重排为飞书文档（表格列宽/行内公式/高清图/参考文献） |
+| `fsecretcheck` | L1 | 密钥泄露检查 — 扫描工作树与 git 历史里的真实凭据，判定属公开仓还是私密仓 |
+| `fskillcreat` | L1 | Skill 开发脚手架 — 快速创建新 skill 骨架 |
 
 ## 外部 skill — 三方上游 + 系统层 lark-cli（不通过本仓装）
 
