@@ -42,7 +42,25 @@ python3 ~/.claude/skills/fdigest/scripts/extract.py <源文件> \
 - `text.txt` 全文本
 - `manifest.json` 元数据与源哈希
 
-**混合态文件的关键判断**：先看 `manifest.json` 的 `full_page_scans` 与 `tables` 数量。若扫描页多但表格也有内容，说明正文在文本层、案例在图里——文本层直抽，扫描页单独走 vision，不无脑 OCR。
+**混合态文件的关键判断**：先看 `manifest.json` 的 `full_page_scans` 与 `tables` 数量。若扫描页多但表格也有内容，说明正文在文本层、案例在图里——文本层直抽，扫描页单独走 OCR，不无脑全量 OCR。
+
+**零文本层的扫描页 → 先试 MinerU，不要停成「等人工」**。MinerU 收图片输入
+（png/jpg/webp/gif/bmp/tiff/jp2），输出带版面结构的 markdown（标题层级/表格/段落），
+比通用 vision 模型"描述这张图"更贴近文档本身结构。三步：
+
+```bash
+# 1. OCR（配置在 ~/.claude/skill-config/mineru.json：api_base + token）
+python3 ~/.claude/skills/fdigest/scripts/ocr_cases.py <slug> <图片目录> /tmp/cases_ocr.json
+# 2. 译中文（按页分片落盘，中断可续跑；必须 setsid 脱离会话）
+setsid nohup python3 ~/.claude/skills/fdigest/scripts/translate_cases.py \
+  /tmp/cases_ocr.json /tmp/cases_ocr_zh.json 8 > /tmp/tc.log 2>&1 &
+# 3. 排版：图 → 中文 → （英文核对看原图）
+python3 ~/.claude/skills/fdigest/scripts/build_cases.py <slug> \
+  --images-dir <压缩后图片目录> --ocr /tmp/cases_ocr.json --ocr-zh /tmp/cases_ocr_zh.json --out /tmp/cases.xml
+```
+
+⚠️ MinerU 预签名 PUT 的 URL 用**空 Content-Type 签名**，客户端带任何 Content-Type
+都 403 `SignatureDoesNotMatch` → `headers={'Content-Type': ''}`。
 
 ### Step 3：建索引
 
