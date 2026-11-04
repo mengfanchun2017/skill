@@ -68,10 +68,21 @@ def _is_bold_lead(l):
     if t.startswith('•') or t.startswith('-'):
         return False
     # 旧阈值 60 字符会漏掉长一点的标题（"Frontier AI May Reshape Entire Sectors
-    # and Accelerate Novel Discoveries" 71 字符），放宽到 90 且按词数兜底。
+    # and Accelerate Novel Discoveries" 71 字符），放宽到 90。
+    # 但不能无限放宽：风险因素里满篇「If our actual compute requirements differ
+    # materially from our estimates.」这类加粗句子首句，会长出 57 个假标题。
+    # 真标题是 Title Case（实词首字母大写），句子是 "If our actual..." 这种小写起。
     if len(t) > 90 or t.endswith(('.', '。', ':', '：', ';', '；')):
         return False
-    return len(t.split()) <= 14
+    words = t.split()
+    if len(words) > 14:
+        return False
+    if len(words) > 6 and len(t) > 60:
+        # 长标题必须是 Title Case：跳过首词后，实词首字母应大写
+        tail = [w for w in words[1:] if w[:1].isalpha() and len(w) > 3]
+        if tail and sum(1 for w in tail if w[0].isupper()) < len(tail) * 0.6:
+            return False
+    return True
 
 
 def _is_standalone_heading(lines, i):
