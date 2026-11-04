@@ -46,6 +46,27 @@ python3 ~/.claude/skills/fdigest/scripts/extract.py <源文件> \
 
 **零文本层的扫描页 → 先试 MinerU，不要停成「等人工」**。MinerU 收图片输入
 （png/jpg/webp/gif/bmp/tiff/jp2），输出带版面结构的 markdown（标题层级/表格/段落），
+比通用 vision 模型"描述这张图"更贴近文档本身的结构。三步：
+
+```bash
+# 1. OCR — 配置在 ~/.claude/skill-config/mineru.json（api_base + token），token 不进公开库
+python3 ~/.claude/skills/fdigest/scripts/ocr_cases.py <slug> <压缩后图片目录> /tmp/cases_ocr.json
+
+# 2. 译中文 — 按页分片落盘可续跑；必须 setsid 脱离会话，否则 session 挂掉整轮白跑
+setsid nohup python3 ~/.claude/skills/fdigest/scripts/translate_cases.py \
+  /tmp/cases_ocr.json /tmp/cases_ocr_zh.json 8 > /tmp/tc.log 2>&1 &
+
+# 3. 排版 — 每节：原图 → 中文译文（需核对英文就看原图）
+python3 ~/.claude/skills/fdigest/scripts/build_cases.py <slug> \
+  --images-dir <压缩后图片目录> \
+  --ocr /tmp/cases_ocr.json --ocr-zh /tmp/cases_ocr_zh.json --out /tmp/cases.xml
+```
+
+⚠️ **MinerU 预签名 PUT 必须发空 Content-Type**（`headers={'Content-Type': ''}`）。
+URL 用空串签名，客户端带任何值都 403 `SignatureDoesNotMatch`（MinerU issue #5393）。
+
+**零文本层的扫描页 → 先试 MinerU，不要停成「等人工」**。MinerU 收图片输入
+（png/jpg/webp/gif/bmp/tiff/jp2），输出带版面结构的 markdown（标题层级/表格/段落），
 比通用 vision 模型"描述这张图"更贴近文档本身结构。三步：
 
 ```bash
