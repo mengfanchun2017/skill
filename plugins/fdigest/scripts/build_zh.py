@@ -391,6 +391,8 @@ def main():
                     help='跳过 p1-15（封面/免责/目录/术语表），从正文开始')
     ap.add_argument('--skip-pages', default='',
                     help='排除的页（逗号分隔或区间，如 "219-238,37,143"）。案例单独成文时用')
+    ap.add_argument('--drop-legal', action='store_true', default=False,
+                    help='剔除法律/程序性章节（承销/税务/法律意见/附件索引），面向学习聚焦')
     args = ap.parse_args()
 
     skip = set()
