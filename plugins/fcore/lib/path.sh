@@ -130,6 +130,7 @@ f_conf_get() {
     out="$(printf '%s' "$cands" | python3 -c '
 import json, os, sys
 key, plugin = sys.argv[1], sys.argv[2]
+KEY = key
 cands = json.load(sys.stdin)
 def _emit(v):
     """只输出单值。命中 dict/list 说明 key 路径不完整，直接把 Python repr 当值用是个坑
