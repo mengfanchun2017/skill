@@ -143,9 +143,14 @@ allowed-tools: Read, Write, Bash, Glob
 # 1. lark-cli 是否可用
 which lark-cli 2>/dev/null || (echo "lark-cli 未安装，降级为 PPTX" && exit 1)
 
-# 2. auth 是否有效
-export LARKSUITE_CLI_CONFIG_DIR="${LARKSUITE_CLI_CONFIG_DIR:-$HOME/.lark-cli}" && export PATH="$HOME/.local/bin:$PATH"
-lark-cli drive +search --query test --page-size 1 --as user 2>&1 | sed '/^\[lark-cli\]/d' | grep -q '"ok":true' || (
+# 2. 账号目录 + auth 是否有效
+# 多账号切换由 marker 记录（lark-switch.sh 维护）；无 marker 时用 lark-cli 默认目录
+if [[ -f "$HOME/.lark-cli-account" ]]; then
+  export LARKSUITE_CLI_CONFIG_DIR="$(grep '^configDir=' "$HOME/.lark-cli-account" | cut -d= -f2)"
+fi
+export PATH="$HOME/.local/bin:$PATH"
+# 匹配必须允许冒号后空格：lark-cli 实际输出 `"ok": true`
+lark-cli drive +search --query test --page-size 1 --as user 2>&1 | sed '/^\[lark-cli\]/d' | grep -qE '"ok": *true' || (
   echo "lark-cli auth 过期。降级为 PPTX"
   exit 1
 )

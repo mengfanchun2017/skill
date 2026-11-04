@@ -94,8 +94,8 @@ current_step: 0                    # 0-8
 首次调 ffeishu 前**必须**预检：
 
 ```bash
-lark-cli drive +search --query test --page-size 1 --as user 2>&1 \
-  | sed '/^\[lark-cli\]/d' | grep -q '"ok":true' || echo "AUTH_FAILED"
+source ~/.claude/skills/ffeishu/references/lark_env.sh   # 账号前缀 + PATH 由共享层解决
+lark_auth_check || echo "AUTH_FAILED"
 ```
 
 失败 → 终止，走 QR 授权（见 `~/.claude/rules/feishu.md`），不硬闯。
