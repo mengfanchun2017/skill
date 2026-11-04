@@ -131,6 +131,19 @@ f_conf_get() {
 import json, os, sys
 key, plugin = sys.argv[1], sys.argv[2]
 cands = json.load(sys.stdin)
+def _emit(v):
+    """只输出单值。命中 dict/list 说明 key 路径不完整，直接把 Python repr 当值用是个坑
+    （实测 fcore conf get wiki_nodes.default 吐出 "{'token': 'xxx'}"），故明确报错。
+    stderr 被外层 2>/dev/null 吞掉，必须走 stdout 并用 MAGIC 前缀让 bash 侧识别。"""
+    if isinstance(v, (dict, list)):
+        if isinstance(v, dict):
+            msg = "%s 是嵌套结构，不是单值。子键: %s\\n用法: fcore conf get <key>.%s" % (
+                KEY, ", ".join(sorted(v)), sorted(v)[0])
+        else:
+            msg = "%s 是列表，不是单值。用下标: fcore conf get <key>.0" % KEY
+        print("__FCORE_ERR__" + msg); sys.exit(2)
+    print(v if not isinstance(v, bool) else str(v).lower())
+
 def dig(node, path):
     for k in path.split("."):
         if isinstance(node, dict) and k in node: node = node[k]
