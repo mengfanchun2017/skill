@@ -274,6 +274,60 @@ footer a:hover{color:#a1a1aa}
 <script>
 const SKILLS = [
   {
+    id: "fcore", name: "fcore", icon: "⚙️", cat: "docs", needs_ccconfig: false,
+    ccconfig_zh: "纯技能，机械内核（无外部依赖）",
+    ccconfig_en: "Pure skill, mechanical core (no external deps)",
+    desc_zh: "L0 机械内核。路径解析、配置读写（升级不覆盖）、lark-cli 授权预检、文档增改查上传、格式断言、技能派发匹配。其他技能不重写这些命令，一律调它。",
+    desc_en: "L0 mechanical core: config resolution, lark-cli auth precheck, doc CRUD, format assertions, skill dispatch matching. Every other skill delegates these to it.",
+    scenarios_zh: [
+      {trigger: '"检查飞书授权还能用吗"', result: "→ fcore auth，返回可用/未装/未配置三态"},
+      {trigger: '"我的配置存在哪了"', result: "→ fcore where 打印全部解析路径"},
+      {trigger: '"这段内容格式对吗"', result: "→ fcore fmt-xml 机械断言 H1 配色/表格 colgroup/引用数"}
+    ],
+    scenarios_en: [
+      {trigger: '"Is my Feishu auth still valid?"', result: "→ fcore auth returns available / not-installed / not-configured"},
+      {trigger: '"Where is my config stored?"', result: "→ fcore where prints every resolution path"},
+      {trigger: '"Is this document formatted correctly?"', result: "→ fcore fmt-xml asserts heading color, table colgroup, citation count"}
+    ],
+    deps: []
+  },
+  {
+    id: "fhub", name: "fhub", icon: "🧭", cat: "writing", needs_ccconfig: false,
+    ccconfig_zh: "纯技能，总入口（需同时装 fcore）",
+    ccconfig_en: "Pure skill, main entry (installs alongside fcore)",
+    desc_zh: "技能包总入口。判断需求属于哪个子技能并派发，用户不必记技能名。先跑 fcore genre 做确定性匹配，命中就派发、不命中才问。",
+    desc_en: "Main entry. Figures out which skill a request needs and dispatches it, so you never have to remember skill names. Runs deterministic matching first, only asks when ambiguous.",
+    scenarios_zh: [
+      {trigger: '"帮我写一份 AI 芯片行业分析报告"', result: "→ 判为 write/report，派发 fworch-report"},
+      {trigger: '"把这个 PDF 排到飞书"', result: "→ 判为 pdf 域，派发 fpdf"},
+      {trigger: '"总结一下本周工作"', result: "→ 判为 personal 域，派发 flogme"}
+    ],
+    scenarios_en: [
+      {trigger: '"Write an AI chip industry analysis"', result: "→ Classified as write/report, dispatches fworch-report"},
+      {trigger: '"Put this PDF onto Feishu"', result: "→ Classified as pdf, dispatches fpdf"},
+      {trigger: '"Summarize this week\'s work"', result: "→ Classified as personal, dispatches flogme"}
+    ],
+    deps: ["fcore"]
+  },
+  {
+    id: "fdigest", name: "fdigest", icon: "📚", cat: "research", needs_ccconfig: true,
+    ccconfig_zh: "ccconfig 已装：lark-cli、mineru",
+    ccconfig_en: "ccconfig installs: lark-cli, mineru",
+    desc_zh: "大宗报告阅读与归档。结构化抽取 → 段落级检索 → 分节详解 → 飞书分层归档。每份报告存可定位的事实层，结论可反查原文页码。",
+    desc_en: "Bulk report reading and archiving. Structured extraction → paragraph retrieval → section-by-section analysis → layered Feishu archive. Every claim traceable to a page.",
+    scenarios_zh: [
+      {trigger: '"读这份 SEC 年报，帮我总结归档"', result: "→ 抽取结构 → 建索引 → 写详解 → 归档飞书三层"},
+      {trigger: '"我之前存的那份报告里怎么说的"', result: "→ 本地 FTS5 段落检索，返回页码 + 章节 + 原文片段"},
+      {trigger: '"把这份 400 页研报全文翻成中文"', result: "→ 块级翻译 + 按版面还原排版，一篇不分卷"}
+    ],
+    scenarios_en: [
+      {trigger: '"Read this SEC filing and archive it"', result: "→ Extract → index → detailed analysis → 3-layer Feishu archive"},
+      {trigger: '"What did that report I saved earlier say?"', result: "→ Local FTS5 paragraph search, returns page + section + snippet"},
+      {trigger: '"Translate this 400-page report into Chinese"', result: "→ Block-level translation with layout restoration, single document"}
+    ],
+    deps: ["fcore", "lark-cli"]
+  },
+  {
     id: "ffeishu", name: "ffeishu", icon: "🪶", cat: "docs", needs_ccconfig: true,
     ccconfig_zh: "ccconfig 已装：lark-cli、officecli",
     ccconfig_en: "ccconfig installs: lark-cli, officecli",
