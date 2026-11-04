@@ -336,6 +336,8 @@ def main():
     ap.add_argument('--split-cost', type=int, default=0,
                     help='按飞书块数切成多段（0=不切）。单次 append 上限 5000')
     ap.add_argument('--split-dir', default=None, help='多段输出目录')
+    ap.add_argument('--skip-front-matter', action='store_true', default=False,
+                    help='跳过 p1-15（封面/免责/目录/术语表），从正文开始')
     args = ap.parse_args()
 
     d = os.path.join(args.workdir, args.slug)
