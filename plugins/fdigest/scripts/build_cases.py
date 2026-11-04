@@ -107,7 +107,8 @@ def main():
             head = f'第 {p} 页 · {co}' if co else f'第 {p} 页'
             o.append(f'<h2>{esc(head)}</h2>')
             pth = os.path.join(args.images_dir, x['file'])
-            o.append(f'<img path="@{pth}" caption="第 {p} 页 · {esc(co) or esc(x[chr(39)+"file"+chr(39)]) if False else esc(x["file"])}"/>')
+            cap = f'第 {p} 页 · {co}' if co else f'第 {p} 页 · {x["file"]}'
+            o.append(f'<img path="@{pth}" caption="{esc(cap)}"/>')
             o.append('<p><b>案例解读</b>：<i>待视觉识别补充</i></p>')
 
     xml = '\n'.join(o)
