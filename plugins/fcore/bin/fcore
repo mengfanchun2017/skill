@@ -38,6 +38,16 @@ source "$_ROOT/lib/fmt.sh"
 
 _usage() { sed -n '2,30p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; }
 
+# --plugin <name>：跨 plugin 取值（如在 fcore 里读 fdigest 的配置）
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --plugin) F_PLUGIN_NAME="${2:?--plugin 需要参数}"; shift 2 ;;
+        --plugin=*) F_PLUGIN_NAME="${1#*=}"; shift ;;
+        *) break ;;
+    esac
+done
+export F_PLUGIN_NAME
+
 cmd="${1:-}"; shift || true
 case "$cmd" in
     auth)
