@@ -155,22 +155,12 @@ for c in cands:
             raw = sec[k]
             v = raw.get("options", raw) if isinstance(raw, dict) else None
             v = dig(v, key) if isinstance(v, dict) else None
-            if v not in (None, ""): print(v if not isinstance(v, bool) else str(v).lower()); sys.exit(0)
+            if v in (None, ""): continue
+            _emit(v); sys.exit(0)
         continue
     v = dig(d, key)
     if v in (None, ""): continue
-    # 命中的是 dict/list 时说明 key 路径不完整（如 wiki_nodes.default 下还有 token）。
-    # 直接 print(dict) 会输出 Python repr 被当成值用，实测踩过 —— 改为报错并列出子键。
-    if isinstance(v, (dict, list)):
-        if isinstance(v, dict):
-            sys.stderr.write("[fcore] %s 是嵌套结构，不是单值。子键: %s\n"
-                             "        用法: fcore conf get %s.<子键>\n"
-                             % (key, ", ".join(sorted(v)), key))
-        else:
-            sys.stderr.write("[fcore] %s 是列表，不是单值。用下标: fcore conf get %s.0\n"
-                             % (key, key))
-        sys.exit(2)
-    print(v if not isinstance(v, bool) else str(v).lower()); sys.exit(0)
+    _emit(v); sys.exit(0)
 sys.exit(1)
 ' "$key" "$plugin" 2>/dev/null)" || true
     if [[ -n "$out" ]]; then printf '%s\n' "$out"; return 0; fi
