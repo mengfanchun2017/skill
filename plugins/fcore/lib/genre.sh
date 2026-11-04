@@ -10,8 +10,22 @@
 
 f_registry_file() {
     local f
-    f="$(f_conf_file fcore.yaml 2>/dev/null)" || return 1
-    [[ -f "$f" ]] && printf '%s\n' "$f"
+    # 1. 用户/私有仓配置（f_conf_file 已按 ccprivate → 用户数据目录 顺序找）
+    if f="$(f_conf_file fcore.yaml 2>/dev/null)" && [[ -f "$f" ]]; then
+        printf '%s\n' "$f"; return 0
+    fi
+    # 2. plugin 自带的用户 config.yaml（官方通道写到 plugin 目录时）
+    if f="$(f_plugin_dir 2>/dev/null)" && [[ -f "$f/config.yaml" ]]; then
+        printf '%s\n' "$f/config.yaml"; return 0
+    fi
+    # 3. 内置默认（模板级，无真值）—— 保证独立用户也能派发
+    if [[ -n "${F_CORE_LIB:-}" && -f "$F_CORE_LIB/../references/fcore.default.yaml" ]]; then
+        printf '%s\n' "$F_CORE_LIB/../references/fcore.default.yaml"; return 0
+    fi
+    if [[ -f "$_ROOT/references/fcore.default.yaml" ]]; then
+        printf '%s\n' "$_ROOT/references/fcore.default.yaml"; return 0
+    fi
+    return 1
 }
 
 # f_genre_match <需求文本> — 输出 JSON: {domain, skill, orchestrator, spec, config, score}
