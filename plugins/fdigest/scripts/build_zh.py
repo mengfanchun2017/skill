@@ -396,6 +396,14 @@ def main():
                     bi = fl.index(cand)
                     break
 
+        li_buf = []       # 连续的项目符号行攒成一个 <ul>
+
+        def flush_li():
+            if li_buf:
+                body = ''.join(f'<li>{_inline_code(esc(x))}</li>' for x in li_buf)
+                out.append(f'<ul>{body}</ul>')
+                li_buf.clear()
+
         for i, b in enumerate(blocks):
             by = first_y.get(id(b))
             if by is not None:
@@ -409,6 +417,7 @@ def main():
             if not txt:
                 continue
             if b['kind'] == 'h':
+                flush_li()
                 lvl = min(b['level'], 3)
                 txt = strip_manual_number(txt)
                 if not txt:
@@ -417,8 +426,16 @@ def main():
                     out.append(f'<h1><span text-color="blue">{esc(txt)}</span></h1>')
                 else:
                     out.append(f'<h{lvl}>{esc(txt)}</h{lvl}>')
+            elif b['kind'] == 'li':
+                li_buf.append(re.sub(r'^[•▪·]\s*', '', txt))
+            elif b['kind'] == 'note':
+                # 脚注渲染成引用块：学习者一眼能看出这是注释而非正文
+                flush_li()
+                out.append(f'<blockquote><p>{_inline_code(esc(txt))}</p></blockquote>')
             else:
-                out.append(f'<p>{esc(txt)}</p>')
+                flush_li()
+                out.append(f'<p>{_inline_code(esc(txt))}</p>')
+        flush_li()
 
         # 页面尾部剩余的图（y 大于所有正文块）
         while page_imgs:
