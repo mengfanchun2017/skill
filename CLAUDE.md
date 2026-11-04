@@ -1,116 +1,102 @@
 # CLAUDE.md — skill
 
-> 项目级 AI 行为指南。**仅在 `/home/francis/git/skill/` 工作时加载**。全局规则在 `~/.claude/CLAUDE.md`。
+> 项目级 AI 行为指南，仅在 `~/git/skill/` 工作时加载。全局规则在 `~/CLAUDE.md`。
+>
+> **分工**：README 面向外部用户（怎么装、有哪些技能），CONTRIBUTING 面向贡献者（PR 流程），
+> 本文件只写**本机能动文件时的约定**和**从文档看不出来的机制**。三者不重复。
 
-## 项目定位
-Claude Code skill 聚合仓。**27 个自建 plugin，全部在 marketplace 注册**（每个 `plugins/<name>/` 是独立 Claude Code plugin），第三方 skill 由用户用 `npx skills` 自管（不通过 marketplace）。
+## 一句话
 
-## 目录结构
-```
-skill/
-├── plugins/                # 27 个自建 plugin
-├── scripts/                # marketplace 工具脚本
-├── .claude-plugin/         # Claude Code plugin 元数据
-├── .github/                # CI
-├── CHANGELOG.md
-├── CONTRIBUTING.md
-├── README.md
-└── www/                    # 静态展示页（部署到 skill.aiagt.dev）
-```
+30 个自建 Claude Code plugin 的聚合仓，五层架构：`fcore`(机械) → `fhub`(派发) →
+业务技能 → `fwstd-*`(规范) → `fworch-*`(编排)。详见 README 的架构图。
 
-## 27 个 plugin
-| Plugin | 用途 |
-|--------|------|
-| ffeishu | 飞书文档/PPT/表格/Base 操作统一入口 |
-| fpptx | PPT / 飞书 Slides 生成 |
-| fdocx | Word 文档 |
-| fxlsx | Excel 表格 |
-| fdiagram | 飞书画板统一入口（架构/流程/时序/ER/类/甘特/思维导图） |
-| fsearch | 搜索活动统一原语（中英双语路由） |
-| fresearchframe | 4 领域研究方法论框架 |
-| fworch | 撰写系统统一入口（按体裁路由） |
-| fworch-report | 报告生成 orchestrator |
-| fworch-course | 系列课程创作 orchestrator |
-| fworch-case | 案例库编排器 |
-| fworch-interview | 面试准备 orchestrator |
-| fwstd-report | 报告写作规范 |
-| fwstd-course | 课程内容规范 |
-| fwstd-case | 案例库内容规范 |
-| fwstd-interview | 面试准备内容规范 |
-| flogme | 个人 OKR/工作日志/反思 |
-| fmoocrec | MOOC 课程推荐 |
-| fsysarchi | 系统分析师备考 |
-| flibaudit | 仓库全面审计 |
-| fsyncdoc | 源码文档同步 + 产品页同步 |
-| fmashwork | AI 图生 3D → 拓竹打印 |
-| fllmpack | LLM 预设配置导出/导入 |
-| fskillcreat | Skill 开发脚手架 |
+## 硬约束（改文件前必看）
 
-## 硬约束
-1. **每个 plugin 是独立 Claude Code plugin**：有自己的 `commands/` `skills/` `scripts/`，可独立 `/plugin install <name>`
-2. **marketplace 同步**：`marketplace.json` 是 plugin 清单的真相源，新增 plugin 必须同步
-3. **不重复造轮子**：跨 plugin 共享工具放 `fsearch` / `ffeishu` 等已有 hub，不新建 `f-utils`
-4. **CHANGELOG 必写**：每次发布新版本（plugin 增删或行为变更）必须更新对应节
-5. **公开仓库**：本仓库公开，不放任何 API key / 个人 token。Skill 运行时的 YAML 配置放 ccprivate/skill/
+1. **`SKILL.md` 的 `description` 是单一真相源**。改完跑 `python3 scripts/sync-marketplace.py --write`，
+   CI 会检查 marketplace.json 是否同步（不同步 = 非零退出）。
+2. **公开仓零真值**。不放 API key / 飞书 token / 租户域名 / 个人文档 URL。
+   CI 检查 `plugins/*/config.yaml` 必须不存在（只允许 `config.yaml.example`）。
+3. **机械操作一律走 `fcore`**，不要在 SKILL.md 里手写 lark-cli 参数。历史上 5 处各抄一份
+   auth 预检，其中 3 处 grep 写错（`'"ok":true'` 匹配不到 `"ok": true`）导致认证正常也恒失败。
+4. **SKILL.md 只写判断，不写实现**。细则进 `references/`，命令进 `scripts/` 或 `fcore`。
+   超过 200 行就该拆。
+5. **不改 `_boot.sh` 副本**。`plugins/*/references/_boot.sh` 是 `fcore/references/_boot.sh`
+   的生成物，由 `ccconfig/bin/sync-plugin-env.sh` 分发。改源文件后重新分发。
+6. **本仓不手动 commit/push**。`~/git/` 下由 auto-sync monitor 独占提交权（inotify → 30s
+   debounce → add+commit+push）。改完文件继续干别的。
+
+## 从文档看不出来的机制
+
+### 为什么每个 plugin 都带一份 `_boot.sh`
+
+`/plugin install` **只复制 plugin 自己的目录**。`fcore` 的实现（lib/*.sh）装在
+`plugins/cache/<market>/fcore/<版本>/`，别的 plugin 装完拿不到它。
+
+所以每个 plugin 带一份 40 行的 stub 去找实现，**实现仍然只有 fcore 一处**。
+stub 依次找：自己就是 fcore → 兄弟目录（git clone 布局）→ cache 布局 → `~/.claude/skills/fcore/`
+→ `F_CORE_LIB` 环境变量。
+
+改 fcore 的 lib 后，若要覆盖所有布局，跑 `bash ccconfig/bin/sync-plugin-env.sh`。
+
+### 为什么 description 不能随手改格式
+
+`sync-marketplace.py` 逐字比对。改写时多一个空格、少一个换行都会报 `DRIFT`，
+CI 直接红。改完必须 `--write`。
+
+### 为什么配置不放 plugin 目录
+
+`/plugin update` 整目录替换 `~/.claude/plugins/cache/<market>/<plugin>/<版本号>/`。
+写在那里的 `config.yaml` 会丢。用户自填配置落 `~/.claude/skill-config/<plugin>.yaml`
+（cache 之外），由 `fcore conf` 统一读写。
 
 ## 常用命令
+
 ```bash
-# 本地展示页预览
-cd www && python3 -m http.server 8000
+python3 scripts/sync-marketplace.py           # 检查漂移（CI 同款）
+python3 scripts/sync-marketplace.py --write   # 写回 marketplace.json
 
-# Plugin 元数据校验
-cat .claude-plugin/marketplace.json | python3 -m json.tool
+cd www && python3 -m http.server 8000         # 本地预览展示页
 
-# 同步到 GitHub（auto-sync 自动处理，无需手动 push）
-git status  # 确认干净
+bash ccconfig/bin/sync-plugin-env.sh          # 分发 _boot.sh 到所有 plugin
+bash ccconfig/bin/sync-plugin-env.sh --check  # 只校验
 ```
 
-## 添加新 plugin 流程（marketplace）
-1. `mkdir plugins/<name>` — 目录名 = plugin 名（小写、无连字符）
-2. 写 `SKILL.md`，frontmatter 含 `name` 和 `description`（description 是单一真相源）
-3. 在 `.claude-plugin/marketplace.json` 添加 entry（`name`, `source`, `keywords`，不用写 description）
-4. `python3 scripts/sync-marketplace.py --write` — 从 SKILL.md 同步 description
-5. 写 CHANGELOG 一行：`### Added - <name>: ...`
-6. `git commit && git push` → auto-sync 推送
+## 改完必须验证
+
+```bash
+bash -n plugins/fcore/lib/*.sh                 # 改 shell 后
+python3 scripts/sync-marketplace.py            # 改 description 后
+~/.claude/skills/fcore/bin/fcore where         # 确认路径解析正常
+```
+
+**shell 改动后不跑 `bash -n` 会出事**：Edit 跨行替换容易把多行压成一行，
+运行时才报 `[: missing ']'`。
+
+## 新增 plugin
+
+步骤见 CONTRIBUTING。补充两条本机约定：
+
+1. 建完目录后跑 `bash ccconfig/bin/sync-plugin-env.sh`，让新 plugin 拿到 `_boot.sh`
+   （否则该 plugin 装到 cache 后无法解析配置）。
+2. `marketplace.json` 里的 `keywords` 统一写 `["f"]`。
 
 ## 与 ccconfig 的关系
-- `~/git/ccconfig/` 提供通用编码规范（rules/）+ init-skill.sh 同步脚本
-- 本仓库的 skill/plugin 是产物，ccconfig 负责安装分发
-- skill YAML 配置（私有 key）从 ccprivate/skill/<name>.yaml 通过 symlink 注入到 `~/.claude/skills/<name>/config.yaml`
 
-## 链接
-- 完整 skill 列表 → [README.md](README.md)
-- 变更历史 → [CHANGELOG.md](CHANGELOG.md)
-- 贡献指南 → [CONTRIBUTING.md](CONTRIBUTING.md)
+本仓是**产物**（技能实体），`~/git/ccconfig` 是**安装分发层**：
 
-## 依赖管理
-每个 plugin 用 `deps.txt` 声明底层 npm 包依赖（仅声明，不自动安装）：
-```
-<package> <type:version> <skill-name>
-```
-- 运行时 skill 本身应在首次调用时检测依赖是否可用（`which <binary>` 或 `command -v`）
-- 缺失时提示用户安装，不强制自动安装（避免公开仓库的安装脚本风险）
-- Config 在 `config.yaml.example`，真实值通过 ccprivate 注入
+| ccconfig 侧 | 作用 |
+|---|---|
+| `lib/init-skill.sh sync` | symlink 本仓 plugin → `~/.claude/skills/` |
+| `bin/sync-plugin-env.sh` | 分发 `_boot.sh` 到所有 plugin |
+| `lib/deps-check.sh` | 读各 plugin 的 `deps.txt` 装 CLI 依赖 |
 
-## 配置注入模式（2026-10-27 重写）
-```
-config_env.py / plugin_env.sh（唯一实现在 ffeishu/references/，8 级优先级链）
-  1. $SKILLCONF_<KEY>            环境变量
-  2. $CLAUDE_PLUGIN_DATA/config.json
-  3. settings.json → pluginConfigs      /plugin install 弹窗填的
-  4. .credentials.json → pluginSecrets  sensitive:true 的键
-  5. ccprivate/conf/<plugin>.yaml       自用多机同步
-  6. ccprivate/conf/_shared.yaml        多 plugin 共用
-  7-8. 旧路径（兼容，勿再写）
-```
-各 plugin 带 `references/_skillconf_boot.{sh,py}`（**生成物**）定位唯一实现 ——
-`/plugin install` 只复制 plugin 自身目录，靠 stub 才能跨 plugin 取到解析器。
-改实现后跑 `bash ccconfig/bin/sync-plugin-env.sh` 重新分发 stub。
-公开仓只放 `config.yaml.example`；CI 检查 `plugins/*/config.yaml` 不存在。
+私有真值在 `~/git/ccprivate/conf/<plugin>.yaml`（**不是 `skill/`**，旧路径已迁走），
+本仓只放 `config.yaml.example`。
 
-## 同步流程
-```bash
-python3 scripts/sync-marketplace.py           # 检查：SKILL.md frontmatter 与 marketplace.json 一致？
-python3 scripts/sync-marketplace.py --write   # 写入：SKILL.md description → marketplace.json
-```
-**SKILL.md 的 `description` 是单一真相源**。新增 plugin 时：写 SKILL.md frontmatter → `--write` 同步 → 提交。
+## 相关
+
+- 用户怎么装 → [README.md](README.md)
+- 怎么加技能 → [CONTRIBUTING.md](CONTRIBUTING.md)
+- 版本变更 → [CHANGELOG.md](CHANGELOG.md)
+- 架构决策 → [docs/adr/](docs/adr/)
+- 层级决策记录 → `ccconfig/docs/adr/0058-skill-layer-fcore-fhub.md`
