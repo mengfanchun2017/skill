@@ -72,6 +72,48 @@ def _is_bold_lead(l):
     return len(t.split()) <= 8
 
 
+def _is_standalone_heading(lines, i):
+    """独立成行的小标题（不加粗版本）。
+
+    这是此前标题丢失的根因：SEC 里有些小节标题是 10pt **不加粗**，
+    比如 p63 "Internal Governance and Decision-Making"、p45 "Electrical
+    Power and Fuel Constraints"。旧判据只认「≥12 加粗」和「10pt 加粗」，
+    这一整档全部被当成正文段落吞掉，用户反复反馈的"标题丢失"就是它。
+
+    判据不能只看"短"：正文里的断行短句（"efficient training methodologies;"）
+    也短。关键是**前后都有段落分界的行距**（>PARA_GAP）——段落内部的断行
+    行距只有 11.4pt，独立小标题前后都是 20.4pt。
+    """
+    l = lines[i]
+    t = l['t'].strip()
+    if _heading_level(l['sz']) or l['b']:
+        return False                      # 已由字号/加粗判据覆盖
+    if not (9.9 <= l['sz'] <= 11.9):
+        return False
+    if len(t) < 4 or len(t) > 70:
+        return False
+    if t.startswith(('•', '-', '(')) or re.search(r'[.。,，;；:：]$', t):
+        return False
+    if re.match(r'^[a-z]', t):
+        return False
+    # 首字母大写或全大写；且后面紧跟正文（不是列表项）
+    if not (t[0].isupper() or t.isupper()):
+        return False
+    words = t.split()
+    if len(words) > 9:
+        return False
+    # 前后行距都要是段落分界（标题自成一行）
+    prev_gap = l['y'] - lines[i - 1]['y'] if i > 0 else 999
+    next_gap = lines[i + 1]['y'] - l['y'] if i + 1 < len(lines) else 999
+    if prev_gap < PARA_GAP * 0.85:
+        return False                      # 紧贴上行 → 是段落内断行
+    if next_gap < PARA_GAP * 0.85:
+        return False                      # 紧贴下行 → 是段落内断行
+    if words and t.isupper() and len(words) == 1:
+        return False                      # 单词大写多为表头/装饰
+    return True
+
+
 def _is_furniture(l):
     """页眉页脚 / 页码 / 目录行 —— 不属于正文。"""
     if l['y'] and (l['y'] < HEADER_Y or l['y'] > FOOTER_Y):
