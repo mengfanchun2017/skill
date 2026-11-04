@@ -5,6 +5,7 @@
 # 模型不需要照抄 lark-cli 参数，命令对错由本脚本保证。
 #
 # 用法：
+#   fcore [--plugin <名>] <命令>          --plugin 跨技能取值（如读 fdigest 的配置）
 #   fcore auth                          预检 lark-cli（0=可用 1=未装 2=未配置）
 #   fcore conf get <key> [默认值]        读配置（8 级回退，含用户自填）
 #   fcore conf set <key> <值>            写用户自填（/plugin update 不覆盖）
@@ -84,7 +85,11 @@ case "$cmd" in
     search)  f_lark_search "${1:?关键词 required}" "${2:-10}"; exit $? ;;
     where)
         echo "plugin:      $(f_plugin_name 2>/dev/null || echo '(未识别)')"
-        echo "plugin dir:  $(f_plugin_dir 2>/dev/null || echo '(未识别)')"
+        if [[ -n "${F_PLUGIN_NAME:-}" ]]; then
+            echo "plugin dir:  (--plugin 指定，不推断)"
+        else
+            echo "plugin dir:  $(f_plugin_dir 2>/dev/null || echo '(未识别)')"
+        fi
         echo "ccprivate:   $(f_ccprivate_root 2>/dev/null || echo '(无 — 独立用户模式)')"
         echo "user config: $(f_user_config_dir)"
         echo "user data:   $(f_userdata_dir "$(f_plugin_name 2>/dev/null || echo unknown)")"

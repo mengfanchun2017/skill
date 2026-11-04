@@ -24,7 +24,11 @@ PAGE_SPLIT = re.compile(r'<div style="--justify:justify;--position:absolute;[^"]
 # 早期只匹配 font-size → 正文段落整段漏抽（实测 14MB 文件只抽到 33.6 万字符，实际可见
 # 159.5 万，覆盖率 21%）。这里放宽到任意属性，靠「内含 <font>」过滤掉纯布局 div。
 LINE_RE = re.compile(r'<div style="([^"]*)"[^>]*>(.*?)</div>', re.S)
-FONT_RE = re.compile(r'<font style="([^"]*)"[^>]*>([^<]*)</font>')
+# SEC 会把标题逐字母拆成独立 <font>（"Principal Stockholders" 每个字母一个标签，
+# 各带绝对 left 定位）。旧正则 `<font ...>([^<]*)</font>` 遇到嵌套就匹配不上，
+# 实测导致 p299 大标题只剩后半截 "and Selling Stockholders"，前半段整段丢失，
+# 出现「of Capital Stock」「Matters」这类残句标题。这里允许标签内出现子标签。
+FONT_RE = re.compile(r'<font style="([^"]*)"[^>]*>(.*?)</font>', re.S)
 IMG_RE = re.compile(r'<img([^>]*)>')
 TOP_RE = re.compile(r'top:([\d.]+)pt')
 LEFT_RE = re.compile(r'left:([\d.]+)pt')
