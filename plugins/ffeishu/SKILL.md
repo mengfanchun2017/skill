@@ -47,7 +47,14 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 
 ## 文档父子层级规则
 
-**默认父目录**：配置的 `wiki_nodes.default`（真值在私有配置，本仓库只有 `.example` 占位符）。
+**默认父目录**：配置的 `wiki_nodes.default.token`（真值在私有配置，本仓库只有 `.example` 占位符）。
+
+```bash
+~/.claude/skills/fcore/bin/fcore --plugin ffeishu conf get wiki_nodes.default.token
+```
+
+⚠️ 不能只取到 `wiki_nodes.default` —— 它下面是 `{token: ...}` 结构，`fcore conf get`
+遇到 dict 会报错并提示子键（直接打印 Python repr 当值用是踩过的坑）。
 
 **任务级判断**：
 - 用户给出父文档 URL → 以该 token 为 `--parent-token`
