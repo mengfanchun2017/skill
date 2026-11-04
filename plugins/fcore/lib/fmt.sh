@@ -40,8 +40,22 @@ f_fmt_check_xml() {
     if [[ "$tables" -gt 0 ]] && ! grep -q '<colgroup' "$f"; then
         _f_fmt_bad "有表格但缺 <colgroup>（飞书表格必须 XML + colgroup width=822）"
     fi
-    grep -qE '<colgroup' "$f" && ! grep -qE 'width="822"' "$f" \
-        && _f_fmt_bad "colgroup 未统一 width=822"
+    # 判据是**每个 colgroup 的宽度和**等于 822，不是某个 col 写了 822。
+    # 旧判据 grep 字面 'width="822"' 会把「两列 411+411」「三列 90+340+392」
+    # 这类完全合法的表全判失败（实测误报 141 张表）。
+    local cg
+    while IFS= read -r cg; do
+        local sum
+        sum=$(printf '%s' "$cg" | grep -oE 'width="[0-9]+"' | grep -oE '[0-9]+' \
+              | awk '{s+=$1} END{print s+0}')
+        [[ "$sum" -ne 822 ]] && _f_fmt_bad "colgroup 宽度和 = $sum（应为 822）"
+    done < <(python3 - "$f" <<'PY'
+import re, sys
+x = open(sys.argv[1], encoding='utf-8').read()
+for m in re.finditer(r'<colgroup[^>]*>(.*?)</colgroup>', x, re.S):
+    print(m.group(1))
+PY
+)
 
     # 手动编号（飞书自动生成目录，禁止手写编号）
     grep -qE '^#+ *([一二三四五六七八九十]+、|[0-9]+\.[0-9]* *|[（(][0-9]+[)）] *)' "$f" \
