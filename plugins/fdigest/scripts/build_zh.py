@@ -208,13 +208,20 @@ def build_blocks(page, zh_lines, table_rows):
                 break
             if n['t'].strip() in table_cells:
                 break
+            # 脚注单独成块：不和正文段落混在一起，否则读者分不清哪句是注释
+            if _is_footnote(n) != _is_footnote(para[-1]):
+                break
             prev = para[-1]
             if abs(n['x'] - prev['x']) > 8 or not (0 < n['y'] - prev['y'] < PARA_GAP):
                 break
             para.append(n)
             j += 1
         text = ' '.join(x['t'] for x in para)
-        blocks.append({'kind': 'p', 'text': text, 'nlines': len(para)})
+        kind = 'note' if _is_footnote(para[0]) else 'p'
+        # 项目符号行（"•Rapid Revenue Growth. ..."）单独成块，后面拼列表时按块分组
+        if text.lstrip().startswith(('•', '▪', '·')):
+            kind = 'li'
+        blocks.append({'kind': kind, 'text': text, 'nlines': len(para)})
         i = j
     return blocks
 
