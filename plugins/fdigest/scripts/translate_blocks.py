@@ -78,9 +78,17 @@ def main():
         if not (args.start <= n <= end):
             continue
         out = os.path.join(outdir, f'{n:04d}.json')
-        if os.path.exists(out):
-            continue
         blocks = build_blocks(p, [], [r for rs in tb.get(n, []) for r in rs])
+        # 缓存必须校验块数：结构判据改了（如新增独立小标题识别）会让块数变化，
+        # 只看"文件存在"就跳过，会把旧结构下的译文贴到新块上 —— 张冠李戴。
+        if os.path.exists(out):
+            try:
+                cached = json.load(open(out))
+                if len(cached.get('blocks') or []) == len(blocks):
+                    continue
+            except Exception:
+                pass
+            os.remove(out)
         if not blocks and n not in tb:
             json.dump({'page': n, 'blocks': [], 'tables': []}, open(out, 'w'), ensure_ascii=False)
             continue
