@@ -41,9 +41,9 @@
 
 ```mermaid
 flowchart TB
-    subgraph L1["L1 · 入口与业务层"]
+    subgraph L1["L1 入口与业务层"]
         direction LR
-        fhub["fhub<br/>总入口 · 判域派发"]
+        fhub["fhub 总入口<br/>判域派发"]
         feishu["ffeishu<br/>飞书文档"]
         pdf["fpdf / fdigest<br/>PDF 精排 / 大宗报告"]
         office["fpptx / fdocx / fxlsx<br/>Office 三件套"]
@@ -52,16 +52,16 @@ flowchart TB
         tool["fsecretcheck / fpostpone / flibaudit<br/>工具链"]
     end
 
-    subgraph L2["L2 · 内容规范层"]
-        fwstd["fwstd-report / fwstd-course<br/>fwstd-case / fwstd-interview<br/><i>什么算好，无命令</i>"]
+    subgraph L2["L2 内容规范层"]
+        fwstd["fwstd-report / fwstd-course<br/>fwstd-case / fwstd-interview<br/>定义什么算好，不含命令"]
     end
 
-    subgraph L3["L3 · 编排层"]
-        fworch["fworch-report / fworch-course<br/>fworch-case / fworch-interview<br/><i>什么时候做哪一步</i>"]
+    subgraph L3["L3 编排层"]
+        fworch["fworch-report / fworch-course<br/>fworch-case / fworch-interview<br/>决定什么时候做哪一步"]
     end
 
-    subgraph L0["L0 · 机械内核"]
-        fcore["fcore<br/>路径解析 · 配置读写 · 授权预检<br/>文档增改查 · 格式断言 · 派发匹配"]
+    subgraph L0["L0 机械内核"]
+        fcore["fcore<br/>路径解析 / 配置读写 / 授权预检<br/>文档增改查 / 格式断言 / 派发匹配"]
     end
 
     L1 --> L2
@@ -69,9 +69,9 @@ flowchart TB
     L3 --> L0
     L1 --> L0
 
-    ext1["lark-cli<br/>(npm 全局)"]
-    ext2["OfficeCLI<br/>(.NET)"]
-    ext3["MinerU / Tavily / Exa<br/>(外部 API)"]
+    ext1["lark-cli<br/>npm 全局"]
+    ext2["OfficeCLI<br/>.NET"]
+    ext3["MinerU / Tavily / Exa<br/>外部 API"]
     L0 --> ext1
     L1 --> ext2
     L1 --> ext3

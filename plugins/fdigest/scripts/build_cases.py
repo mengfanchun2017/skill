@@ -131,7 +131,7 @@ def main():
              '<thead><tr><th><p>原文页</p></th><th><p>案例</p></th><th><p>关键点</p></th></tr></thead><tbody>')
     for p in ordered:
         fn = by_page[p][0]['file']
-        md = ocr.get(p, '')
+        md = ocr_zh.get(p, '') or ocr.get(p, '')
         title = ''
         for line in md.split('\n'):
             if line.startswith('#'):
