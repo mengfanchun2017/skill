@@ -67,9 +67,11 @@ def _is_bold_lead(l):
         return False
     if t.startswith('•') or t.startswith('-'):
         return False
-    if len(t) > 60 or t.endswith(('.', '。', ':', '：', ';', '；')):
+    # 旧阈值 60 字符会漏掉长一点的标题（"Frontier AI May Reshape Entire Sectors
+    # and Accelerate Novel Discoveries" 71 字符），放宽到 90 且按词数兜底。
+    if len(t) > 90 or t.endswith(('.', '。', ':', '：', ';', '；')):
         return False
-    return len(t.split()) <= 8
+    return len(t.split()) <= 14
 
 
 def _is_standalone_heading(lines, i):
