@@ -358,7 +358,20 @@ def main():
     ap.add_argument('--split-dir', default=None, help='多段输出目录')
     ap.add_argument('--skip-front-matter', action='store_true', default=False,
                     help='跳过 p1-15（封面/免责/目录/术语表），从正文开始')
+    ap.add_argument('--skip-pages', default='',
+                    help='排除的页（逗号分隔或区间，如 "219-238,37,143"）。案例单独成文时用')
     args = ap.parse_args()
+
+    skip = set()
+    for seg in (args.skip_pages or '').split(','):
+        seg = seg.strip()
+        if not seg:
+            continue
+        if '-' in seg:
+            a, b = seg.split('-', 1)
+            skip.update(range(int(a), int(b) + 1))
+        else:
+            skip.add(int(seg))
 
     d = os.path.join(args.workdir, args.slug)
     pages = json.load(open(os.path.join(d, 'pages.json')))
@@ -395,6 +408,8 @@ def main():
         n = p['page']
         if args.skip_front_matter and n < FRONT_MATTER_END:
             continue    # SEC 封面/免责/目录页，对学习无价值
+        if n in skip:
+            continue    # 案例页/纯装饰扉页，已单独处理
         if args.page_end and not (args.page_start <= n <= args.page_end):
             continue
         zrec = zb_by_page.get(n)
