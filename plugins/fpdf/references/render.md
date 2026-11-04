@@ -14,6 +14,10 @@ $F --plugin fpdf conf path wiki_nodes.default.token      # 看当前从哪读
 ⚠️ 路径必须写到 `.token`：`wiki_nodes.default` 本身是 `{token: ...}` 结构，
 `fcore conf get` 遇到嵌套 dict 会报错并提示子键。
 
+> 脚本层（`parse.py`）暂时仍走旧配置层 `ffeishu/references/config_env.py`（经
+> `_skillconf_boot.py` 定位），只为不破坏已在跑的机器。**文档层与新增代码一律用 fcore**；
+> 等脚本也迁完再删旧层。
+
 用户自填落 `~/.claude/skill-config/fpdf.yaml`（`/plugin update` 不覆盖）。
 未配置时回落 ffeishu 的 default；`--parent` 参数可临时覆盖。
 
