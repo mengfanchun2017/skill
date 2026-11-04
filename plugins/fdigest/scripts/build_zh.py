@@ -120,11 +120,17 @@ def _is_standalone_heading(lines, i):
 
 
 def _is_furniture(l):
-    """页眉页脚 / 页码 / 目录行 —— 不属于正文。"""
+    """页眉页脚 / 页码 / 目录行 / 续页标记 —— 不属于正文。"""
     if l['y'] and (l['y'] < HEADER_Y or l['y'] > FOOTER_Y):
         return True
     t = l['t'].strip()
-    return bool(re.fullmatch(r'\d{1,3}', t) or t == 'Table of Contents')
+    if re.fullmatch(r'\d{1,3}', t) or t == 'Table of Contents':
+        return True
+    # 财报长表格跨 50 页，每页顶部都有 "(Continued)"。它既不是标题也不是正文，
+    # 混进去会在目录里堆 51 个同名条目。
+    if re.fullmatch(r'\(?Continued\)?|\(续\)', t, re.I):
+        return True
+    return False
 
 
 def build_blocks(page, zh_lines, table_rows):
