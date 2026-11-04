@@ -165,6 +165,8 @@ def build_blocks(page, zh_lines, table_rows):
             n = lines[j]
             if _heading_level(n['sz']) and n['b']:
                 break
+            if _is_standalone_heading(lines, j):
+                break
             if n['t'].strip() in table_cells:
                 break
             prev = para[-1]
