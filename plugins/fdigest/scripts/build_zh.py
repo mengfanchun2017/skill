@@ -133,6 +133,34 @@ def _is_furniture(l):
     return False
 
 
+FOOTNOTE_SZ = 8.2       # 正文 9.5pt，脚注 8.0pt（实测 499 行集中在 8.0）
+FRONT_MATTER_END = 16   # p1-15 是封面/免责/目录/术语表，p16 起才是正文
+GLOSSARY_START = 12     # p12 "Select Defined Terms"
+
+
+def _is_footnote(l):
+    """行尾的脚注（小字号 + 页码编号开头）。
+
+    SEC 把脚注排在页面底部，字号 8pt，正文是 9.5pt。学习者需要能区分
+    "这是正文的一句" 和 "这是对上面某个数字的注释"——所以渲染成引用块。
+    """
+    if l['sz'] > FOOTNOTE_SZ:
+        return False
+    t = l['t'].strip()
+    # "1 See the section titled ..." / "2 IDC, The Economic Impact of AI ..."
+    return bool(re.match(r'^\d{1,2}\s+\S', t))
+
+
+def _inline_code(text):
+    """把 (MCP)/(SDK)/(API) 这类缩写括号改成行内代码。
+
+    原文用括号补全缩写（"通用模型上下文协议（MCP）"），正文里满屏括号很吵。
+    改成 `<code>MCP</code>` 后既保留信息又更好扫读。
+    """
+    import re as _re
+    return _re.sub(r'[（(]([A-Z][A-Z0-9\-]{1,7})[）)]', r'<code>\1</code>', text)
+
+
 def build_blocks(page, zh_lines, table_rows):
     """一页 → 有序块列表。
 
