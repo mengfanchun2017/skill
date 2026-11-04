@@ -132,7 +132,9 @@ Workflow({name: "fdigest-build", args: "<slug>"})
 | `build_zh.py` | 版面还原 + 嵌图 + 按块数切段 |
 | `translate_blocks.py` | 块级翻译（推荐） |
 | `translate.py` / `render_zh.py` | 逐行翻译（旧，拼回段落会断裂） |
-| `build_cases.py` | 生成案例/图表子文档内容 |
+| `ocr_cases.py` | 案例整页扫描图 → MinerU OCR（视觉通道，输出带版面结构的 md） |
+| `translate_cases.py` | OCR md 译中文（按页缓存，可续跑；表格逐格翻） |
+| `build_cases.py` | 生成案例/图表子文档内容（图 → 中文 → 英文原文） |
 | `parent_tpl.xml` / `brief_tpl.xml` | 父文档模板 / 摘要模板 |
 | `child_source_tpl.xml` / `child_figures_tpl.xml` | 来源索引 / 关键图表子文档模板 |
 | `topic_company_tpl.xml` / `topic_market_tpl.xml` / `topic_finance_tpl.xml` | 公司 / 赛道 / 财务基准档案模板 |

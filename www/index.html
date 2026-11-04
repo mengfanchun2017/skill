@@ -455,10 +455,10 @@ const SKILLS = [
   },
   {
     id: "fworch", name: "fworch", icon: "🧩", cat: "writing", needs_ccconfig: false,
-    ccconfig_zh: "纯技能，撰写系统路由层",
-    ccconfig_en: "Pure skill, writing-system router",
-    desc_zh: "撰写系统统一入口（路由层）。读体裁注册表判断需求属于哪种体裁（课程/报告/案例/面试准备），派发到对应 orchestrator，用户只描述需求、无需记内部 skill 名。",
-    desc_en: "Writing-system unified entry (router). Reads the genre registry, dispatches to the right orchestrator (course/report/case/interview) — you just describe the need.",
+    ccconfig_zh: "旧入口，职能已并入 fhub",
+    ccconfig_en: "Legacy entry, superseded by fhub",
+    desc_zh: "撰写系统路由层（旧入口）。判断需求属于哪种体裁并派发到 fworch-course/report/case/interview。职能已并入 fhub + fcore genre，保留只为不打断既有习惯，新用请走 fhub。",
+    desc_en: "Writing-system router (legacy). Dispatches to the right orchestrator. Superseded by fhub + fcore genre; kept only for backward compatibility — use fhub instead.",
     scenarios_zh: [
       {trigger: '"做一门课"', result: "→ 识别为课程体裁，派发 fworch-course"},
       {trigger: '"写一份分析报告"', result: "→ 识别为报告体裁，派发 fworch-report"},
@@ -678,6 +678,24 @@ const SKILLS = [
       {trigger: '"Import the LLM preset pack"', result: "→ Imports preset definitions, prompts for your own keys"}
     ],
     deps: ["python3"]
+  },
+  {
+    id: "fpostpone", name: "fpostpone", icon: "⏰", cat: "productivity", needs_ccconfig: false,
+    ccconfig_zh: "纯技能，用官方 CronCreate",
+    ccconfig_en: "Pure skill, built on official CronCreate",
+    desc_zh: "定时延迟执行。把一条命令排到将来某时刻跑，输出回到本会话。支持中文时间表达（18点/明天9点/+2h），会话内投递或 systemd 分离模式（关终端也跑）。",
+    desc_en: "Delayed execution. Schedule a command for later and get its output back in this session. Accepts natural time expressions; session-scoped or detached via systemd.",
+    scenarios_zh: [
+      {trigger: '"18点运行 /transliter x.zip"', result: "→ 解析时间 → 排任务 → 到点执行，输出回本会话"},
+      {trigger: '"明天早上9点跑一次同步，关掉终端也要跑"', result: "→ 走 systemd --detach 分离模式"},
+      {trigger: '"列出定时任务"', result: "→ 列出待执行任务与预计执行时间"}
+    ],
+    scenarios_en: [
+      {trigger: '"Run /transliter x.zip at 6pm"', result: "→ Parse time → schedule → execute and return output here"},
+      {trigger: '"Run sync at 9am tomorrow, must survive closing terminal"', result: "→ Uses systemd detached mode"},
+      {trigger: '"List scheduled tasks"', result: "→ Lists pending tasks with expected run time"}
+    ],
+    deps: []
   },
   {
     id: "flibaudit", name: "flibaudit", icon: "🛡️", cat: "research", needs_ccconfig: false,
