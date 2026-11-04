@@ -86,3 +86,5 @@ Supabase 课程数据共享只读，**无需用户配置**。
 | `references/certificate-guide.md` | 证书获取/验证/LinkedIn 挂载 |
 | `references/platform-guide.md` | 平台定价、免费策略、语言支持 |
 | `scripts/bio-progress.py` | Base 进度读写 |
+| `scripts/refresh-courses.py` | 刷新课程状态（活跃/失效） |
+| `scripts/seed-courses.sql` | 课程表初始化 SQL |
