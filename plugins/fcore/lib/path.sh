@@ -138,8 +138,9 @@ def _emit(v):
     stderr 被外层 2>/dev/null 吞掉，必须走 stdout 并用 MAGIC 前缀让 bash 侧识别。"""
     if isinstance(v, (dict, list)):
         if isinstance(v, dict):
-            msg = "%s 是嵌套结构，不是单值。子键: %s\\n用法: fcore conf get <key>.%s" % (
-                KEY, ", ".join(sorted(v)), sorted(v)[0])
+            msg = ("%s 是嵌套结构，不是单值。子键: %s\n"
+                   "用法: fcore conf get <key>.%s" % (
+                       KEY, ", ".join(sorted(v)), sorted(v)[0]))
         else:
             msg = "%s 是列表，不是单值。用下标: fcore conf get <key>.0" % KEY
         print("__FCORE_ERR__" + msg); sys.exit(2)
@@ -177,6 +178,11 @@ for c in cands:
     _emit(v); sys.exit(0)
 sys.exit(1)
 ' "$key" "$plugin" 2>/dev/null)" || true
+    # 嵌套结构错误（KEY 路径不完整）走 stdout 传递，这里翻译成人话
+    if [[ "$out" == __FCORE_ERR__* ]]; then
+        printf '%s\n' "${out#__FCORE_ERR__}" >&2
+        return 2
+    fi
     if [[ -n "$out" ]]; then printf '%s\n' "$out"; return 0; fi
     if [[ -n "$default" ]]; then printf '%s\n' "$default"; return 0; fi
     return 1
