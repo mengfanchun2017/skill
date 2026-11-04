@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+# fcore — 技能包机械内核 CLI（L0）
+#
+# 设计原则：SKILL.md 只写"该走哪条路"，命令一律走这里。
+# 模型不需要照抄 lark-cli 参数，命令对错由本脚本保证。
+#
+# 用法：
+#   fcore auth                          预检 lark-cli（0=可用 1=未装 2=未配置）
+#   fcore conf get <key> [默认值]        读配置（8 级回退，含用户自填）
+#   fcore conf set <key> <值>            写用户自填（/plugin update 不覆盖）
+#   fcore conf path <key>                该键命中的文件（诊断）
+#   fcore conf require <key>             缺失时打印"去哪填"
+#   fcore data <相对路径>                 用户数据文件路径（课程进度这类）
+#   fcore data-ls <模式>                 列出用户数据文件
+#   fcore genre <需求文本>                派发：输出 domain/genre → skill
+#   fcore genres                        列出所有域与体裁
+#   fcore fmt-xml <file>                飞书格式断言
+#   fcore fmt-md <file>                 报告格式断言
+#   fcore doc create <parent> <title> [file|-]
+#   fcore doc get <doc> [full|with-ids]
+#   fcore upload <file>
+#   fcore search <关键词> [数量]
+#   fcore where                         打印解析到的各路径（排障第一步）
+
+set -uo pipefail
+
+_HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+_ROOT="$(dirname "$_HERE")"
+
+# shellcheck source=/dev/null
+source "$_ROOT/lib/path.sh"
+# shellcheck source=/dev/null
+source "$_ROOT/lib/lark.sh"
+# shellcheck source=/dev/null
+source "$_ROOT/lib/genre.sh"
+# shellcheck source=/dev/null
+source "$_ROOT/lib/fmt.sh"
+
+_usage() { sed -n '2,30p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; }
+
+cmd="${1:-}"; shift || true
+case "$cmd" in
+    auth)
+        f_lark_need_auth; rc=$?
+        [[ $rc -eq 0 ]] && echo "✅ lark-cli 可用"
+        exit $rc
+        ;;
+    conf)
+        sub="${1:-get}"; shift || true
+        case "$sub" in
+            get)     f_conf_get "${1:?key required}" "${2-}"; exit $? ;;
+            set)     f_conf_set "${1:?key required}" "${2:?value required}"; exit $? ;;
+            path)    f_conf_path "${1:?key required}"; exit $? ;;
+            require) f_conf_require "${1:?key required}"; exit $? ;;
+            *)       echo "未知 conf 子命令: $sub" >&2; _usage; exit 2 ;;
+        esac
+        ;;
+    data)      f_conf_file "${1:?relpath required}"; exit $? ;;
+    data-ls)   f_conf_files "${1:?pattern required}"; exit $? ;;
+    genre)     f_genre_match "${1:?需求文本 required}"; exit $? ;;
+    genres)    f_genre_list; exit $? ;;
+    fmt-xml)   f_fmt_check_xml "${1:?file required}"; exit $? ;;
+    fmt-md)    f_fmt_check_md "${1:?file required}"; exit $? ;;
+    doc)
+        sub="${1:-}"; shift || true
+        case "$sub" in
+            create) f_lark_doc_create "$@"; exit $? ;;
+            get)    f_lark_doc_get "$@"; exit $? ;;
+            ids)    f_lark_doc_ids "$@"; exit $? ;;
+            *)      echo "未知 doc 子命令: $sub" >&2; exit 2 ;;
+        esac
+        ;;
+    upload)  f_lark_upload "${1:?file required}"; exit $? ;;
+    search)  f_lark_search "${1:?关键词 required}" "${2:-10}"; exit $? ;;
+    where)
+        echo "plugin:      $(f_plugin_name 2>/dev/null || echo '(未识别)')"
+        echo "plugin dir:  $(f_plugin_dir 2>/dev/null || echo '(未识别)')"
+        echo "ccprivate:   $(f_ccprivate_root 2>/dev/null || echo '(无 — 独立用户模式)')"
+        echo "user config: $(f_user_config_dir)"
+        echo "user data:   $(f_userdata_dir "$(f_plugin_name 2>/dev/null || echo unknown)")"
+        echo "registry:    $(f_registry_file 2>/dev/null || echo '(未找到 fcore.yaml)')"
+        ;;
+    ''|-h|--help|help) _usage ;;
+    *) echo "未知命令: $cmd" >&2; _usage; exit 2 ;;
+esac
