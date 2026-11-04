@@ -234,3 +234,41 @@
 - 浏览器 / 工具：f-vessel, caveman, diagnose, grill-me, improve-codebase-architecture, write-a-skill, zoom-out
 - option-vessel/ 配套安装器
 - .claude-plugin/marketplace.json 入口
+
+## [0.16.0] — 2026-11-04
+
+### Added
+- **`fcore`（L0 机械内核，第 29 个 plugin）**：路径解析、配置读写、lark-cli 授权预检、
+  文档增改查上传、格式断言、技能派发匹配。14 条命令，取代此前散落各处的重复实现
+  （27 份 boot stub、2 份已分叉 lark_env、5 处 auth 预检其中 3 处 grep 写错导致认证正常
+  也恒报失败）。
+- **`fhub`（L1 总入口，第 30 个 plugin）**：判断需求属哪个技能并派发。
+  先跑 `fcore genre` 确定性匹配（整短语 + 中文二元组词元兜底），命中就派发、不命中才问。
+  实测 11 条口语化需求全部正确派发。
+- `fhub/commands/fhub.md` — `/fhub <需求>` 斜杠命令。
+
+### Changed
+- **六个最大技能减肥 -73%**：ffeishu 619→207、fmoocrec 513→90、fpptx 359→69、
+  flogme 364→96、fdigest 395→142、fpdf 345→93 行。细节全部移入 `references/`，行为不变。
+- 三处 auth 预检统一改调 `fcore auth`（`fpptx` 还额外修了写死 `~/.lark-cli` 的问题）。
+- 配置读写统一走 `fcore conf`，旧的 8 级回退链从文档层移除（脚本层仍兼容，待迁移）。
+- `fworch` 标注为旧入口，职能已并入 `fhub` + `fcore genre`。
+
+### Fixed
+- **auth 预检恒失败**：3 处 `grep -q '"ok":true'` 匹配不到 lark-cli 实际输出 `"ok": true`
+  （冒号后有空格），导致认证明明正常也固定报 AUTH_FAILED，技能拒绝干活。
+  `fworch-course` 那处还漏了续行反斜杠，直接跑报 `AUTH_FAILED: command not found`。
+- **`fdigest` 泄露真实飞书 token**：5 个 token 写进公开 SKILL.md 并已推送至历史，
+  且文件自称「从 ccprivate/conf/fdigest.yaml 读」而该文件根本不存在。已移入私有配置。
+- **`fcore conf get` 对嵌套结构输出 Python repr**：取 `wiki_nodes.default` 会打印
+  `{'token': 'xxx'}` 被当值用。改为检测 dict/list → 报错并提示正确子键路径。
+- 减肥时误删的脚本引用（`export_whole_tree_pdf.sh`、`collect_pages.py`、`seed-courses.sql`、
+  fdigest 的 7 个模板）已补回。
+
+### Docs
+- README 重写：补充五层架构图（mermaid）、派发时序图、配置优先级图、目录结构、
+  全部 30 个技能清单、外部依赖表。
+- `CLAUDE.md` 重写：删掉与 README/CONTRIBUTING 重复的内容，只留 AI 会话需要的行为约定
+  和从文档看不出的机制（`_boot.sh` 为何存在、description 为何不能随手改格式、
+  配置为何不放 plugin 目录）。
+- 修正多处过时：27→30 个 plugin、`ccprivate/skill/`→`ccprivate/conf/`、移除旧的 8 级链描述。

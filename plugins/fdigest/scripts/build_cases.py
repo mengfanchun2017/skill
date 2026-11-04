@@ -120,7 +120,7 @@ def main():
     ordered = sorted(by_page)
     o = [f'<title>{esc(args.title)}</title>']
     o.append('<callout emoji="🗂️" background-color="light-gray">'
-             '<p>本页收录原文中的客户案例。每页一张原图，图下是 OCR 提取的案例正文。</p>'
+             '<p>本页收录原文中的客户案例。每页一张原图，图下是案例中文全文。</p>'
              f'<p>共 {len(ordered)} 页（第 {ordered[0]}-{ordered[-1]} 页）。'
              '原文件中这些页是整页扫描图，文字不在文本层，'
              '已用 MinerU 视觉 OCR 通道提取并译成中文。</p>'
