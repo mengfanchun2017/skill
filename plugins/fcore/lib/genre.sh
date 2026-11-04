@@ -27,25 +27,58 @@ except ImportError:
     print(json.dumps({"error": "no_yaml"})); sys.exit(1)
 path, text = sys.argv[1], sys.argv[2]
 d = yaml.safe_load(open(path)) or {}
+
+def hits(triggers, text):
+    """返回命中的触发词。两级匹配：
+    ① 完整短语出现过 → 高分（长词加权）
+    ② 触发词拆成词元，命中比例高 → 低分兜底
+    "PDF排到飞书" 不含 "PDF转飞书"，但含 "PDF"+"飞书" → 靠词元兜底命中。"""
+    best = (0, None)
+    for t in triggers or []:
+        if not t:
+            continue
+        if t in text:
+            s = len(t) ** 2
+            if s > best[0]:
+                best = (s, t)
+    if best[0]:
+        return best
+    # 词元兜底：把触发词与文本都切成 2 字以上的中文块 + 英文词
+    import re
+    def toks(s):
+        return set(re.findall(r"[A-Za-z]+|[一-鿿]{2,}", s.lower()))
+    tt = toks(text)
+    for t in triggers or []:
+        if not t:
+            continue
+        st = toks(t)
+        if not st:
+            continue
+        inter = st & tt
+        ratio = len(inter) / len(st)
+        if ratio >= 0.5:
+            s = int(ratio * len(t) ** 2 * 0.6)   # 打折：词元匹配不如整短语可靠
+            if s > best[0]:
+                best = (s, t)
+    return best
+
 best = None
 for dom, spec in (d.get("domains") or {}).items():
-    for t in spec.get("trigger") or []:
-        if t and t in text:
-            score = len(t) ** 2
-            if best is None or score > best["score"]:
-                best = {"domain": dom, "skill": spec.get("skill"),
-                        "trigger": t, "score": score, "desc": spec.get("desc", "")}
+    s, t = hits(spec.get("trigger"), text)
+    if s and (best is None or s > best["score"]):
+        best = {"domain": dom, "skill": spec.get("skill"),
+                "trigger": t, "score": s, "desc": spec.get("desc", "")}
 for g, spec in (d.get("genres") or {}).items():
-    for t in spec.get("trigger") or []:
-        if t and t in text:
-            score = len(t) ** 2 + 10   # 体裁比域更具体，同命中优先
-            if best is None or score > best["score"]:
-                best = {"domain": spec.get("parent", "write"), "genre": g,
-                        "skill": spec.get("skill"), "orchestrator": spec.get("orchestrator"),
-                        "spec": spec.get("spec"), "config": spec.get("config"),
-                        "trigger": t, "score": score, "desc": spec.get("desc", "")}
+    s, t = hits(spec.get("trigger"), text)
+    if s:
+        s += 10   # 体裁比域更具体，同命中优先
+        if best is None or s > best["score"]:
+            best = {"domain": spec.get("parent", "write"), "genre": g,
+                    "skill": spec.get("skill"), "orchestrator": spec.get("orchestrator"),
+                    "spec": spec.get("spec"), "config": spec.get("config"),
+                    "trigger": t, "score": s, "desc": spec.get("desc", "")}
 if best is None:
-    print(json.dumps({"domain": None, "hint": "无触发词命中，需模型判断或问用户"}))
+    print(json.dumps({"domain": None, "hint": "无触发词命中，需模型判断或问用户"}, ensure_ascii=False))
 else:
     print(json.dumps(best, ensure_ascii=False))
 PYEOF
