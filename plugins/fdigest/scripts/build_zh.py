@@ -154,6 +154,16 @@ FOOTNOTE_SZ = 8.2       # 正文 9.5pt，脚注 8.0pt（实测 499 行集中在 
 FRONT_MATTER_END = 16   # p1-15 是封面/免责/目录/术语表，p16 起才是正文
 GLOSSARY_START = 12     # p12 "Select Defined Terms"
 
+# 法律/程序性章节：IPO 流程文件，与「学 AI 知识」无关，默认不进中文版。
+#   p315 Shares Eligible for Future Sale（限售）
+#   p319 Material U.S. Federal Income Tax Consequences（税务）
+#   p324 Underwriting（承销）
+#   p342 Legal Matters / Experts / Additional Information
+#   p407 Part II（后附注册声明）
+#   p412 Exhibit Index / p414 Signatures / p415 Power of Attorney
+# 财报正文 p344-406 保留不动（含算力承诺、关联方交易等信息）。
+LEGAL_PAGES = set(range(315, 344)) | set(range(407, 416))
+
 
 def _is_footnote(l):
     """行尾的脚注（小字号 + 页码编号开头）。
@@ -431,6 +441,8 @@ def main():
             continue    # SEC 封面/免责/目录页，对学习无价值
         if n in skip:
             continue    # 案例页/纯装饰扉页，已单独处理
+        if args.drop_legal and n in LEGAL_PAGES:
+            continue    # 承销/税务/法律意见/附件索引，与学 AI 无关
         if args.page_end and not (args.page_start <= n <= args.page_end):
             continue
         zrec = zb_by_page.get(n)
