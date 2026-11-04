@@ -35,16 +35,19 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, mcp__mineru__parse_documents
 | 主题档案（横向复用） | wiki `<topic-wiki-node>` | `topic_wiki_node` |
 | 报告归档（按份存） | wiki `<archive-wiki-node>` | `archive_wiki_node` |
 
-真实 token 属于私有配置，不进公开仓库。运行时读取顺序（同一套 `skillconf_*` 解析）：
+真实 token 属于私有配置，不进公开仓库。运行时一律走 `skillconf_get`（8 级回退，
+ccprivate / 官方 pluginConfigs / CLAUDE_PLUGIN_DATA / 用户级 skill-config 都能命中）：
 
 ```bash
-source ~/.claude/skills/ffeishu/references/lark_env.sh
-lark_conf_get fdigest.yaml digestlib_wiki_node
+source ~/.claude/skills/ffeishu/references/plugin_env.sh
+SKILLCONF_PLUGIN_NAME=fdigest skillconf_get digestlib_wiki_node
+# 诊断值来自哪个源：SKILLCONF_PLUGIN_NAME=fdigest skillconf_diag digestlib_wiki_node
 ```
 
-`skillconf_file` 解析不到时（未装 ccprivate 的独立用户），提示用户把 5 个 token 写进
-`~/.claude/skill-config/fdigest.yaml`（用户级稳定路径，`/plugin update` 不覆盖）。
-缺配置不阻断：只做本地抽取/索引/检索，跳过飞书归档步骤。
+**未命中任何源时不阻断**：只做本地抽取/索引/检索，跳过飞书归档，并提示用户
+`skillconf_require` 给出的三个填写位置。用户自填的值落在
+`~/.claude/skill-config/fdigest.yaml` 或 `${CLAUDE_PLUGIN_DATA}/config.json`，
+两者都不在 `/plugin update` 的替换范围内。
 
 ## 能力边界
 
