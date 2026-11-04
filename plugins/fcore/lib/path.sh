@@ -125,9 +125,11 @@ f_conf_get() {
         printf '%s\n' "${!envkey}"; return 0
     fi
     [[ -n "$plugin" ]] || { [[ -n "$default" ]] && { printf '%s\n' "$default"; return 0; }; return 1; }
-    out="$(f_config_candidates "$plugin" | python3 -c '
+    local cands
+    cands="$(f_config_candidates "$plugin")"
+    out="$(printf '%s' "$cands" | python3 -c '
 import json, os, sys
-key = sys.argv[1]
+key, plugin = sys.argv[1], sys.argv[2]
 cands = json.load(sys.stdin)
 def dig(node, path):
     for k in path.split("."):
@@ -149,15 +151,16 @@ for c in cands:
     if src in ("settings.pluginConfigs", "credentials.pluginSecrets"):
         sec = d.get(src.split(".")[1]) or {}
         for k in sec:
-            if k.split("@", 1)[0] != plugin_name: continue
-            v = sec[k].get("options", sec[k]) if isinstance(sec[k], dict) else None
+            if k.split("@", 1)[0] != plugin: continue
+            raw = sec[k]
+            v = raw.get("options", raw) if isinstance(raw, dict) else None
             v = dig(v, key) if isinstance(v, dict) else None
             if v not in (None, ""): print(v if not isinstance(v, bool) else str(v).lower()); sys.exit(0)
         continue
     v = dig(d, key)
     if v not in (None, ""): print(v if not isinstance(v, bool) else str(v).lower()); sys.exit(0)
 sys.exit(1)
-' "$key" 2>/dev/null)" || true
+' "$key" "$plugin" 2>/dev/null)" || true
     if [[ -n "$out" ]]; then printf '%s\n' "$out"; return 0; fi
     if [[ -n "$default" ]]; then printf '%s\n' "$default"; return 0; fi
     return 1
