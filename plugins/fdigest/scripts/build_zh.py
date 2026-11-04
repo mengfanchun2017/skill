@@ -161,6 +161,26 @@ def _inline_code(text):
     return _re.sub(r'[（(]([A-Z][A-Z0-9\-]{1,7})[）)]', r'<code>\1</code>', text)
 
 
+GLOSSARY_TERM = re.compile(r'^[“"]([^”"]{1,40})[”"]\s*(指|refer to|refers to|means)\s*(.*)$', re.S)
+
+
+def _glossary_split(text):
+    """术语表条目拆成 (术语, 定义)。
+
+    原文是 "“agent loop” refers to the iterative cycle in which..." —— 术语和
+    定义挤在一句话里，读起来像词典正文。用户要求改成
+    「术语名（软换行）定义」的列表形态，每条一眼能扫到词条。
+    """
+    m = GLOSSARY_TERM.match(text.strip())
+    if not m:
+        return None
+    term = m.group(1).strip()
+    rest = m.group(3).strip()
+    if not rest:
+        return None
+    return term, rest
+
+
 def build_blocks(page, zh_lines, table_rows):
     """一页 → 有序块列表。
 
@@ -373,6 +393,8 @@ def main():
     missing, mismatched = 0, []
     for p in pages:
         n = p['page']
+        if args.skip_front_matter and n < FRONT_MATTER_END:
+            continue    # SEC 封面/免责/目录页，对学习无价值
         if args.page_end and not (args.page_start <= n <= args.page_end):
             continue
         zrec = zb_by_page.get(n)
