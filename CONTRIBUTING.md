@@ -4,7 +4,7 @@
 
 ```
 skill/
-├── .claude-plugin/marketplace.json    # 仓根入口，**手动维护**
+├── .claude-plugin/marketplace.json    # 仓根入口（description 由脚本同步）
 ├── plugins/<skill>/                   # 自建 plugin（实体）
 │   ├── SKILL.md                       # skill 描述（必须 frontmatter）
 │   ├── references/                    # 可选：长文档
@@ -34,7 +34,11 @@ skill/
    ```
    **不需要写 `description`** — 运行 `python3 scripts/sync-marketplace.py --write` 自动从 SKILL.md frontmatter 填充。
 4. 运行 `python3 scripts/sync-marketplace.py` 确认无漂移
-5. 提交 PR
+   （新 plugin 是 ORPHAN 时，`--write` 会自动登记进 marketplace，不必手改 JSON）
+5. 如果技能要用 `fcore`（配置解析、lark-cli 操作、格式断言），跑
+   `bash ccconfig/bin/sync-plugin-env.sh` 让新 plugin 拿到 `references/_boot.sh` ——
+   缺了它，`/plugin install` 装到 `cache/` 后无法跨 plugin 找到 fcore
+6. 提交 PR
 
 ## 引用外部 skill
 
