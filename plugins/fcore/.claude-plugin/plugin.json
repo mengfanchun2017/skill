@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin.json",
+  "name": "fcore",
+  "version": "0.1.0",
+  "description": "f* 技能包机械内核 — 路径解析、配置读写（升级不覆盖）、lark-cli 授权预检、文档增改查上传、格式断言、体裁派发匹配。其他 f* 技能不重写这些命令，一律调 fcore",
+  "author": {
+    "name": "mengfanchun2017"
+  },
+  "homepage": "https://github.com/mengfanchun2017/skill",
+  "repository": "https://github.com/mengfanchun2017/skill",
+  "license": "MIT",
+  "keywords": ["f", "core", "config", "lark"],
+  "userConfig": {
+    "fcore_registry": {
+      "type": "string",
+      "title": "派发注册表路径",
+      "description": "留空则用内置默认；填入自建的 fcore.yaml 绝对路径可覆盖"
+    }
+  }
+}

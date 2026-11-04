@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin.json",
+  "name": "fhub",
+  "version": "0.1.0",
+  "description": "f* 技能包总入口 — 判断需求属于哪个子技能并派发，用户不必记技能名。用法：用户说\"帮我做X\"/\"该用哪个技能\"且不确定走哪个子技能时触发",
+  "author": {
+    "name": "mengfanchun2017"
+  },
+  "homepage": "https://github.com/mengfanchun2017/skill",
+  "repository": "https://github.com/mengfanchun2017/skill",
+  "license": "MIT",
+  "keywords": ["f", "hub", "dispatch"]
+}

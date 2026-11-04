@@ -1,0 +1,15 @@
+# fcore 配置示例 — 复制到用户自填位置后填真实值
+#
+# 推荐落点（/plugin update 不会覆盖）：
+#   ~/.claude/skill-config/fcore.yaml
+# 或直接命令写入：
+#   fcore conf set fcore_registry /path/to/your/fcore.yaml
+#
+# 自用（有 ccprivate）：真值在 <ccprivate>/conf/fcore.yaml，本文件仅作模板。
+
+# 派发注册表路径。留空 = 用内置默认（domains/genres 见 fcore.yaml）
+fcore_registry: ""
+
+# lark-cli 账号目录。留空 = 读 ~/.lark-cli-account 的 marker
+# 多账号切换用 lark-switch.sh 维护 marker，不必在此配置
+lark_config_dir: ""

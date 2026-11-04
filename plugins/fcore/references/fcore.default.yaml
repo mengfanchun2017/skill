@@ -1,0 +1,86 @@
+# fcore 内置默认注册表 —— 独立用户没有 ccprivate 时用它兜底。
+#
+# 这是**模板级**内容（触发词 + 技能名），不含任何真实 token。
+# 自用机器优先读 <ccprivate>/conf/fcore.yaml 或 ~/.claude/skill-config/fcore.yaml；
+# 都缺失时落到本文件，保证 fcore genre 永远有结果。
+version: 1
+
+defaults:
+  online_source_of_truth: true
+
+domains:
+  write:
+    skill: fhub
+    desc: 撰写类 — 报告/课程/案例/面试
+    trigger: ["写报告", "出报告", "分析报告", "对比报告", "方案报告",
+              "做课程", "创作课程", "设计课程", "继续课程",
+              "案例库", "新增案例", "补充案例",
+              "面试准备", "准备面试", "岗位面试", "应聘", "竞聘"]
+  doc:
+    skill: ffeishu
+    desc: 飞书文档 — 文档/表格/白板/图
+    trigger: ["创建文档", "写文档", "更新文档", "更新报告", "整合文档", "合并文档",
+              "拆分文档", "飞书文档", "飞书表格", "画架构图", "画流程图", "画个架构图",
+              "时序图", "思维导图", "画图", "白板"]
+  office:
+    skill: fpptx
+    desc: Office — PPT/Word/Excel
+    trigger: ["生成PPT", "做slides", "做PPT", "演示文稿", "创建Word", "写Word文档",
+              "生成docx", "创建Excel", "做表格", "生成xlsx", "数据透视表"]
+  pdf:
+    skill: fpdf
+    desc: PDF 精排到飞书
+    trigger: ["PDF排版", "PDF转飞书", "处理这个PDF", "PDF精排", "翻译PDF"]
+  digest:
+    skill: fdigest
+    desc: 大宗报告阅读与归档
+    trigger: ["读这份报告", "资料归档", "披露文件分析", "降低阅读负载", "年报分析",
+              "研报分析", "读年报", "读研报", "这份年报", "这份研报", "大宗报告", "归档"]
+  research:
+    skill: fresearchframe
+    desc: 外部调研方法论
+    trigger: ["调研", "研究", "搜索", "找资料", "收集数据"]
+  personal:
+    skill: flogme
+    desc: 个人管理 — OKR/日志/反思
+    trigger: ["记录工作", "写日志", "总结任务", "OKR", "目标管理", "反思",
+              "生成总结", "季度报告", "年度报告", "本周工作", "工作总结",
+              "周报", "月报", "复盘"]
+  tool:
+    skill: fsecretcheck
+    desc: 工具类 — 密钥检查/定时/审计
+    trigger: ["检查密钥", "密钥泄露", "扫描密钥", "定时执行", "到点跑", "审计仓库"]
+
+genres:
+  report:
+    parent: write
+    skill: fworch-report
+    orchestrator: fworch-report
+    spec: fwstd-report
+    config: writing/report.yaml
+    desc: 报告
+    trigger: ["写报告", "出报告", "分析报告", "对比报告", "方案报告", "研究报告", "复盘报告", "选型报告"]
+  course:
+    parent: write
+    skill: fworch-course
+    orchestrator: fworch-course
+    spec: fwstd-course
+    config: writing/course.yaml
+    desc: 系列课程
+    trigger: ["做课程", "创作课程", "设计课程", "继续课程", "课程材料课程化", "已有课程抽取"]
+  case:
+    parent: write
+    skill: fworch-case
+    orchestrator: fworch-case
+    spec: fwstd-case
+    config: writing/case.yaml
+    desc: 案例库
+    trigger: ["案例库", "案例", "补充案例", "推荐案例", "新增案例"]
+  interview:
+    parent: write
+    skill: fworch-interview
+    orchestrator: fworch-interview
+    spec: fwstd-interview
+    config: writing/interview.yaml
+    desc: 面试准备
+    trigger: ["面试准备", "准备面试", "岗位面试", "应聘", "竞聘", "面试材料", "面试辅导"]
