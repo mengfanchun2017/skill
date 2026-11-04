@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""把整页扫描的客户案例抽成独立文档。
+"""客户案例 → 独立文档（含 MinerU OCR 出来的真实案例内容）。
 
-为什么单独拆出来：案例页是整页图片，文字不在文本层——混在全文中文版里
-读者只会看到一堆图，既不能检索也不能引用。单独成文后，每页一图 + 中文解读
-（解读位置留给后续视觉识别填入），才是可用的案例库。
+案例页是整页扫描图，文本层为零。走 MinerU 的 OCR 通道（它支持图片输入，
+且输出带版面结构的 markdown：标题层级、表格、段落），比让通用 vision
+模型"描述这张图"更贴近文档本身的组织结构。
 
-用户定过：案例文档「每用户一页保留，真实的案例分析中文放在每个图下面」。
-本脚本只负责排版骨架与图像，解读文本由调用方补。
+用户定过：每页一图保留，真实的中文分析放在每个图下面。这里图在上、
+OCR 原文在下，中文解读位留空待补。
 """
 import argparse
 import json
@@ -20,42 +20,75 @@ def esc(s):
     return str(s).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
 
 
-CASE_NAME = re.compile(r'casestudy[-_]?(.+?)\d*[a-z]?\.jpg$', re.I)
+def md_table_to_xml(rows_md):
+    """MinerU 的 <table><tr><td> → 飞书 DocxXML（colgroup 和必须 = 822）。"""
+    rows = []
+    for rm in re.finditer(r'<tr>(.*?)</tr>', rows_md, re.S):
+        cells = [re.sub(r'<[^>]+>', '', c).strip()
+                 for c in re.findall(r'<td>(.*?)</td>', rm.group(1), re.S)]
+        if cells:
+            rows.append(cells)
+    if not rows:
+        return ''
+    ncol = max(len(r) for r in rows)
+    if ncol < 2:
+        return ''
+    first = round(COLWIDTH_TOTAL * 0.22)
+    rest = round((COLWIDTH_TOTAL - first) / (ncol - 1))
+    widths = [first] + [rest] * (ncol - 1)
+    widths[-1] += COLWIDTH_TOTAL - sum(widths)
+    cols = ''.join(f'<col width="{w}"/>' for w in widths)
+    out = [f'<table><colgroup>{cols}</colgroup><tbody>']
+    for r in rows:
+        padded = r + [''] * (ncol - len(r))
+        out.append('<tr>' + ''.join(f'<td><p>{esc(c)}</p></td>' for c in padded) + '</tr>')
+    out.append('</tbody></table>')
+    return ''.join(out)
 
 
-def guess_company(filename):
-    """从文件名推公司名（casestudy-doordash1c.jpg → DoorDash）。
+def md_to_xml(md, base_level=3):
+    """MinerU markdown → DocxXML 片段。
 
-    文件名不全覆盖（a2026-10x25xcasestudyxaccea.jpg 只给了 acce）。
-    推不出来就留空，由视觉识别阶段补 —— 不要瞎猜。
+    # → h3 / ## → h3（案例内小节，挂在「案例详情」h1 下）
+    正文段落 → p，表格 → 真表格，引用行（引号开头）→ blockquote
     """
-    m = CASE_NAME.search(filename)
-    if not m:
-        return ''
-    raw = m.group(1).strip('-x_')
-    if len(raw) < 4:
-        return ''
-    return raw.replace('x', ' ').title()
+    out = []
+    for block in re.split(r'\n\s*\n', md.strip()):
+        b = block.strip()
+        if not b:
+            continue
+        if b.startswith('#'):
+            txt = re.sub(r'^#+\s*', '', b).strip()
+            if txt:
+                out.append(f'<h3>{esc(txt)}</h3>')
+            continue
+        if '<table>' in b:
+            tx = md_table_to_xml(b)
+            if tx:
+                out.append(tx)
+            continue
+        if b.startswith('"') or b.startswith('“'):
+            out.append(f'<blockquote><p>{esc(b)}</p></blockquote>')
+            continue
+        out.append(f'<p>{esc(re.sub(r"\s+", " ", b))}</p>')
+    return '\n'.join(out)
 
 
 def main():
-    ap = argparse.ArgumentParser(description='客户案例 → 独立文档骨架')
+    ap = argparse.ArgumentParser(description='客户案例 → 独立文档')
     ap.add_argument('slug')
     ap.add_argument('--workdir', default=os.path.expanduser('~/digest-work'))
     ap.add_argument('--title', default='客户案例')
-    ap.add_argument('--images-dir', required=True, help='图片目录（相对 lark-cli cwd）')
-    ap.add_argument('--page-start', type=int, default=0)
-    ap.add_argument('--page-end', type=int, default=0)
+    ap.add_argument('--images-dir', required=True)
+    ap.add_argument('--ocr', default='', help='MinerU OCR 结果 json（build_cases_ocr 产出）')
     ap.add_argument('--out', required=True)
     args = ap.parse_args()
 
     d = os.path.join(args.workdir, args.slug)
     imgs = json.load(open(os.path.join(d, 'images.json')))
 
-    # 整页扫描 + 连续排布的才是案例（扉页也是整页扫描，但孤立）
     scans = [x for x in imgs if x.get('full_page_scan')]
     pages = sorted({x['page'] for x in scans})
-    # 找最长的连续页段（案例通常连续排 20 页）
     runs, cur = [], [pages[0]] if pages else []
     for a, b in zip(pages, pages[1:]):
         if b == a + 1:
@@ -66,11 +99,7 @@ def main():
     if cur:
         runs.append(cur)
     runs.sort(key=len, reverse=True)
-    case_pages = runs[0] if runs else []
-    if args.page_start or args.page_end:
-        lo = args.page_start or 0
-        hi = args.page_end or 10 ** 6
-        case_pages = [p for p in case_pages if lo <= p <= hi]
+    case_pages = set(runs[0]) if runs else set()
 
     seen, by_page = set(), {}
     for x in imgs:
@@ -78,47 +107,64 @@ def main():
             seen.add(x['file'])
             by_page.setdefault(x['page'], []).append(x)
 
+    ocr = {}
+    if args.ocr and os.path.exists(args.ocr):
+        for fn, v in json.load(open(args.ocr)).items():
+            ocr[v['page']] = v.get('md', '')
+
+    ordered = sorted(by_page)
     o = [f'<title>{esc(args.title)}</title>']
     o.append('<callout emoji="🗂️" background-color="light-gray">'
-             '<p>本页收录原文中的客户案例，每页一张原图，图下留中文解读位置。</p>'
-             f'<p>共 {len(case_pages)} 页（第 {case_pages[0]}-{case_pages[-1]} 页），'
-             '原文件中这些页是整页扫描图，文字不在文本层，无法用检索命中。</p></callout>')
+             '<p>本页收录原文中的客户案例。每页一张原图，图下是 OCR 提取的案例正文。</p>'
+             f'<p>共 {len(ordered)} 页（第 {ordered[0]}-{ordered[-1]} 页）。'
+             '原文件中这些页是整页扫描图，文字不在文本层，'
+             '已用 MinerU 视觉 OCR 通道提取。</p></callout>')
 
+    # 清单
     o.append('<h1><span text-color="blue">案例清单</span></h1>')
-    names = []
-    for p in case_pages:
-        for x in by_page.get(p, []):
-            co = guess_company(x['file'])
-            names.append((p, co, x['file']))
-    o.append('<table><colgroup><col width="120"/><col width="240"/><col width="462"/></colgroup>'
-             '<thead><tr><th><p>原文页</p></th><th><p>客户</p></th><th><p>图示</p></th></tr></thead><tbody>')
-    for p, co, fn in names:
-        o.append(f'<tr><td><p>{p}</p></td><td><p>{esc(co) or "待识别"}</p></td><td><p>{esc(fn)}</p></td></tr>')
+    o.append('<table><colgroup><col width="90"/><col width="340"/><col width="392"/></colgroup>'
+             '<thead><tr><th><p>原文页</p></th><th><p>案例</p></th><th><p>关键点</p></th></tr></thead><tbody>')
+    for p in ordered:
+        fn = by_page[p][0]['file']
+        md = ocr.get(p, '')
+        title = ''
+        for line in md.split('\n'):
+            if line.startswith('#'):
+                title = re.sub(r'^#+\s*', '', line).strip()
+                break
+        o.append(f'<tr><td><p>{p}</p></td><td><p>{esc(title) or esc(fn)}</p></td>'
+                 f'<td><p>{esc(fn)}</p></td></tr>')
     o.append('</tbody></table>')
 
+    # 详情
     o.append('<h1><span text-color="blue">案例详情</span></h1>')
-    o.append('<callout emoji="⚠️" background-color="light-red">'
-             '<p>以下每页的图下方留了解读位置。客户名与案例细节需视觉识别后填入，'
-             '本版未做识别，不臆测内容。</p></callout>')
-
-    for p in case_pages:
-        for x in by_page.get(p, []):
-            co = guess_company(x['file'])
-            head = f'第 {p} 页 · {co}' if co else f'第 {p} 页'
-            o.append(f'<h2>{esc(head)}</h2>')
-            pth = os.path.join(args.images_dir, x['file'])
-            cap = f'第 {p} 页 · {co}' if co else f'第 {p} 页 · {x["file"]}'
-            o.append(f'<img path="@{pth}" caption="{esc(cap)}"/>')
-            o.append('<p><b>案例解读</b>：<i>待视觉识别补充</i></p>')
+    for p in ordered:
+        x = by_page[p][0]
+        md = ocr.get(p, '')
+        title = ''
+        for line in md.split('\n'):
+            if line.startswith('#'):
+                title = re.sub(r'^#+\s*', '', line).strip()
+                break
+        head = f'第 {p} 页 · {title}' if title else f'第 {p} 页'
+        o.append(f'<h2>{esc(head)}</h2>')
+        pth = os.path.join(args.images_dir, x['file'])
+        o.append(f'<img path="@{pth}" caption="第 {p} 页 · {esc(title) or esc(x["file"])}"/>')
+        if md.strip():
+            o.append(md_to_xml(md))
+        else:
+            o.append('<callout emoji="⚠️" background-color="light-red">'
+                     '<p>本页 OCR 未提取到文字，需人工查看原图。</p></callout>')
 
     xml = '\n'.join(o)
     open(args.out, 'w', encoding='utf-8').write(xml)
     cost = (1 + len(re.findall(r'<p\b', xml)) + len(re.findall(r'<h[1-3]\b', xml))
             + len(re.findall(r'<table\b', xml)) + 2 * len(re.findall(r'<t[hd]\b', xml)))
-    print(json.dumps({'out': args.out, 'cases': len(case_pages),
-                      'images': len(names), 'feishu_blocks': cost,
-                      'pages': case_pages[:3] + ['...'] + case_pages[-2:] if case_pages else []},
-                     ensure_ascii=False))
+    print(json.dumps({'out': args.out, 'cases': len(ordered),
+                      'images': len(seen), 'feishu_blocks': cost,
+                      'with_ocr': sum(1 for p in ordered if ocr.get(p, '').strip()),
+                      'ocr_chars': sum(len(ocr.get(p, '')) for p in ordered),
+                      'over_limit': cost > 5000}, ensure_ascii=False))
 
 
 if __name__ == '__main__':
