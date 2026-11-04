@@ -102,6 +102,12 @@ def _is_standalone_heading(lines, i):
     words = t.split()
     if len(words) > 9:
         return False
+    # 地址 / 编号 / 纯数字符号行不是标题（"San Francisco, California 94104"）
+    if re.search(r'\d{3,}', t) or re.search(r'\b(Suite|Street|Avenue|Road|Blvd)\b', t):
+        return False
+    # 续页标记不是标题
+    if re.fullmatch(r'\(?Continued\)?|\(续\)', t, re.I):
+        return False
     # 前后行距都要是段落分界（标题自成一行）
     prev_gap = l['y'] - lines[i - 1]['y'] if i > 0 else 999
     next_gap = lines[i + 1]['y'] - l['y'] if i + 1 < len(lines) else 999
