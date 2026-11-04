@@ -94,6 +94,8 @@ def _is_standalone_heading(lines, i):
         return False
     if t.startswith(('•', '-', '(')) or re.search(r'[.。,，;；:：]$', t):
         return False
+    if re.fullmatch(r'\(?Continued\)?|\(续\)', t, re.I):
+        return False
     if re.match(r'^[a-z]', t):
         return False
     # 首字母大写或全大写；且后面紧跟正文（不是列表项）
