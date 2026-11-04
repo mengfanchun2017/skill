@@ -65,7 +65,6 @@ python3 ~/.claude/skills/fdigest/scripts/build_cases.py <slug> \
 ⚠️ **MinerU 预签名 PUT 必须发空 Content-Type**（`headers={'Content-Type': ''}`）。
 URL 用空串签名，客户端带任何值都 403 `SignatureDoesNotMatch`（MinerU issue #5393）。
 
-
 ### Step 3：建索引
 
 ```bash
