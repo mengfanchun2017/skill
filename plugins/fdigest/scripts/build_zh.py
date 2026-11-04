@@ -453,13 +453,13 @@ def main():
             elif b['kind'] == 'li':
                 li_buf.append(re.sub(r'^[•▪·]\s*', '', txt))
             elif b['kind'] == 'p' and GLOSSARY_START <= n < FRONT_MATTER_END:
-                # 术语表：术语名 + 软换行 + 定义。用 <br/> 在 <p> 内断行，
-                # 不用列表（用户明确：术语表用软换行不用引用）
+                # 术语表：无序列表项内「术语名 + 软换行(<br/>) + 定义」。
+                # 不用引用块——术语表是查阅用的，不是注解。
                 g = _glossary_split(txt)
                 flush_li()
                 if g:
                     term, rest = g
-                    out.append(f'<p><b>{_inline_code(esc(term))}</b><br/>{_inline_code(esc(rest))}</p>')
+                    out.append(f'<ul><li><p><b>{_inline_code(esc(term))}</b><br/>{_inline_code(esc(rest))}</p></li></ul>')
                 else:
                     out.append(f'<p>{_inline_code(esc(txt))}</p>')
             elif b['kind'] == 'note':
