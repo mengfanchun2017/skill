@@ -85,11 +85,11 @@ current_step: 0                 # 0-5
 首次调 ffeishu 前**必须**预检（详见 `~/.claude/rules/feishu.md` § 预检）：
 
 ```bash
-source ~/.claude/skills/ffeishu/references/lark_env.sh   # 账号前缀 + PATH 由共享层解决
-lark_auth_check || echo "AUTH_FAILED"
+~/.claude/skills/fcore/bin/fcore auth     # 0=可用 1=未装 2=未配置/过期
 ```
 
-失败 → 终止当前 step，提示用户走 QR 授权流程。不在失败时硬闯会写入失败。
+失败 → 按输出提示走授权；不可用时**降级**：继续本地创作，产出落本地 markdown，
+不阻断主流程（此前预检写错导致认证正常也恒报失败，实测踩过）。
 
 ---
 
