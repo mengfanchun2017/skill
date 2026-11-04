@@ -245,7 +245,11 @@ def build_blocks(page, zh_lines, table_rows):
             if _is_footnote(n) != _is_footnote(para[-1]):
                 break
             prev = para[-1]
-            if abs(n['x'] - prev['x']) > 8 or not (0 < n['y'] - prev['y'] < PARA_GAP):
+            # 折行续行的 x 会和首行不同：项目符号行的 "•" 在 x=90、正文在 x=108，
+            # 差 18pt。旧阈值 8pt 会把每个风险条目切成「标题半句 + 正文半句」
+            # （实测 p27 每个条目都被拦腰断开）。行距才是段落归属的可靠判据，
+            # x 只用来区分真分栏，阈值放宽到 20pt。
+            if abs(n['x'] - prev['x']) > 20 or not (0 < n['y'] - prev['y'] < PARA_GAP):
                 break
             para.append(n)
             j += 1
