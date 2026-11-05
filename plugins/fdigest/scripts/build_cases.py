@@ -23,8 +23,13 @@ import re
 COLWIDTH_TOTAL = 822
 
 
+def _strip_dollars(t):
+    """去掉翻译遗留的 $...$ LaTeX 标记。"""
+    return re.sub(r'\$(\d+[,.%]*)+\$', r'\1', t).replace('\\%', '%').replace('\\$', '$')
+
+
 def esc(s):
-    return str(s).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+    return _strip_dollars(str(s)).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
 
 
 def md_table_to_xml(rows_md):
