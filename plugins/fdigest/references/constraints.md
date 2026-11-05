@@ -1,8 +1,8 @@
 # fdigest 关键约束与 workflow 边界
 
-## 什么时候走 workflow（fdigest-build）
+## 什么时候走 workflow（wf-fdigest）
 
-`fdigest-build` 是本 skill 的**确定性重活**部分：预检 → 索引 → 翻译 → 排版 → 格式断言，
+`wf-fdigest` 是本 skill 的**确定性重活**部分：预检 → 索引 → 翻译 → 排版 → 格式断言，
 跑完停在**交付前**。
 
 **为什么拆出去**：实测首战 S-1 全流程 445 次 Bash 里，只有 18% 走到脚本，
@@ -14,7 +14,7 @@ workflow 只保证「产物正确且可上传」，不替人做决定。
 
 ```bash
 # 结构包已存在时
-Workflow({name: "fdigest-build", args: "<slug>"})
+Workflow({name: "wf-fdigest", args: "<slug>"})
 ```
 
 不在 workflow 范围内的（留在主上下文）：抓取源文件（要看 URL 是否可信）、

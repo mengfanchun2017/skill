@@ -86,10 +86,10 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, mcp__mineru__parse_documents
 
 ## 什么时候走 workflow
 
-`fdigest-build` 承担确定性重活：预检 → 索引 → 翻译 → 排版 → 格式断言，跑完**停在交付前**。
+`wf-fdigest` 承担确定性重活：预检 → 索引 → 翻译 → 排版 → 格式断言，跑完**停在交付前**。
 
 ```bash
-Workflow({name: "fdigest-build", args: "<slug>"})
+Workflow({name: "wf-fdigest", args: "<slug>"})
 ```
 
 **为什么拆出去**：首战 S-1 实测 445 次 Bash 里只有 18% 走到脚本，49% 是现场手写 python
