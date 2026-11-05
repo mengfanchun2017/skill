@@ -198,15 +198,22 @@ ATTR_RE = re.compile(
     r'^[一-鿿\w.\s·]{2,30}[，,]\s*\S{2,40}(董事长|CEO|CTO|CIO|COO|总裁|创始人|'
     r'董事|主席|执行官|副总裁|官|合伙人|负责人)$')
 
+# 职务关键词：署名行末尾必须落在这些词上（OCR 会把「联合创始人」这类复合词写全，
+# 正则里列前缀太脆，改成「末尾命中关键词」即可）
+ATTR_TAIL = ('董事长', '总裁', '创始人', '董事', '主席', '执行官', '副总裁',
+             'CEO', 'CTO', 'CIO', 'COO', 'CFO', '官', '合伙人', '负责人', '经理', '主管')
+
 
 def _is_attr(t):
-    """署名行判定：短、无引号、形如「姓名，职务」。
+    """署名行判定：短、无引号、含「，」、末尾落在职务词上。
 
     OCR 常把引文和署名拆成两段（有的还夹在正文中间），必须成对合并，
     否则署名会单独漂在正文里，看不出是谁说的。
     """
     t = t.strip()
-    return len(t) <= 60 and not re.search(r'[「」""]', t) and bool(ATTR_RE.match(t))
+    if len(t) > 60 or re.search(r'[「」""]', t) or '，' not in t and ',' not in t:
+        return False
+    return t.rstrip('。.').endswith(ATTR_TAIL)
 
 
 def _is_quote(t):

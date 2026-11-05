@@ -39,6 +39,9 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 | `fcore upload <file>` | 上传到 Drive |
 | `fcore search <词> [数量]` | 搜文档 |
 | `fcore where` | 打印所有解析路径 —— 排障第一步 |
+| `fcore doctor` | 体检：CLI 工具/授权/配置，只报告 |
+| `fcore fix` | 体检 + 自动修复（缺啥装啥，修完复检） |
+| `fcore office <args>` | OfficeCLI 包装（缺依赖先报错） |
 
 ## 配置存放（升级不覆盖）
 
