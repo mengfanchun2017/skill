@@ -112,7 +112,7 @@ f_doctor() {
             fi
         fi
     fi
-    if gh auth status 2>/dev/null; then
+    if gh auth status >/dev/null 2>&1; then
         _dr "gh auth" "true" "可用"
     else
         _dr "gh auth" "false" "PAT 失效/未配置"
