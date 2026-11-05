@@ -104,7 +104,7 @@ def parse_md(md):
                             metrics.append((t, ''))
                         else:
                             sections.append((cur_h, [('p', t)]))
-            else:
+                else:
                 sections.append((cur_h, cur_body))
         cur_h, cur_body, metric_h = '', [], False
 
@@ -169,6 +169,58 @@ def parse_md(md):
             cur_body.append(('p' if '<table>' not in b else 'table', b))
     flush()
     return title, preamble, metrics, sections
+
+
+def _extract_text_metrics(text):
+    """从连段文本中提取指标行（数字/百分比开头），按换行拆。
+
+    处理「高达\n\n面向顾问的 Joule 项目交付\n\n提速 14%」这种
+    OCR 把一行指标横跨多个段落的情况。
+    """
+    items = []
+    lines = [l.strip() for l in text.replace('\n\n', '\n').split('\n') if l.strip()]
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        # 行尾有数字/百分比
+        has_num = re.search(r'[\d,.%]+', line)
+        # 行首有数字/百分比/约/高达
+        has_lead = re.search(r'^[\d,+\-%↑↓约高达近]+', line)
+        if has_lead or has_num:
+            # 收集后续行直到下一个指标行
+            parts = [line]
+            j = i + 1
+            while j < len(lines):
+                next_lead = re.search(r'^[\d,+\-%↑↓约高达近]+', lines[j])
+                next_trail = re.search(r'[\d,.%]+', lines[j][-20:])
+                # 「25 小时」这种混合行本身是数字+单位，算独立行
+                if next_lead and not re.search(r'^约|高达|近', lines[j]):
+                    break
+                # 短行（无完整句子）继续合并
+                if len(lines[j]) < 60 and j < len(lines) - 1:
+                    parts.append(lines[j])
+                    j += 1
+                else:
+                    parts.append(lines[j])
+                    j += 1
+                    break
+            merged = ' '.join(parts)
+            # 提取数字 + 描述
+            m = re.search(r'([\d,.+\-%↑↓]+)\s*(.*?)(?:[\d,.+\-%↑↓]+\s*)?$', merged)
+            if m:
+                num = m.group(1)
+                desc = m.group(2).strip()
+                if not desc:
+                    desc = merged[:merged.index(num) + len(num):].strip()
+                    desc = merged.replace(num, '', 1).strip()
+                items.append((num, desc))
+            else:
+                items.append((merged, ''))
+            i = j
+        else:
+            items.append((line, ''))
+            i += 1
+    return items
 
 
 def md_to_xml(md):
