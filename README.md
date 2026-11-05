@@ -256,6 +256,9 @@ flowchart LR
 | `fcore fmt-xml / fmt-md` | 格式断言（H1 配色/表格 colgroup/引用/文献数） |
 | `fcore doc create/get/ids`、`upload`、`search` | 文档操作固定参数模板 |
 | `fcore where` | 打印全部解析路径 |
+| `fcore doctor` | 体检：CLI 工具、授权、配置（只报告） |
+| `fcore fix` | 体检 + 自动修复（缺啥装啥，修完复检） |
+| `fcore office <args>` | OfficeCLI 包装 |
 
 ### L1 · 入口与业务
 
