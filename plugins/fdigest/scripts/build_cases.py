@@ -218,16 +218,24 @@ ATTR_SINGLE = ('Mercado Libre', 'Jane Street', 'PayPal', 'SAP', 'Travelers', 'Ve
                'Shy Bird', 'KBF')
 
 
+def _strip_dollars(t):
+    """去掉翻译遗留的 $...$ LaTeX 标记。"""
+    return re.sub(r'\$(\d+[,.%]*)+\$', r'\1', t).replace('\\%', '%').replace('\\$', '$')
+
+
 def _is_attr(t):
-    """署名行判定：短、无引号、含「，」、末尾落在职务词上。
+    """署名行判定：短、无引号、含「，」+ 职务末尾，或公司名单行。
 
     OCR 常把引文和署名拆成两段（有的还夹在正文中间），必须成对合并，
     否则署名会单独漂在正文里，看不出是谁说的。
     """
     t = t.strip()
-    if len(t) > 60 or re.search(r'[「」""]', t) or '，' not in t and ',' not in t:
+    if len(t) > 60 or re.search(r'[「」""]', t):
         return False
-    return t.rstrip('。.').endswith(ATTR_TAIL)
+    if '，' in t or ',' in t:
+        return t.rstrip('。.').endswith(ATTR_TAIL)
+    # 无逗号纯公司名（OCR 截断署名行，丢了逗号和职务）
+    return t in ATTR_SINGLE
 
 
 def _is_quote(t):
