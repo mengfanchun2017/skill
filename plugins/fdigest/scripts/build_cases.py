@@ -105,12 +105,20 @@ def parse_md(md):
                         line = line.strip()
                         if not line:
                             continue
-                        # 数字开头（含逗号/百分比/符号）
-                        m = re.match(r'^([\d,+\-%↑↓]+)\s*(.*)', line)
-                        if m:
-                            num, desc = m.group(1), m.group(2).strip()
+                        # 数字开头（含逗号/百分比/符号），兼容「近 25,000」「约 1 周」
+                        pre = ''
+                        pm = re.match(r'^(约|高达|近)\s*([\d,+\-%↑↓]+)\s*(.*)', line)
+                        if pm:
+                            pre, num, desc = pm.group(1), pm.group(2), pm.group(3).strip()
+                        else:
+                            m = re.match(r'^([\d,+\-%↑↓]+)\s*(.*)', line)
+                            if m:
+                                num, desc = m.group(1), m.group(2).strip()
+                            else:
+                                num, desc = '', ''
+                        if num:
                             desc = re.sub(r'^(名|位|个|家|人|种|项)\s*', '', desc)
-                            metrics.append((num, desc))
+                            metrics.append((pre + num, desc))
                         # 行末百分比/数字（如「提速 14%」）
                         elif re.search(r'([\d,.%]+)$', line) and not re.search(r'Firefox |Claude |Fable |Opus ', line):
                             m2 = re.search(r'(.+?)\s*([\d,.%]+)$', line)
