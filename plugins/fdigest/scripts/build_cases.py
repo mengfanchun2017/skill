@@ -84,9 +84,8 @@ def parse_md(md):
                                     metrics.append((num, desc))
                     elif kind == 'p':
                         t = b.strip()
-                        # 纯文本指标：数字/百分比/约/高达 开头
-                        if re.match(r'^[\d+,.+\-%↑↓约高达近]+', t):
-                            # 拆成指标和说明
+                        # 纯文本指标：数字/百分比/约/高达/Claude 开头
+                        if re.search(r'^[\d+,.+\-%↑↓约高达近]+', t) or re.match(r'^Claude [\w.]+', t):
                             m = re.match(r'^([\d+,.+\-%↑↓]+)\s*(.*)', t)
                             if m:
                                 metrics.append((m.group(1), m.group(2).strip()))
@@ -104,16 +103,22 @@ def parse_md(md):
                 title = re.sub(r'^#+\s*', '', b).strip()
                 phase = 'preamble'
             else:
-                # 第二个 # 行 — 可能是引言被 OCR 成标题，放 preamble
+                # 第二个 # 行 — 可能是引言被 OCR 成标题
                 txt = re.sub(r'^#+\s*', '', b).strip()
                 preamble.append(('quote', txt))
             continue
         if b.startswith('## '):
             flush()
             cur_h = re.sub(r'^##+\s*', '', b).strip()
+            # 没有 # 标题时，第一个 ## 当标题
+            if not title:
+                title = cur_h
+                phase = 'preamble'
+                cur_h = ''
+                continue
             metric_h = cur_h in ('成果', '结果')
             # 某些案例 OCR 把指标行写成了 ## 节标题（如 "## 约 1 周"）
-            if not metric_h and re.match(r'^(约|高达|近)?[\d+,.+\-%↑↓]+', cur_h):
+            if not metric_h and re.search(r'^[\d,+\-%↑↓约高达近]+', cur_h):
                 metrics.append((cur_h, ''))
                 metric_h = True
                 cur_h = ''
@@ -141,7 +146,10 @@ def parse_md(md):
             else:
                 is_quote = bool(re.search(r'[「」\"”“]', b)) and len(b) > 30
                 is_attribution = bool(re.search(r'(董事长|CEO|CTO|总裁|联合创始人|董事|主席|执行官)', b))
-                if is_quote or is_attribution:
+                # 形如 "成果" "Results" 的标题残词直接跳过
+                if b.strip() in ('成果', 'Results', '结果'):
+                    pass
+                elif is_quote or is_attribution:
                     preamble.append(('quote', b))
                 else:
                     preamble.append(('p', b))
