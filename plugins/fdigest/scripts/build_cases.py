@@ -139,8 +139,9 @@ def parse_md(md):
                     cells = [re.sub(r'<[^>]+>', '', c).strip()
                              for c in re.findall(r'<td>(.*?)</td>', rm.group(1), re.S)]
                     if cells:
-                        num = re.sub(r'\d+$', '', cells[0]).strip() if cells[0] else ''
-                        desc = re.sub(r'\d+$', '', cells[1]).strip() if len(cells) > 1 else ''
+                        num = cells[0] or ''
+                        desc = (re.sub(r':?\d+$', '', cells[1]).strip()
+                                if len(cells) > 1 else '')
                         if num:
                             metrics.append((num, desc))
             else:
