@@ -105,6 +105,10 @@ case "$cmd" in
         f_doctor "$@"
         exit $?
         ;;
+    fix)
+        f_doctor --fix
+        exit $?
+        ;;
     office)
         # OfficeCLI 包装：自动确保 libicu 等依赖存在
         if ! command -v officecli &>/dev/null; then
