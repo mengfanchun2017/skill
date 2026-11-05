@@ -25,7 +25,8 @@ COLWIDTH_TOTAL = 822
 
 def _strip_dollars(t):
     """去掉翻译遗留的 $...$ LaTeX 标记。"""
-    return re.sub(r'\$(\d+[,.%]*)+\$', r'\1', t).replace('\\%', '%').replace('\\$', '$')
+    s = t.replace('\\%', '%').replace('\\$', '$')
+    return re.sub(r'\$(\d+[,.%]+)*\$', r'\1', s)
 
 
 def esc(s):
@@ -225,7 +226,8 @@ ATTR_SINGLE = ('Mercado Libre', 'Jane Street', 'PayPal', 'SAP', 'Travelers', 'Ve
 
 def _strip_dollars(t):
     """去掉翻译遗留的 $...$ LaTeX 标记。"""
-    return re.sub(r'\$(\d+[,.%]*)+\$', r'\1', t).replace('\\%', '%').replace('\\$', '$')
+    s = t.replace('\\%', '%').replace('\\$', '$')
+    return re.sub(r'\$(\d+[,.%]+)*\$', r'\1', s)
 
 
 def _is_attr(t):
