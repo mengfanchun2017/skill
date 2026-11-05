@@ -40,12 +40,11 @@ f_doctor() {
         if $json; then
             results+=("{\"check\":\"$name\",\"ok\":$ok,\"detail\":\"$detail\"}")
         else
-            if [[ "$ok" == "true" ]]; then
-                printf '  ✅  %-20s %s\n' "$name" "$detail"
-            else
-                printf '  ❌  %-20s %s\n' "$name" "$detail"
-                all_ok=false
-            fi
+            case "$ok" in
+                true)  printf '  ✅  %-20s %s\n' "$name" "$detail" ;;
+                n/a)   printf '  ⭕  %-20s %s\n' "$name" "$detail" ;;
+                *)     printf '  ❌  %-20s %s\n' "$name" "$detail"; all_ok=false ;;
+            esac
         fi
     }
 
@@ -112,11 +111,14 @@ f_doctor() {
             fi
         fi
     fi
-    if gh auth status >/dev/null 2>&1; then
-        _dr "gh auth" "true" "可用"
+    if command -v gh &>/dev/null; then
+        if gh auth status >/dev/null 2>&1; then
+            _dr "gh auth" "true" "可用"
+        else
+            _dr "gh auth" "false" "PAT 失效/未配置"
+        fi
     else
-        _dr "gh auth" "false" "PAT 失效/未配置"
-        # 不可自动修 — 需用户续期
+        _dr "gh auth" "n/a" "未安装（ccconfig 用户需要）"
     fi
 
     # ====== 6. ccprivate ======
