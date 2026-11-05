@@ -73,7 +73,21 @@ def parse_md(md):
             cur_h, cur_body, metric_h = '', [], False
             return
         if metric_h:
-            # 成果/结果 节 → 提取指标
+            # 成果/结果 节 → 先合并连续的文本块
+            merged_ps = []
+            cur_texts = []
+            for kind, b in cur_body:
+                if kind == 'p':
+                    cur_texts.append(b)
+                else:
+                    if cur_texts:
+                        merged_ps.append(('p', '\n'.join(cur_texts)))
+                        cur_texts = []
+                    merged_ps.append((kind, b))
+            if cur_texts:
+                merged_ps.append(('p', '\n'.join(cur_texts)))
+            cur_body = merged_ps
+            # 提取指标
             for kind, b in cur_body:
                 if kind == 'table':
                     for rm in re.finditer(r'<tr>(.*?)</tr>', b, re.S):
@@ -101,12 +115,12 @@ def parse_md(md):
                         desc = re.sub(r'^(名|位|个|家|人|种|项)\s*', '', desc)
                         metrics.append((num, desc))
                     elif re.match(r'^Claude [\w.]+', t):
-                        # "Claude Opus 4.6 发现 22 个漏洞..." → 拆数字
-                        m3 = re.search(r'(\d[\d,.]*)\s', t)
+                        # "Claude Opus 4.6 发现 22 个漏洞..." → num="Claude Opus 4.6"
+                        m3 = re.search(r'(\d[\d,.%]*)\s', t)
                         if m3:
-                            idx = m3.start()
-                            desc = t[idx:].strip()
-                            num = t[:idx].strip()
+                            num_end = m3.end()
+                            num = t[:num_end].strip()
+                            desc = t[num_end:].strip()
                             metrics.append((num, desc))
                         else:
                             metrics.append((t, ''))
