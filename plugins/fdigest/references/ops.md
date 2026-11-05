@@ -138,6 +138,20 @@ lark-cli docs +update --api-version v2 --doc <doc_token> --as user \
 **引文判定**（`_is_quote`）：长度 ≥ 20 且含 `「」""…`。无引号但与署名紧邻的段落
 也当引文（译文常把引文改写成转述），靠「下一项是署名」这个条件兜住。
 
+**引言不准飘在高亮块前面（已固化为 `_preamble_to_impact()`）**。
+preamble 尾部的 `(p,quote)` 配对或独立 `quote` 整体搬入「影响」节开头。
+p222 的 Andy Fang、p228 的 Bobby Holley 曾因此飘在文档最前面。
+
+⚠️ **`$...$` LaTeX 残留**：翻译保留了原文的 `$110\%$` 数学标记。`esc()` 嵌入
+`_strip_dollars()` 全局去除。同处理 `\\%` 和 `\\$` 转义。
+
+⚠️ **OCR 截断的署名行**：部分案例引文后的署名被 OCR 切成只有公司名（`Mercado Libre`
+孤行，无逗号无职务）。用 `ATTR_SINGLE` 集合兜住这类单行公司名。已收录 15+ 个案例知名。
+
+⚠️ **p224 式指标碎片的说明补充**（`_fill_orphan_metrics`）：OCR 把 `+32%` 和其说明
+`Claude Fable 5.1…` 切成两块。指标提取后遍历 metrics，对缺 desc 的指标从后续 section
+取正文首段补上。
+
 ### 指标提取的限制（OCR 碎片，已知不完美）
 
 指标来自「## 成果 / ## 结果」节。两种形态：
@@ -149,6 +163,22 @@ lark-cli docs +update --api-version v2 --doc <doc_token> --as user \
 **已知失败形态**——OCR 把一行指标切成三段时无解（实测 p232 SAP：
 `高达` / `面向顾问的 Joule 项目交付` / `提速 14%` 三行分开，只能取到 `14% 提速`）。
 这类留残缺也比瞎猜强，用户看原图核对。
+
+**p224 式跨节指标**：OCR 把指标行写成 `## 成果\n+32%\n\nClaude Fable 5.1…`，
+说明行以独立段落形式存在。`_fill_orphan_metrics()` 从 metrics 后面的 section 取首段
+正文补上。约 1 周的说明同样处理。⚠️ 双指标共享同一段说明时（+32% 和 约 1 周都取
+`Claude Fable…`），但线上效果勉强可用，不完美。
+
+## MinerU PDF 解析（2026-11-05 定案）
+
+当前 extract.py 只支持 HTML。PDF 场景走 MinerU API（与案例 OCR 同链路），
+通过 `fpdf scripts/parse.py` 或 `ocr_cases.py` 调 MinerU 产出结构包后复用同一索引。
+
+fpdf 的 PDF→MD 走 **MinerU API v4**（`/file-urls/batch` → presigned PUT → pool → download），
+不是本地 PyMuPDF/pdftotext。原因是 MinerU 的 VLM OCR 通道对扫描 PDF 的表格/标题结构
+保留远优于纯文本提取器，且 `enable_formula=True` 能处理数学公式。
+
+⚠️ MinerU API 的 presigned PUT 必须空 Content-Type，详见 workflow.md。
 
 ### 重译触发条件（踩过的坑）
 
