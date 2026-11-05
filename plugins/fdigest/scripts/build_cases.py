@@ -45,32 +45,135 @@ def md_table_to_xml(rows_md):
     return ''.join(out)
 
 
-def md_to_xml(md, base_level=3):
-    """MinerU markdown → DocxXML 片段。
+def parse_md(md):
+    """MinerU markdown → (title, metrics_lines, sections_list)。
 
-    # → h3 / ## → h3（案例内小节，挂在「案例详情」h1 下）
-    正文段落 → p，表格 → 真表格，引用行（引号开头）→ blockquote
+    把 md 分成三个部分：
+      1. 标题（# 开头第一行）
+      2. 指标（标题之后、第一个 ## 之前的内容 — 可能是 table 或纯文本）
+      3. 各小节（从 ## 开始往后拆）
+
+    metrics_lines: [(kind, line)]，kind ∈ 'table_row'/'text'
+    sections_list: [(h_text, [(kind, line)])]
     """
-    out = []
-    for block in re.split(r'\n\s*\n', md.strip()):
-        b = block.strip()
-        if not b:
-            continue
-        if b.startswith('#'):
+    blocks = [b.strip() for b in re.split(r'\n\s*\n', md.strip()) if b.strip()]
+    title = ''
+    metrics = []
+    sections = []
+    phase = 'title'
+    cur_h = ''
+    cur_body = []
+
+    def flush():
+        nonlocal cur_h, cur_body
+        if cur_h and cur_body:
+            sections.append((cur_h, cur_body))
+        cur_h, cur_body = '', []
+
+    for b in blocks:
+        if b.startswith('# '):
+            title = re.sub(r'^#+\s*', '', b).strip()
+            phase = 'metrics'
+        elif b.startswith('## '):
+            flush()
+            cur_h = re.sub(r'^##+\s*', '', b).strip()
+            phase = 'body'
+        elif b.startswith('#'):
+            # non-first level headings — treat as sub-heading
             txt = re.sub(r'^#+\s*', '', b).strip()
-            if txt:
-                out.append(f'<h3>{esc(txt)}</h3>')
-            continue
-        if '<table>' in b:
-            tx = md_table_to_xml(b)
-            if tx:
-                out.append(tx)
-            continue
-        if b.startswith('"') or b.startswith('“'):
-            out.append(f'<blockquote><p>{esc(b)}</p></blockquote>')
-            continue
-        out.append(f'<p>{esc(re.sub(r"\s+", " ", b))}</p>')
-    return '\n'.join(out)
+            if phase == 'body':
+                cur_body.append(('h3', txt))
+            else:
+                # a heading before any ## — unusual
+                if title:
+                    metrics.append(('text', b))
+                else:
+                    title = txt
+                    phase = 'metrics'
+        else:
+            if phase == 'metrics':
+                if '<table>' in b:
+                    # 把表格行解析为指标
+                    for rm in re.finditer(r'<tr>(.*?)</tr>', b, re.S):
+                        cells = [re.sub(r'<[^>]+>', '', c).strip()
+                                 for c in re.findall(r'<td>(.*?)</td>', rm.group(1), re.S)]
+                        if cells:
+                            metrics.append(('metric_row', cells))
+                else:
+                    metrics.append(('text', b))
+            else:
+                if '<table>' in b:
+                    cur_body.append(('table', b))
+                else:
+                    cur_body.append(('p', b))
+    flush()
+    return title, metrics, sections
+
+
+def md_to_xml(md):
+    """把案例 md 渲染成 DocxXML。
+
+    结构：蓝色高亮块（指标）→ 正文各小节。
+    引号段落的句子 → blockquote（引用）。
+    H3 仅在正文小节内使用。
+    """
+    title, metrics, sections = parse_md(md)
+    o = []
+
+    # 案例标题
+    if title:
+        o.append(f'<h2>{esc(title)}</h2>')
+
+    # 指标 → 蓝色高亮块
+    if metrics:
+        o.append('<callout emoji="📊" background-color="blue">')
+        o.append('<p><b>成果</b></p>')
+        o.append('<ul>')
+        for kind, data in metrics:
+            if kind == 'metric_row':
+                for cells in [data]:
+                    num = esc(cells[0]) if len(cells) > 0 else ''
+                    txt = esc(cells[1]) if len(cells) > 1 else ''
+                    # 去掉末尾的数字（原文脚注标记，如 "业务线1" → "业务线"）
+                    txt = re.sub(r'\d+$', '', txt).strip()
+                    if num and txt:
+                        o.append(f'<li><p><b>{num}</b>　{txt}</p></li>')
+                    elif num:
+                        o.append(f'<li><p><b>{num}</b></p></li>')
+            elif kind == 'text':
+                # 纯文本指标，如 "+32% … 性能提升"
+                o.append(f'<li><p>{esc(data)}</p></li>')
+        o.append('</ul>')
+        o.append('</callout>')
+
+    # 各小节
+    for h, body in sections:
+        o.append(f'<h3>{esc(h)}</h3>')
+        for kind, b in body:
+            if kind == 'h3':
+                o.append(f'<h3>{esc(b)}</h3>')
+            elif kind == 'table':
+                tx = md_table_to_xml(b)
+                if tx:
+                    o.append(tx)
+            elif kind == 'p':
+                # 识别引文：整段被「」包裹，或"人名职务"结尾
+                t = b.strip()
+                is_quote = False
+                if t.startswith('「') or t.startswith('"') or t.startswith('“'):
+                    is_quote = True
+                if not is_quote and re.search(r'[」\"”]\s*，?\s*[，。]\s*[一-鿿\w\s]+0?,?\s*$', t[-80:]) and '说' in t[-80:]:
+                    is_quote = True  # 句末有「…」+ 人名 + "说"
+                # 更精确：匹配「xxx。xxxx」 整段都是引用
+                if '「' in t and '」' in t:
+                    inner = t[t.index('「') + 1:t.index('」')]
+                    if len(inner) > 20:
+                        is_quote = True
+                if is_quote:
+                    o.append(f'<blockquote><p>{esc(t)}</p></blockquote>')
+                else:
+                    o.append(f'<p>{esc(re.sub(r"\s+", " ", t))}</p>')
+    return '\n'.join(o)
 
 
 def main():
