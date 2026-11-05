@@ -100,37 +100,25 @@ def parse_md(md):
                                 metrics.append((num, desc))
                 elif kind == 'p':
                     t = b.strip()
-                    # 在整段文本中按数字位置切分。模式：
-                    # 「高达 14%」或「25 小时」= 数字/百分比
-                    # 「面向顾问的 Joule 项目交付 提速」= 数字前的说明
-                    # 按顺序：第一个数字前的文本是 prefix（如果有数字的话）
-                    # 两个数字之间的文本是前一个数字的描述
-                    parts = re.split(r'([\d,+\-%↑↓%]+)', t)
-                    # parts = [text, num, text, num, ...]
-                    cur_desc = ''
-                    for i in range(0, len(parts) - 1, 2):
-                        text = parts[i].strip()
-                        num = parts[i+1].strip() if i+1 < len(parts) else ''
-                        # 数字后的部分
-                        if cur_desc and text:
-                            cur_desc += ' ' + text
-                        elif text:
-                            cur_desc = text
-                        if num:
-                            # 前缀关键词（高达/约/近）
-                            pm = re.match(r'.*?(高达|约|近)$', cur_desc)
-                            if pm:
-                                num = pm.group(1) + ' ' + num
-                            metrics.append((num, re.sub(r'^(高达|约|近)\s*', '', cur_desc).strip()))
-                            cur_desc = ''
-                    # 最后一段（数字后的余文）
-                    if len(parts) % 2 == 1 and parts[-1].strip():
-                        cur_desc = (cur_desc + ' ' + parts[-1].strip()).strip()
-                    # 如果没有数字，整段当正文
-                    if not metrics:
-                        sections.append((cur_h, [('p', (cur_desc or t))]))
-                    elif cur_desc:
-                        sections.append((cur_h, [('p', cur_desc)]))
+                    # 简单提取：数字开头行 / 数字结尾行
+                    for line in t.split('\n'):
+                        line = line.strip()
+                        if not line:
+                            continue
+                        # 数字开头（含逗号/百分比/符号）
+                        m = re.match(r'^([\d,+\-%↑↓]+)\s*(.*)', line)
+                        if m:
+                            num, desc = m.group(1), m.group(2).strip()
+                            desc = re.sub(r'^(名|位|个|家|人|种|项)\s*', '', desc)
+                            metrics.append((num, desc))
+                        # 行末百分比/数字（如「提速 14%」）
+                        elif re.search(r'([\d,.%]+)$', line) and not re.search(r'Firefox |Claude |Fable |Opus ', line):
+                            m2 = re.search(r'(.+?)\s*([\d,.%]+)$', line)
+                            if m2:
+                                desc, num = m2.group(1).strip(), m2.group(2).strip()
+                                metrics.append((num, desc))
+                        else:
+                            sections.append((cur_h, [('p', line)]))
         else:
             sections.append((cur_h, cur_body))
         cur_h, cur_body, metric_h = '', [], False
