@@ -24,7 +24,12 @@ SYSTEM = (
 
 
 def split_blocks(md):
-    """markdown → [(kind, raw)]，kind ∈ head/text/table/quote。"""
+    """markdown → [(kind, raw)]，kind ∈ head/text/table/quote。
+
+    块边界必须与原文一致：build_cases.py 的 _pair_quotes 靠「引文块 + 紧随的
+    署名块」配对，如果这里把署名并进引文（或反过来跨块合并），下游就配不上，
+    署名会漂成正文。所以翻译只做 1:1 块替换，不跨块重组。
+    """
     out = []
     for b in re.split(r'\n\s*\n', md.strip()):
         b = b.strip()
