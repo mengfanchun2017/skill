@@ -267,15 +267,6 @@ def md_to_xml(md):
         o.append('</callout>')
     elif title:
         o.append(f'<h2>{esc(title)}</h2>')
-        for num, desc in metrics:
-            num_e = esc(num)
-            if desc:
-                desc_e = esc(desc)
-                o.append(f'<li><p><b>{num_e}</b>　{desc_e}</p></li>')
-            else:
-                o.append(f'<li><p><b>{num_e}</b></p></li>')
-        o.append('</ul>')
-        o.append('</callout>')
 
     # 各小节
     for h, body in sections:
@@ -291,8 +282,11 @@ def md_to_xml(md):
             elif kind == 'p':
                 t = b.strip()
                 is_quote = bool(re.search(r'[「」\"”“]', t)) and len(t) > 30
+                is_attribution = bool(re.search(r'(董事长|CEO|CTO|总裁|联合创始人|董事|主席|执行官|副总裁|高级副总裁)', t[-40:]))
                 if is_quote:
                     o.append(f'<blockquote><p>{esc(t)}</p></blockquote>')
+                elif is_attribution:
+                    o.append(f'<p>{esc(t)}</p>')
                 else:
                     o.append(f'<p>{esc(re.sub(r"\s+", " ", t))}</p>')
     return '\n'.join(o)
