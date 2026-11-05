@@ -100,34 +100,37 @@ def parse_md(md):
                                 metrics.append((num, desc))
                 elif kind == 'p':
                     t = b.strip()
-                    # 把整段文本扫一遍，找所有数字/百分比行
-                    for line in t.split('\n'):
-                        line = line.strip()
-                        if not line:
-                            continue
-                        if line in ('高达', '约', '近'):
-                            continue  # OCR 碎片前缀，随下一行数字
-                        # 优先匹配「数字 描述」或「描述 数字」
-                        m = re.match(r'^([\d,+\-%↑↓]+)\s*(.*)', line)
-                        if m:
-                            desc = m.group(2).strip()
-                            desc = re.sub(r'^(名|位|个|家|人|种|项)\s*', '', desc)
-                            metrics.append((m.group(1), desc))
-                        elif re.search(r'^Claude [\w.]+', line):
-                            m3 = re.search(r'(\d[\d,.%]*)\s', line)
-                            if m3:
-                                num_end = m3.end()
-                                metrics.append((line[:num_end].strip(), line[num_end:].strip()))
-                            else:
-                                metrics.append((line, ''))
-                        else:
-                            # 行末有百分比/数字？如「提速 14%」
-                            tail = re.search(r'(\d[\d,.%]*)$', line)
-                            if tail:
-                                end = tail.end()
-                                metrics.append((line[end - tail.end() + tail.start():].strip(), line[:tail.start()].strip()))
-                            else:
-                                sections.append((cur_h, [('p', line)]))
+                    # 在整段文本中按数字位置切分。模式：
+                    # 「高达 14%」或「25 小时」= 数字/百分比
+                    # 「面向顾问的 Joule 项目交付 提速」= 数字前的说明
+                    # 按顺序：第一个数字前的文本是 prefix（如果有数字的话）
+                    # 两个数字之间的文本是前一个数字的描述
+                    parts = re.split(r'(\d[\d,+\-%↑↓]*)', t)
+                    # parts = [text, num, text, num, ...]
+                    cur_desc = ''
+                    for i in range(0, len(parts) - 1, 2):
+                        text = parts[i].strip()
+                        num = parts[i+1].strip() if i+1 < len(parts) else ''
+                        # 数字后的部分
+                        if cur_desc and text:
+                            cur_desc += ' ' + text
+                        elif text:
+                            cur_desc = text
+                        if num:
+                            # 前缀关键词（高达/约/近）
+                            pm = re.match(r'.*?(高达|约|近)$', cur_desc)
+                            if pm:
+                                num = pm.group(1) + ' ' + num
+                            metrics.append((num, re.sub(r'^(高达|约|近)\s*', '', cur_desc).strip()))
+                            cur_desc = ''
+                    # 最后一段（数字后的余文）
+                    if len(parts) % 2 == 1 and parts[-1].strip():
+                        cur_desc = (cur_desc + ' ' + parts[-1].strip()).strip()
+                    # 如果没有数字，整段当正文
+                    if not metrics:
+                        sections.append((cur_h, [('p', (cur_desc or t))]))
+                    elif cur_desc:
+                        sections.append((cur_h, [('p', cur_desc)]))
         else:
             sections.append((cur_h, cur_body))
         cur_h, cur_body, metric_h = '', [], False
