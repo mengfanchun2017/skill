@@ -64,6 +64,8 @@ skill/
 - 直接改 `plugins/<skill>/SKILL.md` 或其他文件
 - 如果改了 frontmatter `description`，运行 `python3 scripts/sync-marketplace.py --write` 同步到 marketplace.json
 - CI 会检查 marketplace.json 是否与 SKILL.md 一致（`python3 scripts/sync-marketplace.py` 非零退出 = 不同步）
+- **改 shell 后必跑 `bash -n`**：Edit 跨行替换容易把多行压成一行，运行时才报错
+- **SKILL.md 超过 200 行就该拆**：细则进 `references/`，命令进 `scripts/` 或 `fcore`
 
 ## 版本
 
