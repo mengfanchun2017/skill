@@ -161,5 +161,13 @@ f_doctor() {
         echo "[${results[*]}]"
     fi
 
+    # fix 模式：修完重检一次，让退出码反映修复后真实状态
+    if $fix_mode && ! $all_ok; then
+        echo ""
+        echo "  ── 修复后复检 ──"
+        f_doctor
+        return $?
+    fi
+
     $all_ok
 }
