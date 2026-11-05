@@ -84,13 +84,24 @@ def parse_md(md):
                                     metrics.append((num, desc))
                     elif kind == 'p':
                         t = b.strip()
-                        # 纯文本指标：数字/百分比/约/高达/Claude 开头
-                        if re.search(r'^[\d+,.+\-%↑↓约高达近]+', t) or re.match(r'^Claude [\w.]+', t):
-                            m = re.match(r'^([\d+,.+\-%↑↓]+)\s*(.*)', t)
-                            if m:
-                                metrics.append((m.group(1), m.group(2).strip()))
-                            else:
-                                metrics.append((t, ''))
+                        # 纯文本指标：数字逗号开头（含可选前缀 约/高达/近）
+                        prefix = ''
+                        m = re.match(r'^(约|高达|近)(.+)$', t)
+                        if m:
+                            prefix, t2 = m.group(1), m.group(2)
+                            t2 = t2.strip()
+                        else:
+                            t2 = t
+                        # 数字 + 逗号 + 数字（如 "45,000名" 或 "+32%"）
+                        m2 = re.match(r'^([\d,+\-%↑↓]+)\s*(.*)', t2)
+                        if m2:
+                            num = prefix + m2.group(1)
+                            desc = m2.group(2).strip()
+                            # 去掉 desc 开头的量词（"名"、"位"、"个"、"家"）
+                            desc = re.sub(r'^(名|位|个|家|人|种|项)\s*', '', desc)
+                            metrics.append((num, desc))
+                        elif re.match(r'^Claude [\w.]+', t):
+                            metrics.append((t, ''))
                         else:
                             sections.append((cur_h, [('p', t)]))
             else:
