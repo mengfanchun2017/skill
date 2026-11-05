@@ -93,6 +93,7 @@ def parse_md(md):
                         t2 = t2.strip()
                     else:
                         t2 = t
+                    # "25 小时" → ("25 小时", "")
                     m2 = re.match(r'^([\d,+\-%↑↓]+)\s*(.*)', t2)
                     if m2:
                         num = prefix + m2.group(1)
@@ -100,7 +101,15 @@ def parse_md(md):
                         desc = re.sub(r'^(名|位|个|家|人|种|项)\s*', '', desc)
                         metrics.append((num, desc))
                     elif re.match(r'^Claude [\w.]+', t):
-                        metrics.append((t, ''))
+                        # "Claude Opus 4.6 发现 22 个漏洞..." → 拆数字
+                        m3 = re.search(r'(\d[\d,.]*)\s', t)
+                        if m3:
+                            idx = m3.start()
+                            desc = t[idx:].strip()
+                            num = t[:idx].strip()
+                            metrics.append((num, desc))
+                        else:
+                            metrics.append((t, ''))
                     else:
                         sections.append((cur_h, [('p', t)]))
         else:
