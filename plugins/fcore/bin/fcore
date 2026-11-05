@@ -22,6 +22,8 @@
 #   fcore upload <file>
 #   fcore search <关键词> [数量]
 #   fcore where                         打印解析到的各路径（排障第一步）
+#   fcore doctor                         全量体检（7 项健康检查）
+#   fcore office <args>                  OfficeCLI 包装（自动依赖检查）
 
 set -uo pipefail
 
@@ -36,6 +38,9 @@ source "$_ROOT/lib/lark.sh"
 source "$_ROOT/lib/genre.sh"
 # shellcheck source=/dev/null
 source "$_ROOT/lib/fmt.sh"
+# shellcheck source=/dev/null
+source "$_ROOT/lib/doctor.sh"
+
 
 _usage() { sed -n '2,30p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; }
 
@@ -94,6 +99,19 @@ case "$cmd" in
         echo "user config: $(f_user_config_dir)"
         echo "user data:   $(f_userdata_dir "$(f_plugin_name 2>/dev/null || echo unknown)")"
         echo "registry:    $(f_registry_file 2>/dev/null || echo '(未找到 fcore.yaml)')"
+        ;;
+    doctor)
+        f_doctor "$@"
+        exit $?
+        ;;
+    office)
+        # OfficeCLI 包装：自动确保 libicu 等依赖存在
+        if ! command -v officecli &>/dev/null; then
+            echo "OfficeCLI 未安装 — 安装: curl -fsSL https://d.officecli.ai/install.sh | bash" >&2
+            exit 1
+        fi
+        officecli "$@"
+        exit $?
         ;;
     ''|-h|--help|help) _usage ;;
     *) echo "未知命令: $cmd" >&2; _usage; exit 2 ;;
