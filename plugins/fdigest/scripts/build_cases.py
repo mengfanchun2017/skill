@@ -215,7 +215,7 @@ ATTR_RE = re.compile(
 # 正则里列前缀太脆，改成「末尾命中关键词」即可）
 ATTR_TAIL = ('董事长', '总裁', '创始人', '董事', '主席', '执行官', '副总裁',
              'CEO', 'CTO', 'CIO', 'COO', 'CFO', '官', '合伙人', '负责人', '经理',
-             '主管', '总监', '总工程师', 'VP', 'SVP', 'EVP', 'MD')
+             '主管', '总监', '总工程师', 'VP', 'SVP', 'EVP', 'MD', '总经理', '社长')
 
 # 行末「公司名」作为署名（无逗号），仅限单行公司名
 ATTR_SINGLE = ('Mercado Libre', 'Jane Street', 'PayPal', 'SAP', 'Travelers', 'Verizon',
