@@ -221,11 +221,13 @@ def main():
     ordered = sorted(by_page)
     o = [f'<title>{esc(args.title)}</title>']
     o.append('<callout emoji="🗂️" background-color="light-gray">'
-             '<p>本页收录原文中的客户案例。每页一张原图，图下是案例中文全文。</p>'
+             '<p>本页收录原文中的客户案例。每页一张原图，图下结构：</p>'
+             '<ul><li><p>蓝色高亮块：案例核心成果指标</p></li>'
+             '<li><p>正文小节（背景→影响），引文以引用格式展示</p></li></ul>'
              f'<p>共 {len(ordered)} 页（第 {ordered[0]}-{ordered[-1]} 页）。'
              '原文件中这些页是整页扫描图，文字不在文本层，'
              '已用 MinerU 视觉 OCR 通道提取并译成中文。</p>'
-             '<p>每节先放原图，图下是中文译文；需要核对英文时看原图。</p></callout>')
+             '<p>需要核对英文原文时，直接看原图。</p></callout>')
 
     # 清单
     o.append('<h1><span text-color="blue">案例清单</span></h1>')
@@ -239,15 +241,26 @@ def main():
             if line.startswith('#'):
                 title = re.sub(r'^#+\s*', '', line).strip()
                 break
-        # 关键点取案例自带指标表的首列（原文这些案例都用「数字 | 说明」两列表带成果）
+        # 关键点取案例指标数据：优先表格行，回落纯文本"成果"段
         pts = []
         for rm in re.finditer(r'<tr>(.*?)</tr>', md, re.S):
             cells = [re.sub(r'<[^>]+>', '', c).strip()
                      for c in re.findall(r'<td>(.*?)</td>', rm.group(1), re.S)]
             if len(cells) == 2 and cells[0]:
                 pts.append(cells[0])
+        if not pts:
+            # 纯文本指标：找「## 成果/结果」后的数字行
+            after = re.split(r'## 成果|## 结果', md, maxsplit=1)
+            if len(after) > 1:
+                for line in after[1].split('\n')[:15]:
+                    s = line.strip()
+                    if s.startswith(('+', '-', '高达', '近', '约')):
+                        pts.append(s[:30])
+                    m = re.match(r'^[\d,]+', s)
+                    if m:
+                        pts.append(m.group()[:15])
         o.append(f'<tr><td><p>{p}</p></td><td><p>{esc(title) or esc(fn)}</p></td>'
-                 f'<td><p>{esc(" / ".join(pts[:3]))}</p></td></tr>')
+                 f'<td><p>{esc(" / ".join(x.strip() for x in pts[:3]))}</p></td></tr>')
     o.append('</tbody></table>')
 
     # 详情
@@ -256,11 +269,10 @@ def main():
         x = by_page[p][0]
         md = ocr.get(p, '')
         zh = ocr_zh.get(p, '')
-        # 标题取中文版（有就用），保证目录和正文语言一致
-        src_for_title = zh or md
+        src = zh or md
         title = ''
-        for line in src_for_title.split('\n'):
-            if line.startswith('#'):
+        for line in src.split('\n'):
+            if line.startswith('# '):
                 title = re.sub(r'^#+\s*', '', line).strip()
                 break
         head = f'第 {p} 页 · {title}' if title else f'第 {p} 页'
@@ -270,9 +282,9 @@ def main():
         if zh.strip():
             o.append(md_to_xml(zh))
         elif md.strip():
+            o.append(f'<callout emoji="⚠️" background-color="light-yellow">'
+                     '<p>本页暂无中文译文，以下为 MinerU OCR 原文。</p></callout>')
             o.append(md_to_xml(md))
-            o.append('<callout emoji="⚠️" background-color="light-yellow">'
-                     '<p>本页暂无中文译文，以上为 MinerU OCR 原文。</p></callout>')
         else:
             o.append('<callout emoji="⚠️" background-color="light-red">'
                      '<p>本页 OCR 未提取到文字，需人工查看原图。</p></callout>')
