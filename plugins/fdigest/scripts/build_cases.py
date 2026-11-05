@@ -379,26 +379,23 @@ def _preamble_to_impact(preamble, sections):
 def _fill_orphan_metrics(metrics, sections):
     """成果指标有数字无说明时，从后续节逐一取说明。
 
-    p224 模式：OCR 把指标行写成「## 约 1 周\n\n使用 Claude Fable…」，
-    指标名成了节标题。把这类节当作前一个指标的文字说明。
+    p224 模式：OCR 把指标行间的说明文字变成独立段落。
+    在 metrics 内部，数字后的纯文本行自动作为该数字的描述。
     """
     if not metrics:
         return metrics, sections
-    new_sections = list(sections)
     new_metrics = list(metrics)
+    new_sections = list(sections)
     for mi, (num, desc) in enumerate(new_metrics):
         if desc:
             continue
-        # 找到第一个有正文的 section，取第一段作为说明
         for si, (h, body) in enumerate(new_sections):
             if body and any(k == 'p' and len(b.strip()) > 10 for k, b in body):
                 first_text = next(b.strip() for k, b in body if k == 'p' and len(b.strip()) > 10)
                 new_metrics[mi] = (num, first_text)
-                # 如果 section 只有这段正文，整节删掉（避免重复展示标题）
-                if len(body) == 1:
-                    new_sections[si] = (h, [])
+                new_sections[si] = (h, body[1:])
                 break
-    return new_metrics, [s for s in new_sections if s[1]]
+    return new_metrics, [s for s in new_sections if s[1] or s[0] in ('背景', '影响')]
 
 
 def md_to_xml(md):
