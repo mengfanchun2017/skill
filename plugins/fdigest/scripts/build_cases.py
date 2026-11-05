@@ -377,29 +377,28 @@ def _preamble_to_impact(preamble, sections):
 
 
 def _fill_orphan_metrics(metrics, sections):
-    """成果指标有数字无说明时，从紧跟的节正文取说明。
+    """成果指标有数字无说明时，从后续节逐一取说明。
 
-    p224 模式：「+32%」被 OCR 切成「## 成果\n+32%\n\nClaude Fable 5.1…」
-    说明行落到了下一节，指标只有数字没说明。从后续节找第一段正文当说明。
+    p224 模式：OCR 把指标行写成「## 约 1 周\n\n使用 Claude Fable…」，
+    指标名成了节标题。把这类节当作前一个指标的文字说明。
     """
     if not metrics:
         return metrics, sections
+    new_sections = list(sections)
     new_metrics = list(metrics)
     for mi, (num, desc) in enumerate(new_metrics):
         if desc:
             continue
-        # 找第一个非空 section 的第一段正文
-        for si, (h, body) in enumerate(sections):
-            if body:
-                first_text = None
-                for kind, b in body:
-                    if kind == 'p' and len(b.strip()) > 20:
-                        first_text = b.strip()
-                        break
-                if first_text:
-                    new_metrics[mi] = (num, first_text)
-                    break
-    return new_metrics, sections
+        # 找到第一个有正文的 section，取第一段作为说明
+        for si, (h, body) in enumerate(new_sections):
+            if body and any(k == 'p' and len(b.strip()) > 10 for k, b in body):
+                first_text = next(b.strip() for k, b in body if k == 'p' and len(b.strip()) > 10)
+                new_metrics[mi] = (num, first_text)
+                # 如果 section 只有这段正文，整节删掉（避免重复展示标题）
+                if len(body) == 1:
+                    new_sections[si] = (h, [])
+                break
+    return new_metrics, [s for s in new_sections if s[1]]
 
 
 def md_to_xml(md):
