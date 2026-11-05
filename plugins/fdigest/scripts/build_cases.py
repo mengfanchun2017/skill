@@ -217,16 +217,29 @@ def _is_quote(t):
 
 
 def _pair_quotes(items):
-    """[(kind,text)] → [(kind,text,attr)]，引文与紧随署名合成一项。"""
+    """[(kind,text)] → [(kind,text,attr)]，引文与紧随署名合成一项。
+
+    两种合并：
+      1. 带引号的段落 + 下一个署名行 → 一个引用块
+      2. 无引号但后面紧跟署名的段落（OCR/译文常把引文改写成转述）→ 同样合成
+    署名独占一行且前一块不是署名，说明这段就是那个人说的，必须配对。
+    """
     out, i = [], 0
     while i < len(items):
         kind, t = items[i]
+        if kind == 'p' and i + 1 < len(items) and _is_attr(items[i + 1][1]):
+            out.append(('quote', t.strip(), items[i + 1][1].strip()))
+            i += 2
+            continue
         if _is_quote(t):
             attr = ''
             if i + 1 < len(items) and _is_attr(items[i + 1][1]):
                 attr = items[i + 1][1].strip()
                 i += 1
             out.append(('quote', t.strip(), attr))
+        elif _is_attr(t):
+            # 孤立署名（前面没有可配对的正文）→ 单独引用块，右对齐
+            out.append(('quote', '', t.strip()))
         elif kind == 'h3':
             out.append(('h3', t, ''))
         elif kind == 'table':
@@ -242,7 +255,7 @@ def _render(items):
     o = []
     for kind, t, attr in items:
         if kind == 'quote':
-            inner = f'<p>{esc(t)}</p>'
+            inner = f'<p>{esc(t)}</p>' if t else ''
             if attr:
                 inner += f'<p align="right">{esc(attr)}</p>'
             o.append(f'<blockquote>{inner}</blockquote>')
