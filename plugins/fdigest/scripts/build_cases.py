@@ -105,7 +105,7 @@ def parse_md(md):
                     # 「面向顾问的 Joule 项目交付 提速」= 数字前的说明
                     # 按顺序：第一个数字前的文本是 prefix（如果有数字的话）
                     # 两个数字之间的文本是前一个数字的描述
-                    parts = re.split(r'(\d[\d,+\-%↑↓]*)', t)
+                    parts = re.split(r'([\d,+\-%↑↓%]+)', t)
                     # parts = [text, num, text, num, ...]
                     cur_desc = ''
                     for i in range(0, len(parts) - 1, 2):
