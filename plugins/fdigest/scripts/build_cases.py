@@ -345,20 +345,25 @@ def layout_check(xml):
 def _preamble_to_impact(preamble, sections):
     """preamble 的引言/引用归入「影响」节开头。
 
-    用户指出：前引（"对我们真正重要的成果…" / "现在可能做到的事情…" / 双#引文）
-    不应该飘在高亮块前面，而是放在「影响」节的开头，作为案例成果的总结引语。
-
-    搬移规则：从尾部往前找 (p+quote) 配对或独立 quote，整体搬入「影响」节头部。
+    用户指出：前引不应该飘在高亮块前面，应放在「影响」节开头。
+    搬移规则：从尾部往前找 (p+quote) 配对、独立 quote、或 (quote+p) 配对。
     """
     if not preamble:
         return preamble, sections
     movable, i = [], len(preamble) - 1
     while i >= 0:
         k, t = preamble[i]
-        if k == 'quote' and i > 0 and preamble[i-1][0] == 'p':
-            movable.insert(0, preamble[i-1]); movable.insert(0, preamble[i]); i -= 2
+        if k == 'p' and i > 0 and preamble[i-1][0] == 'quote':
+            movable.insert(0, preamble[i-1])  # quote first
+            movable.insert(0, preamble[i])     # p second (text then attribution)
+            i -= 2
+        elif k == 'quote' and i > 0 and preamble[i-1][0] == 'p':
+            movable.insert(0, preamble[i-1])  # p first
+            movable.insert(0, preamble[i])     # quote second
+            i -= 2
         elif k == 'quote':
-            movable.insert(0, preamble[i]); i -= 1
+            movable.insert(0, preamble[i])
+            i -= 1
         else:
             break
     if not movable:
