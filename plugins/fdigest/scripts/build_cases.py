@@ -100,47 +100,34 @@ def parse_md(md):
                                 metrics.append((num, desc))
                 elif kind == 'p':
                     t = b.strip()
-                    pending_prefix = ''
-                    pending_mid = ''
+                    # 把整段文本扫一遍，找所有数字/百分比行
                     for line in t.split('\n'):
                         line = line.strip()
                         if not line:
                             continue
                         if line in ('高达', '约', '近'):
-                            pending_prefix = line
-                            continue
-                        prefix = pending_prefix
-                        pending_prefix = ''
-                        m = re.match(r'^(约|高达|近)(.+)$', line)
+                            continue  # OCR 碎片前缀，随下一行数字
+                        # 优先匹配「数字 描述」或「描述 数字」
+                        m = re.match(r'^([\d,+\-%↑↓]+)\s*(.*)', line)
                         if m:
-                            prefix, t2 = m.group(1), m.group(2)
-                            t2 = t2.strip()
-                        else:
-                            t2 = line
-                        m2 = re.match(r'^([\d,+\-%↑↓]+)\s*(.*)', t2)
-                        if m2:
-                            desc = m2.group(2).strip()
+                            desc = m.group(2).strip()
                             desc = re.sub(r'^(名|位|个|家|人|种|项)\s*', '', desc)
-                            metrics.append((prefix + m2.group(1), (pending_mid + desc).strip()))
-                            pending_mid = ''
-                        elif re.match(r'^Claude [\w.]+', line):
+                            metrics.append((m.group(1), desc))
+                        elif re.search(r'^Claude [\w.]+', line):
                             m3 = re.search(r'(\d[\d,.%]*)\s', line)
                             if m3:
                                 num_end = m3.end()
-                                num = line[:num_end].strip()
-                                desc = line[num_end:].strip()
-                                metrics.append((prefix + num, (pending_mid + desc).strip()))
+                                metrics.append((line[:num_end].strip(), line[num_end:].strip()))
                             else:
-                                metrics.append((prefix + line, ''))
-                            pending_mid = ''
-                        elif prefix:
-                            # 前缀后面跟非数字行（如「高达」+「提速」）→ 当作前缀延续
-                            # 把当前行当整句
-                            metrics.append((prefix + ' ' + line, ''))
-                            pending_mid = ''
+                                metrics.append((line, ''))
                         else:
-                            sections.append((cur_h, [('p', (pending_mid + line).strip())]))
-                            pending_mid = ''
+                            # 行末有百分比/数字？如「提速 14%」
+                            tail = re.search(r'(\d[\d,.%]*)$', line)
+                            if tail:
+                                end = tail.end()
+                                metrics.append((line[end - tail.end() + tail.start():].strip(), line[:tail.start()].strip()))
+                            else:
+                                sections.append((cur_h, [('p', line)]))
         else:
             sections.append((cur_h, cur_body))
         cur_h, cur_body, metric_h = '', [], False
