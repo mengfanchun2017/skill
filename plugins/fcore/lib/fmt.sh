@@ -69,7 +69,7 @@ PY
     return 1
 }
 
-# f_fmt_check_md <file> — 校验纯 markdown 报告（fwstd-report 交付前门禁的可执行子集）
+# f_fmt_check_md <file> — 校验纯 markdown 报告（fstander-report 交付前门禁的可执行子集）
 f_fmt_check_md() {
     local f="$1"
     [[ -f "$f" ]] || { echo "[fcore] 文件不存在: $f" >&2; return 2; }
@@ -100,7 +100,7 @@ f_fmt_check_md() {
         echo "  ✅ 无问题"
         return 0
     fi
-    echo "  共 $F_FMT_VIOLATIONS 项，规则真相源: fwstd-report"
+    echo "  共 $F_FMT_VIOLATIONS 项，规则真相源: fstander-report"
     return 1
 }
 

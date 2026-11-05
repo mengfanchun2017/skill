@@ -20,16 +20,16 @@
       ]
     },
     {
-      "name": "fwstd-report",
+      "name": "fstander-report",
       "description": "报告写作横向规范 — 内容结构、数据分级与引用纪律、判断主线、论证逻辑、图表约定。 4 套模板（研究/分析/对比/方案）+ 通用规则。 用法：用户说\"写报告\"/\"出报告\"/\"分析报告\"/\"对比报告\"/\"方案报告\"触发， 或任何需要产出\"长篇正式文档\"的场景。",
-      "source": "./plugins/fwstd-report",
+      "source": "./plugins/fstander-report",
       "keywords": [
         "f"
       ]
     },
     {
       "name": "fpptx",
-      "description": "PPT/X 总控 — 从 md/wiki/材料到 PPTX 或飞书 Slides。 OfficeCLI 引擎（原生 OpenXML），也支持 lark-cli 生成飞书在线幻灯片。 内置 6 套设计主题，图表委托 fdiagram，内容规范委托 fwstd-report。",
+      "description": "PPT/X 总控 — 从 md/wiki/材料到 PPTX 或飞书 Slides。 OfficeCLI 引擎（原生 OpenXML），也支持 lark-cli 生成飞书在线幻灯片。 内置 6 套设计主题，图表委托 fdiagram，内容规范委托 fstander-report。",
       "source": "./plugins/fpptx",
       "keywords": [
         "f"
@@ -44,9 +44,9 @@
       ]
     },
     {
-      "name": "fworch-report",
-      "description": "报告生成 — 读 JSON / 大纲 / 自由素材 → 结构化 markdown 报告。 3 种输入模式，按用户场景自动选择。内容规范委派 fwstd-report。 飞书输出委派 ffeishu（图子文档工作流 G）。 用法：用户说\"写报告\"/\"出报告\"/\"分析报告\"/\"对比报告\"/\"方案报告\"触发",
-      "source": "./plugins/fworch-report",
+      "name": "forch-report",
+      "description": "报告生成 — 读 JSON / 大纲 / 自由素材 → 结构化 markdown 报告。 3 种输入模式，按用户场景自动选择。内容规范委派 fstander-report。 飞书输出委派 ffeishu（图子文档工作流 G）。 用法：用户说\"写报告\"/\"出报告\"/\"分析报告\"/\"对比报告\"/\"方案报告\"触发",
+      "source": "./plugins/forch-report",
       "keywords": [
         "f"
       ]
@@ -142,56 +142,56 @@
       ]
     },
     {
-      "name": "fwstd-course",
-      "description": "课程文档内容规范 — 系列课程各产物（调研报告/课程体系/教案/练习/总结）的 内容架构、骨架与写作要求。飞书格式见 ffeishu，编排与执行见 fworch-course。 用法：被 fworch-course 及其子 skill 引用，一般不直接触发",
-      "source": "./plugins/fwstd-course",
+      "name": "fstander-course",
+      "description": "课程文档内容规范 — 系列课程各产物（调研报告/课程体系/教案/练习/总结）的 内容架构、骨架与写作要求。飞书格式见 ffeishu，编排与执行见 forch-course。 用法：被 forch-course 及其子 skill 引用，一般不直接触发",
+      "source": "./plugins/fstander-course",
       "keywords": [
         "f"
       ]
     },
     {
-      "name": "fwstd-case",
-      "description": "案例库内容规范 — Base 字段 schema、案例起名规则、正文模版与写作要求。 飞书格式见 ffeishu；案例编排/检索/建库执行见 fworch-case。 用法：被 fworch-case 引用，一般不直接触发",
-      "source": "./plugins/fwstd-case",
+      "name": "fstander-case",
+      "description": "案例库内容规范 — Base 字段 schema、案例起名规则、正文模版与写作要求。 飞书格式见 ffeishu；案例编排/检索/建库执行见 forch-case。 用法：被 forch-case 引用，一般不直接触发",
+      "source": "./plugins/fstander-case",
       "keywords": [
         "f"
       ]
     },
     {
-      "name": "fworch",
-      "description": "撰写系统统一入口（路由层）。读体裁注册表判断需求属于哪种体裁（课程/报告/案例/面试准备）， 派发到对应 orchestrator（fworch-course/fworch-report/fworch-case/fworch-interview）。用户只描述需求，无需记内部 skill 名。 用法：用户说\"做课程\"/\"写报告\"/\"新增案例\"/\"准备面试\"等撰写需求时触发",
-      "source": "./plugins/fworch",
+      "name": "forch",
+      "description": "撰写系统统一入口（路由层）。读体裁注册表判断需求属于哪种体裁（课程/报告/案例/面试准备）， 派发到对应 orchestrator（forch-course/forch-report/forch-case/forch-interview）。用户只描述需求，无需记内部 skill 名。 用法：用户说\"做课程\"/\"写报告\"/\"新增案例\"/\"准备面试\"等撰写需求时触发",
+      "source": "./plugins/forch",
       "keywords": [
         "f"
       ]
     },
     {
-      "name": "fwstd-interview",
-      "description": "面试准备内容规范 — 岗位画像/组织行业/知识地图/能力模型/问题库/问答素材/未来工作思路/模拟清单/成稿包 的内容架构与写作要求。面向\"零经验应聘者\"的全链条准备。飞书格式见 ffeishu，编排与执行见 fworch-interview。 用法：被 fworch-interview 引用，或用户说\"准备面试\"/\"岗位面试\"触发",
-      "source": "./plugins/fwstd-interview",
+      "name": "fstander-interview",
+      "description": "面试准备内容规范 — 岗位画像/组织行业/知识地图/能力模型/问题库/问答素材/未来工作思路/模拟清单/成稿包 的内容架构与写作要求。面向\"零经验应聘者\"的全链条准备。飞书格式见 ffeishu，编排与执行见 forch-interview。 用法：被 forch-interview 引用，或用户说\"准备面试\"/\"岗位面试\"触发",
+      "source": "./plugins/fstander-interview",
       "keywords": [
         "f"
       ]
     },
     {
-      "name": "fworch-course",
-      "source": "./plugins/fworch-course",
+      "name": "forch-course",
+      "source": "./plugins/forch-course",
       "keywords": [
         "f"
       ],
-      "description": "系列课程创作 orchestrator。读 ccprivate/conf/fcourse/<slug>.yaml 配置 -> 判断当前课程进度 -> 读取对应 step 细则执行 -> 更新配置。 所有产物存飞书父文档下的子文档。fworch-case 案例库**可选**调用（按需、用户触发）。 两种模式：Mode A 从零创作（调研→体系→教案）；Mode B 现有材料课程化（已有课件/PDF 抽取为 memo+update）。 用法：用户说\"做课程\"/\"创作课程\"/\"设计课程\"/\"继续课程\"/\"课程材料课程化\"/\"已有课程抽取\"触发"
+      "description": "系列课程创作 orchestrator。读 ccprivate/conf/fcourse/<slug>.yaml 配置 -> 判断当前课程进度 -> 读取对应 step 细则执行 -> 更新配置。 所有产物存飞书父文档下的子文档。forch-case 案例库**可选**调用（按需、用户触发）。 两种模式：Mode A 从零创作（调研→体系→教案）；Mode B 现有材料课程化（已有课件/PDF 抽取为 memo+update）。 用法：用户说\"做课程\"/\"创作课程\"/\"设计课程\"/\"继续课程\"/\"课程材料课程化\"/\"已有课程抽取\"触发"
     },
     {
-      "name": "fworch-case",
-      "source": "./plugins/fworch-case",
+      "name": "forch-case",
+      "source": "./plugins/forch-case",
       "keywords": [
         "f"
       ],
-      "description": "案例库编排器。维护飞书 wiki 三层案例库 + Base 元数据，按关键词/专业领域检索案例， 新增/更新案例时搜索整理生成正文，fetch 案例主文档内容注入课程上下文。 内容规范（schema/起名/正文模版）见 fwstd-case。 用法：用户说\"案例库\"/\"案例\"/\"补充案例\"/\"推荐案例\"/\"新增案例\"触发"
+      "description": "案例库编排器。维护飞书 wiki 三层案例库 + Base 元数据，按关键词/专业领域检索案例， 新增/更新案例时搜索整理生成正文，fetch 案例主文档内容注入课程上下文。 内容规范（schema/起名/正文模版）见 fstander-case。 用法：用户说\"案例库\"/\"案例\"/\"补充案例\"/\"推荐案例\"/\"新增案例\"触发"
     },
     {
-      "name": "fworch-interview",
-      "source": "./plugins/fworch-interview",
+      "name": "forch-interview",
+      "source": "./plugins/forch-interview",
       "keywords": [
         "f"
       ],

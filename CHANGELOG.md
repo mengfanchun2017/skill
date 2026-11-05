@@ -17,12 +17,12 @@
 - **`fskillcreat` 的手动 git 提交指引改掉**：原指引教用户 `git add . && git commit
   && git push`，与 auto-sync monitor 独占提交权直接冲突（手动提交会与 monitor 抢跑，
   两边改动被扫进同一 commit）。改为"改完即止，等 monitor 自动提交"。
-- **`~/git/ccprivate` 硬编码改 `${CCPRIVATE_HOME:-...}`**（fworch-course /
-  fworch-interview 及其 comm-contract），换机/自定义路径不再断。
+- **`~/git/ccprivate` 硬编码改 `${CCPRIVATE_HOME:-...}`**（forch-course /
+  forch-interview 及其 comm-contract），换机/自定义路径不再断。
 
 ### Fixed
 - **4 个 `config.yaml.example` 指向不存在的路径**：`ccprivate/config/<x>.yaml` →
-  实际是 `ccprivate/skill/<name>.yaml`（fsearch/fresearchframe/fsysarchi/fworch-report）。
+  实际是 `ccprivate/skill/<name>.yaml`（fsearch/fresearchframe/fsysarchi/forch-report）。
 - **README/CLAUDE.md 的 plugin 计数 24 → 26**（fpdf 是第 25 个、fsecretcheck 是第 26 个，
   此前一直漏登 fpdf）。
 
@@ -112,7 +112,7 @@
 - fpdf: `config.yaml.example` + `.gitignore`
 
 ### Fixed
-- **表格 XML 语法更正（重要）**：`<lark-table rows= cols= column-widths=>` 经实测**无效** —— 列宽被丢弃（全变 120）、第二个 `<lark-tr>` 被吞。正确写法是标准 HTML `<table><colgroup><thead><tr><th>`（实测列宽 411 保留、多行完整）。ffeishu SKILL.md + write-checklist.md 已更正，fworch-interview / fwstd-course / fwstd-report / fwstd-interview 的残留引用一并清理，`report_check.py` 的标签白名单同步更新
+- **表格 XML 语法更正（重要）**：`<lark-table rows= cols= column-widths=>` 经实测**无效** —— 列宽被丢弃（全变 120）、第二个 `<lark-tr>` 被吞。正确写法是标准 HTML `<table><colgroup><thead><tr><th>`（实测列宽 411 保留、多行完整）。ffeishu SKILL.md + write-checklist.md 已更正，forch-interview / fstander-course / fstander-report / fstander-interview 的残留引用一并清理，`report_check.py` 的标签白名单同步更新
 
 ### Changed
 - **ffeishu**: PDF 处理改为**委托 fpdf**（新增「PDF 处理 → 委托 fpdf skill」路由节），不再自己用 MCP/外部工具临时对付；移除低效的 `— | 用 MCP/外部工具` 占位
@@ -120,17 +120,17 @@
 ## [0.12.0] — 2026-10-16
 
 ### Added
-- marketplace.json: 注册 fworch 撰写系统全套缺失条目 — **fworch**（统一入口）+ **fworch-course** + **fworch-case** + **fworch-interview**，及 **fllmpack**（LLM 预设导出/导入）。marketplace 从 20 → 24 个 plugin，与 `plugins/` 目录数一致
+- marketplace.json: 注册 forch 撰写系统全套缺失条目 — **forch**（统一入口）+ **forch-course** + **forch-case** + **forch-interview**，及 **fllmpack**（LLM 预设导出/导入）。marketplace 从 20 → 24 个 plugin，与 `plugins/` 目录数一致
 
 ### Changed
 - marketplace.json 版本 0.9.0 → 0.12.0（此前用旧版号，与 CHANGELOG 漂移）
-- **README.md 全面重写**：修正仓名 `claude-skills` → `skill`；marketplace add 命令修正；自建 skill 表从 16 条刷新为 24 条（补 fworch/fwstd-* 撰写系统 8 个 + fllmpack + fmashwork）；移除不存在的 `freportstd` / `fresearchreport` 旧名（实为 `fwstd-report` / `fworch-report`）
+- **README.md 全面重写**：修正仓名 `claude-skills` → `skill`；marketplace add 命令修正；自建 skill 表从 16 条刷新为 24 条（补 forch/fstander-* 撰写系统 8 个 + fllmpack + fmashwork）；移除不存在的 `freportstd` / `fresearchreport` 旧名（实为 `fstander-report` / `forch-report`）
 - **CLAUDE.md 重写**：plugin 数 15→24、目录结构、插件清单、配置注入路径（`ccprivate/skill-config/` → `ccprivate/skill/`）
 - **CONTRIBUTING.md**：仓名修正；移除不存在的 `plugins/skill-template/` 与 `option-<name>/` 结构条目
 
 ### Fixed
 - README / CLAUDE.md / CONTRIBUTING.md 中所有 `github.com/mengfanchun2017/claude-skills` 死链 → `github.com/mengfanchun2017/skill`
-- **www/index.html 展示页刷新**：SKILLS 数组 15 → 24 张卡片（修正 3 个不存在的 skill 名 `fresearchreport`/`freportstd`/`getnote` → `fworch-report`/`fwstd-report`/撰写系统全套）；技能数文案 16 → 24；GitHub 链接与 marketplace add 命令修正；补充 i18n fllmpack 卡片
+- **www/index.html 展示页刷新**：SKILLS 数组 15 → 24 张卡片（修正 3 个不存在的 skill 名 `fresearchreport`/`freportstd`/`getnote` → `forch-report`/`fstander-report`/撰写系统全套）；技能数文案 16 → 24；GitHub 链接与 marketplace add 命令修正；补充 i18n fllmpack 卡片
 
 ## [0.11.0] — 2026-08-23
 
@@ -252,12 +252,12 @@
   flogme 364→96、fdigest 395→142、fpdf 345→93 行。细节全部移入 `references/`，行为不变。
 - 三处 auth 预检统一改调 `fcore auth`（`fpptx` 还额外修了写死 `~/.lark-cli` 的问题）。
 - 配置读写统一走 `fcore conf`，旧的 8 级回退链从文档层移除（脚本层仍兼容，待迁移）。
-- `fworch` 标注为旧入口，职能已并入 `fhub` + `fcore genre`。
+- `forch` 标注为旧入口，职能已并入 `fhub` + `fcore genre`。
 
 ### Fixed
 - **auth 预检恒失败**：3 处 `grep -q '"ok":true'` 匹配不到 lark-cli 实际输出 `"ok": true`
   （冒号后有空格），导致认证明明正常也固定报 AUTH_FAILED，技能拒绝干活。
-  `fworch-course` 那处还漏了续行反斜杠，直接跑报 `AUTH_FAILED: command not found`。
+  `forch-course` 那处还漏了续行反斜杠，直接跑报 `AUTH_FAILED: command not found`。
 - **`fdigest` 泄露真实飞书 token**：5 个 token 写进公开 SKILL.md 并已推送至历史，
   且文件自称「从 ccprivate/conf/fdigest.yaml 读」而该文件根本不存在。已移入私有配置。
 - **`fcore conf get` 对嵌套结构输出 Python repr**：取 `wiki_nodes.default` 会打印

@@ -54,33 +54,33 @@ domains:
 genres:
   report:
     parent: write
-    skill: fworch-report
-    orchestrator: fworch-report
-    spec: fwstd-report
+    skill: forch-report
+    orchestrator: forch-report
+    spec: fstander-report
     config: writing/report.yaml
     desc: 报告
     trigger: ["写报告", "出报告", "分析报告", "对比报告", "方案报告", "研究报告", "复盘报告", "选型报告"]
   course:
     parent: write
-    skill: fworch-course
-    orchestrator: fworch-course
-    spec: fwstd-course
+    skill: forch-course
+    orchestrator: forch-course
+    spec: fstander-course
     config: writing/course.yaml
     desc: 系列课程
     trigger: ["做课程", "创作课程", "设计课程", "继续课程", "课程材料课程化", "已有课程抽取"]
   case:
     parent: write
-    skill: fworch-case
-    orchestrator: fworch-case
-    spec: fwstd-case
+    skill: forch-case
+    orchestrator: forch-case
+    spec: fstander-case
     config: writing/case.yaml
     desc: 案例库
     trigger: ["案例库", "案例", "补充案例", "推荐案例", "新增案例"]
   interview:
     parent: write
-    skill: fworch-interview
-    orchestrator: fworch-interview
-    spec: fwstd-interview
+    skill: forch-interview
+    orchestrator: forch-interview
+    spec: fstander-interview
     config: writing/interview.yaml
     desc: 面试准备
     trigger: ["面试准备", "准备面试", "岗位面试", "应聘", "竞聘", "面试材料", "面试辅导"]

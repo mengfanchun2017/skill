@@ -8,7 +8,7 @@
 ## 一句话
 
 30 个自建 Claude Code plugin 的聚合仓，五层架构：`fcore`(机械) → `fhub`(派发) →
-业务技能 → `fwstd-*`(规范) → `fworch-*`(编排)。详见 README 的架构图。
+业务技能 → `fstander-*`(规范) → `forch-*`(编排)。详见 README 的架构图。
 
 ## 硬约束（改文件前必看）
 

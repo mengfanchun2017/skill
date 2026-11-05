@@ -44,7 +44,7 @@ def _dir_from_path(p) -> Path:
 def _caller_plugin_dir() -> Path | None:
     """从调用栈里找到**第一个不在本文件所在 plugin 内**的帧所属的 plugin 根。
 
-    ⚠️ 不能用 __file__：本模块住在 ffeishu 下，被 fpdf/fworch-case import 后
+    ⚠️ 不能用 __file__：本模块住在 ffeishu 下，被 fpdf/forch-case import 后
     __file__ 仍指向 ffeishu → 给别的 skill 取配置会读成 ffeishu 的。实测踩过。
     """
     own = Path(__file__).resolve()

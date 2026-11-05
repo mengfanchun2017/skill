@@ -17,7 +17,7 @@ allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 | 触发 | 行为 |
 |------|------|
 | "调研 XX" / "分析 XX 用户" | 自动判断领域 → 调 fsearch → 按框架解读 |
-| fworch-report 需要调研素材 | 委派本 skill（不在模式 1 中直接调 fsearch） |
+| forch-report 需要调研素材 | 委派本 skill（不在模式 1 中直接调 fsearch） |
 | Batch Mode（批量研究） | 委派本 skill 做单 item 的领域判断 + 框架 |
 
 ## 自动领域判断
@@ -81,7 +81,7 @@ allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 
 **分析方法论 → `references/market-analysis.md`**（行业/市场/赛道调研必读）：10 个分析镜头（主线压缩 / 规模与需求底线 / 利润池与价值迁移 / 竞争格局与终局 / 驱动—制约矩阵 / 周期定位与供需 / 政策传导 / 盈利质量与回报 / 预期差 / 证伪与终止条件）+ 4 类行业结构分支（产业链型 / 网络型 / 资产负债型 / 单店模型型，各带分析侧重与必做表）。
 
-要点：把事实**转成判断**而非罗列资料；链式行业必点"利润从哪个环节流向哪个环节"、点名"剪刀差"。数据分级与引用纪律见 `../fwstd-report/references/data-grading-and-citation.md`。
+要点：把事实**转成判断**而非罗列资料；链式行业必点"利润从哪个环节流向哪个环节"、点名"剪刀差"。数据分级与引用纪律见 `../fstander-report/references/data-grading-and-citation.md`。
 
 ### technical 领域
 
@@ -106,13 +106,13 @@ allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 - 概览 + 关键特征（generic）
 
 ### Step 4: 输出
-输出结构化领域数据 + 置信度标注，交给调用方（fworch-report / Batch Mode / 用户）
+输出结构化领域数据 + 置信度标注，交给调用方（forch-report / Batch Mode / 用户）
 
 ## 关联 Skills
 
 - `fsearch` — 搜索工具（必调用）
 - `Batch Mode` — 批量研究（委托本 skill 做单 item）
-- `fworch-report` — 报告生成（用本 skill 的输出做素材）
+- `forch-report` — 报告生成（用本 skill 的输出做素材）
 
 ## Batch Mode（原 f-research-deep）
 

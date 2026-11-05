@@ -1,12 +1,12 @@
 #!/bin/bash
 # fcore/lib/genre.sh — 技能派发注册表匹配
 #
-# 取代 fworch 的单一职责（读体裁注册表 → 判体裁 → 派发）。注册表在私有仓
+# 取代 forch 的单一职责（读体裁注册表 → 判体裁 → 派发）。注册表在私有仓
 # ccprivate/conf/fcore.yaml（真值），公开仓只放 .example 模板。
 #
 # 设计要点：注册表**只有一份**。此前触发词存在三处（~/CLAUDE.md、
 # registry.yaml、每个 SKILL.md 的 description），实测已漂移 ——
-# ~/CLAUDE.md 曾写「写报告 → fresearchframe」而实际该派 fworch-report。
+# ~/CLAUDE.md 曾写「写报告 → fresearchframe」而实际该派 forch-report。
 
 f_registry_file() {
     local f

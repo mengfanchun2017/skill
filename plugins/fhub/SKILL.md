@@ -22,8 +22,8 @@ allowed-tools: Bash, Read, Glob, Grep, Skill, AskUserQuestion
 输出示例：
 
 ```json
-{"domain":"write","genre":"report","skill":"fworch-report",
- "orchestrator":"fworch-report","spec":"fwstd-report","config":"writing/report.yaml",
+{"domain":"write","genre":"report","skill":"forch-report",
+ "orchestrator":"forch-report","spec":"fstander-report","config":"writing/report.yaml",
  "trigger":"分析报告","score":26}
 ```
 
@@ -41,7 +41,7 @@ allowed-tools: Bash, Read, Glob, Grep, Skill, AskUserQuestion
 
 | 输出 | 怎么做 |
 |---|---|
-| 有 `orchestrator` | 直接派给 `orchestrator`（如 fworch-report） |
+| 有 `orchestrator` | 直接派给 `orchestrator`（如 forch-report） |
 | 只有 `domain`，无 `genre` | 派给 `skill` 字段的技能 |
 | `"domain": null` | 触发词没命中 → 用 `fcore genres` 列清单，AskUserQuestion 让用户选；仍不确定就问"你想做什么" |
 
@@ -51,7 +51,7 @@ allowed-tools: Bash, Read, Glob, Grep, Skill, AskUserQuestion
 传过去，不要自己改写或补充——改写会丢掉用户的具体约束。
 
 ```
-Skill(skill="fworch-report", args="<用户原始描述>")
+Skill(skill="forch-report", args="<用户原始描述>")
 ```
 
 **不要做的事**：
@@ -65,7 +65,7 @@ Skill(skill="fworch-report", args="<用户原始描述>")
 
 | 域 | 派给 | 覆盖 |
 |---|---|---|
-| write | 按体裁派 fworch-report / -course / -case / -interview | 报告、课程、案例、面试 |
+| write | 按体裁派 forch-report / -course / -case / -interview | 报告、课程、案例、面试 |
 | doc | ffeishu | 飞书文档、表格、白板、图表 |
 | office | fpptx / fdocx / fxlsx | PPT、Word、Excel |
 | pdf | fpdf | PDF 精排上飞书 |
@@ -82,7 +82,7 @@ Skill(skill="fworch-report", args="<用户原始描述>")
 
 此前触发词散在三处（`~/CLAUDE.md`、writing/registry.yaml、各 SKILL.md 的
 description），实测已漂移过：`~/CLAUDE.md` 曾写"写报告 → fresearchframe"
-而实际该派 fworch-report。现在一律以 `fcore.yaml` 为准。
+而实际该派 forch-report。现在一律以 `fcore.yaml` 为准。
 
 ## 斜杠命令
 

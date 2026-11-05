@@ -34,7 +34,7 @@
 # ⚠️ 必须在 **source 时刻**捕获调用方，不能在调用时刻用 ${BASH_SOURCE[1]}：
 # plugin_env.sh 住在 ffeishu 下，被别的 skill source 后再调用 skillconf_get 时，
 # 函数内部的 BASH_SOURCE[1] 指向的是 plugin_env.sh 自己（或中间函数）→ 会解析成
-# ffeishu，导致"给 fworch-case 取配置却读到 ffeishu 的"。实测踩过。
+# ffeishu，导致"给 forch-case 取配置却读到 ffeishu 的"。实测踩过。
 _SKILLCONF_SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[1]:-${BASH_SOURCE[0]}}")" 2>/dev/null && pwd || true)"
 case "$(basename "${_SKILLCONF_SOURCE_DIR:-}")" in
     references|scripts) _SKILLCONF_SOURCE_DIR="$(dirname "$_SKILLCONF_SOURCE_DIR")" ;;

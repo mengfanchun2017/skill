@@ -2,12 +2,12 @@
 
 > 架构图/流程图/时序图委托 fdiagram（飞书画板，就地嵌入）。
 > 本文件只覆盖**数据/分析图**（matplotlib/plotly）：每个图建独立子文档，父文档只放链接。
-> 内容规范见 `../../fwstd-report/references/chart-guide.md`。
+> 内容规范见 `../../fstander-report/references/chart-guide.md`。
 
 ## 工作流 G: 图子文档生成（数据/分析图）
 
 > 架构/流程图委托 fdiagram。本工作流用于**数据/分析图**（matplotlib/plotly）：每个图建独立子文档。
-> 内容规范见 `../fwstd-report/SKILL.md`，触发见 `../fworch-report/SKILL.md` 工作流 G。
+> 内容规范见 `../fstander-report/SKILL.md`，触发见 `../forch-report/SKILL.md` 工作流 G。
 
 ### 完整流程
 

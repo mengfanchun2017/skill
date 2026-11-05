@@ -43,7 +43,7 @@
 ```
 /fpostpone 18点运行 /transliter "C:\docs\batch.zip"
 /fpostpone 明天9点 汇总昨天合并的 PR
-/fpostpone +2h /fworch-report 生成季度报告
+/fpostpone +2h /forch-report 生成季度报告
 /fpostpone 中午闲时 用 fsearch 调研竞品动态
 ```
 

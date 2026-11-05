@@ -4,7 +4,7 @@ user-invocable: true
 description: |
   PPT/X 总控 — 从 md/wiki/材料到 PPTX 或飞书 Slides。
   OfficeCLI 引擎（原生 OpenXML），也支持 lark-cli 生成飞书在线幻灯片。
-  内置 6 套设计主题，图表委托 fdiagram，内容规范委托 fwstd-report。
+  内置 6 套设计主题，图表委托 fdiagram，内容规范委托 fstander-report。
 allowed-tools: Read, Write, Bash, Glob
 ---
 
@@ -54,7 +54,7 @@ allowed-tools: Read, Write, Bash, Glob
 
 | 需求 | 走哪 |
 |---|---|
-| 内容结构（章节骨架/论证） | `fwstd-report` 4 套模板 |
+| 内容结构（章节骨架/论证） | `fstander-report` 4 套模板 |
 | 图表（架构/流程/数据） | `fdiagram` → 可编辑 SVG 再嵌入 |
 | 素材搜索 | `fsearch` |
 | 交付与飞书上传 | `fcore doc` / `ffeishu` |

@@ -5,7 +5,7 @@
 # ///
 """fpdf 解析层 — PDF → 结构包（markdown + content_list + 图片）。
 
-为什么独立于 fworch-case/references/mineru_parse.py：
+为什么独立于 forch-case/references/mineru_parse.py：
     那个脚本是「素材转 markdown」取向（stdout 出 md，用途=喂给课程化流水线）。
     本脚本是「版式还原」取向：必须拿到 content_list 的 bbox 坐标，才能重建
     分栏/表格结构 → 交给飞书 XML 排版。两者输出契约不同，故不复用。

@@ -25,7 +25,7 @@
 装完直接用自然语言描述需求，不必记技能名：
 
 ```
-帮我写一份 AI 芯片行业分析报告        → fworch-report
+帮我写一份 AI 芯片行业分析报告        → forch-report
 把这个 PDF 排到飞书上                → fpdf
 总结一下本周工作                     → flogme
 画个架构图                          → ffeishu + fdiagram
@@ -53,11 +53,11 @@ flowchart TB
     end
 
     subgraph L2["L2 内容规范层"]
-        fwstd["fwstd-report / fwstd-course<br/>fwstd-case / fwstd-interview<br/>定义什么算好，不含命令"]
+        fstander["fstander-report / fstander-course<br/>fstander-case / fstander-interview<br/>定义什么算好，不含命令"]
     end
 
     subgraph L3["L3 编排层"]
-        fworch["fworch-report / fworch-course<br/>fworch-case / fworch-interview<br/>决定什么时候做哪一步"]
+        forch["forch-report / forch-course<br/>forch-case / forch-interview<br/>决定什么时候做哪一步"]
     end
 
     subgraph L0["L0 机械内核"]
@@ -99,13 +99,13 @@ sequenceDiagram
     participant U as 用户
     participant H as fhub
     participant C as fcore
-    participant O as fworch-report
-    participant S as fwstd-report
+    participant O as forch-report
+    participant S as fstander-report
 
     U->>H: "帮我写个 AI 芯片行业分析报告"
     H->>C: fcore genre "帮我写个..."
-    C-->>H: {domain:write, genre:report,<br/>orchestrator:fworch-report}
-    H->>O: Skill(skill=fworch-report)
+    C-->>H: {domain:write, genre:report,<br/>orchestrator:forch-report}
+    H->>O: Skill(skill=forch-report)
     O->>S: 读取报告规范
     O-->>U: 结构化报告
 ```
@@ -141,10 +141,10 @@ skill/
 │   ├── fhub/                     # L1 总入口
 │   │   ├── commands/fhub.md      #   /fhub 斜杠命令
 │   │   └── SKILL.md
-│   ├── fworch-report/            # L3 编排
+│   ├── forch-report/            # L3 编排
 │   │   ├── references/comm-contract.md
 │   │   └── SKILL.md
-│   ├── fwstd-report/             # L2 规范
+│   ├── fstander-report/             # L2 规范
 │   │   ├── references/           #   4 套模板 + 写作法则
 │   │   ├── scripts/report_check.py
 │   │   └── SKILL.md
@@ -286,25 +286,25 @@ flowchart LR
 
 | Plugin | 说明 |
 |---|---|
-| `fwstd-report` | 报告写作（4 套模板：研究/分析/对比/方案 + 数据分级/引用纪律/判断主线） |
-| `fwstd-course` | 课程文档内容规范 |
-| `fwstd-case` | 案例库内容规范（Base schema + 起名规则 + 正文模版） |
-| `fwstd-interview` | 面试准备内容规范 |
+| `fstander-report` | 报告写作（4 套模板：研究/分析/对比/方案 + 数据分级/引用纪律/判断主线） |
+| `fstander-course` | 课程文档内容规范 |
+| `fstander-case` | 案例库内容规范（Base schema + 起名规则 + 正文模版） |
+| `fstander-interview` | 面试准备内容规范 |
 
 ### L3 · 编排
 
 | Plugin | 说明 |
 |---|---|
-| `fworch-report` | 报告生成（JSON/大纲/自由素材 → 结构化 markdown，3 种输入模式） |
-| `fworch-course` | 系列课程创作（从零创作 / 现有材料课程化） |
-| `fworch-case` | 案例库编排（飞书 wiki 三层 + Base 元数据） |
-| `fworch-interview` | 面试准备（岗位认知 → 专业能力 → 未来工作思路） |
+| `forch-report` | 报告生成（JSON/大纲/自由素材 → 结构化 markdown，3 种输入模式） |
+| `forch-course` | 系列课程创作（从零创作 / 现有材料课程化） |
+| `forch-case` | 案例库编排（飞书 wiki 三层 + Base 元数据） |
+| `forch-interview` | 面试准备（岗位认知 → 专业能力 → 未来工作思路） |
 
 ### 旧入口（建议改走 fhub）
 
 | Plugin | 说明 |
 |---|---|
-| `fworch` | 撰写系统路由层。职能已并入 `fhub` + `fcore genre`，保留只为不打断既有习惯 |
+| `forch` | 撰写系统路由层。职能已并入 `fhub` + `fcore genre`，保留只为不打断既有习惯 |
 
 ---
 
@@ -355,8 +355,8 @@ A Claude Code plugin marketplace with **30 self-built skills** in a five-layer d
   have to remember skill names.
 - **L1 business skills** — ffeishu, fpdf, fdigest, fpptx, fdocx, fxlsx, fdiagram, fsearch,
   fresearchframe, flogme, fmoocrec, fsysarchi, fmashwork, ...
-- **L2 specs** (`fwstd-*`) — what a good report / course / case looks like.
-- **L3 orchestrators** (`fworch-*`) — what order to do things in.
+- **L2 specs** (`fstander-*`) — what a good report / course / case looks like.
+- **L3 orchestrators** (`forch-*`) — what order to do things in.
 
 **Config is never overwritten by updates**: user-supplied values live in
 `~/.claude/skill-config/<plugin>.yaml`, outside the `/plugin update` replace path
