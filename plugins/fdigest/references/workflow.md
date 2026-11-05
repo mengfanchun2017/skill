@@ -34,6 +34,13 @@ python3 ~/.claude/skills/fdigest/scripts/build_cases.py <slug> --images-dir <压
 ```
 ⚠️ MinerU 预签名 PUT 必须发空 Content-Type（`headers={'Content-Type': ''}`），否则 403。
 
+**案例版式由 `build_cases.py` 固定，别在飞书里手改**。每页顺序：
+原图 → 蓝色高亮块（案例名居中加粗 + 成果无序列表，**不用表格**）
+→ 引用块（引文 + 署名同行内，署名 `<p align="right">`）→ 背景/影响 H3。
+生成时自动跑 `layout_check()` 断言这三条，输出里 `layout.errors` 非空即违规。
+来由与反例 → `ops.md §案例文档版式`。
+⚠️ `align` 只在 fetch `--detail full` 可见；默认 `simple` 会丢，用它验证会误判成没生效。
+
 **Step 3 索引（workflow 自带，手工补跑）：**
 ```bash
 python3 ~/.claude/skills/fdigest/scripts/index.py <slug> --meta '{"title":"...","subject":"...","doc_kind":"...","disclosed_at":"...","feishu_url":"..."}'
