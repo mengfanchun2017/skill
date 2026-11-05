@@ -342,13 +342,66 @@ def layout_check(xml):
                                       'quotes': quote_n, 'attr_right': attr_ok}}
 
 
+def _preamble_to_impact(preamble, sections):
+    """preamble 的引言/引用归入「影响」节开头。
+
+    用户指出：前引（"对我们真正重要的成果…" / "现在可能做到的事情…" / 双#引文）
+    不应该飘在高亮块前面，而是放在「影响」节的开头，作为案例成果的总结引语。
+
+    不删除 preamble 里的段落：p222 的 DoorDash 引言前面还有一段正文
+    （"对我们真正重要的…"）不是引言，是案例摘要，放 preamble 合理。
+    """
+    if not preamble:
+        return preamble, sections
+    # 找到「影响」节
+    for i, (h, body) in enumerate(sections):
+        if h == '影响':
+            # 把 preamble 的引用/署名插入影响节开头
+            # 只搬 quote 类型；纯 p 留在 preamble（属案例摘要）
+            quotes = [x for x in preamble if x[0] == 'quote']
+            if quotes:
+                sections[i] = (h, quotes + body)
+            remaining = [x for x in preamble if x[0] != 'quote']
+            return remaining, sections
+    return preamble, sections
+
+
+def _fill_orphan_metrics(metrics, sections):
+    """成果指标有数字无说明时，从紧跟的节正文取说明。
+
+    p224 模式：「+32%」被 OCR 切成「## 成果\n+32%\n\nClaude Fable 5.1…」
+    说明行落到了下一节，指标只有数字没说明。从后续节找第一段正文当说明。
+    """
+    if not metrics:
+        return metrics, sections
+    new_metrics = list(metrics)
+    for mi, (num, desc) in enumerate(new_metrics):
+        if desc:
+            continue
+        # 找第一个非空 section 的第一段正文
+        for si, (h, body) in enumerate(sections):
+            if body:
+                first_text = None
+                for kind, b in body:
+                    if kind == 'p' and len(b.strip()) > 20:
+                        first_text = b.strip()
+                        break
+                if first_text:
+                    new_metrics[mi] = (num, first_text)
+                    break
+    return new_metrics, sections
+
+
 def md_to_xml(md):
     """把案例 md 渲染成 DocxXML。
 
-    顺序（用户定）：蓝色高亮块（案例名居中 + 成果指标列表）→ 引言/正文各小节。
-    引言放高亮块之后，不能压在成果前面。引文与署名合成一个引用块，署名右对齐。
+    顺序（用户定）：蓝色高亮块（案例名居中 + 成果指标列表）→ 摘要正文
+    → 各小节。引文与署名合成一个引用块，署名右对齐。
+    引言（如 p222 的 Andy Fang）归入「影响」节开头。
     """
     title, preamble, metrics, sections = parse_md(md)
+    metrics, sections = _fill_orphan_metrics(metrics, sections)
+    preamble, sections = _preamble_to_impact(preamble, sections)
     o = []
 
     # 高亮块：案例名居中加粗 + 成果列表。没指标时只放标题，不再重复 h2。
