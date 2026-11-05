@@ -437,6 +437,7 @@ def main():
                       'images': len(seen), 'feishu_blocks': cost,
                       'with_ocr': sum(1 for p in ordered if ocr.get(p, '').strip()),
                       'ocr_chars': sum(len(ocr.get(p, '')) for p in ordered),
+                      'layout': layout_check(xml),
                       'over_limit': cost > 5000}, ensure_ascii=False))
 
 
