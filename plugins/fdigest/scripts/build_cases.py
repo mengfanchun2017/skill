@@ -224,12 +224,6 @@ ATTR_SINGLE = ('Mercado Libre', 'Jane Street', 'PayPal', 'SAP', 'Travelers', 'Ve
                'Shy Bird', 'KBF')
 
 
-def _strip_dollars(t):
-    """去掉翻译遗留的 $...$ LaTeX 标记。"""
-    s = t.replace('\\%', '%').replace('\\$', '$')
-    return re.sub(r'\$(\d+[,.%]+)*\$', r'\1', s)
-
-
 def _is_attr(t):
     """署名行判定：短、无引号、含「，」+ 职务末尾，或公司名单行。
 
