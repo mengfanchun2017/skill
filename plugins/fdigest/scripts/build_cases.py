@@ -285,6 +285,44 @@ def _render(items):
     return o
 
 
+def layout_check(xml):
+    """案例版式断言 —— 把用户三轮反馈的规则变成可执行检查，不靠人眼。
+
+    返回 {"errors": [...], "stats": {...}}。errors 非空说明版式违规。
+    """
+    errs = []
+    # 每页一节切分
+    parts = re.split(r'(?=<h2>第 \d+ 页)', xml)
+    parts = [p for p in parts if re.match(r'^<h2>第 \d+ 页', p)]
+    quote_n = attr_ok = callout_n = tbl_in_metric = 0
+    for p in parts:
+        pg = re.match(r'^<h2>第 (\d+) 页', p).group(1)
+        # 1. 高亮块必须在第一个引用之前
+        ci, qi = p.find('<callout'), p.find('<blockquote')
+        if ci < 0:
+            errs.append(f'p{pg} 无成果高亮块')
+        else:
+            callout_n += 1
+            if qi >= 0 and qi < ci:
+                errs.append(f'p{pg} 引言漂在高亮块之前')
+        # 2. 引用块内的署名必须右对齐；块外的署名视为漂移
+        for seg in re.findall(r'<blockquote>.*?</blockquote>', p, re.S):
+            quote_n += 1
+            inner = re.findall(r'<p[^>]*>([^<]{0,60})</p>', seg)
+            tail = inner[-1].strip() if inner else ''
+            if tail.endswith(ATTR_TAIL):
+                attr_ok += 1
+                if 'align="right"' not in seg:
+                    errs.append(f'p{pg} 署名未右对齐：{tail[:20]}')
+        # 3. 高亮块里不许有表格
+        for seg in re.findall(r'<callout[^>]*>.*?</callout>', p, re.S):
+            if '<table' in seg:
+                tbl_in_metric += 1
+                errs.append(f'p{pg} 成果用了表格（应为无序列表）')
+    return {'errors': errs, 'stats': {'pages': len(parts), 'callout': callout_n,
+                                      'quotes': quote_n, 'attr_right': attr_ok}}
+
+
 def md_to_xml(md):
     """把案例 md 渲染成 DocxXML。
 
