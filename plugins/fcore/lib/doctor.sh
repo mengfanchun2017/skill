@@ -100,7 +100,7 @@ f_doctor() {
         _dr "git config" "true" "$(git config --global user.name)"
     else
         _dr "git config" "false" "缺少 user.name/email"
-        if $fix_mode && gh auth status 2>/dev/null; then
+        if $fix_mode && command -v gh &>/dev/null && gh auth status >/dev/null 2>&1; then
             local gh_name gh_email
             gh_name=$(gh api user --jq '.name // .login' 2>/dev/null || echo "")
             gh_email=$(gh api user --jq '.email' 2>/dev/null || echo "")
