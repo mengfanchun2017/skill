@@ -241,7 +241,8 @@ def md_to_xml(md):
     o = []
 
     if title:
-        o.append(f'<h2>{esc(title)}</h2>')
+        # 标题放蓝色高亮块里居中加粗；没指标时单独 h2
+        metrics_title = title
 
     # 引言
     for kind, t in preamble:
@@ -250,11 +251,22 @@ def md_to_xml(md):
         else:
             o.append(f'<p>{esc(re.sub(r"\s+", " ", t))}</p>')
 
-    # 指标 → 蓝色高亮块
+    # 指标 → 蓝色高亮块（含居中标题）
     if metrics:
         o.append('<callout emoji="📊" background-color="blue">')
-        o.append('<p><b>成果</b></p>')
+        o.append(f'<p align="center"><b>{esc(metrics_title)}</b></p>')
         o.append('<ul>')
+        for num, desc in metrics:
+            num_e = esc(num)
+            if desc:
+                desc_e = esc(desc)
+                o.append(f'<li><p><b>{num_e}</b>　{desc_e}</p></li>')
+            else:
+                o.append(f'<li><p><b>{num_e}</b></p></li>')
+        o.append('</ul>')
+        o.append('</callout>')
+    elif title:
+        o.append(f'<h2>{esc(title)}</h2>')
         for num, desc in metrics:
             num_e = esc(num)
             if desc:
