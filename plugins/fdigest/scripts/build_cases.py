@@ -348,22 +348,25 @@ def _preamble_to_impact(preamble, sections):
     用户指出：前引（"对我们真正重要的成果…" / "现在可能做到的事情…" / 双#引文）
     不应该飘在高亮块前面，而是放在「影响」节的开头，作为案例成果的总结引语。
 
-    不删除 preamble 里的段落：p222 的 DoorDash 引言前面还有一段正文
-    （"对我们真正重要的…"）不是引言，是案例摘要，放 preamble 合理。
+    搬移规则：从尾部往前找 (p+quote) 配对或独立 quote，整体搬入「影响」节头部。
     """
     if not preamble:
         return preamble, sections
-    # 找到「影响」节
-    for i, (h, body) in enumerate(sections):
+    movable, i = [], len(preamble) - 1
+    while i >= 0:
+        k, t = preamble[i]
+        if k == 'quote' and i > 0 and preamble[i-1][0] == 'p':
+            movable.insert(0, preamble[i-1]); movable.insert(0, preamble[i]); i -= 2
+        elif k == 'quote':
+            movable.insert(0, preamble[i]); i -= 1
+        else:
+            break
+    if not movable:
+        return preamble, sections
+    for si, (h, body) in enumerate(sections):
         if h == '影响':
-            # 把 preamble 的引用/署名插入影响节开头
-            # 只搬 quote 类型；纯 p 留在 preamble（属案例摘要）
-            quotes = [x for x in preamble if x[0] == 'quote']
-            if quotes:
-                sections[i] = (h, quotes + body)
-            remaining = [x for x in preamble if x[0] != 'quote']
-            return remaining, sections
-    return preamble, sections
+            sections[si] = (h, movable + body); break
+    return preamble[:i+1] if i >= 0 else [], sections
 
 
 def _fill_orphan_metrics(metrics, sections):
