@@ -194,64 +194,97 @@ def parse_md(md):
     return title, preamble, metrics, sections
 
 
+ATTR_RE = re.compile(
+    r'^[一-鿿\w.\s·]{2,30}[，,]\s*\S{2,40}(董事长|CEO|CTO|CIO|COO|总裁|创始人|'
+    r'董事|主席|执行官|副总裁|官|合伙人|负责人)$')
+
+
+def _is_attr(t):
+    """署名行判定：短、无引号、形如「姓名，职务」。
+
+    OCR 常把引文和署名拆成两段（有的还夹在正文中间），必须成对合并，
+    否则署名会单独漂在正文里，看不出是谁说的。
+    """
+    t = t.strip()
+    return len(t) <= 60 and not re.search(r'[「」""]', t) and bool(ATTR_RE.match(t))
+
+
+def _is_quote(t):
+    t = t.strip()
+    if len(t) < 20:
+        return False
+    return bool(re.search(r'[「」""…]', t))
+
+
+def _pair_quotes(items):
+    """[(kind,text)] → [(kind,text,attr)]，引文与紧随署名合成一项。"""
+    out, i = [], 0
+    while i < len(items):
+        kind, t = items[i]
+        if _is_quote(t):
+            attr = ''
+            if i + 1 < len(items) and _is_attr(items[i + 1][1]):
+                attr = items[i + 1][1].strip()
+                i += 1
+            out.append(('quote', t.strip(), attr))
+        elif kind == 'h3':
+            out.append(('h3', t, ''))
+        elif kind == 'table':
+            out.append(('table', t, ''))
+        else:
+            out.append(('p', t, ''))
+        i += 1
+    return out
+
+
+def _render(items):
+    """渲染 [(kind,text,attr)]。引用块内署名右对齐。"""
+    o = []
+    for kind, t, attr in items:
+        if kind == 'quote':
+            inner = f'<p>{esc(t)}</p>'
+            if attr:
+                inner += f'<p align="right">{esc(attr)}</p>'
+            o.append(f'<blockquote>{inner}</blockquote>')
+        elif kind == 'h3':
+            o.append(f'<h3>{esc(t)}</h3>')
+        elif kind == 'table':
+            tx = md_table_to_xml(t)
+            if tx:
+                o.append(tx)
+        else:
+            o.append(f'<p>{esc(re.sub(r"\s+", " ", t.strip()))}</p>')
+    return o
+
+
 def md_to_xml(md):
     """把案例 md 渲染成 DocxXML。
 
-    结构：H2 标题 → 引言（前置段落/引用）→ 蓝色高亮块（指标）
-          → 正文各小节（背景/影响，引号段落后自动识别为引用）。
+    顺序（用户定）：蓝色高亮块（案例名居中 + 成果指标列表）→ 引言/正文各小节。
+    引言放高亮块之后，不能压在成果前面。引文与署名合成一个引用块，署名右对齐。
     """
     title, preamble, metrics, sections = parse_md(md)
     o = []
 
-    if title:
-        # 标题放蓝色高亮块里居中加粗；没指标时单独 h2
-        metrics_title = title
-
-    # 引言
-    for kind, t in preamble:
-        if kind == 'quote':
-            o.append(f'<blockquote><p>{esc(t)}</p></blockquote>')
-        else:
-            o.append(f'<p>{esc(re.sub(r"\s+", " ", t))}</p>')
-
-    # 指标 → 蓝色高亮块（含居中标题）
-    if metrics:
+    # 高亮块：案例名居中加粗 + 成果列表。没指标时只放标题，不再重复 h2。
+    if title or metrics:
         o.append('<callout emoji="📊" background-color="blue">')
-        o.append(f'<p align="center"><b>{esc(metrics_title)}</b></p>')
-        o.append('<ul>')
-        for num, desc in metrics:
-            num_e = esc(num)
-            if desc:
-                desc_e = esc(desc)
-                o.append(f'<li><p><b>{num_e}</b>　{desc_e}</p></li>')
-            else:
-                o.append(f'<li><p><b>{num_e}</b></p></li>')
-        o.append('</ul>')
+        if title:
+            o.append(f'<p align="center"><b>{esc(title)}</b></p>')
+        if metrics:
+            o.append('<ul>')
+            for num, desc in metrics:
+                num_e = esc(num)
+                o.append(f'<li><p><b>{num_e}</b>{("　" + esc(desc)) if desc else ""}</p></li>')
+            o.append('</ul>')
         o.append('</callout>')
-    elif title:
-        o.append(f'<h2>{esc(title)}</h2>')
 
-    # 各小节
+    o.extend(_render(_pair_quotes(preamble)))
+
     for h, body in sections:
         if h:
             o.append(f'<h3>{esc(h)}</h3>')
-        for kind, b in body:
-            if kind == 'h3':
-                o.append(f'<h3>{esc(b)}</h3>')
-            elif kind == 'table':
-                tx = md_table_to_xml(b)
-                if tx:
-                    o.append(tx)
-            elif kind == 'p':
-                t = b.strip()
-                is_quote = bool(re.search(r'[「」\"”“]', t)) and len(t) > 30
-                is_attribution = bool(re.search(r'(董事长|CEO|CTO|总裁|联合创始人|董事|主席|执行官|副总裁|高级副总裁)', t[-40:]))
-                if is_quote:
-                    o.append(f'<blockquote><p>{esc(t)}</p></blockquote>')
-                elif is_attribution:
-                    o.append(f'<p>{esc(t)}</p>')
-                else:
-                    o.append(f'<p>{esc(re.sub(r"\s+", " ", t))}</p>')
+        o.extend(_render(_pair_quotes(body)))
     return '\n'.join(o)
 
 
