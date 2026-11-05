@@ -69,43 +69,42 @@ def parse_md(md):
 
     def flush():
         nonlocal cur_h, cur_body, metric_h
-        if cur_h and cur_body:
-            if metric_h:
-                # 提取指标行
-                for kind, b in cur_body:
-                    if kind == 'table':
-                        for rm in re.finditer(r'<tr>(.*?)</tr>', b, re.S):
-                            cells = [re.sub(r'<[^>]+>', '', c).strip()
-                                     for c in re.findall(r'<td>(.*?)</td>', rm.group(1), re.S)]
-                            if cells:
-                                num = re.sub(r'\d+$', '', cells[0]).strip() if cells[0] else ''
-                                desc = re.sub(r'\d+$', '', cells[1]).strip() if len(cells) > 1 else ''
-                                if num:
-                                    metrics.append((num, desc))
-                    elif kind == 'p':
-                        t = b.strip()
-                        # 纯文本指标：数字逗号开头（含可选前缀 约/高达/近）
-                        prefix = ''
-                        m = re.match(r'^(约|高达|近)(.+)$', t)
-                        if m:
-                            prefix, t2 = m.group(1), m.group(2)
-                            t2 = t2.strip()
-                        else:
-                            t2 = t
-                        # 数字 + 逗号 + 数字（如 "45,000名" 或 "+32%"）
-                        m2 = re.match(r'^([\d,+\-%↑↓]+)\s*(.*)', t2)
-                        if m2:
-                            num = prefix + m2.group(1)
-                            desc = m2.group(2).strip()
-                            # 去掉 desc 开头的量词（"名"、"位"、"个"、"家"）
-                            desc = re.sub(r'^(名|位|个|家|人|种|项)\s*', '', desc)
-                            metrics.append((num, desc))
-                        elif re.match(r'^Claude [\w.]+', t):
-                            metrics.append((t, ''))
-                        else:
-                            sections.append((cur_h, [('p', t)]))
-                else:
-                sections.append((cur_h, cur_body))
+        if not cur_h or not cur_body:
+            cur_h, cur_body, metric_h = '', [], False
+            return
+        if metric_h:
+            # 成果/结果 节 → 提取指标
+            for kind, b in cur_body:
+                if kind == 'table':
+                    for rm in re.finditer(r'<tr>(.*?)</tr>', b, re.S):
+                        cells = [re.sub(r'<[^>]+>', '', c).strip()
+                                 for c in re.findall(r'<td>(.*?)</td>', rm.group(1), re.S)]
+                        if cells:
+                            num = re.sub(r'\d+$', '', cells[0]).strip() if cells[0] else ''
+                            desc = re.sub(r'\d+$', '', cells[1]).strip() if len(cells) > 1 else ''
+                            if num:
+                                metrics.append((num, desc))
+                elif kind == 'p':
+                    t = b.strip()
+                    prefix = ''
+                    m = re.match(r'^(约|高达|近)(.+)$', t)
+                    if m:
+                        prefix, t2 = m.group(1), m.group(2)
+                        t2 = t2.strip()
+                    else:
+                        t2 = t
+                    m2 = re.match(r'^([\d,+\-%↑↓]+)\s*(.*)', t2)
+                    if m2:
+                        num = prefix + m2.group(1)
+                        desc = m2.group(2).strip()
+                        desc = re.sub(r'^(名|位|个|家|人|种|项)\s*', '', desc)
+                        metrics.append((num, desc))
+                    elif re.match(r'^Claude [\w.]+', t):
+                        metrics.append((t, ''))
+                    else:
+                        sections.append((cur_h, [('p', t)]))
+        else:
+            sections.append((cur_h, cur_body))
         cur_h, cur_body, metric_h = '', [], False
 
     for b in blocks:
