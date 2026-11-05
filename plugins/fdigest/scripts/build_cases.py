@@ -100,12 +100,17 @@ def parse_md(md):
                                 metrics.append((num, desc))
                 elif kind == 'p':
                     t = b.strip()
-                    # 逐行提取（OCR 可能把一行指标切碎成多段）
+                    pending_prefix = ''
+                    pending_mid = ''
                     for line in t.split('\n'):
                         line = line.strip()
                         if not line:
                             continue
-                        prefix = ''
+                        if line in ('高达', '约', '近'):
+                            pending_prefix = line
+                            continue
+                        prefix = pending_prefix
+                        pending_prefix = ''
                         m = re.match(r'^(约|高达|近)(.+)$', line)
                         if m:
                             prefix, t2 = m.group(1), m.group(2)
@@ -114,21 +119,28 @@ def parse_md(md):
                             t2 = line
                         m2 = re.match(r'^([\d,+\-%↑↓]+)\s*(.*)', t2)
                         if m2:
-                            num = prefix + m2.group(1)
                             desc = m2.group(2).strip()
                             desc = re.sub(r'^(名|位|个|家|人|种|项)\s*', '', desc)
-                            metrics.append((num, desc))
+                            metrics.append((prefix + m2.group(1), (pending_mid + desc).strip()))
+                            pending_mid = ''
                         elif re.match(r'^Claude [\w.]+', line):
                             m3 = re.search(r'(\d[\d,.%]*)\s', line)
                             if m3:
                                 num_end = m3.end()
                                 num = line[:num_end].strip()
                                 desc = line[num_end:].strip()
-                                metrics.append((num, desc))
+                                metrics.append((prefix + num, (pending_mid + desc).strip()))
                             else:
-                                metrics.append((line, ''))
+                                metrics.append((prefix + line, ''))
+                            pending_mid = ''
+                        elif prefix:
+                            # 前缀后面跟非数字行（如「高达」+「提速」）→ 当作前缀延续
+                            # 把当前行当整句
+                            metrics.append((prefix + ' ' + line, ''))
+                            pending_mid = ''
                         else:
-                            sections.append((cur_h, [('p', line)]))
+                            sections.append((cur_h, [('p', (pending_mid + line).strip())]))
+                            pending_mid = ''
         else:
             sections.append((cur_h, cur_body))
         cur_h, cur_body, metric_h = '', [], False
