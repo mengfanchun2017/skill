@@ -354,12 +354,14 @@ def _preamble_to_impact(preamble, sections):
     while i >= 0:
         k, t = preamble[i]
         if k == 'p' and i > 0 and preamble[i-1][0] == 'quote':
-            movable.insert(0, preamble[i-1])  # quote first
-            movable.insert(0, preamble[i])     # p second (text then attribution)
+            # p at i is attribution, quote at i-1 is text → 保持原序 (quote, p)
+            movable.insert(0, preamble[i])     # p (attribution)
+            movable.insert(0, preamble[i-1])   # quote (text)
             i -= 2
         elif k == 'quote' and i > 0 and preamble[i-1][0] == 'p':
-            movable.insert(0, preamble[i-1])  # p first
-            movable.insert(0, preamble[i])     # quote second
+            # quote at i is text, p at i-1 is attribution → 保持原序 (p, quote)
+            movable.insert(0, preamble[i])     # quote
+            movable.insert(0, preamble[i-1])   # p
             i -= 2
         elif k == 'quote':
             movable.insert(0, preamble[i])
