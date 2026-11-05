@@ -220,6 +220,30 @@ flowchart LR
 ~/.claude/skills/fcore/bin/fcore where
 ```
 
+---
+
+## 装完先体检
+
+```bash
+~/.claude/skills/fcore/bin/fcore doctor   # 只报告，不改环境
+~/.claude/skills/fcore/bin/fcore fix      # 缺啥自动装，修完复检
+```
+
+`fcore doctor` 查 9 项：lark-cli、OfficeCLI（含 libicu）、uv、代理、
+git config、gh auth、ccprivate、fcore 自身、飞书授权。
+
+**能自动修的**（`fix` 会做）：lark-cli 未装、OfficeCLI 未装、uv 未装、
+libicu 缺失、git config 缺 name/email。
+
+**不能自动修的**（只报告）：gh PAT 失效、代理不可达、飞书授权过期
+（需扫码）、ccprivate 缺失（独立用户正常）。
+
+**和 ccconfig `maintain.sh status` 的区别**：那个查「整个环境部署对了没」
+（symlink、仓库、MCP、systemd），这个查「干活时工具链通不通」。
+两套体检视角不同，装了 ccconfig 的机器两套都会跑（`init-skill.sh sync`
+末尾自动跑 `fcore doctor`，`maintain.sh fix` 第 5 步跑 `fcore fix`）；
+**只装 skill 仓库的独立用户只用 `fcore doctor/fix`，不需要 ccconfig**。
+
 **配置 vs 用户数据**：
 
 | 类型 | 例子 | 命令 | 落点 |
