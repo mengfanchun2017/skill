@@ -111,14 +111,26 @@ f_doctor() {
             fi
         fi
     fi
-    if command -v gh &>/dev/null; then
-        if gh auth status >/dev/null 2>&1; then
-            _dr "gh auth" "true" "可用"
+    # GitHub 认证：GCM（WSL interop 借 Windows 凭据）或 PAT 任一可用即 OK。
+    # 只认 gh auth 会误报 —— 用户用 GCM 时 gh 未登录但 git push 实际可用。
+    local gh_ok=false gh_detail="GCM/PAT 均未配置"
+    local gcm_h gcm_p
+    gcm_h=$(git config --global --get-all "credential.https://github.com.helper" 2>/dev/null | grep -v '^$' | head -1 || true)
+    if [[ -n "$gcm_h" ]]; then
+        gcm_p="${gcm_h#!}"; gcm_p="${gcm_p#\"}"; gcm_p="${gcm_p%\"}"
+        if [[ -x "$gcm_p" ]]; then
+            gh_ok=true; gh_detail="GCM（WSL interop）"
         else
-            _dr "gh auth" "false" "PAT 失效/未配置"
+            gh_detail="GCM helper 已配但 exe 不可达"
         fi
+    fi
+    if ! $gh_ok && command -v gh &>/dev/null && gh auth status >/dev/null 2>&1; then
+        gh_ok=true; gh_detail="PAT（gh auth）"
+    fi
+    if $gh_ok; then
+        _dr "GitHub auth" "true" "$gh_detail"
     else
-        _dr "gh auth" "n/a" "未安装（ccconfig 用户需要）"
+        _dr "GitHub auth" "false" "$gh_detail"
     fi
 
     # ====== 6. ccprivate ======
