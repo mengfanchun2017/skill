@@ -34,16 +34,19 @@ f_doctor() {
 
     local all_ok=true
     local -a results=()
+    local _n=0 _bad=0
 
+    # 明细用字符 ✓/❌（不再每行一个绿 ✅）—— 9 行绿勾太重，绿色只留给总状态。
     _dr() {
         local name="$1" ok="$2" detail="$3"
         if $json; then
             results+=("{\"check\":\"$name\",\"ok\":$ok,\"detail\":\"$detail\"}")
         else
+            _n=$((_n+1))
             case "$ok" in
-                true)  printf '  ✅  %-20s %s\n' "$name" "$detail" ;;
+                true)  printf '  ✓  %-20s %s\n' "$name" "$detail" ;;
                 n/a)   printf '  ⭕  %-20s %s\n' "$name" "$detail" ;;
-                *)     printf '  ❌  %-20s %s\n' "$name" "$detail"; all_ok=false ;;
+                *)     printf '  ❌  %-20s %s\n' "$name" "$detail"; all_ok=false; _bad=$((_bad+1)) ;;
             esac
         fi
     }
@@ -173,6 +176,13 @@ f_doctor() {
     if $json; then
         local IFS=','
         echo "[${results[*]}]"
+    else
+        # 总状态一行：绿色 ✅ 只出现一次（全绿），异常用 ❌ 标数量
+        if $all_ok; then
+            printf '  ✅ 全部 %d 项正常\n' "$_n"
+        else
+            printf '  ❌ %d/%d 项异常\n' "$_bad" "$_n"
+        fi
     fi
 
     # fix 模式：修完重检一次，让退出码反映修复后真实状态
