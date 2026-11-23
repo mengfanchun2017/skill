@@ -1,6 +1,6 @@
 # skill — Claude Code 技能集
 
-> 30 个自建 Claude Code 技能，覆盖飞书文档、撰写系统、PDF 精排、调研搜索、Office 三件套、
+> 28 个自建 Claude Code 技能，覆盖飞书文档、撰写系统、PDF 精排、调研搜索、Office 三件套、
 > 图表、个人管理与工具链。**分层设计**：机械操作沉到一个内核，业务判断留给技能。
 >
 > 不确定用哪个技能时说一句"帮我做 X"，`fhub` 会判断并派发。
@@ -48,8 +48,8 @@ flowchart TB
         pdf["fpdf / fdigest<br/>PDF 精排 / 大宗报告"]
         office["fpptx / fdocx / fxlsx<br/>Office 三件套"]
         research["fsearch / fresearchframe<br/>搜索 / 调研方法论"]
-        personal["flogme / fmoocrec / fsysarchi<br/>个人管理 / 课程 / 备考"]
-        tool["fsecretcheck / fpostpone / flibaudit<br/>工具链"]
+        personal["flogme / fmoocrec<br/>个人管理 / 课程"]
+        tool["fsecretcheck / fpostpone<br/>工具链"]
     end
 
     subgraph L2["L2 内容规范层"]
@@ -134,7 +134,7 @@ skill/
 │   │   ├── bin/fcore             #   CLI 入口（14 条命令）
 │   │   ├── lib/                  #   path / lark / genre / fmt
 │   │   ├── references/
-│   │   │   ├── _boot.sh          #   分发到 30 个 plugin，用于跨插件定位 fcore
+│   │   │   ├── _boot.sh          #   分发到 28 个 plugin，用于跨插件定位 fcore
 │   │   │   └── fcore.default.yaml#   无配置时的内置派发注册表
 │   │   ├── SKILL.md
 │   │   └── config.yaml.example
@@ -300,11 +300,9 @@ libicu 缺失、git config 缺 name/email。
 | `fresearchframe` | 4 领域研究方法论（customer/generic/market/technical） |
 | `flogme` | 个人管理（OKR/Worklog/Reflect/SUM，飞书 Base） |
 | `fmoocrec` | MOOC 课程推荐（QS 课程体系 + 学习路径） |
-| `fsysarchi` | 系统分析师备考（暗号 `archi` 触发） |
 | `fmashwork` | AI 图生 3D → 拓竹打印 |
 | `fsecretcheck` | 密钥泄露检查（工作树 + git 历史） |
 | `fpostpone` | 定时延迟执行（`18点运行 /transliter "x.zip"`） |
-| `flibaudit` | 仓库全面审计 |
 | `fsyncdoc` | 源码文档同步 |
 | `fllmpack` | LLM 预设导出/导入（不含 key） |
 | `fskillcreat` | Skill 开发脚手架 |
@@ -370,24 +368,3 @@ cd www && python3 -m http.server 8000
 
 MIT — 见 [LICENSE](LICENSE)
 
----
-
-## English Summary
-
-A Claude Code plugin marketplace with **30 self-built skills** in a five-layer design:
-
-- **L0 `fcore`** — mechanical core: config resolution, lark-cli auth precheck, doc CRUD,
-  format assertions, skill dispatch matching. Every other skill delegates these to it.
-- **L1 `fhub`** — dispatcher: figures out which skill a request needs, so users don't
-  have to remember skill names.
-- **L1 business skills** — ffeishu, fpdf, fdigest, fpptx, fdocx, fxlsx, fdiagram, fsearch,
-  fresearchframe, flogme, fmoocrec, fsysarchi, fmashwork, ...
-- **L2 specs** (`fstander-*`) — what a good report / course / case looks like.
-- **L3 orchestrators** (`forch-*`) — what order to do things in.
-
-**Config is never overwritten by updates**: user-supplied values live in
-`~/.claude/skill-config/<plugin>.yaml`, outside the `/plugin update` replace path
-(`~/.claude/plugins/cache/...`). Missing config degrades gracefully instead of blocking.
-
-**Third-party skills** are installed via `npx skills` (not through this marketplace)
-for cleaner dialog UX.

@@ -72,7 +72,7 @@ Skill(skill="forch-report", args="<用户原始描述>")
 | digest | fdigest | 大宗报告阅读归档 |
 | research | fresearchframe（配合 fsearch） | 外部调研 |
 | personal | flogme | OKR、日志、反思、总结 |
-| tool | fsecretcheck / fpostpone / flibaudit | 密钥检查、定时、仓库审计 |
+| tool | fsecretcheck / fpostpone | 密钥检查、定时 |
 
 ## 注册表在哪
 
