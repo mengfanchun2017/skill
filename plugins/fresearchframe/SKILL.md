@@ -2,117 +2,59 @@
 name: fresearchframe
 user-invocable: true
 description: |
-  4 领域研究方法论 — customer（JTBD）/ generic / market / technical。
-  收到调研主题后自动判断领域，调 fsearch 收集数据，再按对应领域框架解读。
+  研究维度方法论 — 按调研主题自动判断维度（customer / generic / market / technical），
+  委派 fsearch 收集数据，再按对应维度框架（references/frame-*.md）解读输出。
+  4 个维度是稳定的研究视角，不常变；新增维度 = 加 references/frame-<name>.md + 判断表一行。
   搜索工具调用委派 fsearch，本 skill 不直接调 API。
+  用法：用户说"调研 XX"/"研究 XX"/"分析 XX 用户"/"市场趋势"时触发。
 allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 ---
 
-# fresearchframe — 4 领域研究方法论
+# fresearchframe — 研究维度方法论
 
-按领域给"调研方法"，搜索工具调用委派 fsearch。
+收到调研主题 → 判断维度 → 委派 `fsearch` 收集数据 → 读对应 `references/frame-<维度>.md` → 按框架解读输出。
+
+**本 skill 不直接调搜索 API**，搜索一律委派 fsearch。
 
 ## 何时用
 
 | 触发 | 行为 |
 |------|------|
-| "调研 XX" / "分析 XX 用户" | 自动判断领域 → 调 fsearch → 按框架解读 |
+| "调研 XX" / "研究 XX" / "分析 XX 用户" | 判断维度 → 派 fsearch → 按框架解读 |
 | forch-report 需要调研素材 | 委派本 skill（不在模式 1 中直接调 fsearch） |
-| Batch Mode（批量研究） | 委派本 skill 做单 item 的领域判断 + 框架 |
+| Batch Mode（批量研究） | 委派本 skill 做单 item 的维度判断 + 框架 |
 
-## 自动领域判断
+## 维度判断
 
-| 领域 | 触发关键词 | 典型场景 |
+| 维度 | 触发关键词 | 框架文件 |
 |------|-----------|----------|
-| `generic` | 调研/研究/分析/对比 | 通用市场/技术概况 |
-| `customer` | 用户/客户/竞品/JTBD/饮水点 | 用户研究、竞品用户分析 |
-| `market` | 市场/TAM/份额/趋势 | 市场规模、竞争分析 |
-| `technical` | 技术/框架/库/选型 | 技术评估、库对比 |
+| `generic` | 调研/研究/分析/对比 | `references/frame-generic.md` |
+| `customer` | 用户/客户/竞品/JTBD/饮水点 | `references/frame-customer.md` |
+| `market` | 市场/TAM/份额/趋势 | `references/frame-market.md` |
+| `technical` | 技术/框架/库/选型 | `references/frame-technical.md` |
 
-## 领域方法论
-
-### customer 领域
-
-用户研究框架，基于 JTBD (Jobs to Be Done) 和饮水点理论。
-
-**两种模式**：
-- Mode 1: 分析已有素材（访谈、问卷、客服记录）
-- Mode 2: 在线挖掘（Reddit、G2、社区、论坛）— 委派 fsearch
-
-**饮水点优先级**：
-
-| ICP类型 | 主要来源 |
-|---------|----------|
-| B2B SaaS | Reddit (r/sales, r/startups), G2, LinkedIn |
-| 开发者 | r/devops, r/programming, Hacker News |
-| SMB/创始人 | Indie Hackers, Product Hunt, Reddit |
-| 消费者 | App Store评论, Reddit, TikTok评论 |
-
-**提取框架**：
-1. **Jobs to Be Done** — 功能性/情感性/社交性工作
-2. **Pain Points** — 痛点（优先未提示的、有情感语言的）
-3. **Trigger Events** — 触发事件（团队增长、新员工、错过目标）
-4. **Desired Outcomes** — 期望结果（用客户原话）
-5. **Language** — 客户实际用语（copy金矿）
-6. **Alternatives** — 考虑过的替代方案
-
-**置信度标注**：
-- High: 3+独立来源，未提示，一致
-- Medium: 2个来源，仅提示
-- Low: 单来源，可能是异常值
-
-**聚合步骤**：
-1. 按主题聚类
-2. 频率+强度评分
-3. 按客户画像分段
-4. 识别"金钱引言"（5-10条代表性原话）
-5. 标记矛盾点
-
-### generic 领域
-
-- name, description, category, tags
-- overview: what_is_it, key_characteristics, current_status
-- performance: metrics, benchmarks, comparison
-- adoption: user_scale, market_share, growth_rate
-
-### market 领域
-
-**字段**：market_overview（market_name/size/growth_rate）、tam_sam_som、competitive_landscape（key_players/market_share）、drivers、challenges。
-
-**分析方法论 → `references/market-analysis.md`**（行业/市场/赛道调研必读）：10 个分析镜头（主线压缩 / 规模与需求底线 / 利润池与价值迁移 / 竞争格局与终局 / 驱动—制约矩阵 / 周期定位与供需 / 政策传导 / 盈利质量与回报 / 预期差 / 证伪与终止条件）+ 4 类行业结构分支（产业链型 / 网络型 / 资产负债型 / 单店模型型，各带分析侧重与必做表）。
-
-要点：把事实**转成判断**而非罗列资料；链式行业必点"利润从哪个环节流向哪个环节"、点名"剪刀差"。数据分级与引用纪律见 `../fstander-report/references/data-grading-and-citation.md`。
-
-### technical 领域
-
-- basic_info: project_name, version, license
-- capabilities: core_features, integrations
-- adoption: github_stars, contributors
-- ecosystem: third_party_packages, community_activity
+- 拿不准用 `generic`
+- **新增维度**：加 `references/frame-<name>.md`，再在上表加一行即可（维度稳定、变化慢，通常只扩不删）
 
 ## 流程
 
-### Step 1: 领域判断
-根据关键词判断领域
+### Step 1: 判断维度
+按上表关键词判断；拿不准用 `generic`。
 
 ### Step 2: 委派 fsearch 收集数据
-调 fsearch 做三源并行搜索（中文/英文/深度），拿回搜索结果 + 搜索清单
+调 fsearch 收集数据（中英语言路由 + 额度耗尽 fallback），拿回搜索结果 + 搜索清单。
 
-### Step 3: 按领域框架解读
-按对应领域的提取框架处理数据：
-- 客户原话、痛点、触发事件（customer）
-- 市场大小、份额、趋势（market）
-- 性能基准、生态、采用率（technical）
-- 概览 + 关键特征（generic）
+### Step 3: 读框架并解读
+读对应 `references/frame-<维度>.md`，按该框架的字段/镜头/提取步骤处理数据。
 
 ### Step 4: 输出
-输出结构化领域数据 + 置信度标注，交给调用方（forch-report / Batch Mode / 用户）
+输出结构化维度数据 + 置信度标注，交给调用方（forch-report / Batch Mode / 用户）。
 
-## 关联 Skills
+## 输出契约
 
-- `fsearch` — 搜索工具（必调用）
-- `Batch Mode` — 批量研究（委托本 skill 做单 item）
-- `forch-report` — 报告生成（用本 skill 的输出做素材）
+- 字段结构按对应框架文件
+- 附置信度：High / Medium / Low（判定规则见 `frame-customer.md`）
+- 附 fsearch 产出的搜索清单（调用方决定是否附加）
 
 ## Batch Mode（原 f-research-deep）
 
@@ -122,7 +64,7 @@ allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 
 1. 定位当前工作目录下的 `*/outline.yaml`
 2. 检查 `output_dir` 中已完成的 JSON，跳过已完成 items
-3. 每批 `batch_size` 个 items（默认 3），逐个调用本 skill 的领域判断 + 搜索流程
+3. 每批 `batch_size` 个 items（默认 3），逐个调用本 skill 的维度判断 + 搜索流程
 4. 输出到 `{output_dir}/{item_name_slug}.json`
 
 ### JSON 结构
@@ -137,6 +79,14 @@ allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 }
 ```
 
+> `_domain`/`_confidence`/`_sources` 是 Batch Mode 的 JSON 键名，保持兼容；其余字段按框架文件。
+
 ### 验证
 
 完成后检查每个 JSON 的字段覆盖完整性。
+
+## 关联 Skills
+
+- `fsearch` — 搜索原语（必调用）
+- `forch-report` — 报告生成（用本 skill 输出做素材）
+- `flogme` / `ffeishu` — 行业调研 / 文档调研
