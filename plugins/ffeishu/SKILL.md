@@ -116,12 +116,18 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 | D 双向转换 | 飞书↔Office | 飞书→Office 走 OfficeCLI；Office→飞书 转 DocxXML 再 create |
 | E 文档对比 | 两文档比对 | 取内容 → 按章节对齐 → 输出对比报告 |
 
-## 图：架构图 vs 数据图
+## 图：默认输出在线可编辑画板
 
-| 图类型 | 走法 |
+**默认所有图都用飞书在线可编辑画板（whiteboard）** —— 文档里可直接编辑修改，比静态图片清晰。
+架构图 / 流程图 / 时序图 / 思维导图 / 在线图表 / mermaid / 白板 / 绘图，在飞书里都指**同一类东西**：whiteboard。
+
+| 场景 | 走法 |
 |--------|------|
-| 架构/流程/时序/思维导图 | **fdiagram**（飞书画板，就地嵌入） |
+| 架构/流程/时序/思维导图/在线可编辑图 | 文档内 `<whiteboard type="mermaid">`（或 `plantuml`/`svg`）一步嵌入；复杂绘制委托 fdiagram |
 | 数据/分析图（折线/柱状/散点/热力图） | **工作流 G** → python 脚本 → 独立子文档 |
+| 静态位图（PNG/SVG 导出） | **仅当明确要「不可编辑的图片」时**用，不是默认 |
+
+**转换规则**：原文档用代码块 / ASCII 画的流程或架构，转飞书时**一律改成 whiteboard**，不保留代码块图。
 
 工作流 G 的完整步骤 → `references/figure-workflow.md`（每图一子文档，含图/解读/代码 3 段，
 父文档只放链接不复制图）。

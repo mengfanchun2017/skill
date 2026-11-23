@@ -130,9 +130,13 @@ def is_sep(row):
 </ol>
 ```
 
-### 图表 → 委托 fdiagram skill
-- [ ] 架构图/流程图等由 fdiagram 生成，通过 `block_insert_after` 嵌入
+### 图表 → 默认在线可编辑画板（whiteboard）
+- [ ] **默认所有图 = whiteboard**（mermaid/plantuml/svg）；飞书里可直接编辑，比静态图清晰
+- [ ] 架构/流程/时序/思维导图/在线图表/绘图都走 whiteboard，不要用静态 PNG/SVG 图片
+- [ ] 原文档用代码块 / ASCII 画的流程或架构 → 转飞书时改成 whiteboard，不保留代码块图
+- [ ] 数据/分析图（折线/柱状等）走工作流 G（python 脚本 → 子文档）
 - [ ] 图表在对应内容位置嵌入，不在末尾堆砌
+- [ ] 白板用 `block_insert_after` 插入（`str_replace` 插 `<whiteboard>` 无效）；`type` 可为 mermaid/plantuml/svg/blank
 
 #### 在 XML 内容里直接嵌画板（批量建文档用）
 `docs +create` / `docs +update --command overwrite` 的 XML 里可直接写画板，**一步到位**，无需再 block_insert_after：
