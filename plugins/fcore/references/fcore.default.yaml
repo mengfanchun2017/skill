@@ -37,7 +37,7 @@ domains:
     trigger: ["读这份报告", "资料归档", "披露文件分析", "降低阅读负载", "年报分析",
               "研报分析", "读年报", "读研报", "这份年报", "这份研报", "大宗报告", "归档"]
   research:
-    skill: fresearchmethod
+    skill: fresmethod
     desc: 外部调研方法论
     trigger: ["调研", "研究", "搜索", "找资料", "收集数据"]
   personal:

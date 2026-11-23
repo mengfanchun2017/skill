@@ -147,11 +147,11 @@ python3 ../fstander-report/scripts/report_check.py check report.md --profile res
 - 候选对比 → `comparison.md`
 - 背景+现状+趋势 → `research.md`
 
-#### Step 大纲.3: 调 fresearchmethod 补素材
-对每个章节调 fresearchmethod 做轻量搜索（2-3 源），产出每章 200-500 字。
+#### Step 大纲.3: 调 fresmethod 补素材
+对每个章节调 fresmethod 做轻量搜索（2-3 源），产出每章 200-500 字。
 
 #### Step 大纲.4: 填充模板
-按模板骨架 + fresearchmethod 素材生成报告。
+按模板骨架 + fresmethod 素材生成报告。
 
 #### Step 大纲.5: 输出
 委派 ffeishu 创建飞书文档。
@@ -169,8 +169,8 @@ python3 ../fstander-report/scripts/report_check.py check report.md --profile res
 
 不确定时用 AskUserQuestion 让用户选。
 
-#### Step 自由.2: 调 fresearchmethod 深度搜索
-全流程走 fresearchmethod 框架：
+#### Step 自由.2: 调 fresmethod 深度搜索
+全流程走 fresmethod 框架：
 - 领域判断
 - 三源并行搜索
 - 聚合去重
@@ -253,6 +253,6 @@ v2（Claude 改）
 
 ## 关联 Skills
 - `fstander-report` — 内容规范、模板（必读）
-- `fresearchmethod` — 研究维度方法论（4 维度：customer/generic/market/technical）
-- `fresearchmethod（Batch Mode）` — 批量研究
+- `fresmethod` — 研究维度方法论（4 维度：customer/generic/market/technical）
+- `fresmethod（Batch Mode）` — 批量研究
 - `ffeishu` — 飞书格式 + 图子文档 lark-cli 命令

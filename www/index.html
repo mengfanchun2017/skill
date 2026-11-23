@@ -436,7 +436,7 @@ const SKILLS = [
     deps: ["Tavily MCP", "Exa MCP"]
   },
   {
-    id: "fresearchmethod", name: "fresearchmethod", icon: "🧭", cat: "research", needs_ccconfig: false,
+    id: "fresmethod", name: "fresmethod", icon: "🧭", cat: "research", needs_ccconfig: false,
     ccconfig_zh: "纯技能，无外部工具依赖",
     ccconfig_en: "Pure skill, no external tool dependencies",
     desc_zh: "四领域研究方法论。客户（JTBD）/ 通用 / 市场（TAM）/ 技术四维度，自动判断领域，委托 fsearch 搜索，带置信度标注。",
@@ -455,8 +455,8 @@ const SKILLS = [
   },
   {
     id: "forch-report", name: "forch-report", icon: "📋", cat: "writing", needs_ccconfig: false,
-    ccconfig_zh: "纯技能，依赖 fstander-report + fresearchmethod + ffeishu",
-    ccconfig_en: "Pure skill, depends on fstander-report + fresearchmethod + ffeishu",
+    ccconfig_zh: "纯技能，依赖 fstander-report + fresmethod + ffeishu",
+    ccconfig_en: "Pure skill, depends on fstander-report + fresmethod + ffeishu",
     desc_zh: "报告生成 orchestrator。三种输入模式（JSON/大纲/自由素材）→ 结构化 Markdown 报告，内容规范委托 fstander-report，飞书输出委托 ffeishu。",
     desc_en: "Report generation orchestrator. 3 input modes (JSON/outline/free material) → structured Markdown, delegates standards to fstander-report, Feishu output to ffeishu.",
     scenarios_zh: [
@@ -469,7 +469,7 @@ const SKILLS = [
       {trigger: '"Write an X vs Y competitive analysis"', result: "→ Auto search + comparison + conclusions"},
       {trigger: '"Deep research on quantum computing industry"', result: "→ outline.yaml batch, per-chapter write"}
     ],
-    deps: ["fstander-report", "fresearchmethod", "ffeishu"]
+    deps: ["fstander-report", "fresmethod", "ffeishu"]
   },
   {
     id: "forch-course", name: "forch-course", icon: "📚", cat: "writing", needs_ccconfig: true,

@@ -3,7 +3,7 @@
 ## [0.16.0] — 2026-11-23
 
 ### Changed
-- **`fresearchframe` → `fresearchmethod`**：原名不体现功能。新名直白表达"研究方法论"
+- **`fresearchframe` → `fresmethod`**：原名不体现功能。新名直白表达"研究方法论"
   （判维度 → 派 fsearch → 按 `references/frame-*.md` 解读）。全仓 56 处引用、marketplace、
   fcore 注册表、ccprivate 配置、README、www 同步更新。
 

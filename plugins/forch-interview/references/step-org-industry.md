@@ -19,9 +19,9 @@
 
 ## 流程
 1. 调 fsearch 三源搜（单位官网/年报、行业报告、新闻、民航局）
-2. 调 fresearchmethod 按 market 领域框架整理
+2. 调 fresmethod 按 market 领域框架整理
 3. 调 ffeishu 创建子文档（父文档 = 配置 `root_doc_url`）
 4. 返回 `{status, doc_url, notes}`
 
 ## 依赖
-fsearch / fresearchmethod / ffeishu
+fsearch / fresmethod / ffeishu

@@ -19,7 +19,7 @@ allowed-tools: Read, Glob, Grep
 | 课程各产物的内容架构/骨架 | 飞书格式（表格 XML 822 等）→ `ffeishu` |
 | 各产物模板（templates） | 编排/进度/委派 → `forch-course` |
 | 案例注入的内容约定 | 案例检索 → `forch-case` |
-| 课程级写作要求 | 搜索素材 → `fsearch`/`fresearchmethod` |
+| 课程级写作要求 | 搜索素材 → `fsearch`/`fresmethod` |
 
 ## 产物与模板
 
@@ -76,5 +76,5 @@ allowed-tools: Read, Glob, Grep
 - `ffeishu` — 飞书格式（write-checklist §2 为真相源）
 - `forch-course` — 课程编排（orchestrator）
 - `forch-case` — 案例检索与注入协议
-- `fsearch` / `fresearchmethod` — 素材搜索
+- `fsearch` / `fresmethod` — 素材搜索
 - `fdiagram` — 模块依赖图 / 知识图谱

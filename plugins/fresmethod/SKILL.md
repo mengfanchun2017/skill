@@ -1,5 +1,5 @@
 ---
-name: fresearchmethod
+name: fresmethod
 user-invocable: true
 description: |
   研究维度方法论 — 按调研主题自动判断维度（customer / generic / market / technical），
@@ -10,7 +10,7 @@ description: |
 allowed-tools: Read, Write, Glob, Bash, AskUserQuestion
 ---
 
-# fresearchmethod — 研究维度方法论
+# fresmethod — 研究维度方法论
 
 收到调研主题 → 判断维度 → 委派 `fsearch` 收集数据 → 读对应 `references/frame-<维度>.md` → 按框架解读输出。
 

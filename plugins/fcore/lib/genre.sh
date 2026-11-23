@@ -6,7 +6,7 @@
 #
 # 设计要点：注册表**只有一份**。此前触发词存在三处（~/CLAUDE.md、
 # registry.yaml、每个 SKILL.md 的 description），实测已漂移 ——
-# ~/CLAUDE.md 曾写「写报告 → fresearchmethod」而实际该派 forch-report。
+# ~/CLAUDE.md 曾写「写报告 → fresmethod」而实际该派 forch-report。
 
 f_registry_file() {
     local f

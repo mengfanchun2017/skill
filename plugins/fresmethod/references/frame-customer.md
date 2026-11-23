@@ -1,6 +1,6 @@
 # customer 维度 — 用户研究框架（JTBD + 饮水点）
 
-> fresearchmethod `customer` 维度方法论。Mode 2 在线挖掘委派 fsearch；Mode 1 分析已有素材。
+> fresmethod `customer` 维度方法论。Mode 2 在线挖掘委派 fsearch；Mode 1 分析已有素材。
 
 ## 两种模式
 

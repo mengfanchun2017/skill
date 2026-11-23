@@ -136,7 +136,7 @@ $E "$CFG" set feishu.org_doc_url "<url>"
 
 - fstander-interview — 内容规范 + 模板（岗位画像/知识地图/能力模型/问答/工作思路）
 - ffeishu — 飞书操作（父文档 + 子文档）
-- fsearch / fresearchmethod — 岗位/行业/专业知识搜索
+- fsearch / fresmethod — 岗位/行业/专业知识搜索
 - fdiagram — 能力模型图 / 工作思路流程 / 组织架构图
 
 ## 参考

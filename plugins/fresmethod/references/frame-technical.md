@@ -1,6 +1,6 @@
 # technical 维度 — 技术评估框架
 
-> fresearchmethod `technical` 维度方法论。适用于技术评估、库/框架对比、选型调研。
+> fresmethod `technical` 维度方法论。适用于技术评估、库/框架对比、选型调研。
 
 ## 字段
 
