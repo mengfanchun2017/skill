@@ -121,7 +121,7 @@ current_step: 0                 # 0-5
 
 ## Step 1: 课程调研
 
-详见 `references/step-research.md`。调 fsearch + fresearchframe 按方向框架三源搜索 → 飞书子文档 → 展示 → 你改 → 确认 → 更新配置。
+详见 `references/step-research.md`。调 fsearch + fresearchmethod 按方向框架三源搜索 → 飞书子文档 → 展示 → 你改 → 确认 → 更新配置。
 
 ---
 
@@ -170,7 +170,7 @@ current_step: 0                 # 0-5
 0 抽取      本地 PDF → 文本（pymupdf）；Excel/其他另存
 1 memo      按「周/案例」合并相关材料 → <slug>-<weekN>-memo 子文档
 2 骨架      从材料抽取要点骨架（spine），供 update 复用
-3 演进      按单元主题搜 2024—2026 更新（fsearch/fresearchframe）
+3 演进      按单元主题搜 2024—2026 更新（fsearch/fresearchmethod）
 4 update    memo 骨架 + 演进 → 课程化 <slug>-<weekN>-update 子文档
 5 归集      写回 Base（courselist/framework，见「课程归集」）
 ```
@@ -211,7 +211,7 @@ $E "$CFG" append feishu.lesson_docs chapter=1 title="导入" url="<url>"
 
 - forch-case — 案例库（**可选**，按需调用，非强制依赖）
 - ffeishu — 飞书操作
-- fsearch / fresearchframe — 搜索
+- fsearch / fresearchmethod — 搜索
 - fdiagram — 图（飞书画板入口，默认 `<whiteboard type="mermaid">` 嵌入课程文档）
 - fstander-course — 内容规范 + 模板
 

@@ -18,7 +18,7 @@ allowed-tools: Read, Glob, Grep
 |--------------|--------------|
 | 各准备产物的内容架构/骨架 | 飞书格式（表格 XML 822）→ `ffeishu` |
 | 模板（`references/templates.md`） | 编排/进度 → `forch-interview` |
-| 岗位画像/知识地图/能力模型/问答/工作思路 的写法 | 搜索素材 → `fsearch` / `fresearchframe` |
+| 岗位画像/知识地图/能力模型/问答/工作思路 的写法 | 搜索素材 → `fsearch` / `fresearchmethod` |
 
 ## 产物与模板
 
@@ -59,5 +59,5 @@ JD 是唯一权威输入：从职责动词抽 capability → 展开 skill → �
 
 - `ffeishu` — 飞书格式
 - `forch-interview` — 面试准备编排（orchestrator）
-- `fsearch` / `fresearchframe` — 岗位/行业/知识搜索
+- `fsearch` / `fresearchmethod` — 岗位/行业/知识搜索
 - `fdiagram` — 能力模型图 / 工作规划图

@@ -36,9 +36,9 @@
       ]
     },
     {
-      "name": "fresearchframe",
+      "name": "fresearchmethod",
       "description": "研究维度方法论 — 按调研主题自动判断维度（customer / generic / market / technical）， 委派 fsearch 收集数据，再按对应维度框架（references/frame-*.md）解读输出。 4 个维度是稳定的研究视角，不常变；新增维度 = 加 references/frame-<name>.md + 判断表一行。 搜索工具调用委派 fsearch，本 skill 不直接调 API。 用法：用户说\"调研 XX\"/\"研究 XX\"/\"分析 XX 用户\"/\"市场趋势\"时触发。",
-      "source": "./plugins/fresearchframe",
+      "source": "./plugins/fresearchmethod",
       "keywords": [
         "f"
       ]
@@ -69,7 +69,7 @@
     },
     {
       "name": "fsearch",
-      "description": "搜索活动统一原语 — 分语言路由搜索（中文→MiniMax、英文→Tavily，额度耗尽切 Exa）、 聚合去重、来源标注、搜索清单输出。 何时用本 skill 而非裸 Tavily/Exa MCP：需要①中英语言路由 ②额度耗尽自动 fallback ③聚合去重 ④来源标签 ⑤搜索清单 时；单源单次简单搜索可直接用 MCP。 被 fresearchframe / flogme / ffeishu 等需要外部调研的 skill 委托调用。 不含研究维度方法论（解读由 fresearchframe 负责）。",
+      "description": "搜索活动统一原语 — 分语言路由搜索（中文→MiniMax、英文→Tavily，额度耗尽切 Exa）、 聚合去重、来源标注、搜索清单输出。 何时用本 skill 而非裸 Tavily/Exa MCP：需要①中英语言路由 ②额度耗尽自动 fallback ③聚合去重 ④来源标签 ⑤搜索清单 时；单源单次简单搜索可直接用 MCP。 被 fresearchmethod / flogme / ffeishu 等需要外部调研的 skill 委托调用。 不含研究维度方法论（解读由 fresearchmethod 负责）。",
       "source": "./plugins/fsearch",
       "keywords": [
         "f"
@@ -137,14 +137,6 @@
       "name": "fstander-case",
       "description": "案例库内容规范 — Base 字段 schema、案例起名规则、正文模版与写作要求。 飞书格式见 ffeishu；案例编排/检索/建库执行见 forch-case。 用法：被 forch-case 引用，一般不直接触发",
       "source": "./plugins/fstander-case",
-      "keywords": [
-        "f"
-      ]
-    },
-    {
-      "name": "forch",
-      "description": "撰写系统统一入口（路由层）。读体裁注册表判断需求属于哪种体裁（课程/报告/案例/面试准备）， 派发到对应 orchestrator（forch-course/forch-report/forch-case/forch-interview）。用户只描述需求，无需记内部 skill 名。 用法：用户说\"做课程\"/\"写报告\"/\"新增案例\"/\"准备面试\"等撰写需求时触发",
-      "source": "./plugins/forch",
       "keywords": [
         "f"
       ]

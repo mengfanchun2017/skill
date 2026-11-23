@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-plugin.json",
-  "name": "fresearchframe",
+  "name": "fresearchmethod",
   "version": "0.1.0",
   "description": "研究维度方法论 — 按调研主题自动判断维度（customer / generic / market / technical）， 委派 fsearch 收集数据，再按对应维度框架（references/frame-*.md）解读输出。 4 个维度是稳定的研究视角，不常变；新增维度 = 加 references/frame-<name>.md + 判断表一行。 搜索工具调用委派 fsearch，本 skill 不直接调 API。",
   "author": {

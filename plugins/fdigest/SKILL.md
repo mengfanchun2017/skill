@@ -23,7 +23,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, mcp__mineru__parse_documents
 |---|---|---|
 | fpdf | 单篇 PDF 精排上飞书 | — |
 | forch-report | 从素材写出结构化报告 | — |
-| fresearchframe | 网上找外部信息 | — |
+| fresearchmethod | 网上找外部信息 | — |
 | **fdigest** | — | **读得少、找得到** |
 
 ## 三层结构

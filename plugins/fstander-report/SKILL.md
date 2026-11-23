@@ -18,7 +18,7 @@ allowed-tools: Read, Write, Glob, Grep, Bash
 | 本 skill 负责 | 不负责（委派其他 skill） |
 |--------------|---------------------|
 | 内容结构（H1/章节顺序/概括） | 飞书格式（表格 XML 822 等）→ ffeishu |
-| 论证规范（数据+因果+不确定） | 搜索/数据收集 → fresearchframe |
+| 论证规范（数据+因果+不确定） | 搜索/数据收集 → fresearchmethod |
 | 数据呈现原则（对比用表/数值量级） | 图表生成（python/mermaid）→ ffeishu 工作流 G |
 | 模板（4 套） | 报告工作流执行 → forch-report |
 | 引用规范（国标/通用性） | 文档索引维护 → ffeishu |
@@ -117,7 +117,7 @@ python3 "$S" check report.md --profile research --min-refs 15   # 交付门禁�
 ```
 用户："写一份 X 报告"
   └─→ fstander-report（选模板 + 规范）
-       ├─→ fresearchframe（搜索调研）         [可选]
+       ├─→ fresearchmethod（搜索调研）         [可选]
        ├─→ forch-report（出报告）     [执行]
        │     └─→ ffeishu（飞书格式 + 图子文档）
        └─→ 完成
@@ -135,7 +135,7 @@ cat "$SKILL_DIR/config.yaml"
 
 ## 关联 Skills
 - `ffeishu` — 飞书格式 + 图子文档工作流 G
-- `fresearchframe` — 搜索调研
+- `fresearchmethod` — 搜索调研
 - `forch-report` — 报告生成执行
 - `flogme` — OKR/SUM 总结可参考本框架
 

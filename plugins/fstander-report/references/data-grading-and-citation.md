@@ -148,5 +148,5 @@
 ## 关联
 
 - 判断主线底稿模板 → `insight-spine.md`
-- 行业分析镜头 → `../../fresearchframe/references/frame-market.md`
+- 行业分析镜头 → `../../fresearchmethod/references/frame-market.md`
 - 飞书格式落地 → `../../ffeishu/SKILL.md` + `write-checklist.md` §2

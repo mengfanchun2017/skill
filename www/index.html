@@ -4,15 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ccskills — Claude Code 技能市场</title>
-<meta name="description" content="28 个精选 Claude Code 技能。飞书文档、PPT、Excel、图表、调研、撰写系统、OKR 管理 — 按需安装，独立使用。ccconfig 一键装好底层工具 + 自动 clone 本仓库。">
+<meta name="description" content="27 个精选 Claude Code 技能。飞书文档、PPT、Excel、图表、调研、撰写系统、OKR 管理 — 按需安装，独立使用。ccconfig 一键装好底层工具 + 自动 clone 本仓库。">
 <meta name="color-scheme" content="dark">
 <meta property="og:title" content="ccskills — Claude Code 技能市场">
-<meta property="og:description" content="28 个精选 Claude Code 技能，与 ccconfig 环境配置配套使用。按需安装，独立使用。">
+<meta property="og:description" content="27 个精选 Claude Code 技能，与 ccconfig 环境配置配套使用。按需安装，独立使用。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://skill.aiagt.dev">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="ccskills — Claude Code 技能市场">
-<meta name="twitter:description" content="28 个精选 Claude Code 技能，与 ccconfig 环境配置配套使用。">
+<meta name="twitter:description" content="27 个精选 Claude Code 技能，与 ccconfig 环境配置配套使用。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230a0a0f'/><text x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-size='18' font-weight='bold' fill='%23a78bfa'>S</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -160,7 +160,7 @@ footer a:hover{color:#a1a1aa}
 
 <section class="hero">
   <div class="container">
-    <h1 data-i18n="hero_title">28 个技能，<br>一个<span>市场</span>。</h1>
+    <h1 data-i18n="hero_title">27 个技能，<br>一个<span>市场</span>。</h1>
     <p class="sub" data-i18n="hero_sub">Claude Code 技能集合。飞书文档、PPT、Excel、图表、调研、撰写系统、OKR 管理 — 按需安装，独立使用。ccconfig 一条命令装好底层工具 + 自动 clone 本仓库。</p>
     <div class="hero-cta">
       <a href="https://github.com/mengfanchun2017/skill" class="primary" target="_blank" rel="noopener" data-i18n="hero_cta">查看 GitHub →</a>
@@ -436,7 +436,7 @@ const SKILLS = [
     deps: ["Tavily MCP", "Exa MCP"]
   },
   {
-    id: "fresearchframe", name: "fresearchframe", icon: "🧭", cat: "research", needs_ccconfig: false,
+    id: "fresearchmethod", name: "fresearchmethod", icon: "🧭", cat: "research", needs_ccconfig: false,
     ccconfig_zh: "纯技能，无外部工具依赖",
     ccconfig_en: "Pure skill, no external tool dependencies",
     desc_zh: "四领域研究方法论。客户（JTBD）/ 通用 / 市场（TAM）/ 技术四维度，自动判断领域，委托 fsearch 搜索，带置信度标注。",
@@ -454,27 +454,9 @@ const SKILLS = [
     deps: ["fsearch"]
   },
   {
-    id: "forch", name: "forch", icon: "🧩", cat: "writing", needs_ccconfig: false,
-    ccconfig_zh: "旧入口，职能已并入 fhub",
-    ccconfig_en: "Legacy entry, superseded by fhub",
-    desc_zh: "撰写系统路由层（旧入口）。判断需求属于哪种体裁并派发到 forch-course/report/case/interview。职能已并入 fhub + fcore genre，保留只为不打断既有习惯，新用请走 fhub。",
-    desc_en: "Writing-system router (legacy). Dispatches to the right orchestrator. Superseded by fhub + fcore genre; kept only for backward compatibility — use fhub instead.",
-    scenarios_zh: [
-      {trigger: '"做一门课"', result: "→ 识别为课程体裁，派发 forch-course"},
-      {trigger: '"写一份分析报告"', result: "→ 识别为报告体裁，派发 forch-report"},
-      {trigger: '"准备一下这个岗位的面试"', result: "→ 识别为面试体裁，派发 forch-interview"}
-    ],
-    scenarios_en: [
-      {trigger: '"Build me a course"', result: "→ Detected as course, dispatches forch-course"},
-      {trigger: '"Write an analysis report"', result: "→ Detected as report, dispatches forch-report"},
-      {trigger: '"Prepare me for this job interview"', result: "→ Detected as interview, dispatches forch-interview"}
-    ],
-    deps: ["forch-report", "forch-course", "forch-case", "forch-interview"]
-  },
-  {
     id: "forch-report", name: "forch-report", icon: "📋", cat: "writing", needs_ccconfig: false,
-    ccconfig_zh: "纯技能，依赖 fstander-report + fresearchframe + ffeishu",
-    ccconfig_en: "Pure skill, depends on fstander-report + fresearchframe + ffeishu",
+    ccconfig_zh: "纯技能，依赖 fstander-report + fresearchmethod + ffeishu",
+    ccconfig_en: "Pure skill, depends on fstander-report + fresearchmethod + ffeishu",
     desc_zh: "报告生成 orchestrator。三种输入模式（JSON/大纲/自由素材）→ 结构化 Markdown 报告，内容规范委托 fstander-report，飞书输出委托 ffeishu。",
     desc_en: "Report generation orchestrator. 3 input modes (JSON/outline/free material) → structured Markdown, delegates standards to fstander-report, Feishu output to ffeishu.",
     scenarios_zh: [
@@ -487,7 +469,7 @@ const SKILLS = [
       {trigger: '"Write an X vs Y competitive analysis"', result: "→ Auto search + comparison + conclusions"},
       {trigger: '"Deep research on quantum computing industry"', result: "→ outline.yaml batch, per-chapter write"}
     ],
-    deps: ["fstander-report", "fresearchframe", "ffeishu"]
+    deps: ["fstander-report", "fresearchmethod", "ffeishu"]
   },
   {
     id: "forch-course", name: "forch-course", icon: "📚", cat: "writing", needs_ccconfig: true,
@@ -772,7 +754,7 @@ const I18N = {
     nav_eco: "生态",
     nav_gh: "GitHub",
     lang_switch: "EN",
-    hero_title: '28 个技能，<br>一个<span>市场</span>。',
+    hero_title: '27 个技能，<br>一个<span>市场</span>。',
     hero_sub: "Claude Code 技能集合。飞书文档、PPT、Excel、图表、调研、撰写系统、OKR 管理 — 按需安装，独立使用。底层工具由 ccconfig 一键装好。",
     hero_cta: "查看 GitHub →",
     hero_ccconfig: "⚙️ ccconfig 环境配置",

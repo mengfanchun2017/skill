@@ -1,6 +1,6 @@
 # skill — Claude Code 技能集
 
-> 28 个自建 Claude Code 技能，覆盖飞书文档、撰写系统、PDF 精排、调研搜索、Office 三件套、
+> 27 个自建 Claude Code 技能，覆盖飞书文档、撰写系统、PDF 精排、调研搜索、Office 三件套、
 > 图表、个人管理与工具链。**分层设计**：机械操作沉到一个内核，业务判断留给技能。
 >
 > 不确定用哪个技能时说一句"帮我做 X"，`fhub` 会判断并派发。
@@ -47,7 +47,7 @@ flowchart TB
         feishu["ffeishu<br/>飞书文档"]
         pdf["fpdf / fdigest<br/>PDF 精排 / 大宗报告"]
         office["fpptx / fdocx / fxlsx<br/>Office 三件套"]
-        research["fsearch / fresearchframe<br/>搜索原语 / 研究维度"]
+        research["fsearch / fresearchmethod<br/>搜索原语 / 研究维度"]
         personal["flogme / fmoocrec<br/>个人管理 / 课程"]
         tool["fsecretcheck / fpostpone<br/>工具链"]
     end
@@ -134,7 +134,7 @@ skill/
 │   │   ├── bin/fcore             #   CLI 入口（14 条命令）
 │   │   ├── lib/                  #   path / lark / genre / fmt
 │   │   ├── references/
-│   │   │   ├── _boot.sh          #   分发到 28 个 plugin，用于跨插件定位 fcore
+│   │   │   ├── _boot.sh          #   分发到 27 个 plugin，用于跨插件定位 fcore
 │   │   │   └── fcore.default.yaml#   无配置时的内置派发注册表
 │   │   ├── SKILL.md
 │   │   └── config.yaml.example
@@ -148,7 +148,7 @@ skill/
 │   │   ├── references/           #   4 套模板 + 写作法则
 │   │   ├── scripts/report_check.py
 │   │   └── SKILL.md
-│   └── ...                       # 其余 26 个
+│   └── ...                       # 其余 25 个
 ├── scripts/
 │   └── sync-marketplace.py       # SKILL.md → marketplace.json 同步
 ├── .github/workflows/check.yml   # CI：frontmatter / config 卫生 / 描述同步
@@ -297,7 +297,7 @@ libicu 缺失、git config 缺 name/email。
 | `fpdf` | PDF 精排上飞书（表格列宽/行内公式/高清图/参考文献） |
 | `fdigest` | 大宗报告阅读与归档（结构化抽取 → 段落检索 → 分层归档） |
 | `fsearch` | 搜索统一原语 — 中英语言路由 + 额度耗尽 fallback + 聚合去重 + 来源标注（实现细节见 `references/search-internals.md`） |
-| `fresearchframe` | 研究维度方法论 — 判维度（customer/generic/market/technical）→ 派 fsearch 收集 → 按 `references/frame-*.md` 解读 |
+| `fresearchmethod` | 研究维度方法论 — 判维度（customer/generic/market/technical）→ 派 fsearch 收集 → 按 `references/frame-*.md` 解读 |
 | `flogme` | 个人管理（OKR/Worklog/Reflect/SUM，飞书 Base） |
 | `fmoocrec` | MOOC 课程推荐（QS 课程体系 + 学习路径） |
 | `fmashwork` | AI 图生 3D → 拓竹打印 |
@@ -324,12 +324,6 @@ libicu 缺失、git config 缺 name/email。
 | `forch-course` | 系列课程创作（从零创作 / 现有材料课程化） |
 | `forch-case` | 案例库编排（飞书 wiki 三层 + Base 元数据） |
 | `forch-interview` | 面试准备（岗位认知 → 专业能力 → 未来工作思路） |
-
-### 旧入口（建议改走 fhub）
-
-| Plugin | 说明 |
-|---|---|
-| `forch` | 撰写系统路由层。职能已并入 `fhub` + `fcore genre`，保留只为不打断既有习惯 |
 
 ---
 

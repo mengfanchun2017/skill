@@ -6,8 +6,8 @@ description: |
   聚合去重、来源标注、搜索清单输出。
   何时用本 skill 而非裸 Tavily/Exa MCP：需要①中英语言路由 ②额度耗尽自动 fallback
   ③聚合去重 ④来源标签 ⑤搜索清单 时；单源单次简单搜索可直接用 MCP。
-  被 fresearchframe / flogme / ffeishu 等需要外部调研的 skill 委托调用。
-  不含研究维度方法论（解读由 fresearchframe 负责）。
+  被 fresearchmethod / flogme / ffeishu 等需要外部调研的 skill 委托调用。
+  不含研究维度方法论（解读由 fresearchmethod 负责）。
 allowed-tools: Read, Write, Bash,
   mcp__tavily__tavily_search, mcp__tavily__tavily_research,
   mcp__tavily__tavily_extract, mcp__tavily__tavily_crawl, mcp__tavily__tavily_map,
@@ -19,7 +19,7 @@ allowed-tools: Read, Write, Bash,
 
 query 规划（判语言选源）→ 主力搜索（额度耗尽切 Exa）→ extract 全文 → 聚合去重 → 来源标注 → 搜索清单输出
 
-**不含研究维度方法论**（解读由 `fresearchframe` 负责）。
+**不含研究维度方法论**（解读由 `fresearchmethod` 负责）。
 实现细节（三源对比 / MiniMax 调用 / 提取流程 / 参数速查 / 去重代码 / 缓存）见 `references/search-internals.md`。
 
 ## 何时用（含与裸 MCP 的边界）
@@ -35,7 +35,7 @@ query 规划（判语言选源）→ 主力搜索（额度耗尽切 Exa）→ ex
 | 触发 | 调用方 |
 |------|--------|
 | "调研 XX" / "搜 XX 资料" | 任何 skill / 用户直接调用 |
-| fresearchframe 调方法论前的数据收集 | fresearchframe |
+| fresearchmethod 调方法论前的数据收集 | fresearchmethod |
 | flogme 行业调研 | flogme |
 | ffeishu 文档调研 | ffeishu |
 
@@ -116,6 +116,6 @@ query 规划（判语言选源）→ 主力搜索（额度耗尽切 Exa）→ ex
 
 ## 关联 Skills
 
-- `fresearchframe` — 研究维度方法论（最常调用方，用本 skill 收集数据）
+- `fresearchmethod` — 研究维度方法论（最常调用方，用本 skill 收集数据）
 - `flogme` — OKR/SUM 总结前的行业调研
 - `ffeishu` — 文档调研

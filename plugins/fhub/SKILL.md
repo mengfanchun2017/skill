@@ -70,7 +70,7 @@ Skill(skill="forch-report", args="<用户原始描述>")
 | office | fpptx / fdocx / fxlsx | PPT、Word、Excel |
 | pdf | fpdf | PDF 精排上飞书 |
 | digest | fdigest | 大宗报告阅读归档 |
-| research | fresearchframe（配合 fsearch） | 外部调研 |
+| research | fresearchmethod（配合 fsearch） | 外部调研 |
 | personal | flogme | OKR、日志、反思、总结 |
 | tool | fsecretcheck / fpostpone | 密钥检查、定时 |
 
@@ -81,7 +81,7 @@ Skill(skill="forch-report", args="<用户原始描述>")
 `~/.claude/skill-config/fcore.yaml`。
 
 此前触发词散在三处（`~/CLAUDE.md`、writing/registry.yaml、各 SKILL.md 的
-description），实测已漂移过：`~/CLAUDE.md` 曾写"写报告 → fresearchframe"
+description），实测已漂移过：`~/CLAUDE.md` 曾写"写报告 → fresearchmethod"
 而实际该派 forch-report。现在一律以 `fcore.yaml` 为准。
 
 ## 斜杠命令

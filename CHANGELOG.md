@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.16.0] — 2026-11-23
+
+### Changed
+- **`fresearchframe` → `fresearchmethod`**：原名不体现功能。新名直白表达"研究方法论"
+  （判维度 → 派 fsearch → 按 `references/frame-*.md` 解读）。全仓 56 处引用、marketplace、
+  fcore 注册表、ccprivate 配置、README、www 同步更新。
+
+### Removed
+- **`forch`**：撰写系统路由层，职能早已并入 `fhub` + `fcore genre`（ADR-0058），保留无实际
+  意义。删除 plugin 目录、marketplace 条目、www 卡片、README 旧入口段。plugin 计数 28 → 27。
+
 ## [0.15.0] — 2026-11-23
 
 ### Changed

@@ -1,6 +1,6 @@
 # generic 维度 — 通用概览框架
 
-> fresearchframe `generic` 维度方法论。适用于通用市场/技术概况调研。
+> fresearchmethod `generic` 维度方法论。适用于通用市场/技术概况调研。
 
 ## 字段
 
