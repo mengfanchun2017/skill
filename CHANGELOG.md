@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.15.0] — 2026-11-23
+
+### Changed
+- **README 清理**：删 `flibaudit` / `fsysarchi` 残留引用（plugin 目录已删，但 README、
+  marketplace、www、fhub 仍挂着死链）；删无用的 English Summary；plugin 计数 30 → 28
+  （marketplace 原 30 条含 2 个死条目）。
+- **README 重写 lark-* 段**：原「lark-* skill 不用装」不成立 —— `lark-cli install` 内部
+  调 `npx skills add larksuite/cli -y -g` 自动装 28 个官方 skill 到 `~/.agents/skills/`
+  并 symlink 进 `~/.claude/skills/`，`lark-cli update` 联动升级。改为说明 lark-*
+  （单域操作层）与 `ffeishu`（跨域编排层）的分工。
+- **fresearchframe 结构重组**：「4 领域方法论」改为「研究维度方法论」（维度稳定、非 domain），
+  正文拆成 `references/frame-{customer,generic,market,technical}.md`（原 `market-analysis.md`
+  并入 `frame-market.md`），SKILL.md 142 → 92 行，只留维度判断表 + 流程 + 输出契约；
+  新增维度 = 加 `frame-<name>.md` + 判断表一行。
+- **fsearch 瘦身**：SKILL.md 265 → 121 行，实现细节（三源对比 / MiniMax 调用 / 提取流程 /
+  参数速查 / 去重代码 / 缓存）移入 `references/search-internals.md`；description 明确
+  「何时用 fsearch 而非裸 Tavily/Exa MCP」的边界。
+
+### Removed
+- `flibaudit` / `fsysarchi` 的 marketplace 死条目（source 指向不存在目录，`/plugin install` 会失败）。
+
 ## [0.14.0] — 2026-10-25
 
 ### Added
