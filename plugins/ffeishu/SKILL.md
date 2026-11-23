@@ -129,6 +129,13 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 
 **转换规则**：原文档用代码块 / ASCII 画的流程或架构，转飞书时**一律改成 whiteboard**，不保留代码块图。
 
+**实战选择（按图的复杂度）**：
+- 简单流程 / 时序 / 思维导图 → mermaid，`block_insert_after` 插 `<whiteboard type="mermaid">…</whiteboard>`
+- **复杂结构图（四象限、多关系架构、组织架构）→ SVG 导入**：`whiteboard +update --whiteboard-token <tok> --input_format svg --source @x.svg --overwrite --as user`，保留精确布局 + 大字号（mermaid/plantuml 的自动布局做不到）
+- plantuml 布局不可控（易堆叠重叠），仅在需要其语法特性时用；需 `@startuml`、虚线写 `.right.>`
+- mermaid 限制：`subgraph` 只竖向堆叠、节点字号不可调；要大字/精确布局就用 SVG
+- ⚠️ 更新已有画板**必须加 `--overwrite`**，否则默认增量追加（旧内容残留、图看起来叠加）
+
 工作流 G 的完整步骤 → `references/figure-workflow.md`（每图一子文档，含图/解读/代码 3 段，
 父文档只放链接不复制图）。
 

@@ -137,6 +137,9 @@ def is_sep(row):
 - [ ] 数据/分析图（折线/柱状等）走工作流 G（python 脚本 → 子文档）
 - [ ] 图表在对应内容位置嵌入，不在末尾堆砌
 - [ ] 白板用 `block_insert_after` 插入（`str_replace` 插 `<whiteboard>` 无效）；`type` 可为 mermaid/plantuml/svg/blank
+- [ ] **复杂结构图（四象限 / 多关系架构 / 组织架构）用 SVG 导入**：`whiteboard +update --input_format svg --overwrite`，可保留精确布局 + 大字号
+- [ ] mermaid 限制：`subgraph` 只竖排、字号不可调；plantuml 布局易堆叠（虚线 `.right.>`，需 `@startuml`）
+- [ ] 更新已有画板必须 `--overwrite`（默认增量追加会残留旧内容）
 
 #### 在 XML 内容里直接嵌画板（批量建文档用）
 `docs +create` / `docs +update --command overwrite` 的 XML 里可直接写画板，**一步到位**，无需再 block_insert_after：
