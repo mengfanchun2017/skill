@@ -3,9 +3,11 @@ name: fsearch
 user-invocable: true
 description: |
   搜索活动统一原语 — 分语言路由搜索（中文→MiniMax、英文→Tavily，额度耗尽切 Exa）、
-  自动 extract、按需 research、聚合去重、来源标注、搜索清单输出。
+  聚合去重、来源标注、搜索清单输出。
+  何时用本 skill 而非裸 Tavily/Exa MCP：需要①中英语言路由 ②额度耗尽自动 fallback
+  ③聚合去重 ④来源标签 ⑤搜索清单 时；单源单次简单搜索可直接用 MCP。
   被 fresearchframe / flogme / ffeishu 等需要外部调研的 skill 委托调用。
-  不含领域方法论（领域解读由 fresearchframe 负责）。
+  不含研究维度方法论（解读由 fresearchframe 负责）。
 allowed-tools: Read, Write, Bash,
   mcp__tavily__tavily_search, mcp__tavily__tavily_research,
   mcp__tavily__tavily_extract, mcp__tavily__tavily_crawl, mcp__tavily__tavily_map,
@@ -17,17 +19,18 @@ allowed-tools: Read, Write, Bash,
 
 query 规划（判语言选源）→ 主力搜索（额度耗尽切 Exa）→ extract 全文 → 聚合去重 → 来源标注 → 搜索清单输出
 
-**不含领域方法论**。领域方法论由 `fresearchframe` 负责。
+**不含研究维度方法论**（解读由 `fresearchframe` 负责）。
+实现细节（三源对比 / MiniMax 调用 / 提取流程 / 参数速查 / 去重代码 / 缓存）见 `references/search-internals.md`。
 
-## 配置
+## 何时用（含与裸 MCP 的边界）
 
-API key 配置：
-- **Tavily / Exa**：通过 Claude Code 的 MCP 配置管理
-  - **ccconfig 用户**：真实 key 放 `ccprivate/conf/claude.json`（symlink）
-  - **独立用户**：`~/.claude/settings.json` 的 `mcpServers` 中配置 Tavily + Exa
-- **MiniMax**：`ccprivate/conf/llm.json` 的 `llms.minimax31`（与 LLM 预设同一把 key，REST 直调，无需 MCP）
-
-## 何时用
+| 场景 | 走哪 |
+|------|------|
+| 单源、单次、简单搜索 | 直接用 Tavily / Exa MCP |
+| 中英语言路由、额度耗尽自动 fallback | **fsearch** |
+| 多源聚合去重 + 来源标签 + 搜索清单 | **fsearch** |
+| 中文搜索（MiniMax REST，无 MCP schema） | **fsearch** |
+| 任何 skill 需要外部调研 | 委派 fsearch |
 
 | 触发 | 调用方 |
 |------|--------|
@@ -36,23 +39,16 @@ API key 配置：
 | flogme 行业调研 | flogme |
 | ffeishu 文档调研 | ffeishu |
 
-## 搜索工作流
+## 配置
 
-搜索分三层，调用方按需选择策略，**不是必跑所有层**：
+- **Tavily / Exa**：通过 Claude Code 的 MCP 配置管理
+  - **ccconfig 用户**：真实 key 放 `ccprivate/conf/claude.json`（symlink）
+  - **独立用户**：`~/.claude/settings.json` 的 `mcpServers` 中配置 Tavily + Exa
+- **MiniMax**：`ccprivate/conf/llm.json` 的 `llms.minimax31`（与 LLM 预设同一把 key，REST 直调，无需 MCP）
 
-```
-query 规划（判断语言 + 策略选择）
-    │
-    ├─ [快速 ~1s] 主力单源 fast 探查（英文→Tavily fast，中文→MiniMax）
-    │
-    ├─ [标准 ~3s] 主力源搜索（按语言路由）→ 额度耗尽/报错 → Exa 兜底 → 自动 extract URL
-    │       │
-    │       └─ extract 不够？→ Exa fetch 补充全文
-    │
-    └─ [深度 ~30-150s] 标准搜索完成 → 用户确认 → Tavily Research（依赖 Tavily 额度）
-```
+## 搜索策略预设
 
-### 搜索策略预设
+搜索分三层，调用方按需选择，**不是必跑所有层**：
 
 | 策略 | 耗时 | 调用的源 | 适用场景 |
 |------|------|---------|---------|
@@ -71,162 +67,27 @@ query 规划（判断语言 + 策略选择）
 | 英文 | **Tavily Search** | → Exa Search |
 | 中文 | **MiniMax 搜索**（REST） | → Exa Search |
 
-- 判断依据是 query 主体语言；中英混合 query 优先按中文路由（MiniMax 中文强），拿不准可两源都跑
+- 判断依据是 query 主体语言；中英混合优先按中文路由（MiniMax 中文强），拿不准可两源都跑
 - **Tavily 超限特征**：`exceeds your plan's set usage limit` → 本次及后续直接切 Exa
 - **MiniMax 失败特征**：HTTP 非 200 / `base_resp.status_code != 0`（额度/鉴权）→ 切 Exa
-- 执行后必须逐条标注来源标签：`[tavily]`、`[minimax]`、`[exa]`、`[tavily-research]`。
-
-### MiniMax 搜索调用（中文主力）
-
-REST 端点，key 与 LLM 预设同一把（`ccprivate/conf/llm.json` 的 `llms.minimax31`）：
-
-```bash
-KEY=$(python3 -c "
-import sys, json, os
-sys.path.insert(0, os.path.expanduser('~/.claude/skills/ffeishu/references'))
-from config_env import ccprivate_root
-print(json.load(open(ccprivate_root()/'conf/llm.json'))['llms']['minimax31']['key'])")
-curl -s -X POST 'https://api.minimaxi.com/v1/coding_plan/search' \
-  -H "Authorization: Bearer $KEY" -H 'Content-Type: application/json' \
-  -d '{"q":"查询词"}'
-```
-
-- 返回：`{organic:[{title,link,snippet,date}], related_searches, base_resp}`
-- 走 coding_plan 搜索额度，非 Tavily 额度
-- 注意：`q` 只接受一个查询词；多 query 分多次请求
-
-### 三源对比
-
-| | MiniMax Search | Tavily Search | Exa Search |
-|--|---------------|--------------|------------|
-| 定位 | **中文主力** | **英文主力** | 兜底 + 中英补充 |
-| 速度 | ~1-2s | ~2-3s | ~3-4s |
-| 中文 | **强项**，本土站点覆盖好 | 能覆盖，但不如本土深 | 较强，社区/测评站多 |
-| 英文前沿 | 一般 | **强项**，arXiv/博客/新闻好 | 也可但不如 Tavily |
-| 失败切换 | → Exa | → Exa | 末位，无兜底 |
-| 内容提取 | snippet 为主 | Tavily extract（主力） | Exa fetch（补充） |
-
-### 提取全文流程
-
-```
-Tavily extract（主力）→ 拿到内容 → 直接用
-                      → Exa fetch（补充）→ 直接用
-                      → 需保留结构（标题层级/表格/公式/图）且国内可达 → MinerU crawl
-                      → 空壳/被拦截/需登录/SPA → Playwright（见 rules/search.md）
-                      → 均失败 → 跳过，备注即可
-```
-
-- **Tavily extract** 速度快、可并行，适合公开静态页面
-- **Exa fetch** 适合 Exa 搜索结果的页面内容提取
-- **MinerU crawl**（`mcp__mineru__parse_documents`）：国内可达 + 需结构保留时用，正文提取保留 `#` 标题层级/表格/公式/图片 URL，适合把网页正文嵌进文档。**限制**：服务器在中国区，github/aws/wikipedia 等境外站超时或被区域限制；目标站反爬（如飞书官网）会失败 → 回落 Tavily/Exa
-- 注意：Tavily extract 走 MCP Task 机制可能超时，超时后自动切 Exa fetch
-
-**网页源选型速查**：
-
-| 场景 | 首选 |
-|------|------|
-| 常规国内/外静态页 | Tavily extract |
-| Exa 搜索结果页 | Exa fetch |
-| 国内页 + 要保留结构嵌文档 | **MinerU crawl** |
-| 登录墙 / SPA / 反爬 | Playwright |
-
-### WebSearch（已禁用，勿调用）
-
-`WebSearch` 是 Claude Code **内置搜索工具**，在 `settings.json` `permissions.deny` 中被禁用（中国区域 US-only 不可用 + bridge 路由事故后恢复禁用）。
-
-fsearch **禁止调用 WebSearch**。搜索只走本 skill 的路由源（Tavily / MiniMax / Exa）。
+- 执行后**必须逐条标注来源标签**：`[tavily]`、`[minimax]`、`[exa]`、`[tavily-research]`
+- 调用细节与三源对比见 `references/search-internals.md`
 
 ## Tavily Research（深度综合）
 
 **不是并行搜索源**，而是标准搜索后的按需步骤。
 
-### 何时用
+- **何时用**：标准搜索有效结果 <5 条 / 调用方指定 `fsearch:deep` / 用户确认要深度报告
+- **执行**：标准搜索完成 → 收集已有 URL + query → 调 Tavily Research → 结果 append 到数据集，不覆盖
+- **速度**：`mini` ~10-30s（简版摘要）；`pro` ~60-150s（完整报告）。走 MCP 后台 Task 有排队延迟，交互等待中不建议用 `pro`
 
-- 标准搜索返回结果量不足（<5 条有效）
-- 调用方指定 `fsearch:deep` 策略
-- 用户确认需要深度报告
+## WebSearch（已禁用，勿调用）
 
-### 执行方式
-
-```
-标准搜索完成 → 收集已有 URL + query → 调 Tavily Research
-  └─ research 结果自动 append 到数据集，不覆盖已有搜索
-```
-
-### 速度说明
-
-| 模型 | 典型耗时 | 输出 |
-|------|---------|------|
-| `mini` | ~10-30s | 简版摘要 |
-| `pro` | ~60-150s | 完整研究报告，含归一化排名、敏感性分析等 |
-
-- Tavily Research 走 MCP 后台 Task 机制，有排队延迟
-- pro 模式下做多轮搜索+综合，产出质量高但耗时长
-- **不建议在用户交互等待中使用 pro**，适合后台批处理
-- 设 timeout 建议：mini=60s, pro=180s
-
-## Tavily 参数速查
-
-### Search 参数
-
-| 参数 | 可选值 | 说明 |
-|------|--------|------|
-| `search_depth` | `basic` / `advanced` / `fast` / `ultra-fast` | fast=低延迟高相关; ultra-fast=极低延迟 |
-| `topic` | `general` / `news` / `finance` | |
-| `time_range` | `day` / `week` / `month` / `year` | |
-| `start_date`/`end_date` | `YYYY-MM-DD` | |
-| `max_results` | `5`-`20` | |
-| `include_raw_content` | `false` / `markdown` / `text` | 返回原始页面内容 |
-| `include_domains` / `exclude_domains` | 域名列表 | |
-| `country` | ISO | |
-
-### Research 参数
-
-| 参数 | 可选值 | 说明 |
-|------|--------|------|
-| `model` | `mini` / `pro` / `auto` | mini < 30s, pro 60-150s |
-| `input` | 字符串 | 详细描述需求，越详细质量越高 |
-
-### 推荐默认值
-
-- 普通快速搜索：`tavily_search(query, search_depth="fast", max_results=5)`
-- 标准搜索：`tavily_search(query, search_depth="advanced", max_results=10)`
-- 新闻动态：`tavily_search(query, topic="news", time_range="week", search_depth="advanced")`
-
-## 双语搜索
-
-对需要全局覆盖的主题，同时执行中英文 query：
-
-```
-中文 query  → MiniMax 搜索（主力），耗尽 → Exa
-英文 query  → Tavily Search（主力），耗尽 → Exa
-```
-
-聚合、去重后标注 `[minimax]` / `[tavily]` / `[exa]`。
-
-## 聚合去重
-
-```python
-def deduplicate_by_url(results):
-    seen = set()
-    unique = []
-    for r in results:
-        url = r.get('url', '')
-        if url and url not in seen:
-            seen.add(url)
-            unique.append(r)
-    return unique
-```
-
-## Session 内缓存（搜索质量保底）
-
-- 同一 query 在 **15 分钟内**不重复执行搜索（依赖 Tavily MCP 自带缓存）
-- 当前无 skill 层缓存实现，调用方自行管理
-- 搜索质量保底：结果数 < 3 → 自动改写 query 重搜一次；仍 < 3 → 换源重搜（主力↔Exa 互换）或改用 `fsearch:deep`（需 Tavily 额度可用）
+`WebSearch` 是 Claude Code 内置搜索工具，在 `settings.json` `permissions.deny` 中被禁用（中国区域 US-only 不可用 + bridge 路由事故后恢复禁用）。fsearch **禁止调用 WebSearch**。
 
 ## 搜索清单（必须输出到调用方）
 
-每次搜索完成后，**必须输出搜索清单**给调用方，由调用方决定是否附加。
+每次搜索完成后，**必须输出搜索清单**，由调用方决定是否附加：
 
 ```markdown
 ## 搜索清单
@@ -235,32 +96,26 @@ def deduplicate_by_url(results):
 
 ### MiniMax（中文）
 1. [标题](url) `[minimax]`
-2. [标题](url) `[minimax]`
 
 ### Tavily（英文）
 1. [标题](url) `[tavily]`
-2. [标题](url) `[tavily]`
 
 ### Exa（兜底/补充）
 1. [标题](url) `[exa]`
-2. [标题](url) `[exa]`
 
 ### 核心引用
 | 来源 | 标题 | 用途 |
 |------|------|------|
 | [minimax] | ... | 数据 |
-| [tavily] | ... | 数据 |
-| [exa] | ... | 案例 |
 ```
 
 **规则**：
 - 每源 ≤5 条，每条标注 `[minimax]` / `[tavily]` / `[exa]` / `[tavily-research]`
 - 核心引用表选前 3 条，用途列填：定义 / 案例 / 数据 / 对比
-- 统一用 `[minimax]` `[tavily]` `[exa]` `[tavily-research]`，不用 `[tv]` `[web]` `[mm]` 等变体
-- 调用方决定是否附加到最终输出文档
+- 统一用这四种标签，不用 `[tv]` `[web]` `[mm]` 等变体
 
 ## 关联 Skills
 
-- `fresearchframe` — 4 领域方法论（最常调用方）
+- `fresearchframe` — 研究维度方法论（最常调用方，用本 skill 收集数据）
 - `flogme` — OKR/SUM 总结前的行业调研
 - `ffeishu` — 文档调研

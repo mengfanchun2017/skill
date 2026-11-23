@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin.json",
   "name": "fsearch",
   "version": "0.1.0",
-  "description": "搜索活动统一原语 — 分语言路由搜索（中文→MiniMax、英文→Tavily，额度耗尽切 Exa）、 自动 extract、按需 research、聚合去重、来源标注、搜索清单输出。 被 fresearchframe / flogme / ffeishu 等需要外部调研的 skill 委托调用。 不含领域方法论（领域解读由 fresearchframe 负责）。",
+  "description": "搜索活动统一原语 — 分语言路由搜索（中文→MiniMax、英文→Tavily，额度耗尽切 Exa）、 聚合去重、来源标注、搜索清单输出。 何时用本 skill 而非裸 Tavily/Exa MCP：需要中英语言路由 / 额度耗尽 fallback / 聚合去重 / 来源标签 / 搜索清单时；单源单次简单搜索可直接用 MCP。 被 fresearchframe / flogme / ffeishu 等需要外部调研的 skill 委托调用。 不含研究维度方法论（解读由 fresearchframe 负责）。",
   "author": {
     "name": "mengfanchun2017"
   },

@@ -253,6 +253,6 @@ v2（Claude 改）
 
 ## 关联 Skills
 - `fstander-report` — 内容规范、模板（必读）
-- `fresearchframe` — 领域方法论 (4 领域)
+- `fresearchframe` — 研究维度方法论（4 维度：customer/generic/market/technical）
 - `fresearchframe（Batch Mode）` — 批量研究
 - `ffeishu` — 飞书格式 + 图子文档 lark-cli 命令

@@ -47,7 +47,7 @@ flowchart TB
         feishu["ffeishu<br/>飞书文档"]
         pdf["fpdf / fdigest<br/>PDF 精排 / 大宗报告"]
         office["fpptx / fdocx / fxlsx<br/>Office 三件套"]
-        research["fsearch / fresearchframe<br/>搜索 / 调研方法论"]
+        research["fsearch / fresearchframe<br/>搜索原语 / 研究维度"]
         personal["flogme / fmoocrec<br/>个人管理 / 课程"]
         tool["fsecretcheck / fpostpone<br/>工具链"]
     end
@@ -296,8 +296,8 @@ libicu 缺失、git config 缺 name/email。
 | `fxlsx` | Excel .xlsx（OfficeCLI：公式/图表/条件格式/透视表） |
 | `fpdf` | PDF 精排上飞书（表格列宽/行内公式/高清图/参考文献） |
 | `fdigest` | 大宗报告阅读与归档（结构化抽取 → 段落检索 → 分层归档） |
-| `fsearch` | 搜索统一原语（中文→MiniMax、英文→Tavily，耗尽切 Exa） |
-| `fresearchframe` | 4 领域研究方法论（customer/generic/market/technical） |
+| `fsearch` | 搜索统一原语 — 中英语言路由 + 额度耗尽 fallback + 聚合去重 + 来源标注（实现细节见 `references/search-internals.md`） |
+| `fresearchframe` | 研究维度方法论 — 判维度（customer/generic/market/technical）→ 派 fsearch 收集 → 按 `references/frame-*.md` 解读 |
 | `flogme` | 个人管理（OKR/Worklog/Reflect/SUM，飞书 Base） |
 | `fmoocrec` | MOOC 课程推荐（QS 课程体系 + 学习路径） |
 | `fmashwork` | AI 图生 3D → 拓竹打印 |

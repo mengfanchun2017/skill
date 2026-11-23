@@ -37,7 +37,7 @@
     },
     {
       "name": "fresearchframe",
-      "description": "4 领域研究方法论 — customer（JTBD）/ generic / market / technical。 收到调研主题后自动判断领域，调 fsearch 收集数据，再按对应领域框架解读。 搜索工具调用委派 fsearch，本 skill 不直接调 API。",
+      "description": "研究维度方法论 — 按调研主题自动判断维度（customer / generic / market / technical）， 委派 fsearch 收集数据，再按对应维度框架（references/frame-*.md）解读输出。 4 个维度是稳定的研究视角，不常变；新增维度 = 加 references/frame-<name>.md + 判断表一行。 搜索工具调用委派 fsearch，本 skill 不直接调 API。 用法：用户说\"调研 XX\"/\"研究 XX\"/\"分析 XX 用户\"/\"市场趋势\"时触发。",
       "source": "./plugins/fresearchframe",
       "keywords": [
         "f"
@@ -69,7 +69,7 @@
     },
     {
       "name": "fsearch",
-      "description": "搜索活动统一原语 — 分语言路由搜索（中文→MiniMax、英文→Tavily，额度耗尽切 Exa）、 自动 extract、按需 research、聚合去重、来源标注、搜索清单输出。 被 fresearchframe / flogme / ffeishu 等需要外部调研的 skill 委托调用。 不含领域方法论（领域解读由 fresearchframe 负责）。",
+      "description": "搜索活动统一原语 — 分语言路由搜索（中文→MiniMax、英文→Tavily，额度耗尽切 Exa）、 聚合去重、来源标注、搜索清单输出。 何时用本 skill 而非裸 Tavily/Exa MCP：需要①中英语言路由 ②额度耗尽自动 fallback ③聚合去重 ④来源标签 ⑤搜索清单 时；单源单次简单搜索可直接用 MCP。 被 fresearchframe / flogme / ffeishu 等需要外部调研的 skill 委托调用。 不含研究维度方法论（解读由 fresearchframe 负责）。",
       "source": "./plugins/fsearch",
       "keywords": [
         "f"
