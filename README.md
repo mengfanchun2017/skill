@@ -345,8 +345,22 @@ libicu 缺失、git config 缺 name/email。
 各 plugin 用 `deps.txt` 声明 CLI 依赖。技能首次调用时检测可用性，缺失则提示装法，
 不自动安装（公开仓不放安装脚本）。
 
-**飞书 lark-\* skill 不用装**：`lark-cli` 是 monorepo，一次 `/plugin install` 会暴露
-26 个 lark-\* 技能，对话框噪音太大。本仓的 `ffeishu` 已封装所有 lark-cli 命令组合。
+**飞书 lark-\* skill 会随 lark-cli 自动装，挡不住**：`lark-cli install` 内部执行
+`npx skills add larksuite/cli -y -g`，把官方 28 个 lark-\* skill 装进 `~/.agents/skills/`
+并 symlink 到 `~/.claude/skills/`（Claude Code 官方不扫 `~/.agents/skills/`，靠这条
+symlink 发现）；`lark-cli update` 会连同 skills 一起同步（同 monorepo `larksuite/cli`）。
+所以「不装」不现实 —— 它们随 CLI 一起来。
+
+| | lark-\* skill（官方 28 个） | `ffeishu`（本仓） |
+|---|---|---|
+| 定位 | 单域准确操作层（doc/base/im/...） | 跨域编排层（整合/拆分/转换/对比 + 格式契约） |
+| 内容 | intent 路由表 + 各域 `references/` | 编排流程 + 委托 `fcore` 的固定命令模板 |
+| 升级 | 随 `lark-cli update` | 随 `/plugin update` |
+
+**分工建议**：单域操作（读文档、建 Base、发消息）读对应 lark-\* skill 的 `references/`，
+别在 `ffeishu` 里再抄一遍命令；`ffeishu` 只保留跨域组合与格式契约。28 个 skill 全量进
+skill 列表确实有噪音，但**官方不鼓励重复造封装层** —— 硬编码会让 `ffeishu` 在
+lark-cli 升级后过时（它现在已硬编码 79 处 lark-cli 命令）。
 
 ---
 
